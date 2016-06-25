@@ -1,0 +1,6 @@
+{
+  "name": "Zimageloader",
+  "tagline": "Android image loader library",
+  "body": "# ZImageLoader\r\nAndroid image loader library\r\n\r\n### Usage\r\nmvn:\r\n```\r\n<dependency>\r\n  <groupId>dev.nick</groupId>\r\n  <artifactId>imageloader</artifactId>\r\n  <version>0.1</version>\r\n  <type>pom</type>\r\n</dependency>\r\n```\r\n\r\ngradle\r\n```\r\ncompile 'dev.nick:imageloader:0.1'\r\n```\r\n\r\n### Samples\r\n\r\nConfig:\r\n```java\r\npublic class MyApp extends Application {\r\n    @Override\r\n    public void onCreate() {\r\n        super.onCreate();\r\n        ZImageLoader.init(this, new ZImageLoader.Config()\r\n                .setDebug(true)\r\n                .setPreferExternalStorageCache(true)\r\n                .setCacheThreads(2)\r\n                .setLoadingThreads(2)\r\n                .setEnableFileCache(true)\r\n                .setEnableMemCache(true));\r\n    }\r\n}\r\n```\r\n\r\nEasy useage:\r\n```java\r\n ZImageLoader.getInstance().displayImage(uri, holder.imageView,\r\n                        new DisplayOption(R.drawable.ic_broken_image_black_24dp,\r\n                                R.drawable.ic_cloud_download_black_24dp));\r\n```\r\n\r\nSupported content:\r\n```java\r\nfile://\r\ncontent://\r\nhttp://\r\nassets://\r\ndrawable://\r\n```",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
