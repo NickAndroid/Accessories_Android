@@ -1,6 +1,8 @@
 # ZImageLoader
 Android image loader library
 
+[ ![Download](https://api.bintray.com/packages/nickandroid/maven/imageloader/images/download.svg) ](https://bintray.com/nickandroid/maven/imageloader/_latestVersion)
+
 ![Logo](art/screen1.png)
 
 ### Usage
@@ -8,15 +10,15 @@ mvn:
 ```
 <dependency>
   <groupId>dev.nick</groupId>
-  <artifactId>eventbus</artifactId>
-  <version>0.2</version>
+  <artifactId>imageloader</artifactId>
+  <version>0.1</version>
   <type>pom</type>
 </dependency>
 ```
 
 gradle
 ```
-compile 'dev.nick:eventbus:0.2'
+compile 'dev.nick:imageloader:0.1'
 ```
 
 ### Samples
