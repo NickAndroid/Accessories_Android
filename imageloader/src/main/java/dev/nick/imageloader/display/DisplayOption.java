@@ -25,16 +25,21 @@ public class DisplayOption {
     @IdRes
     int imgResShowWhenLoading;
 
-    public DisplayOption(int imgResShowWhenError, int imgResShowWhenLoading) {
-        this.imgResShowWhenError = imgResShowWhenError;
-        this.imgResShowWhenLoading = imgResShowWhenLoading;
-    }
-
     public int getImgResShowWhenError() {
         return imgResShowWhenError;
     }
 
     public int getImgResShowWhenLoading() {
         return imgResShowWhenLoading;
+    }
+
+    public DisplayOption setImgResShowWhenError(int imgResShowWhenError) {
+        this.imgResShowWhenError = imgResShowWhenError;
+        return this;
+    }
+
+    public DisplayOption setImgResShowWhenLoading(int imgResShowWhenLoading) {
+        this.imgResShowWhenLoading = imgResShowWhenLoading;
+        return this;
     }
 }

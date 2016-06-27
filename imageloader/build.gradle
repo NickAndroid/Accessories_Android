@@ -6,15 +6,15 @@ def siteUrl = 'http://nickandroid.github.io/ZImageLoader/'    // project homepag
 def gitUrl = 'https://github.com/NickAndroid/ZImageLoader.git' // project git
 
 group = "dev.nick"
-version = "0.1"
+version = "0.2"
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 24
     buildToolsVersion "23.0.3"
 
     defaultConfig {
-        minSdkVersion 17
-        targetSdkVersion 23
+        minSdkVersion 14
+        targetSdkVersion 24
         versionCode 1
         versionName "1.0"
     }
@@ -29,7 +29,7 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:23.4.0'
+    compile 'com.android.support:appcompat-v7:24.0.0'
     compile files('libs/volley.jar')
 }
 

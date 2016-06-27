@@ -17,7 +17,9 @@
 package dev.nick.imageloader.loader;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 public enum ImageSource {
 
@@ -61,7 +63,18 @@ public enum ImageSource {
         }
     }), "http://"),
 
-    UNKNOWN(null, null);
+    UNKNOWN(new ImageFetcher() {
+        @Override
+        public Bitmap fetchFromUrl(@NonNull String url, ImageInfo info) throws Exception {
+            Log.w("ZImageLoader.ImgSource", "Using UNKNOWN ImageSource for url:" + url);
+            return null;
+        }
+
+        @Override
+        public void attachContext(Context context) {
+            // Nothing.
+        }
+    }, null);
 
     ImageFetcher fetcher;
     String prefix;
@@ -71,6 +84,7 @@ public enum ImageSource {
         this.prefix = prefix;
     }
 
+    @NonNull
     public ImageFetcher getFetcher(Context context) {
         fetcher.attachContext(context);
         return fetcher;

@@ -17,6 +17,7 @@
 package dev.nick.imageloader.cache.disk;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -24,7 +25,6 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresPermission;
 import android.support.annotation.WorkerThread;
-import android.util.AtomicFile;
 import android.util.Log;
 
 import java.io.File;
@@ -33,9 +33,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import dev.nick.imageloader.ZImageLoader;
 import dev.nick.imageloader.cache.Cache;
@@ -49,7 +47,7 @@ public class DiskCache implements Cache<String, Bitmap> {
 
     boolean debug;
 
-    List<FileOperator> mRunningOps;
+    final List<FileOperator> mRunningOps;
 
     public DiskCache(ZImageLoader.Config config, Context context) {
         preferToExternal = config.isPreferExternalStorageCache();
@@ -85,6 +83,7 @@ public class DiskCache implements Cache<String, Bitmap> {
         }
     }
 
+    @SuppressLint("InlinedApi")
     @Override
     @WorkerThread
     @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -129,7 +128,7 @@ public class DiskCache implements Cache<String, Bitmap> {
                 return null;
             }
 
-            AtomicFile atomicFile = new AtomicFile(in);
+            AtomicFileCompat atomicFile = new AtomicFileCompat(in);
 
             try {
                 FileInputStream fis = atomicFile.openRead();
@@ -137,10 +136,14 @@ public class DiskCache implements Cache<String, Bitmap> {
                 if (debug) {
                     Log.d("ZImageLoader.DiskCache", "Success read file cache:" + in.getAbsolutePath());
                 }
+                fis.close();
                 return out;
             } catch (FileNotFoundException e) {
                 if (debug)
                     Log.e("ZImageLoader.DiskCache", "Cache file do not exists:" + Log.getStackTraceString(e));
+                return null;
+            } catch (IOException e) {
+                Log.e("ZImageLoader.DiskCache", "Failed to close fis:" + Log.getStackTraceString(e));
                 return null;
             }
         }
@@ -212,14 +215,16 @@ public class DiskCache implements Cache<String, Bitmap> {
                     removeOp(this);
                     return false;
                 }
-                AtomicFile atomicFile = new AtomicFile(out);
+                AtomicFileCompat atomicFile = new AtomicFileCompat(out);
                 FileOutputStream fos = atomicFile.startWrite();
                 if (!in.compress(Bitmap.CompressFormat.PNG, 100 /*full*/, fos)) {
                     if (debug)
                         Log.e("ZImageLoader.DiskCache", "Failed to compress bitmap to file:" + out.getAbsolutePath());
                     removeOp(this);
+                    atomicFile.failWrite(fos);
                     return false;
                 }
+                atomicFile.finishWrite(fos);
             } catch (IOException e) {
                 // Something went wrong, nothing to do.
                 if (debug)

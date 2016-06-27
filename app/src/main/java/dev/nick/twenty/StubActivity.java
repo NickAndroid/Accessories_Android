@@ -103,8 +103,8 @@ public class StubActivity extends AppCompatActivity {
                 String uri = mArtworkUri + File.separator + tracks.get(position).getAlbumId();
 
                 ZImageLoader.getInstance().displayImage(uri, holder.imageView,
-                        new DisplayOption(R.drawable.ic_broken_image_black_24dp,
-                                R.drawable.ic_cloud_download_black_24dp));
+                        new DisplayOption().setImgResShowWhenLoading(R.drawable.ic_cloud_download_black_24dp
+                        ).setImgResShowWhenError(R.drawable.ic_broken_image_black_24dp));
 
                 return convertView;
             }
