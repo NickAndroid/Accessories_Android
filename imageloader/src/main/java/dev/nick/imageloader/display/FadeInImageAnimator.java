@@ -23,10 +23,15 @@ import android.widget.ImageView;
 
 public class FadeInImageAnimator implements ImageAnimator {
     @Override
-    public void animate(@NonNull ImageView imageView) {
+    public void animate(@NonNull ImageSettable settable) {
         AlphaAnimation fadeImage = new AlphaAnimation(0, 1);
-        fadeImage.setDuration(DEFAULT_DURATION);
+        fadeImage.setDuration(getDuration());
         fadeImage.setInterpolator(new DecelerateInterpolator());
-        imageView.startAnimation(fadeImage);
+        settable.startAnimation(fadeImage);
+    }
+
+    @Override
+    public long getDuration() {
+        return DEFAULT_DURATION;
     }
 }

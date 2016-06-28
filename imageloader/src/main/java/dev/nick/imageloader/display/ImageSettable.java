@@ -16,14 +16,17 @@
 
 package dev.nick.imageloader.display;
 
-import android.support.annotation.NonNull;
-import android.widget.ImageView;
+import android.graphics.Bitmap;
+import android.support.annotation.UiThread;
+import android.view.animation.Animation;
 
-public interface ImageAnimator {
-
-    long DEFAULT_DURATION = 600;
-
-    void animate(@NonNull ImageSettable settable);
-
-    long getDuration();
+public interface ImageSettable {
+    @UiThread
+    void setImageBitmap(Bitmap bitmap);
+    @UiThread
+    void setImageResource(int resId);
+    int getWidth();
+    int getHeight();
+    @UiThread
+    void startAnimation(Animation animation);
 }

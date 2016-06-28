@@ -24,4 +24,30 @@ public class ImageInfo {
         this.width = width;
         this.height = height;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ImageInfo info = (ImageInfo) o;
+
+        if (width != info.width) return false;
+        return height == info.height;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = width;
+        result = 31 * result + height;
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "ImageInfo{" +
+                "height=" + height +
+                ", width=" + width +
+                '}';
+    }
 }

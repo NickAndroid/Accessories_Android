@@ -18,6 +18,7 @@ package dev.nick.imageloader.cache;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.Process;
 import android.support.annotation.NonNull;
 
 import java.util.concurrent.ExecutorService;
@@ -60,6 +61,7 @@ public class CacheManager {
             mCacheService.execute(new Runnable() {
                 @Override
                 public void run() {
+                    Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
                     mDiskCache.cache(key, value);
                 }
             });

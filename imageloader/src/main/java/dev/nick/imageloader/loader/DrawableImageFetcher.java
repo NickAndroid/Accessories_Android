@@ -33,13 +33,9 @@ public class DrawableImageFetcher extends BaseImageFetcher {
 
         Resources resources = this.context.getResources();
 
-        Log.d("ImageLoader", "real url:" + splitter.getRealPath(url));
-
         int resId = resources.getIdentifier(splitter.getRealPath(url),
                 "drawable",
                 this.context.getPackageName());
-
-        Log.d("ImageLoader", "id:" + resId);
 
         if (resId <= 0) throw new Resources.NotFoundException("Res:" + url);
 
@@ -49,35 +45,19 @@ public class DrawableImageFetcher extends BaseImageFetcher {
         decodeOptions.inJustDecodeBounds = true;
         BitmapFactory.decodeResource(resources, resId, decodeOptions);
 
-        int actualWidth = decodeOptions.outWidth;
-        int actualHeight = decodeOptions.outHeight;
-
-        // Then compute the dimensions we would ideally like to decode to.
-        int desiredWidth = getResizedDimension(info.width, info.height,
-                actualWidth, actualHeight);
-        int desiredHeight = getResizedDimension(info.height, info.width,
-                actualHeight, actualWidth);
-
         // Decode to the nearest power of two scaling factor.
         decodeOptions.inJustDecodeBounds = false;
-        // TODO(ficus): Do we need this or is it okay since API 8 doesn't support it?
-        // decodeOptions.inPreferQualityOverSpeed = PREFER_QUALITY_OVER_SPEED;
         decodeOptions.inSampleSize =
-                findBestSampleSize(actualWidth, actualHeight, desiredWidth, desiredHeight);
-        Bitmap tempBitmap =
-                BitmapFactory.decodeResource(resources, resId, decodeOptions);
-
-        Bitmap bitmap;
-
-        // If necessary, scale down to the maximal acceptable size.
-        if (tempBitmap != null && (tempBitmap.getWidth() > desiredWidth ||
-                tempBitmap.getHeight() > desiredHeight)) {
-            bitmap = Bitmap.createScaledBitmap(tempBitmap,
-                    desiredWidth, desiredHeight, true);
-            tempBitmap.recycle();
-        } else {
-            bitmap = tempBitmap;
+                computeSampleSize(decodeOptions, UNCONSTRAINED,
+                        (info.height * info.height == 0 ?
+                                MAX_NUM_PIXELS_THUMBNAIL
+                                : info.width * info.height));
+        Bitmap tempBitmap;
+        try {
+            tempBitmap = BitmapFactory.decodeResource(resources, resId, decodeOptions);
+        } catch (OutOfMemoryError error) {
+            throw new RuntimeException("OutOfMemoryError:" + Log.getStackTraceString(error));
         }
-        return bitmap;
+        return tempBitmap;
     }
 }

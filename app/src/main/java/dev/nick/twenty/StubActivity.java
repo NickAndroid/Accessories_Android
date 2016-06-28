@@ -17,8 +17,10 @@
 package dev.nick.twenty;
 
 import android.Manifest;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
@@ -34,11 +36,10 @@ import com.nick.scalpel.annotation.binding.FindView;
 import com.nick.scalpel.annotation.binding.MainThreadHandler;
 import com.nick.scalpel.annotation.request.RequirePermission;
 
-import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import dev.nick.imageloader.ZImageLoader;
-import dev.nick.imageloader.display.DisplayOption;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
 public class StubActivity extends AppCompatActivity {
@@ -61,13 +62,14 @@ public class StubActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.stub);
         Scalpel.getInstance().wire(this);
+        TwentyApp.DataCleanManager.cleanExternalCache(this);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
-        final List<Track> tracks = MediaUtils.getTrackList(this);
+        final List<Track> tracks = gallery();
 
         BaseAdapter adapter = new BaseAdapter() {
             @Override
@@ -90,21 +92,23 @@ public class StubActivity extends AppCompatActivity {
 
                 ViewHolder holder;
 
-                if (convertView == null) {
-                    convertView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.item, parent, false);
-                    holder = new ViewHolder(convertView);
-                    convertView.setTag(holder);
-                } else {
-                    holder = (ViewHolder) convertView.getTag();
-                }
+//                if (convertView == null) {
+//                    convertView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.item, parent, false);
+//                    holder = new ViewHolder(convertView);
+//                    convertView.setTag(holder);
+//                } else {
+//                    holder = (ViewHolder) convertView.getTag();
+//                }
+
+                convertView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.item, parent, false);
+                holder = new ViewHolder(convertView);
 
                 holder.textView.setText(tracks.get(position).getTitle());
 
-                String uri = mArtworkUri + File.separator + tracks.get(position).getAlbumId();
+                // String uri = mArtworkUri + File.separator + tracks.get(position).getAlbumId();
+                String uri = "file://" + tracks.get(position).getUrl();
 
-                ZImageLoader.getInstance().displayImage(uri, holder.imageView,
-                        new DisplayOption().setImgResShowWhenLoading(R.drawable.ic_cloud_download_black_24dp
-                        ).setImgResShowWhenError(R.drawable.ic_broken_image_black_24dp));
+                ZImageLoader.getInstance().displayImage(uri, holder.imageView);
 
                 return convertView;
             }
@@ -123,6 +127,32 @@ public class StubActivity extends AppCompatActivity {
         public ViewHolder(View convert) {
             Scalpel.getInstance().wire(convert, this);
         }
+    }
+
+    List<Track> gallery() {
+
+        List<Track> tracks = new ArrayList<>();
+
+        Cursor cursor = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, null, null, null, null);
+        if (cursor == null || cursor.getCount() == 0) return tracks;
+
+        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+            int nameIndex = cursor.getColumnIndex(MediaStore.Images.Media.DISPLAY_NAME);
+            int pathIndex = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
+
+            String name = cursor.getString(nameIndex);
+            String path = cursor.getString(pathIndex);
+
+            Track track = new Track();
+            track.setTitle(name);
+            track.setUrl(path);
+
+            tracks.add(track);
+        }
+
+        cursor.close();
+
+        return tracks;
     }
 
 }

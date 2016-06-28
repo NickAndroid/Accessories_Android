@@ -33,7 +33,7 @@ public class ContentImageFetcher extends BaseImageFetcher {
     }
 
     @Override
-    public Bitmap fetchFromUrl(@NonNull String url, ImageInfo info) throws Exception{
+    public Bitmap fetchFromUrl(@NonNull String url, ImageInfo info) throws Exception {
 
         Uri uri = Uri.parse(url);
 
@@ -42,7 +42,12 @@ public class ContentImageFetcher extends BaseImageFetcher {
         Cursor cursor = context.getContentResolver().query(uri, pro, null, null, null);
 
         if (cursor == null) {
-            logW("No cursor found for url:" + url);
+            if (debug) logW("No cursor found for url:" + url);
+            return null;
+        }
+
+        if (cursor.getCount() == 0) {
+            if (debug) logW("Cursor count is ZERO for url:" + url);
             return null;
         }
 

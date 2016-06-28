@@ -67,7 +67,7 @@ public class DiskCache implements Cache<String, Bitmap> {
     public void cache(@NonNull String key, Bitmap value) {
 
         if (debug) {
-            Log.d("ZImageLoader.DiskCache", "Trying to cache:" + key);
+            Log.d("DiskCache", "Trying to cache:" + key);
         }
 
         if (preferToExternal && mExternalCacheDir != null
@@ -124,7 +124,7 @@ public class DiskCache implements Cache<String, Bitmap> {
 
             if (!in.exists()) {
                 if (debug)
-                    Log.e("ZImageLoader.DiskCache", "Cache file do not exists:" + in.getAbsolutePath());
+                    Log.e("DiskCache", "Cache file do not exists:" + in.getAbsolutePath());
                 return null;
             }
 
@@ -134,16 +134,16 @@ public class DiskCache implements Cache<String, Bitmap> {
                 FileInputStream fis = atomicFile.openRead();
                 Bitmap out = BitmapFactory.decodeStream(fis);
                 if (debug) {
-                    Log.d("ZImageLoader.DiskCache", "Success read file cache:" + in.getAbsolutePath());
+                    Log.d("DiskCache", "Success read file cache:" + in.getAbsolutePath());
                 }
                 fis.close();
                 return out;
             } catch (FileNotFoundException e) {
                 if (debug)
-                    Log.e("ZImageLoader.DiskCache", "Cache file do not exists:" + Log.getStackTraceString(e));
+                    Log.e("DiskCache", "Cache file do not exists:" + Log.getStackTraceString(e));
                 return null;
             } catch (IOException e) {
-                Log.e("ZImageLoader.DiskCache", "Failed to close fis:" + Log.getStackTraceString(e));
+                Log.e("DiskCache", "Failed to close fis:" + Log.getStackTraceString(e));
                 return null;
             }
         }
@@ -195,7 +195,7 @@ public class DiskCache implements Cache<String, Bitmap> {
 
             if (out.exists()) {
                 if (debug)
-                    Log.e("ZImageLoader.DiskCache", "Skip cache exists file:" + out.getAbsolutePath());
+                    Log.e("DiskCache", "Skip cache exists file:" + out.getAbsolutePath());
                 removeOp(this);
                 return true;
             }
@@ -203,7 +203,7 @@ public class DiskCache implements Cache<String, Bitmap> {
             if (!out.getParentFile().exists() && !out.getParentFile().mkdirs()) {
                 // Something went wrong, nothing to do.
                 if (debug)
-                    Log.e("ZImageLoader.DiskCache", "Failed to create dirs:" + out.getParentFile().getAbsolutePath());
+                    Log.e("DiskCache", "Failed to create dirs:" + out.getParentFile().getAbsolutePath());
                 removeOp(this);
                 return false;
             }
@@ -211,7 +211,7 @@ public class DiskCache implements Cache<String, Bitmap> {
                 if (!out.createNewFile()) {
                     // Something went wrong, nothing to do.
                     if (debug)
-                        Log.e("ZImageLoader.DiskCache", "Failed to create file:" + out.getAbsolutePath());
+                        Log.e("DiskCache", "Failed to create file:" + out.getAbsolutePath());
                     removeOp(this);
                     return false;
                 }
@@ -219,7 +219,7 @@ public class DiskCache implements Cache<String, Bitmap> {
                 FileOutputStream fos = atomicFile.startWrite();
                 if (!in.compress(Bitmap.CompressFormat.PNG, 100 /*full*/, fos)) {
                     if (debug)
-                        Log.e("ZImageLoader.DiskCache", "Failed to compress bitmap to file:" + out.getAbsolutePath());
+                        Log.e("DiskCache", "Failed to compress bitmap to file:" + out.getAbsolutePath());
                     removeOp(this);
                     atomicFile.failWrite(fos);
                     return false;
@@ -228,13 +228,13 @@ public class DiskCache implements Cache<String, Bitmap> {
             } catch (IOException e) {
                 // Something went wrong, nothing to do.
                 if (debug)
-                    Log.e("ZImageLoader.DiskCache", "IOException when create file:" + Log.getStackTraceString(e));
+                    Log.e("DiskCache", "IOException when create file:" + Log.getStackTraceString(e));
                 removeOp(this);
                 return false;
             }
 
             if (debug) {
-                Log.d("ZImageLoader.DiskCache", "Success write bitmap to:" + out.getAbsolutePath());
+                Log.d("DiskCache", "Success write bitmap to:" + out.getAbsolutePath());
             }
             removeOp(this);
             return true;

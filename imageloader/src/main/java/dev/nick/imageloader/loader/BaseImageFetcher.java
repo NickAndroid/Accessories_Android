@@ -18,10 +18,17 @@ package dev.nick.imageloader.loader;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
 class BaseImageFetcher implements ImageFetcher {
+
+    static final int UNCONSTRAINED = -1;
+
+    /* Maximum pixels size for created bitmap. */
+    static final int MAX_NUM_PIXELS_THUMBNAIL = 512 * 384;
+    static final int MAX_NUM_PIXELS_MICRO_THUMBNAIL = 160 * 120;
 
     protected PathSplitter<String> splitter;
 
@@ -51,61 +58,66 @@ class BaseImageFetcher implements ImageFetcher {
         Log.d("Nick", String.valueOf(msg));
     }
 
-
-    /**
-     * Scales one side of a rectangle to fit aspect ratio.
+    /*
+     * Compute the sample size as a function of minSideLength
+     * and maxNumOfPixels.
+     * minSideLength is used to specify that minimal width or height of a
+     * bitmap.
+     * maxNumOfPixels is used to specify the maximal size in pixels that is
+     * tolerable in terms of memory usage.
      *
-     * @param maxPrimary      Maximum size of the primary dimension (i.e. width for
-     *                        max width), or zero to maintain aspect ratio with secondary
-     *                        dimension
-     * @param maxSecondary    Maximum size of the secondary dimension, or zero to
-     *                        maintain aspect ratio with primary dimension
-     * @param actualPrimary   Actual size of the primary dimension
-     * @param actualSecondary Actual size of the secondary dimension
+     * The function returns a sample size based on the constraints.
+     * Both size and minSideLength can be passed in as IImage.UNCONSTRAINED,
+     * which indicates no care of the corresponding constraint.
+     * The functions prefers returning a sample size that
+     * generates a smaller bitmap, unless minSideLength = IImage.UNCONSTRAINED.
+     *
+     * Also, the function rounds up the sample size to a power of 2 or multiple
+     * of 8 because BitmapFactory only honors sample size this way.
+     * For example, BitmapFactory downsamples an image by 2 even though the
+     * request is 3. So we round up the sample size to avoid OOM.
      */
-    protected int getResizedDimension(int maxPrimary, int maxSecondary, int actualPrimary,
-                                      int actualSecondary) {
-        // If no dominant value at all, just return the actual.
-        if (maxPrimary == 0 && maxSecondary == 0) {
-            return actualPrimary;
+    protected int computeSampleSize(BitmapFactory.Options options,
+                                    int minSideLength, int maxNumOfPixels) {
+        int initialSize = computeInitialSampleSize(options, minSideLength,
+                maxNumOfPixels);
+
+        int roundedSize;
+        if (initialSize <= 8) {
+            roundedSize = 1;
+            while (roundedSize < initialSize) {
+                roundedSize <<= 1;
+            }
+        } else {
+            roundedSize = (initialSize + 7) / 8 * 8;
         }
 
-        // If primary is unspecified, scale primary to match secondary's scaling ratio.
-        if (maxPrimary == 0) {
-            double ratio = (double) maxSecondary / (double) actualSecondary;
-            return (int) (actualPrimary * ratio);
-        }
-
-        if (maxSecondary == 0) {
-            return maxPrimary;
-        }
-
-        double ratio = (double) actualSecondary / (double) actualPrimary;
-        int resized = maxPrimary;
-        if (resized * ratio > maxSecondary) {
-            resized = (int) (maxSecondary / ratio);
-        }
-        return resized;
+        return roundedSize;
     }
 
-    /**
-     * Returns the largest power-of-two divisor for use in downscaling a bitmap
-     * that will not result in the scaling past the desired dimensions.
-     *
-     * @param actualWidth   Actual width of the bitmap
-     * @param actualHeight  Actual height of the bitmap
-     * @param desiredWidth  Desired width of the bitmap
-     * @param desiredHeight Desired height of the bitmap
-     */
-    protected int findBestSampleSize(
-            int actualWidth, int actualHeight, int desiredWidth, int desiredHeight) {
-        double wr = (double) actualWidth / desiredWidth;
-        double hr = (double) actualHeight / desiredHeight;
-        double ratio = Math.min(wr, hr);
-        float n = 1.0f;
-        while ((n * 2) <= ratio) {
-            n *= 2;
+    private int computeInitialSampleSize(BitmapFactory.Options options,
+                                         int minSideLength, int maxNumOfPixels) {
+        double w = options.outWidth;
+        double h = options.outHeight;
+
+        int lowerBound = (maxNumOfPixels == UNCONSTRAINED) ? 1 :
+                (int) Math.ceil(Math.sqrt(w * h / maxNumOfPixels));
+        int upperBound = (minSideLength == UNCONSTRAINED) ? 128 :
+                (int) Math.min(Math.floor(w / minSideLength),
+                        Math.floor(h / minSideLength));
+
+        if (upperBound < lowerBound) {
+            // return the larger one when there is no overlapping zone.
+            return lowerBound;
         }
-        return (int) n;
+
+        if ((maxNumOfPixels == UNCONSTRAINED) &&
+                (minSideLength == UNCONSTRAINED)) {
+            return 1;
+        } else if (minSideLength == UNCONSTRAINED) {
+            return lowerBound;
+        } else {
+            return upperBound;
+        }
     }
 }

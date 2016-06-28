@@ -20,9 +20,13 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
+import android.os.Process;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.ImageView;
 
+import java.lang.ref.WeakReference;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -30,10 +34,14 @@ import dev.nick.imageloader.cache.CacheManager;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.display.FadeInImageAnimator;
 import dev.nick.imageloader.display.ImageAnimator;
+import dev.nick.imageloader.display.ImageSettable;
+import dev.nick.imageloader.display.ImageViewDelegate;
 import dev.nick.imageloader.loader.ImageInfo;
 import dev.nick.imageloader.loader.ImageSource;
 
-public class ZImageLoader {
+public class ZImageLoader implements Handler.Callback {
+
+    static final String LOG_TAG = "ZImageLoader";
 
     private Context mContext;
 
@@ -52,9 +60,9 @@ public class ZImageLoader {
     private ZImageLoader(Context context, Config config) {
         this.mContext = context;
         this.mConfig = config;
-        this.mUIThreadHandler = new Handler(Looper.getMainLooper());
+        this.mUIThreadHandler = new Handler(Looper.getMainLooper(), this);
         this.mCacheManager = new CacheManager(config, context);
-        this.mLoaderService = Executors.newFixedThreadPool(mConfig.loadingThreads);
+        this.mLoaderService = Executors.newSingleThreadExecutor();
     }
 
     public synchronized static void init(Context context, Config config) {
@@ -69,7 +77,7 @@ public class ZImageLoader {
         return sLoader;
     }
 
-    public ImageAnimator getDefaultAnimator() {
+    private ImageAnimator getDefaultAnimator() {
         if (mDefaultImageAnimator == null) mDefaultImageAnimator = new FadeInImageAnimator();
         return mDefaultImageAnimator;
     }
@@ -93,67 +101,132 @@ public class ZImageLoader {
         // 1. Get from cache.
         // 2. If no cache, start a loading task.
         // 3. Cache the loaded.
-        mCacheManager.get(url, new CacheManager.Callback() {
-            @Override
-            public void onResult(final Bitmap cached) {
-                if (cached != null) {
-                    mUIThreadHandler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            applyImageSetting(cached, view, getDefaultAnimator());// Do not animate when loaded from cache?
-                        }
-                    });
-                } else {
-                    displayImageAfterLoaded(url, view, animator, option);
+        final ImageViewDelegate viewDelegate = new ImageViewDelegate(new WeakReference<ImageView>(view));
+        if (mConfig.isEnableMemCache() || mConfig.isEnableFileCache()) {
+            mCacheManager.get(url, new CacheManager.Callback() {
+                @Override
+                public void onResult(final Bitmap cached) {
+                    if (cached != null) {
+                        mUIThreadHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                applyImageSetting(cached,
+                                        viewDelegate,
+                                        getDefaultAnimator());// Do not animate when loaded from cache?
+                            }
+                        });
+                    } else {
+                        displayImageAfterLoaded(url, viewDelegate, animator, option);
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            displayImageAfterLoaded(url, viewDelegate, animator, option);
+        }
     }
 
     private void displayImageAfterLoaded(final String url,
-                                         final ImageView view,
+                                         final ImageSettable settable,
                                          final ImageAnimator animator,
                                          final DisplayOption option) {
 
-        final int imgResWhenLoading = option == null ? 0 : option.getImgResShowWhenLoading();
-        final int imgResWhenError = option == null ? 0 : option.getImgResShowWhenError();
+        ImageInfo info = new ImageInfo(settable.getWidth(), settable.getHeight());
 
-        mLoaderService.execute(new LoadTask(url, new ImageInfo(view.getWidth(), view.getHeight()),
-                new TaskCallback<Bitmap>() {
-                    @Override
-                    public void onComplete(Bitmap result) {
-                        if (result == null) return;
-                        applyImageSetting(result, view, animator);
-                        mCacheManager.cache(url, result);
-                    }
+        int viewId = createIdOfImageSettable(settable);
 
-                    @Override
-                    public void onStart() {
-                        if (imgResWhenLoading > 0) {
-                            applyImageSetting(imgResWhenLoading, view, null);
-                        }
-                    }
+        TaskCallback<Bitmap> callback = new ImageTaskCallback(new WeakReference<ImageAnimator>(animator),
+                option, url, new WeakReference<ImageSettable>(settable));
 
-                    @Override
-                    public void onError(String errMsg) {
-                        if (imgResWhenError > 0) {
-                            applyImageSetting(imgResWhenError, view, null);
-                        }
-                        if (mConfig.isDebug()) Log.e("ZImageLoader", errMsg);
-                    }
-                }));
+        mLoaderService.execute(new LoadTask(callback, viewId, info, url));
     }
 
-    private void applyImageSetting(Bitmap bitmap, ImageView imageView, ImageAnimator animator) {
-        imageView.setImageBitmap(bitmap);
-        if (animator != null)
-            animator.animate(imageView);
+    private int createIdOfImageSettable(ImageSettable view) {
+        return view.hashCode();
     }
 
-    private void applyImageSetting(int resId, ImageView imageView, ImageAnimator animator) {
-        imageView.setImageResource(resId);
-        if (animator != null)
-            animator.animate(imageView);
+    private void applyImageSetting(Bitmap bitmap, ImageSettable settable, ImageAnimator animator) {
+        if (settable != null) {
+            BitmapImageSettings settings = new BitmapImageSettings(animator, new WeakReference<Bitmap>(bitmap), settable);
+            // mUIThreadHandler.obtainMessage(0, settings).sendToTarget();
+            mUIThreadHandler.post(settings);
+        }
+    }
+
+    private void applyImageSetting(int resId, ImageSettable settable, ImageAnimator animator) {
+        if (settable != null) {
+            ResImageSettings settings = new ResImageSettings(animator, resId, settable);
+            // mUIThreadHandler.obtainMessage(0, settings).sendToTarget();
+            mUIThreadHandler.post(settings);
+        }
+    }
+
+    @Override
+    public boolean handleMessage(Message message) {
+        Runnable settings = (Runnable) message.obj;
+        settings.run();
+        return true;
+    }
+
+    class BitmapImageSettings implements Runnable {
+
+        ImageAnimator animator;
+        @NonNull
+        ImageSettable settable;
+        WeakReference<Bitmap> bitmap;
+
+        public BitmapImageSettings(ImageAnimator animator, WeakReference<Bitmap> bitmap, @NonNull ImageSettable settable) {
+            this.animator = animator;
+            this.bitmap = bitmap;
+            this.settable = settable;
+        }
+
+        void apply() {
+            applyImageSetting(bitmap.get(), settable, animator);
+        }
+
+        void applyImageSetting(Bitmap bitmap, ImageSettable settable, ImageAnimator animator) {
+            if (bitmap != null) {
+                settable.setImageBitmap(bitmap);
+                if (animator != null) {
+                    animator.animate(settable);
+                }
+            }
+        }
+
+        @Override
+        public void run() {
+            apply();
+        }
+    }
+
+    class ResImageSettings implements Runnable {
+
+        ImageAnimator animator;
+        @NonNull
+        ImageSettable settable;
+        int resId;
+
+        public ResImageSettings(ImageAnimator animator, int resId, @NonNull ImageSettable settable) {
+            this.animator = animator;
+            this.resId = resId;
+            this.settable = settable;
+        }
+
+        void apply() {
+            applyImageSetting(resId, settable, animator);
+        }
+
+        void applyImageSetting(int resId, ImageSettable settable, ImageAnimator animator) {
+            settable.setImageResource(resId);
+            if (animator != null) {
+                animator.animate(settable);
+            }
+        }
+
+        @Override
+        public void run() {
+            apply();
+        }
     }
 
     class LoadTask implements Runnable {
@@ -162,59 +235,128 @@ public class ZImageLoader {
         ImageInfo info;
         TaskCallback<Bitmap> callback;
 
-        public LoadTask(String url, ImageInfo info, TaskCallback<Bitmap> callback) {
-            this.url = url;
-            this.info = info;
+        int id;
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            LoadTask loadTask = (LoadTask) o;
+
+            if (id != loadTask.id) return false;
+            if (!url.equals(loadTask.url)) return false;
+            return info != null ? info.equals(loadTask.info) : loadTask.info == null;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = url.hashCode();
+            result = 31 * result + (info != null ? info.hashCode() : 0);
+            result = 31 * result + id;
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "LoadTask{" +
+                    ", id=" + id +
+                    ", info=" + info +
+                    ", url='" + url + '\'' +
+                    '}';
+        }
+
+        public LoadTask(TaskCallback<Bitmap> callback, int id, ImageInfo info, String url) {
             this.callback = callback;
+            this.id = id;
+            this.info = info;
+            this.url = url;
         }
 
         @Override
         public void run() {
-            Runnable startRunnable = new Runnable() {
-                @Override
-                public void run() {
-                    callback.onStart();
-                }
-            };
-            mUIThreadHandler.post(startRunnable);
+
+            Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+
+            callback.onStart();
+
             ImageSource source = ImageSource.of(url);
-            final Bitmap bitmap;
+
+            Bitmap bitmap;
             try {
                 bitmap = source.getFetcher(mContext).fetchFromUrl(url, info);
                 if (bitmap == null) {
-                    callOnError("Unknown error.");
+                    callback.onError("No image got.");
                     return;
                 }
-                Runnable finishRunnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        callback.onComplete(bitmap);
-                    }
-                };
-                mUIThreadHandler.post(finishRunnable);
+                callback.onComplete(bitmap, isDirty());
             } catch (Exception e) {
-                e.printStackTrace();
-                callOnError("Error when fetch image:" + Log.getStackTraceString(e));
+                callback.onError("Error when fetch image:" + Log.getStackTraceString(e));
             }
         }
 
-        void callOnError(final String errMsg) {
-            Runnable errorRunnable = new Runnable() {
-                @Override
-                public void run() {
-                    callback.onError(errMsg);
-                }
-            };
-            mUIThreadHandler.post(errorRunnable);
+        boolean isDirty() {
+            return false;
         }
+
     }
 
     interface TaskCallback<T> {
         void onStart();
 
-        void onComplete(T result);
+        void onComplete(T result, boolean dirty);
 
         void onError(String errMsg);
+    }
+
+    class ImageTaskCallback implements TaskCallback<Bitmap> {
+
+        WeakReference<ImageSettable> viewWeakReference;
+        WeakReference<ImageAnimator> animatorWeakReference;
+        String url;
+        DisplayOption option;
+
+        public ImageTaskCallback(WeakReference<ImageAnimator> animatorWeakReference,
+                                 DisplayOption option, String url,
+                                 WeakReference<ImageSettable> viewWeakReference) {
+            this.animatorWeakReference = animatorWeakReference;
+            this.option = option;
+            this.url = url;
+            this.viewWeakReference = viewWeakReference;
+        }
+
+        @Override
+        public void onStart() {
+            if (option != null) {
+                int showWhenLoading = option.getImgResShowWhenLoading();
+                if (showWhenLoading > 0)
+                    applyImageSetting(showWhenLoading, viewWeakReference.get(), null);
+            } else {
+                applyImageSetting(null, viewWeakReference.get(), null);
+            }
+        }
+
+        @Override
+        public void onComplete(Bitmap result, boolean dirty) {
+            if (result == null) return;
+            applyImageSetting(result, viewWeakReference.get(), animatorWeakReference.get());
+            if (!dirty) {
+
+            } else if (mConfig.debug) {
+                Log.d(LOG_TAG, "Skip settings for dirty image of url:" + url);
+            }
+            mCacheManager.cache(url, result);
+        }
+
+        @Override
+        public void onError(String errMsg) {
+            if (option != null) {
+                int showWhenError = option.getImgResShowWhenError();
+                if (showWhenError > 0)
+                    applyImageSetting(showWhenError, viewWeakReference.get(), null);
+            }
+            if (mConfig.isDebug()) Log.e(LOG_TAG, errMsg);
+        }
     }
 
     public static class Config {

@@ -18,8 +18,8 @@ package dev.nick.imageloader.loader;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Rect;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -32,10 +32,10 @@ public class FileImageFetcher extends BaseImageFetcher {
 
     @Override
     public Bitmap fetchFromUrl(@NonNull String url, ImageInfo info) throws Exception {
+
         String path = splitter.getRealPath(url);
         File file = new File(path);
         if (!file.exists()) {
-            logW("File: " + url + " do NOT exist.");
             throw new FileNotFoundException("File:" + url);
         }
 
@@ -45,34 +45,21 @@ public class FileImageFetcher extends BaseImageFetcher {
         decodeOptions.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(path, decodeOptions);
 
-        int actualWidth = decodeOptions.outWidth;
-        int actualHeight = decodeOptions.outHeight;
-
-        // Then compute the dimensions we would ideally like to decode to.
-        int desiredWidth = getResizedDimension(info.width, info.height,
-                actualWidth, actualHeight);
-        int desiredHeight = getResizedDimension(info.height, info.width,
-                actualHeight, actualWidth);
-
         // Decode to the nearest power of two scaling factor.
         decodeOptions.inJustDecodeBounds = false;
-        decodeOptions.inPreferQualityOverSpeed = true;
         decodeOptions.inSampleSize =
-                findBestSampleSize(actualWidth, actualHeight, desiredWidth, desiredHeight);
-        Bitmap tempBitmap =
-                BitmapFactory.decodeFile(path, decodeOptions);
+                computeSampleSize(decodeOptions, UNCONSTRAINED,
+                        (info.height * info.height == 0 ?
+                                MAX_NUM_PIXELS_THUMBNAIL
+                                : info.width * info.height));
 
-        Bitmap bitmap;
-
-        // If necessary, scale down to the maximal acceptable size.
-        if (tempBitmap != null && (tempBitmap.getWidth() > desiredWidth ||
-                tempBitmap.getHeight() > desiredHeight)) {
-            bitmap = Bitmap.createScaledBitmap(tempBitmap,
-                    desiredWidth, desiredHeight, true);
-            tempBitmap.recycle();
-        } else {
-            bitmap = tempBitmap;
+        Bitmap tempBitmap;
+        try {
+            tempBitmap = BitmapFactory.decodeFile(path, decodeOptions);
+        } catch (OutOfMemoryError error) {
+            throw new RuntimeException("OutOfMemoryError:" + Log.getStackTraceString(error));
         }
-        return bitmap;
+
+        return tempBitmap;
     }
 }
