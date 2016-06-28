@@ -153,7 +153,7 @@ public class ZImageLoader implements Handler.Callback {
 
     private void applyImageSetting(Bitmap bitmap, ImageSettable settable, ImageAnimator animator) {
         if (settable != null) {
-            BitmapImageSettings settings = new BitmapImageSettings(animator, new WeakReference<Bitmap>(bitmap), settable);
+            BitmapImageSettings settings = new BitmapImageSettings(animator, new WeakReference<>(bitmap), settable);
             // mUIThreadHandler.obtainMessage(0, settings).sendToTarget();
             mUIThreadHandler.post(settings);
         }
@@ -181,7 +181,8 @@ public class ZImageLoader implements Handler.Callback {
         ImageSettable settable;
         WeakReference<Bitmap> bitmap;
 
-        public BitmapImageSettings(ImageAnimator animator, WeakReference<Bitmap> bitmap, @NonNull ImageSettable settable) {
+        public BitmapImageSettings(ImageAnimator animator, WeakReference<Bitmap> bitmap,
+                                   @NonNull ImageSettable settable) {
             this.animator = animator;
             this.bitmap = bitmap;
             this.settable = settable;
@@ -191,7 +192,8 @@ public class ZImageLoader implements Handler.Callback {
             applyImageSetting(bitmap.get(), settable, animator);
         }
 
-        void applyImageSetting(Bitmap bitmap, ImageSettable settable, ImageAnimator animator) {
+        void applyImageSetting(Bitmap bitmap, ImageSettable settable,
+                               ImageAnimator animator) {
             if (bitmap != null) {
                 settable.setImageBitmap(bitmap);
                 if (animator != null) {
@@ -236,7 +238,7 @@ public class ZImageLoader implements Handler.Callback {
         }
     }
 
-    class LoadTask implements Runnable, dev.nick.queue.Message {
+    class LoadTask implements Runnable {
 
         String url;
         ImageInfo info;
