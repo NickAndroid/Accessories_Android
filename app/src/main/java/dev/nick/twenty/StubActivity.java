@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dev.nick.imageloader.ZImageLoader;
+import dev.nick.imageloader.display.DisplayOption;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
 public class StubActivity extends AppCompatActivity {
@@ -108,7 +109,7 @@ public class StubActivity extends AppCompatActivity {
                 // String uri = mArtworkUri + File.separator + tracks.get(position).getAlbumId();
                 String uri = "file://" + tracks.get(position).getUrl();
 
-                ZImageLoader.getInstance().displayImage(uri, holder.imageView);
+                ZImageLoader.getInstance().displayImage(uri, holder.imageView, new DisplayOption());
 
                 return convertView;
             }

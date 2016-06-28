@@ -27,8 +27,6 @@ import android.util.Log;
 import android.widget.ImageView;
 
 import java.lang.ref.WeakReference;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import dev.nick.imageloader.cache.CacheManager;
 import dev.nick.imageloader.display.DisplayOption;
@@ -38,6 +36,8 @@ import dev.nick.imageloader.display.ImageSettable;
 import dev.nick.imageloader.display.ImageViewDelegate;
 import dev.nick.imageloader.loader.ImageInfo;
 import dev.nick.imageloader.loader.ImageSource;
+import dev.nick.queue.MessageHandler;
+import dev.nick.queue.MessageStackService;
 
 public class ZImageLoader implements Handler.Callback {
 
@@ -51,9 +51,9 @@ public class ZImageLoader implements Handler.Callback {
 
     private ImageAnimator mDefaultImageAnimator;
 
-    private ExecutorService mLoaderService;
-
     private Config mConfig;
+
+    private MessageStackService<LoadTask> mStackService;
 
     private static ZImageLoader sLoader;
 
@@ -62,7 +62,14 @@ public class ZImageLoader implements Handler.Callback {
         this.mConfig = config;
         this.mUIThreadHandler = new Handler(Looper.getMainLooper(), this);
         this.mCacheManager = new CacheManager(config, context);
-        this.mLoaderService = Executors.newSingleThreadExecutor();
+        this.mStackService = MessageStackService.createStarted(
+                new MessageHandler<LoadTask>() {
+                    @Override
+                    public boolean handleMessage(LoadTask task) {
+                        task.run();
+                        return true;
+                    }
+                });
     }
 
     public synchronized static void init(Context context, Config config) {
@@ -101,7 +108,7 @@ public class ZImageLoader implements Handler.Callback {
         // 1. Get from cache.
         // 2. If no cache, start a loading task.
         // 3. Cache the loaded.
-        final ImageViewDelegate viewDelegate = new ImageViewDelegate(new WeakReference<ImageView>(view));
+        final ImageViewDelegate viewDelegate = new ImageViewDelegate(new WeakReference<>(view));
         if (mConfig.isEnableMemCache() || mConfig.isEnableFileCache()) {
             mCacheManager.get(url, new CacheManager.Callback() {
                 @Override
@@ -134,10 +141,10 @@ public class ZImageLoader implements Handler.Callback {
 
         int viewId = createIdOfImageSettable(settable);
 
-        TaskCallback<Bitmap> callback = new ImageTaskCallback(new WeakReference<ImageAnimator>(animator),
-                option, url, new WeakReference<ImageSettable>(settable));
+        TaskCallback<Bitmap> callback = new ImageTaskCallback(new WeakReference<>(animator),
+                option, url, new WeakReference<>(settable));
 
-        mLoaderService.execute(new LoadTask(callback, viewId, info, url));
+        mStackService.push(new LoadTask(callback, viewId, info, url));
     }
 
     private int createIdOfImageSettable(ImageSettable view) {
@@ -229,13 +236,14 @@ public class ZImageLoader implements Handler.Callback {
         }
     }
 
-    class LoadTask implements Runnable {
+    class LoadTask implements Runnable, dev.nick.queue.Message {
 
         String url;
         ImageInfo info;
         TaskCallback<Bitmap> callback;
 
         int id;
+        long upTime = System.currentTimeMillis();
 
         @Override
         public boolean equals(Object o) {
@@ -260,9 +268,8 @@ public class ZImageLoader implements Handler.Callback {
         @Override
         public String toString() {
             return "LoadTask{" +
-                    ", id=" + id +
-                    ", info=" + info +
-                    ", url='" + url + '\'' +
+                    "id=" + id +
+                    ", upTime=" + upTime +
                     '}';
         }
 
@@ -275,6 +282,8 @@ public class ZImageLoader implements Handler.Callback {
 
         @Override
         public void run() {
+
+            if (mConfig.debug) Log.d(LOG_TAG, toString());
 
             Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
 

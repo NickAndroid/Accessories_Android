@@ -35,8 +35,8 @@ public class TwentyApp extends ScalpelApplication {
         ZImageLoader.init(getApplicationContext(), new ZImageLoader.Config()
                 .setDebug(true)
                 .setPreferExternalStorageCache(true)
-                .setCacheThreads(3)
-                .setLoadingThreads(1)
+                .setCacheThreads(4)
+                .setLoadingThreads(4)
                 .setEnableFileCache(true)
                 .setEnableMemCache(true));
     }
