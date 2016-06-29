@@ -45,11 +45,6 @@ public class CacheManager {
 
     }
 
-    public CacheManager(Cache<String, Bitmap> mDiskCache, Cache<String, Bitmap> mMemCache) {
-        this.mDiskCache = mDiskCache;
-        this.mMemCache = mMemCache;
-    }
-
     public void cache(@NonNull String key, Bitmap value) {
         internalCache(key, value);
     }

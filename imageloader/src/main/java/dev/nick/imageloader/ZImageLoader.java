@@ -21,23 +21,25 @@ import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.os.Process;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.ImageView;
 
 import java.lang.ref.WeakReference;
 
 import dev.nick.imageloader.cache.CacheManager;
+import dev.nick.imageloader.display.BitmapImageSettings;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.display.FadeInImageAnimator;
 import dev.nick.imageloader.display.ImageAnimator;
 import dev.nick.imageloader.display.ImageSettable;
 import dev.nick.imageloader.display.ImageViewDelegate;
+import dev.nick.imageloader.display.ResImageSettings;
 import dev.nick.imageloader.loader.ImageInfo;
-import dev.nick.imageloader.loader.ImageSource;
-import dev.nick.queue.MessageHandler;
-import dev.nick.queue.MessageStackService;
+import dev.nick.imageloader.loader.task.LoadingTask;
+import dev.nick.logger.Logger;
+import dev.nick.logger.LoggerManager;
+import dev.nick.stack.RequestHandler;
+import dev.nick.stack.RequestStackService;
 
 public class ZImageLoader implements Handler.Callback {
 
@@ -53,7 +55,9 @@ public class ZImageLoader implements Handler.Callback {
 
     private Config mConfig;
 
-    private MessageStackService<LoadTask> mStackService;
+    private RequestStackService<LoadingTask> mStackService;
+
+    private Logger mLogger;
 
     private static ZImageLoader sLoader;
 
@@ -62,14 +66,16 @@ public class ZImageLoader implements Handler.Callback {
         this.mConfig = config;
         this.mUIThreadHandler = new Handler(Looper.getMainLooper(), this);
         this.mCacheManager = new CacheManager(config, context);
-        this.mStackService = MessageStackService.createStarted(
-                new MessageHandler<LoadTask>() {
+
+        this.mStackService = RequestStackService.createStarted(
+                new RequestHandler<LoadingTask>() {
                     @Override
-                    public boolean handleMessage(LoadTask task) {
-                        task.run();
+                    public boolean handle(LoadingTask request) {
+                        request.run();
                         return true;
                     }
                 });
+        this.mLogger = LoggerManager.getLogger(getClass());
     }
 
     public synchronized static void init(Context context, Config config) {
@@ -105,6 +111,7 @@ public class ZImageLoader implements Handler.Callback {
                              final ImageView view,
                              final ImageAnimator animator,
                              final DisplayOption option) {
+        mLogger.funcEnter();
         // 1. Get from cache.
         // 2. If no cache, start a loading task.
         // 3. Cache the loaded.
@@ -130,6 +137,7 @@ public class ZImageLoader implements Handler.Callback {
         } else {
             displayImageAfterLoaded(url, viewDelegate, animator, option);
         }
+        mLogger.funcExit();
     }
 
     private void displayImageAfterLoaded(final String url,
@@ -141,10 +149,10 @@ public class ZImageLoader implements Handler.Callback {
 
         int viewId = createIdOfImageSettable(settable);
 
-        TaskCallback<Bitmap> callback = new ImageTaskCallback(new WeakReference<>(animator),
+        LoadingTask.TaskCallback<Bitmap> callback = new ImageTaskCallback(new WeakReference<>(animator),
                 option, url, new WeakReference<>(settable));
 
-        mStackService.push(new LoadTask(callback, viewId, info, url));
+        mStackService.push(new LoadingTask(mContext, callback, viewId, info, url));
     }
 
     private int createIdOfImageSettable(ImageSettable view) {
@@ -174,153 +182,7 @@ public class ZImageLoader implements Handler.Callback {
         return true;
     }
 
-    class BitmapImageSettings implements Runnable {
-
-        ImageAnimator animator;
-        @NonNull
-        ImageSettable settable;
-        WeakReference<Bitmap> bitmap;
-
-        public BitmapImageSettings(ImageAnimator animator, WeakReference<Bitmap> bitmap,
-                                   @NonNull ImageSettable settable) {
-            this.animator = animator;
-            this.bitmap = bitmap;
-            this.settable = settable;
-        }
-
-        void apply() {
-            applyImageSetting(bitmap.get(), settable, animator);
-        }
-
-        void applyImageSetting(Bitmap bitmap, ImageSettable settable,
-                               ImageAnimator animator) {
-            if (bitmap != null) {
-                settable.setImageBitmap(bitmap);
-                if (animator != null) {
-                    animator.animate(settable);
-                }
-            }
-        }
-
-        @Override
-        public void run() {
-            apply();
-        }
-    }
-
-    class ResImageSettings implements Runnable {
-
-        ImageAnimator animator;
-        @NonNull
-        ImageSettable settable;
-        int resId;
-
-        public ResImageSettings(ImageAnimator animator, int resId, @NonNull ImageSettable settable) {
-            this.animator = animator;
-            this.resId = resId;
-            this.settable = settable;
-        }
-
-        void apply() {
-            applyImageSetting(resId, settable, animator);
-        }
-
-        void applyImageSetting(int resId, ImageSettable settable, ImageAnimator animator) {
-            settable.setImageResource(resId);
-            if (animator != null) {
-                animator.animate(settable);
-            }
-        }
-
-        @Override
-        public void run() {
-            apply();
-        }
-    }
-
-    class LoadTask implements Runnable {
-
-        String url;
-        ImageInfo info;
-        TaskCallback<Bitmap> callback;
-
-        int id;
-        long upTime = System.currentTimeMillis();
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            LoadTask loadTask = (LoadTask) o;
-
-            if (id != loadTask.id) return false;
-            if (!url.equals(loadTask.url)) return false;
-            return info != null ? info.equals(loadTask.info) : loadTask.info == null;
-        }
-
-        @Override
-        public int hashCode() {
-            int result = url.hashCode();
-            result = 31 * result + (info != null ? info.hashCode() : 0);
-            result = 31 * result + id;
-            return result;
-        }
-
-        @Override
-        public String toString() {
-            return "LoadTask{" +
-                    "id=" + id +
-                    ", upTime=" + upTime +
-                    '}';
-        }
-
-        public LoadTask(TaskCallback<Bitmap> callback, int id, ImageInfo info, String url) {
-            this.callback = callback;
-            this.id = id;
-            this.info = info;
-            this.url = url;
-        }
-
-        @Override
-        public void run() {
-
-            if (mConfig.debug) Log.d(LOG_TAG, toString());
-
-            Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
-
-            callback.onStart();
-
-            ImageSource source = ImageSource.of(url);
-
-            Bitmap bitmap;
-            try {
-                bitmap = source.getFetcher(mContext).fetchFromUrl(url, info);
-                if (bitmap == null) {
-                    callback.onError("No image got.");
-                    return;
-                }
-                callback.onComplete(bitmap, isDirty());
-            } catch (Exception e) {
-                callback.onError("Error when fetch image:" + Log.getStackTraceString(e));
-            }
-        }
-
-        boolean isDirty() {
-            return false;
-        }
-
-    }
-
-    interface TaskCallback<T> {
-        void onStart();
-
-        void onComplete(T result, boolean dirty);
-
-        void onError(String errMsg);
-    }
-
-    class ImageTaskCallback implements TaskCallback<Bitmap> {
+    class ImageTaskCallback implements LoadingTask.TaskCallback<Bitmap> {
 
         WeakReference<ImageSettable> viewWeakReference;
         WeakReference<ImageAnimator> animatorWeakReference;

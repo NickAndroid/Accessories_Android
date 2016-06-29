@@ -17,7 +17,6 @@
 package dev.nick.imageloader.display;
 
 import android.graphics.Bitmap;
-import android.util.Log;
 import android.view.animation.Animation;
 import android.widget.ImageView;
 
@@ -33,7 +32,6 @@ public class ImageViewDelegate implements ImageSettable {
 
     @Override
     public void setImageBitmap(Bitmap bitmap) {
-        Log.d("ImageViewDelegate", "setImageBitmap:" + imageView.get());
         if (imageView.get() != null) imageView.get().setImageBitmap(bitmap);
     }
 
