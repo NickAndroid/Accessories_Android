@@ -5,7 +5,8 @@
       <module fileurl="file://$PROJECT_DIR$/ZImageLoader.iml" filepath="$PROJECT_DIR$/ZImageLoader.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/imageloader/imageloader.iml" filepath="$PROJECT_DIR$/imageloader/imageloader.iml" />
-      <module fileurl="file://$PROJECT_DIR$/queue/priorityqueue.iml" filepath="$PROJECT_DIR$/queue/priorityqueue.iml" />
+      <module fileurl="file://$PROJECT_DIR$/logger/logger.iml" filepath="$PROJECT_DIR$/logger/logger.iml" />
+      <module fileurl="file://$PROJECT_DIR$/stack/queue.iml" filepath="$PROJECT_DIR$/stack/queue.iml" />
     </modules>
   </component>
 </project>

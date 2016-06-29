@@ -13,7 +13,7 @@ android {
     buildToolsVersion "23.0.3"
 
     defaultConfig {
-        minSdkVersion 14
+        minSdkVersion 15
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
@@ -31,7 +31,8 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:24.0.0'
     compile files('libs/volley.jar')
-    compile project(':queue')
+    compile project(':stack')
+    compile project(':logger')
 }
 
 install {
