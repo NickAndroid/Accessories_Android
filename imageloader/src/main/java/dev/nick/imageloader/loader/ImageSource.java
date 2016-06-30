@@ -66,7 +66,7 @@ public enum ImageSource {
     UNKNOWN(new ImageFetcher() {
         @Override
         public Bitmap fetchFromUrl(@NonNull String url, ImageInfo info) throws Exception {
-            Log.w("ZImageLoader.ImgSource", "Using UNKNOWN ImageSource for url:" + url);
+            Log.w("ImageLoader.ImgSource", "Using UNKNOWN ImageSource for url:" + url);
             return null;
         }
 

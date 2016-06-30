@@ -35,8 +35,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.nick.imageloader.ZImageLoader;
+import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.cache.Cache;
+import dev.nick.imageloader.cache.FileNameGenerator;
 
 public class DiskCache implements Cache<String, Bitmap> {
 
@@ -49,7 +50,9 @@ public class DiskCache implements Cache<String, Bitmap> {
 
     final List<FileOperator> mRunningOps;
 
-    public DiskCache(ZImageLoader.Config config, Context context) {
+    FileNameGenerator fileNameGenerator;
+
+    public DiskCache(ImageLoader.Config config, Context context) {
         preferToExternal = config.isPreferExternalStorageCache();
         debug = config.isDebug();
         mCacheDir = context.getCacheDir().getPath();
@@ -59,6 +62,7 @@ public class DiskCache implements Cache<String, Bitmap> {
                 mExternalCacheDir = externalCache.getPath();
         }
         mRunningOps = new ArrayList<>();
+        fileNameGenerator = new HeadlessFileNameGenerator();
     }
 
     @Override
@@ -101,7 +105,7 @@ public class DiskCache implements Cache<String, Bitmap> {
 
     abstract class FileOperator {
         String getFileNameByKey(String key) {
-            return String.valueOf(key.hashCode());
+            return fileNameGenerator.fromKey(key);
         }
     }
 

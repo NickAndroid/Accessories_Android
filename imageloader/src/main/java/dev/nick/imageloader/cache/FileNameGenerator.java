@@ -16,10 +16,6 @@
 
 package dev.nick.imageloader.cache;
 
-import android.support.annotation.NonNull;
-
-import dev.nick.imageloader.loader.ImageInfo;
-
-public interface KeyGenerator {
-    String fromUrl(@NonNull String url, ImageInfo info);
+public interface FileNameGenerator {
+    String fromKey(String key);
 }

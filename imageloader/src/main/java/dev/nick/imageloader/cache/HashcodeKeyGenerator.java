@@ -16,6 +16,13 @@
 
 package dev.nick.imageloader.cache;
 
-public interface CacheFileNameGenerator {
-    String fromKey(String key);
+import android.support.annotation.NonNull;
+
+import dev.nick.imageloader.loader.ImageInfo;
+
+class HashcodeKeyGenerator implements KeyGenerator {
+    @Override
+    public String fromUrl(@NonNull String url, ImageInfo info) {
+        return String.valueOf(url.hashCode() + info.hashCode());
+    }
 }

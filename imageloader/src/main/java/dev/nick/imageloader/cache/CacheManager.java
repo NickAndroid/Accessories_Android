@@ -24,32 +24,36 @@ import android.support.annotation.NonNull;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import dev.nick.imageloader.ZImageLoader;
+import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.cache.disk.DiskCache;
 import dev.nick.imageloader.cache.mem.MemCache;
+import dev.nick.imageloader.loader.ImageInfo;
 
 public class CacheManager {
 
     Cache<String, Bitmap> mDiskCache;
     Cache<String, Bitmap> mMemCache;
 
-    private ZImageLoader.Config mConfig;
+    private KeyGenerator keyGenerator;
+
+    private ImageLoader.Config mConfig;
 
     private ExecutorService mCacheService;
 
-    public CacheManager(ZImageLoader.Config config, Context context) {
+    public CacheManager(ImageLoader.Config config, Context context) {
         mDiskCache = new DiskCache(config, context);
         mMemCache = new MemCache();
         mConfig = config;
         mCacheService = Executors.newFixedThreadPool(config.getCacheThreads());
-
+        keyGenerator = new HashcodeKeyGenerator();
     }
 
-    public void cache(@NonNull String key, Bitmap value) {
-        internalCache(key, value);
+    public void cache(@NonNull String url, ImageInfo info, Bitmap value) {
+        String key = keyGenerator.fromUrl(url, info);
+        cacheByKey(key, value);
     }
 
-    private void internalCache(final String key, final Bitmap value) {
+    private void cacheByKey(final String key, final Bitmap value) {
         if (mConfig.isEnableMemCache())
             mMemCache.cache(key, value);
         if (mConfig.isEnableFileCache())
@@ -70,11 +74,13 @@ public class CacheManager {
         return out;
     }
 
-    public void get(@NonNull final String key, @NonNull final Callback callback) {
+    public void get(@NonNull final String url, @NonNull ImageInfo info, @NonNull final Callback callback) {
         if (!mConfig.isEnableFileCache() && !mConfig.isEnableMemCache()) {
             callback.onResult(null);
             return;
         }
+
+        final String key = keyGenerator.fromUrl(url, info);
 
         Bitmap out = mMemCache.get(key);
 

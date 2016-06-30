@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package dev.nick.imageloader.cache;
+package dev.nick.imageloader.cache.disk;
 
-import android.support.annotation.NonNull;
+import dev.nick.imageloader.cache.FileNameGenerator;
 
-import dev.nick.imageloader.loader.ImageInfo;
-
-public interface KeyGenerator {
-    String fromUrl(@NonNull String url, ImageInfo info);
+class HeadlessFileNameGenerator implements FileNameGenerator {
+    @Override
+    public String fromKey(String key) {
+        return key;
+    }
 }

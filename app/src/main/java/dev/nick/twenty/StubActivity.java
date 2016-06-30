@@ -17,7 +17,11 @@
 package dev.nick.twenty;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.database.Cursor;
+import android.media.AudioAttributes;
+import android.media.SoundPool;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
@@ -26,6 +30,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -39,7 +44,7 @@ import com.nick.scalpel.annotation.request.RequirePermission;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.nick.imageloader.ZImageLoader;
+import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.display.DisplayOption;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
@@ -109,7 +114,7 @@ public class StubActivity extends AppCompatActivity {
                 // String uri = mArtworkUri + File.separator + tracks.get(position).getAlbumId();
                 String uri = "file://" + tracks.get(position).getUrl();
 
-                ZImageLoader.getInstance().displayImage(uri, holder.imageView, new DisplayOption());
+                ImageLoader.getInstance().displayImage(uri, holder.imageView, new DisplayOption());
 
                 return convertView;
             }
@@ -117,6 +122,13 @@ public class StubActivity extends AppCompatActivity {
         };
 
         listView.setAdapter(adapter);
+        loadSound();
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                soundPool.play(soundId, 1.0f, 1.0f, 0, i, 1.0f);
+            }
+        });
     }
 
     class ViewHolder {
@@ -154,6 +166,20 @@ public class StubActivity extends AppCompatActivity {
         cursor.close();
 
         return tracks;
+    }
+
+    SoundPool soundPool;
+    int soundId;
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    void loadSound() {
+        soundPool = new SoundPool.Builder()
+                .setMaxStreams(1)
+                .setAudioAttributes(new AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build())
+                .build();
+        soundId = soundPool.load(this, R.raw.dock, 1);
     }
 
 }

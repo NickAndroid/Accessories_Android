@@ -24,7 +24,7 @@ import com.nick.scalpel.ScalpelApplication;
 import java.io.File;
 
 import dev.nick.eventbus.EventBus;
-import dev.nick.imageloader.ZImageLoader;
+import dev.nick.imageloader.ImageLoader;
 
 public class TwentyApp extends ScalpelApplication {
     @Override
@@ -32,7 +32,7 @@ public class TwentyApp extends ScalpelApplication {
         super.onCreate();
         EventBus.create(this);
 
-        ZImageLoader.init(getApplicationContext(), new ZImageLoader.Config()
+        ImageLoader.init(getApplicationContext(), new ImageLoader.Config()
                 .setDebug(true)
                 .setPreferExternalStorageCache(true)
                 .setCacheThreads(4)

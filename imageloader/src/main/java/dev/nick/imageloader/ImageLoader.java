@@ -41,9 +41,9 @@ import dev.nick.logger.LoggerManager;
 import dev.nick.stack.RequestHandler;
 import dev.nick.stack.RequestStackService;
 
-public class ZImageLoader implements Handler.Callback {
+public class ImageLoader implements Handler.Callback {
 
-    static final String LOG_TAG = "ZImageLoader";
+    static final String LOG_TAG = "ImageLoader";
 
     private Context mContext;
 
@@ -59,9 +59,9 @@ public class ZImageLoader implements Handler.Callback {
 
     private Logger mLogger;
 
-    private static ZImageLoader sLoader;
+    private static ImageLoader sLoader;
 
-    private ZImageLoader(Context context, Config config) {
+    private ImageLoader(Context context, Config config) {
         this.mContext = context;
         this.mConfig = config;
         this.mUIThreadHandler = new Handler(Looper.getMainLooper(), this);
@@ -80,13 +80,13 @@ public class ZImageLoader implements Handler.Callback {
 
     public synchronized static void init(Context context, Config config) {
         if (sLoader == null) {
-            sLoader = new ZImageLoader(context, config);
+            sLoader = new ImageLoader(context, config);
             return;
         }
         throw new IllegalArgumentException("Already configured.");
     }
 
-    public static ZImageLoader getInstance() {
+    public static ImageLoader getInstance() {
         return sLoader;
     }
 
@@ -117,7 +117,8 @@ public class ZImageLoader implements Handler.Callback {
         // 3. Cache the loaded.
         final ImageViewDelegate viewDelegate = new ImageViewDelegate(new WeakReference<>(view));
         if (mConfig.isEnableMemCache() || mConfig.isEnableFileCache()) {
-            mCacheManager.get(url, new CacheManager.Callback() {
+            ImageInfo info = new ImageInfo(viewDelegate.getWidth(), viewDelegate.getHeight());
+            mCacheManager.get(url, info, new CacheManager.Callback() {
                 @Override
                 public void onResult(final Bitmap cached) {
                     if (cached != null) {
@@ -150,7 +151,7 @@ public class ZImageLoader implements Handler.Callback {
         int viewId = createIdOfImageSettable(settable);
 
         LoadingTask.TaskCallback<Bitmap> callback = new ImageTaskCallback(new WeakReference<>(animator),
-                option, url, new WeakReference<>(settable));
+                option, url, info, new WeakReference<>(settable));
 
         mStackService.push(new LoadingTask(mContext, callback, viewId, info, url));
     }
@@ -188,13 +189,15 @@ public class ZImageLoader implements Handler.Callback {
         WeakReference<ImageAnimator> animatorWeakReference;
         String url;
         DisplayOption option;
+        ImageInfo info;
 
         public ImageTaskCallback(WeakReference<ImageAnimator> animatorWeakReference,
-                                 DisplayOption option, String url,
+                                 DisplayOption option, String url, ImageInfo info,
                                  WeakReference<ImageSettable> viewWeakReference) {
             this.animatorWeakReference = animatorWeakReference;
             this.option = option;
             this.url = url;
+            this.info = info;
             this.viewWeakReference = viewWeakReference;
         }
 
@@ -218,7 +221,7 @@ public class ZImageLoader implements Handler.Callback {
             } else if (mConfig.debug) {
                 Log.d(LOG_TAG, "Skip settings for dirty image of url:" + url);
             }
-            mCacheManager.cache(url, result);
+            mCacheManager.cache(url, info, result);
         }
 
         @Override

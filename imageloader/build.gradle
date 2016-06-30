@@ -2,8 +2,8 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
-def siteUrl = 'http://nickandroid.github.io/ZImageLoader/'    // project homepage
-def gitUrl = 'https://github.com/NickAndroid/ZImageLoader.git' // project git
+def siteUrl = 'http://nickandroid.github.io/ImageLoader/'    // project homepage
+def gitUrl = 'https://github.com/NickAndroid/ImageLoader.git' // project git
 
 group = "dev.nick"
 version = "0.2"
