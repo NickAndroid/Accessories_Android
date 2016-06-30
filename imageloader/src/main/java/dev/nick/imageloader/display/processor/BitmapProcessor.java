@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package dev.nick.imageloader.cache.disk;
+package dev.nick.imageloader.display.processor;
 
-import dev.nick.imageloader.cache.FileNameGenerator;
+import android.graphics.Bitmap;
+import android.support.annotation.NonNull;
 
-class HeadlessFileNameGenerator implements FileNameGenerator {
-    @Override
-    public String fromKey(String key) {
-        return key;
-    }
+public interface BitmapProcessor {
+    @NonNull
+    Bitmap process(@NonNull Bitmap in);
 }

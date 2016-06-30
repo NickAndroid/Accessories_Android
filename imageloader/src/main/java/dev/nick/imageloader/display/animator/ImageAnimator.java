@@ -14,24 +14,18 @@
  * limitations under the License.
  */
 
-package dev.nick.imageloader.display;
+package dev.nick.imageloader.display.animator;
 
 import android.support.annotation.NonNull;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 
-public class FadeInImageAnimator implements ImageAnimator {
-    @Override
-    public void animate(@NonNull ImageSettable settable) {
-        AlphaAnimation fadeImage = new AlphaAnimation(0, 1);
-        fadeImage.setDuration(getDuration());
-        fadeImage.setInterpolator(new DecelerateInterpolator());
-        settable.startAnimation(fadeImage);
-    }
+import dev.nick.imageloader.display.ImageSettable;
 
-    @Override
-    public long getDuration() {
-        return DEFAULT_DURATION;
-    }
+public interface ImageAnimator {
+
+    long DEFAULT_DURATION = 800;
+
+    void animate(@NonNull ImageSettable settable);
+
+    long getDuration();
 }

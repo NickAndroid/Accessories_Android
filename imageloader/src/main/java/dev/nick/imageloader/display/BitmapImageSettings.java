@@ -21,9 +21,7 @@ import android.support.annotation.NonNull;
 
 import java.lang.ref.WeakReference;
 
-import dev.nick.imageloader.ImageLoader;
-import dev.nick.logger.Logger;
-import dev.nick.logger.LoggerManager;
+import dev.nick.imageloader.display.animator.ImageAnimator;
 
 public class BitmapImageSettings implements Runnable {
 
@@ -47,7 +45,6 @@ public class BitmapImageSettings implements Runnable {
                            ImageAnimator animator) {
         if (bitmap != null) {
             settable.setImageBitmap(bitmap);
-            LoggerManager.getLogger(ImageLoader.class).info("Animator:" + animator);
             if (animator != null) {
                 animator.animate(settable);
             }

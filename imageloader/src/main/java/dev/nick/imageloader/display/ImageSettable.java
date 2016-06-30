@@ -20,13 +20,21 @@ import android.graphics.Bitmap;
 import android.support.annotation.UiThread;
 import android.view.animation.Animation;
 
+/**
+ * Interface that indicate this is a view that can be set with a image.
+ * like the {@link android.widget.ImageView}
+ */
 public interface ImageSettable {
     @UiThread
     void setImageBitmap(Bitmap bitmap);
+
     @UiThread
     void setImageResource(int resId);
+
     int getWidth();
+
     int getHeight();
+
     @UiThread
     void startAnimation(Animation animation);
 }

@@ -14,16 +14,25 @@
  * limitations under the License.
  */
 
-package dev.nick.imageloader.cache;
+package dev.nick.imageloader.display.animator;
 
 import android.support.annotation.NonNull;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.DecelerateInterpolator;
 
-import dev.nick.imageloader.loader.ImageInfo;
+import dev.nick.imageloader.display.ImageSettable;
 
-class HashcodeKeyGenerator implements KeyGenerator {
+public class FadeInImageAnimator implements ImageAnimator {
     @Override
-    @NonNull
-    public String fromUrl(@NonNull String url, ImageInfo info) {
-        return String.valueOf(url.hashCode() + info.hashCode());
+    public void animate(@NonNull ImageSettable settable) {
+        AlphaAnimation fadeImage = new AlphaAnimation(0, 1);
+        fadeImage.setDuration(getDuration());
+        fadeImage.setInterpolator(new DecelerateInterpolator());
+        settable.startAnimation(fadeImage);
+    }
+
+    @Override
+    public long getDuration() {
+        return DEFAULT_DURATION;
     }
 }

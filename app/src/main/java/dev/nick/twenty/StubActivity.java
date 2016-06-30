@@ -46,6 +46,8 @@ import java.util.List;
 
 import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.display.DisplayOption;
+import dev.nick.imageloader.display.animator.FadeInImageAnimator;
+import dev.nick.imageloader.display.processor.BlackWhiteBitmapProcessor;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
 public class StubActivity extends AppCompatActivity {
@@ -68,7 +70,6 @@ public class StubActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.stub);
         Scalpel.getInstance().wire(this);
-        TwentyApp.DataCleanManager.cleanExternalCache(this);
     }
 
     @Override
@@ -115,9 +116,12 @@ public class StubActivity extends AppCompatActivity {
                 String uri = "file://" + tracks.get(position).getUrl();
 
                 ImageLoader.getInstance().displayImage(uri, holder.imageView,
-                        new DisplayOption()
-                                .setImgResShowWhenLoading(R.drawable.ic_cloud_download_black_24dp)
-                                .setImgResShowWhenError(R.drawable.ic_broken_image_black_24dp));
+                        new DisplayOption.Builder()
+                                .loadingImgRes(R.drawable.ic_cloud_download_black_24dp)
+                                .defaultImgRes(R.drawable.ic_broken_image_black_24dp)
+                                .bitmapProcessor(new BlackWhiteBitmapProcessor())
+                                .imageAnimator(new FadeInImageAnimator())
+                                .build());
 
                 return convertView;
             }

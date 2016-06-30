@@ -16,83 +16,32 @@
 
 package dev.nick.twenty;
 
-import android.content.Context;
-import android.os.Environment;
-
 import com.nick.scalpel.ScalpelApplication;
-
-import java.io.File;
 
 import dev.nick.eventbus.EventBus;
 import dev.nick.imageloader.ImageLoader;
+import dev.nick.imageloader.LoaderConfig;
+import dev.nick.imageloader.cache.CachePolicy;
 
 public class TwentyApp extends ScalpelApplication {
     @Override
     public void onCreate() {
         super.onCreate();
         EventBus.create(this);
-
-        ImageLoader.init(getApplicationContext(), new ImageLoader.Config()
-                .setDebug(true)
-                .setPreferExternalStorageCache(true)
-                .setCacheThreads(Runtime.getRuntime().availableProcessors())
-                .setLoadingThreads(Runtime.getRuntime().availableProcessors())
-                .setEnableFileCache(false)
-                .setEnableMemCache(false));
+        ImageLoader.init(getApplicationContext(), new LoaderConfig.Builder()
+                .cachePolicy(new CachePolicy.Builder().preferredLocation(CachePolicy.Location.EXTERNAL)
+                        .build())
+                .cachingThreads(6)
+                .loadingThreads(6)
+                .diskCacheEnabled(true)
+                .memCacheEnabled(true)
+                .debug(true)
+                .build());
     }
 
-   public static class DataCleanManager {
-
-        public static void cleanInternalCache(Context context) {
-            deleteFilesByDirectory(context.getCacheDir());
-        }
-
-        public static void cleanDatabases(Context context) {
-            deleteFilesByDirectory(new File("/data/data/"
-                    + context.getPackageName() + "/databases"));
-        }
-
-        public static void cleanSharedPreference(Context context) {
-            deleteFilesByDirectory(new File("/data/data/"
-                    + context.getPackageName() + "/shared_prefs"));
-        }
-
-        public static void cleanDatabaseByName(Context context, String dbName) {
-            context.deleteDatabase(dbName);
-        }
-
-        public static void cleanFiles(Context context) {
-            deleteFilesByDirectory(context.getFilesDir());
-        }
-
-        public static void cleanExternalCache(Context context) {
-            if (Environment.getExternalStorageState().equals(
-                    Environment.MEDIA_MOUNTED)) {
-                deleteFilesByDirectory(context.getExternalCacheDir());
-            }
-        }
-
-        public static void cleanCustomCache(String filePath) {
-            deleteFilesByDirectory(new File(filePath));
-        }
-
-        public static void cleanApplicationData(Context context, String... filepath) {
-            cleanInternalCache(context);
-            cleanExternalCache(context);
-            cleanDatabases(context);
-            cleanSharedPreference(context);
-            cleanFiles(context);
-            for (String filePath : filepath) {
-                cleanCustomCache(filePath);
-            }
-        }
-
-        private static void deleteFilesByDirectory(File directory) {
-            if (directory != null && directory.exists() && directory.isDirectory()) {
-                for (File item : directory.listFiles()) {
-                    item.delete();
-                }
-            }
-        }
+    @Override
+    public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
+        ImageLoader.getInstance().clearMemCache();
     }
 }

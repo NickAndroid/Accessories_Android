@@ -22,6 +22,9 @@ import android.widget.ImageView;
 
 import java.lang.ref.WeakReference;
 
+/**
+ * Wrapper class for a {@link ImageView}
+ */
 public class ImageViewDelegate implements ImageSettable {
 
     WeakReference<ImageView> imageView;

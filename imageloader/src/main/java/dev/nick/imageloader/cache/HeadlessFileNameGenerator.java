@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package dev.nick.imageloader.display;
+package dev.nick.imageloader.cache;
 
 import android.support.annotation.NonNull;
-import android.widget.ImageView;
 
-public interface ImageAnimator {
-
-    long DEFAULT_DURATION = 800;
-
-    void animate(@NonNull ImageSettable settable);
-
-    long getDuration();
+class HeadlessFileNameGenerator implements FileNameGenerator {
+    @Override
+    @NonNull
+    public String fromKey(String key) {
+        return key;
+    }
 }

@@ -36,4 +36,9 @@ public class MemCache implements Cache<String, Bitmap> {
     public Bitmap get(@NonNull String key) {
         return mLruCache.get(key);
     }
+
+    @Override
+    public void evictAll() {
+        mLruCache.evictAll();
+    }
 }

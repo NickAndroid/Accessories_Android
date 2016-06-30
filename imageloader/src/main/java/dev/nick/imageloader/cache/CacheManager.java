@@ -20,11 +20,12 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Process;
 import android.support.annotation.NonNull;
+import android.support.annotation.WorkerThread;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import dev.nick.imageloader.ImageLoader;
+import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.cache.disk.DiskCache;
 import dev.nick.imageloader.cache.mem.MemCache;
 import dev.nick.imageloader.loader.ImageInfo;
@@ -36,16 +37,16 @@ public class CacheManager {
 
     private KeyGenerator keyGenerator;
 
-    private ImageLoader.Config mConfig;
+    private LoaderConfig mConfig;
 
     private ExecutorService mCacheService;
 
-    public CacheManager(ImageLoader.Config config, Context context) {
+    public CacheManager(LoaderConfig config, Context context) {
         mDiskCache = new DiskCache(config, context);
         mMemCache = new MemCache();
         mConfig = config;
-        mCacheService = Executors.newFixedThreadPool(config.getCacheThreads());
-        keyGenerator = new HashcodeKeyGenerator();
+        mCacheService = Executors.newFixedThreadPool(config.getCachingThreads());
+        keyGenerator = config.getCachePolicy().getKeyGenerator();
     }
 
     public void cache(@NonNull String url, ImageInfo info, Bitmap value) {
@@ -54,9 +55,9 @@ public class CacheManager {
     }
 
     private void cacheByKey(final String key, final Bitmap value) {
-        if (mConfig.isEnableMemCache())
+        if (mConfig.isMemCacheEnabled())
             mMemCache.cache(key, value);
-        if (mConfig.isEnableFileCache())
+        if (mConfig.isDiskCacheEnabled())
             mCacheService.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -75,7 +76,7 @@ public class CacheManager {
     }
 
     public void get(@NonNull final String url, @NonNull ImageInfo info, @NonNull final Callback callback) {
-        if (!mConfig.isEnableFileCache() && !mConfig.isEnableMemCache()) {
+        if (!mConfig.isDiskCacheEnabled() && !mConfig.isMemCacheEnabled()) {
             callback.onResult(null);
             return;
         }
@@ -96,6 +97,16 @@ public class CacheManager {
                 callback.onResult(out);
             }
         });
+    }
+
+    @WorkerThread
+    public void evictDisk() {
+        mDiskCache.evictAll();
+    }
+
+    @WorkerThread
+    public void evictMem() {
+        mMemCache.evictAll();
     }
 
     public interface Callback {

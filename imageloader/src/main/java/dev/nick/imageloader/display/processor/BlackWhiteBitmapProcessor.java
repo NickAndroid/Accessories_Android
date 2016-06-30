@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package dev.nick.imageloader.cache;
+package dev.nick.imageloader.display.processor;
 
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
-import android.support.annotation.WorkerThread;
 
-public interface Cache<K, V> {
-    @WorkerThread
-    void cache(@NonNull K key, V value);
+import dev.nick.imageloader.display.BitmapUtils;
 
-    @WorkerThread
-    V get(@NonNull K key);
-
-    void evictAll();
+public class BlackWhiteBitmapProcessor implements BitmapProcessor {
+    @NonNull
+    @Override
+    public Bitmap process(@NonNull Bitmap in) {
+        return BitmapUtils.blackAndWhited(in);
+    }
 }

@@ -36,6 +36,10 @@ public final class RequestStackService<T> implements RequestHandler<T> {
         return this;
     }
 
+    public void terminate() {
+        mStack.deactivate();
+    }
+
     public void push(T request) {
         mStack.push(request);
     }

@@ -16,30 +16,85 @@
 
 package dev.nick.imageloader.display;
 
-import android.support.annotation.IdRes;
+import android.support.annotation.DrawableRes;
+
+import dev.nick.imageloader.display.animator.ImageAnimator;
+import dev.nick.imageloader.display.processor.BitmapProcessor;
 
 public class DisplayOption {
 
-    @IdRes
-    int imgResShowWhenError;
-    @IdRes
-    int imgResShowWhenLoading;
+    private int defaultImgRes;
+    private int loadingImgRes;
 
-    public int getImgResShowWhenError() {
-        return imgResShowWhenError;
+    private BitmapProcessor processor;
+    private ImageAnimator animator;
+
+    public DisplayOption(int defaultImgRes, int loadingImgRes, BitmapProcessor processor, ImageAnimator animator) {
+        this.defaultImgRes = defaultImgRes;
+        this.loadingImgRes = loadingImgRes;
+        this.processor = processor;
+        this.animator = animator;
     }
 
-    public int getImgResShowWhenLoading() {
-        return imgResShowWhenLoading;
+    public int getDefaultImgRes() {
+        return defaultImgRes;
     }
 
-    public DisplayOption setImgResShowWhenError(int imgResShowWhenError) {
-        this.imgResShowWhenError = imgResShowWhenError;
-        return this;
+    public int getLoadingImgRes() {
+        return loadingImgRes;
     }
 
-    public DisplayOption setImgResShowWhenLoading(int imgResShowWhenLoading) {
-        this.imgResShowWhenLoading = imgResShowWhenLoading;
-        return this;
+    public BitmapProcessor getProcessor() {
+        return processor;
     }
+
+    public ImageAnimator getAnimator() {
+        return animator;
+    }
+
+    public static class Builder {
+
+        private int defaultImgRes;
+        private int loadingImgRes;
+
+        private BitmapProcessor processor;
+        private ImageAnimator animator;
+
+        /**
+         * @param defaultImgRes Image res showing when load failure.
+         * @return Instance of this builder.
+         */
+        public Builder defaultImgRes(@DrawableRes int defaultImgRes) {
+            this.defaultImgRes = defaultImgRes;
+            return this;
+        }
+
+        /**
+         * @param loadingImgRes Image res showing when loading.
+         * @return Instance of this builder.
+         */
+        public Builder loadingImgRes(@DrawableRes int loadingImgRes) {
+            this.loadingImgRes = loadingImgRes;
+            return this;
+        }
+
+        /**
+         * @param processor {@link BitmapProcessor} instance using to process the bitmap before display.
+         * @return Instance of this builder.
+         */
+        public Builder bitmapProcessor(BitmapProcessor processor) {
+            this.processor = processor;
+            return this;
+        }
+
+        public Builder imageAnimator(ImageAnimator animator) {
+            this.animator = animator;
+            return this;
+        }
+
+        public DisplayOption build() {
+            return new DisplayOption(loadingImgRes, defaultImgRes, processor, animator);
+        }
+    }
+
 }

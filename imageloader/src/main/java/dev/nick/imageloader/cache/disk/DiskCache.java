@@ -35,14 +35,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.nick.imageloader.ImageLoader;
+import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.cache.Cache;
+import dev.nick.imageloader.cache.CachePolicy;
 import dev.nick.imageloader.cache.FileNameGenerator;
 
 public class DiskCache implements Cache<String, Bitmap> {
 
     String mExternalCacheDir;
-    String mCacheDir;
+    String mInternalCacheDir;
 
     boolean preferToExternal;
 
@@ -52,17 +53,17 @@ public class DiskCache implements Cache<String, Bitmap> {
 
     FileNameGenerator fileNameGenerator;
 
-    public DiskCache(ImageLoader.Config config, Context context) {
-        preferToExternal = config.isPreferExternalStorageCache();
+    public DiskCache(LoaderConfig config, Context context) {
+        preferToExternal = config.getCachePolicy().getPreferredLocation() == CachePolicy.Location.EXTERNAL;
         debug = config.isDebug();
-        mCacheDir = context.getCacheDir().getPath();
+        mInternalCacheDir = context.getCacheDir().getPath();
         if (preferToExternal) {
             File externalCache = context.getExternalCacheDir();
             if (externalCache != null)
                 mExternalCacheDir = externalCache.getPath();
         }
         mRunningOps = new ArrayList<>();
-        fileNameGenerator = new HeadlessFileNameGenerator();
+        fileNameGenerator = config.getCachePolicy().getFileNameGenerator();
     }
 
     @Override
@@ -77,13 +78,13 @@ public class DiskCache implements Cache<String, Bitmap> {
         if (preferToExternal && mExternalCacheDir != null
                 && Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             if (!new FileWriter(mExternalCacheDir, value, key).write())
-                new FileWriter(mCacheDir, value, key).write();
+                new FileWriter(mInternalCacheDir, value, key).write();
         } else {
-            if (mCacheDir == null) {
+            if (mInternalCacheDir == null) {
                 // No cache area available.
                 return;
             }
-            new FileWriter(mCacheDir, value, key).write();
+            new FileWriter(mInternalCacheDir, value, key).write();
         }
     }
 
@@ -100,7 +101,22 @@ public class DiskCache implements Cache<String, Bitmap> {
             if (result != null) return result;
         }
         // Try to find from internal cache.
-        return new FileReader(mCacheDir, key).read();
+        return new FileReader(mInternalCacheDir, key).read();
+    }
+
+    @Override
+    public void evictAll() {
+        deleteFilesByDirectory(new File(mExternalCacheDir));
+        deleteFilesByDirectory(new File(mInternalCacheDir));
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private static void deleteFilesByDirectory(File directory) {
+        if (directory != null && directory.exists() && directory.isDirectory()) {
+            for (File item : directory.listFiles()) {
+                item.delete();
+            }
+        }
     }
 
     abstract class FileOperator {

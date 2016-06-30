@@ -21,5 +21,11 @@ import android.support.annotation.NonNull;
 import dev.nick.imageloader.loader.ImageInfo;
 
 public interface KeyGenerator {
+    /**
+     * @param url  Give url of the image request.
+     * @param info Image settable info {@link ImageInfo}
+     * @return A key.
+     */
+    @NonNull
     String fromUrl(@NonNull String url, ImageInfo info);
 }

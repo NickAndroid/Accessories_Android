@@ -18,6 +18,8 @@ package dev.nick.imageloader.display;
 
 import android.support.annotation.NonNull;
 
+import dev.nick.imageloader.display.animator.ImageAnimator;
+
 public class ResImageSettings implements Runnable {
 
     ImageAnimator animator;

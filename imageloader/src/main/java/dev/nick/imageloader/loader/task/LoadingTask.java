@@ -82,18 +82,18 @@ public class LoadingTask implements Runnable {
     @Override
     public void run() {
 
-        mLogger.info("Running task:" + getTaskId() + ", for settle:" + getSettableId());
-
         Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
 
-        callback.onStart();
+        if (!callback.onPreStart(this)) return;
+
+        mLogger.info("Running task:" + getTaskId() + ", for settle:" + getSettableId());
 
         ImageSource source = ImageSource.of(url);
 
         Bitmap bitmap;
         try {
             bitmap = source.getFetcher(mContext).fetchFromUrl(url, info);
-            callback.onComplete(bitmap, id);
+            callback.onComplete(bitmap, this);
         } catch (Exception e) {
             callback.onError("Error when fetch image:" + Log.getStackTraceString(e));
         }
@@ -108,9 +108,9 @@ public class LoadingTask implements Runnable {
     }
 
     public interface TaskCallback<T> {
-        void onStart();
+        boolean onPreStart(LoadingTask task);
 
-        void onComplete(T result, int id);
+        void onComplete(T result, LoadingTask task);
 
         void onError(String errMsg);
     }

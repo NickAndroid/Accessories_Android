@@ -16,6 +16,13 @@
 
 package dev.nick.imageloader.cache;
 
+import android.support.annotation.NonNull;
+
 public interface FileNameGenerator {
+    /**
+     * @param key The generated key of image url by {@link KeyGenerator}
+     * @return The file name of this caching image.
+     */
+    @NonNull
     String fromKey(String key);
 }
