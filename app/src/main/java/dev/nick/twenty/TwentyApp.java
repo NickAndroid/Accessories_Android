@@ -35,10 +35,10 @@ public class TwentyApp extends ScalpelApplication {
         ImageLoader.init(getApplicationContext(), new ImageLoader.Config()
                 .setDebug(true)
                 .setPreferExternalStorageCache(true)
-                .setCacheThreads(4)
-                .setLoadingThreads(4)
-                .setEnableFileCache(true)
-                .setEnableMemCache(true));
+                .setCacheThreads(Runtime.getRuntime().availableProcessors())
+                .setLoadingThreads(Runtime.getRuntime().availableProcessors())
+                .setEnableFileCache(false)
+                .setEnableMemCache(false));
     }
 
    public static class DataCleanManager {

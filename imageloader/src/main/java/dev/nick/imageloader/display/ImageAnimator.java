@@ -21,7 +21,7 @@ import android.widget.ImageView;
 
 public interface ImageAnimator {
 
-    long DEFAULT_DURATION = 600;
+    long DEFAULT_DURATION = 800;
 
     void animate(@NonNull ImageSettable settable);
 

@@ -21,8 +21,11 @@ import android.graphics.Bitmap;
 import android.os.Process;
 import android.util.Log;
 
+import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.loader.ImageInfo;
 import dev.nick.imageloader.loader.ImageSource;
+import dev.nick.logger.Logger;
+import dev.nick.logger.LoggerManager;
 
 public class LoadingTask implements Runnable {
 
@@ -33,7 +36,10 @@ public class LoadingTask implements Runnable {
     Context mContext;
 
     int id;
+    int settableId;
     long upTime = System.currentTimeMillis();
+
+    private Logger mLogger;
 
     @Override
     public boolean equals(Object o) {
@@ -63,16 +69,20 @@ public class LoadingTask implements Runnable {
                 '}';
     }
 
-    public LoadingTask(Context context, TaskCallback<Bitmap> callback, int id, ImageInfo info, String url) {
+    public LoadingTask(Context context, TaskCallback<Bitmap> callback, int id, int settableId, ImageInfo info, String url) {
         this.callback = callback;
         this.id = id;
+        this.settableId = settableId;
         this.info = info;
         this.url = url;
         this.mContext = context;
+        this.mLogger = LoggerManager.getLogger(ImageLoader.class);
     }
 
     @Override
     public void run() {
+
+        mLogger.info("Running task:" + getTaskId() + ", for settle:" + getSettableId());
 
         Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
 
@@ -83,24 +93,24 @@ public class LoadingTask implements Runnable {
         Bitmap bitmap;
         try {
             bitmap = source.getFetcher(mContext).fetchFromUrl(url, info);
-            if (bitmap == null) {
-                callback.onError("No image got.");
-                return;
-            }
-            callback.onComplete(bitmap, isDirty());
+            callback.onComplete(bitmap, id);
         } catch (Exception e) {
             callback.onError("Error when fetch image:" + Log.getStackTraceString(e));
         }
     }
 
-    boolean isDirty() {
-        return false;
+    public int getTaskId() {
+        return id;
+    }
+
+    public int getSettableId() {
+        return settableId;
     }
 
     public interface TaskCallback<T> {
         void onStart();
 
-        void onComplete(T result, boolean dirty);
+        void onComplete(T result, int id);
 
         void onError(String errMsg);
     }

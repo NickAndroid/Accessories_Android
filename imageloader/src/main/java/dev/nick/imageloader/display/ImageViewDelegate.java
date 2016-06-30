@@ -53,8 +53,13 @@ public class ImageViewDelegate implements ImageSettable {
     @Override
     public void startAnimation(Animation animation) {
         if (imageView.get() != null) {
-            // imageView.get().clearAnimation();
+            imageView.get().clearAnimation();
             imageView.get().startAnimation(animation);
         }
+    }
+
+    @Override
+    public int hashCode() {
+        return imageView.get() == null ? 0 : imageView.get().hashCode();
     }
 }

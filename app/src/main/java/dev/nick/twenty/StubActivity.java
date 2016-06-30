@@ -98,23 +98,26 @@ public class StubActivity extends AppCompatActivity {
 
                 ViewHolder holder;
 
-//                if (convertView == null) {
-//                    convertView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.item, parent, false);
-//                    holder = new ViewHolder(convertView);
-//                    convertView.setTag(holder);
-//                } else {
-//                    holder = (ViewHolder) convertView.getTag();
-//                }
+                if (convertView == null) {
+                    convertView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.item, parent, false);
+                    holder = new ViewHolder(convertView);
+                    convertView.setTag(holder);
+                } else {
+                    holder = (ViewHolder) convertView.getTag();
+                }
 
-                convertView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.item, parent, false);
-                holder = new ViewHolder(convertView);
+                //  convertView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.item, parent, false);
+                //holder = new ViewHolder(convertView);
 
                 holder.textView.setText(tracks.get(position).getTitle());
 
                 // String uri = mArtworkUri + File.separator + tracks.get(position).getAlbumId();
                 String uri = "file://" + tracks.get(position).getUrl();
 
-                ImageLoader.getInstance().displayImage(uri, holder.imageView, new DisplayOption());
+                ImageLoader.getInstance().displayImage(uri, holder.imageView,
+                        new DisplayOption()
+                                .setImgResShowWhenLoading(R.drawable.ic_cloud_download_black_24dp)
+                                .setImgResShowWhenError(R.drawable.ic_broken_image_black_24dp));
 
                 return convertView;
             }
