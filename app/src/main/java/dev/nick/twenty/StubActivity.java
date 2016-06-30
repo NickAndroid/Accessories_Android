@@ -189,4 +189,9 @@ public class StubActivity extends AppCompatActivity {
         soundId = soundPool.load(this, R.raw.dock, 1);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ImageLoader.getInstance().clearAllCache();
+    }
 }

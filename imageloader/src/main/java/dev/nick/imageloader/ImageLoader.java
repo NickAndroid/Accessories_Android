@@ -275,18 +275,18 @@ public class ImageLoader implements Handler.Callback, RequestHandler<LoadingTask
 
         @Override
         public boolean onPreStart(LoadingTask task) {
+            // Check if this task is dirty.
+            boolean isTaskDirty = isTaskDirty(task);
+            if (isTaskDirty) {
+                if (DEBUG) mLogger.info("Won't run task, id" + task.getTaskId());
+                return false;
+            }
             if (option != null) {
                 int showWhenLoading = option.getLoadingImgRes();
                 if (showWhenLoading > 0)
                     postApplyImageSettings(showWhenLoading, settable, null);
             } else {
                 postApplyImageSettings(null, null, settable, null);
-            }
-            // Check if this task is dirty.
-            boolean isTaskDirty = isTaskDirty(task);
-            if (isTaskDirty) {
-                if (DEBUG) mLogger.info("Won't run task, id" + task.getTaskId());
-                return false;
             }
             return true;
         }
