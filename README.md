@@ -11,7 +11,7 @@ Android image loader library
 
 ## Usage
 
-Download:
+### JCenter:
 
 [ ![Download](https://api.bintray.com/packages/nickandroid/maven/imageloader/images/download.svg) ](https://bintray.com/nickandroid/maven/imageloader/_latestVersion)
 
@@ -122,5 +122,7 @@ drawable://
 ### Contact me
 ```java
 nick.guo.dev@icloud.com
+```
+```java
 nick.guo.dev@gmail.com
 ```
