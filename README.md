@@ -12,6 +12,7 @@ Android image loader library
 ### Usage
 
 Download:
+
 [ ![Download](https://api.bintray.com/packages/nickandroid/maven/imageloader/images/download.svg) ](https://bintray.com/nickandroid/maven/imageloader/_latestVersion)
 
 
