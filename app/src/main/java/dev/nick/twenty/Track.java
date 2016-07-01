@@ -16,13 +16,12 @@
 
 package dev.nick.twenty;
 
-import java.io.Serializable;
-
 import android.graphics.Bitmap;
+
+import java.io.Serializable;
 
 /**
  * @author Nick
- * 
  */
 public class Track implements Serializable {
 
@@ -42,8 +41,7 @@ public class Track implements Serializable {
     }
 
     /**
-     * @param albumId
-     *            the albumId to set
+     * @param albumId the albumId to set
      */
     public void setAlbumId(long albumId) {
         this.albumId = albumId;
@@ -57,8 +55,7 @@ public class Track implements Serializable {
     }
 
     /**
-     * @param url
-     *            the url to set
+     * @param url the url to set
      */
     public void setUrl(String url) {
         this.url = url;
@@ -79,8 +76,7 @@ public class Track implements Serializable {
     }
 
     /**
-     * @param title
-     *            the title to set
+     * @param title the title to set
      */
     public void setTitle(String title) {
         this.title = title;
@@ -94,8 +90,7 @@ public class Track implements Serializable {
     }
 
     /**
-     * @param art
-     *            the art to set
+     * @param art the art to set
      */
     public void setArt(Bitmap art) {
         this.art = art;
@@ -109,8 +104,7 @@ public class Track implements Serializable {
     }
 
     /**
-     * @param artist
-     *            the artist to set
+     * @param artist the artist to set
      */
     public void setArtist(String artist) {
         this.artist = artist;
@@ -124,8 +118,7 @@ public class Track implements Serializable {
     }
 
     /**
-     * @param id
-     *            the id to set
+     * @param id the id to set
      */
     public void setId(long id) {
         this.id = id;

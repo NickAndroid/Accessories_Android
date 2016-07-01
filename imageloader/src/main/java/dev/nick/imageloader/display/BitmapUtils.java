@@ -28,7 +28,7 @@ import android.graphics.RectF;
 public final class BitmapUtils {
 
     /* Initial blur radius. */
-    private static final int DEFAULT_BLUR_RADIUS = 8;
+    private static final int DEFAULT_RADIUS = 8;
 
     /**
      * This class is never instantiated
@@ -42,7 +42,18 @@ public final class BitmapUtils {
      * @param sentBitmap The {@link Bitmap} to blur.
      * @return A blurred version of the given {@link Bitmap}.
      */
-    public static final Bitmap createBlurredBitmap(final Bitmap sentBitmap) {
+    public static Bitmap createBlurredBitmap(final Bitmap sentBitmap) {
+        return createBlurredBitmap(sentBitmap, DEFAULT_RADIUS);
+    }
+
+    /**
+     * Takes a bitmap and creates a new slightly blurry version of it.
+     *
+     * @param sentBitmap The {@link Bitmap} to blur.
+     * @param radius     Radius of the blur effect.
+     * @return A blurred version of the given {@link Bitmap}.
+     */
+    public static Bitmap createBlurredBitmap(final Bitmap sentBitmap, int radius) {
         if (sentBitmap == null) {
             return null;
         }
@@ -86,7 +97,7 @@ public final class BitmapUtils {
         final int wm = w - 1;
         final int hm = h - 1;
         final int wh = w * h;
-        final int div = DEFAULT_BLUR_RADIUS + DEFAULT_BLUR_RADIUS + 1;
+        final int div = radius + radius + 1;
 
         final int r[] = new int[wh];
         final int g[] = new int[wh];
@@ -108,15 +119,15 @@ public final class BitmapUtils {
         int stackstart;
         int[] sir;
         int rbs;
-        final int r1 = DEFAULT_BLUR_RADIUS + 1;
+        final int r1 = radius + 1;
         int routsum, goutsum, boutsum;
         int rinsum, ginsum, binsum;
 
         for (y = 0; y < h; y++) {
             rinsum = ginsum = binsum = routsum = goutsum = boutsum = rsum = gsum = bsum = 0;
-            for (i = -DEFAULT_BLUR_RADIUS; i <= DEFAULT_BLUR_RADIUS; i++) {
+            for (i = -radius; i <= radius; i++) {
                 p = pix[yi + Math.min(wm, Math.max(i, 0))];
-                sir = stack[i + DEFAULT_BLUR_RADIUS];
+                sir = stack[i + radius];
                 sir[0] = (p & 0xff0000) >> 16;
                 sir[1] = (p & 0x00ff00) >> 8;
                 sir[2] = p & 0x0000ff;
@@ -134,7 +145,7 @@ public final class BitmapUtils {
                     boutsum += sir[2];
                 }
             }
-            stackpointer = DEFAULT_BLUR_RADIUS;
+            stackpointer = radius;
 
             for (x = 0; x < w; x++) {
 
@@ -146,7 +157,7 @@ public final class BitmapUtils {
                 gsum -= goutsum;
                 bsum -= boutsum;
 
-                stackstart = stackpointer - DEFAULT_BLUR_RADIUS + div;
+                stackstart = stackpointer - radius + div;
                 sir = stack[stackstart % div];
 
                 routsum -= sir[0];
@@ -154,7 +165,7 @@ public final class BitmapUtils {
                 boutsum -= sir[2];
 
                 if (y == 0) {
-                    vmin[x] = Math.min(x + DEFAULT_BLUR_RADIUS + 1, wm);
+                    vmin[x] = Math.min(x + radius + 1, wm);
                 }
                 p = pix[yw + vmin[x]];
 
@@ -187,11 +198,11 @@ public final class BitmapUtils {
         }
         for (x = 0; x < w; x++) {
             rinsum = ginsum = binsum = routsum = goutsum = boutsum = rsum = gsum = bsum = 0;
-            yp = -DEFAULT_BLUR_RADIUS * w;
-            for (i = -DEFAULT_BLUR_RADIUS; i <= DEFAULT_BLUR_RADIUS; i++) {
+            yp = -radius * w;
+            for (i = -radius; i <= radius; i++) {
                 yi = Math.max(0, yp) + x;
 
-                sir = stack[i + DEFAULT_BLUR_RADIUS];
+                sir = stack[i + radius];
 
                 sir[0] = r[yi];
                 sir[1] = g[yi];
@@ -218,7 +229,7 @@ public final class BitmapUtils {
                 }
             }
             yi = x;
-            stackpointer = DEFAULT_BLUR_RADIUS;
+            stackpointer = radius;
             for (y = 0; y < h; y++) {
                 pix[yi] = 0xff000000 | dv[rsum] << 16 | dv[gsum] << 8 | dv[bsum];
 
@@ -226,7 +237,7 @@ public final class BitmapUtils {
                 gsum -= goutsum;
                 bsum -= boutsum;
 
-                stackstart = stackpointer - DEFAULT_BLUR_RADIUS + div;
+                stackstart = stackpointer - radius + div;
                 sir = stack[stackstart % div];
 
                 routsum -= sir[0];

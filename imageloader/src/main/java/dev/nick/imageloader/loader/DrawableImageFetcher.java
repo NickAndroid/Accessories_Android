@@ -31,7 +31,8 @@ public class DrawableImageFetcher extends BaseImageFetcher {
     }
 
     @Override
-    public Bitmap fetchFromUrl(@NonNull String url, DisplayOption.ImageQuality quality, ImageSpec info) throws Exception {
+    public Bitmap fetchFromUrl(@NonNull String url, DisplayOption.ImageQuality quality,
+                               ImageSpec spec) throws Exception {
 
         Resources resources = this.context.getResources();
 
@@ -41,19 +42,27 @@ public class DrawableImageFetcher extends BaseImageFetcher {
 
         if (resId <= 0) throw new Resources.NotFoundException("Res:" + url);
 
-        BitmapFactory.Options decodeOptions = new BitmapFactory.Options();
+        BitmapFactory.Options decodeOptions = null;
 
-        // If we have to resize this image, first get the natural bounds.
-        decodeOptions.inJustDecodeBounds = true;
-        BitmapFactory.decodeResource(resources, resId, decodeOptions);
+        switch (quality) {
+            case FIT_VIEW:
+                decodeOptions = new BitmapFactory.Options();
 
-        // Decode to the nearest power of two scaling factor.
-        decodeOptions.inJustDecodeBounds = false;
-        decodeOptions.inSampleSize =
-                computeSampleSize(decodeOptions, UNCONSTRAINED,
-                        (info.height * info.height == 0 ?
-                                MAX_NUM_PIXELS_THUMBNAIL
-                                : info.width * info.height));
+                // If we have to resize this image, first get the natural bounds.
+                decodeOptions.inJustDecodeBounds = true;
+                BitmapFactory.decodeResource(resources, resId, decodeOptions);
+
+                // Decode to the nearest power of two scaling factor.
+                decodeOptions.inJustDecodeBounds = false;
+                decodeOptions.inSampleSize =
+                        computeSampleSize(decodeOptions, UNCONSTRAINED,
+                                (spec.height * spec.height == 0 ?
+                                        MAX_NUM_PIXELS_THUMBNAIL
+                                        : spec.width * spec.height));
+            default:
+                break;
+        }
+
         Bitmap tempBitmap;
         try {
             tempBitmap = BitmapFactory.decodeResource(resources, resId, decodeOptions);

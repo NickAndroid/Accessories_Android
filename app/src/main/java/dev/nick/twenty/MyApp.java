@@ -25,7 +25,7 @@ import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.cache.CachePolicy;
 
-public class TwentyApp extends ScalpelApplication {
+public class MyApp extends ScalpelApplication {
     @Override
     public void onCreate() {
         super.onCreate();

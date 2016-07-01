@@ -31,7 +31,8 @@ public class DisplayOption {
     private BitmapProcessor processor;
     private ImageAnimator animator;
 
-    public DisplayOption(int defaultImgRes, int loadingImgRes, ImageQuality quality, BitmapProcessor processor, ImageAnimator animator) {
+    private DisplayOption(int defaultImgRes, int loadingImgRes, ImageQuality quality,
+                          BitmapProcessor processor, ImageAnimator animator) {
         this.defaultImgRes = defaultImgRes;
         this.loadingImgRes = loadingImgRes;
         this.quality = quality;

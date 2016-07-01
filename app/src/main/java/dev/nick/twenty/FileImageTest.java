@@ -17,19 +17,13 @@
 package dev.nick.twenty;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.database.Cursor;
-import android.media.AudioAttributes;
-import android.media.SoundPool;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -49,22 +43,15 @@ import dev.nick.imageloader.display.processor.BlackWhiteBitmapProcessor;
 import dev.nick.imageloader.loader.ImageSource;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
-public class StubActivity extends AppCompatActivity {
+public class FileImageTest extends BaseTest {
 
     @FindView(id = R.id.list)
     ListView listView;
 
-    final String urlDrawable = "drawable://girl";
-    final String urlHttp = "http://tse2.mm.bing.net/th?id=OIP.M960c6796f4870a8764558c39e9148afao2&pid=15.1";
-    final String urlAssets = "assets://girl.jpg";
-
-    static String mArtworkUri = "content://media/external/audio/albumart";
-
-    String[] urls = new String[]{urlAssets, urlDrawable, urlHttp, urlDrawable, urlAssets};
-
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.stub);
+        setContentView(R.layout.file_image);
+        setTitle(getClass().getSimpleName());
         Scalpel.getInstance().wire(this);
     }
 
@@ -96,14 +83,14 @@ public class StubActivity extends AppCompatActivity {
                 ViewHolder holder;
 
                 if (convertView == null) {
-                    convertView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.item, parent, false);
+                    convertView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.list_item, parent, false);
                     holder = new ViewHolder(convertView);
                     convertView.setTag(holder);
                 } else {
                     holder = (ViewHolder) convertView.getTag();
                 }
 
-                //  convertView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.item, parent, false);
+                //  convertView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.list_item, parent, false);
                 //holder = new ViewHolder(convertView);
 
                 holder.textView.setText(tracks.get(position).getTitle());
@@ -126,13 +113,6 @@ public class StubActivity extends AppCompatActivity {
         };
 
         listView.setAdapter(adapter);
-        loadSound();
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                soundPool.play(soundId, 1.0f, 1.0f, 0, i, 1.0f);
-            }
-        });
     }
 
     class ViewHolder {
@@ -170,20 +150,6 @@ public class StubActivity extends AppCompatActivity {
         cursor.close();
 
         return tracks;
-    }
-
-    SoundPool soundPool;
-    int soundId;
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    void loadSound() {
-        soundPool = new SoundPool.Builder()
-                .setMaxStreams(1)
-                .setAudioAttributes(new AudioAttributes.Builder()
-                        .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
-                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build())
-                .build();
-        soundId = soundPool.load(this, R.raw.dock, 1);
     }
 
     @Override

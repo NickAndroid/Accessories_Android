@@ -114,6 +114,10 @@ public class LoadingTask implements Runnable {
         }
     }
 
+    public long getUpTime() {
+        return upTime;
+    }
+
     public int getTaskId() {
         return id;
     }

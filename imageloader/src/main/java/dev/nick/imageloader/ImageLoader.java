@@ -32,6 +32,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import dev.nick.imageloader.cache.CacheManager;
+import dev.nick.imageloader.control.Freezer;
+import dev.nick.imageloader.control.LoaderState;
 import dev.nick.imageloader.display.BitmapImageSettings;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.display.ImageSettable;
@@ -69,9 +71,14 @@ public class ImageLoader implements Handler.Callback, RequestHandler<LoadingTask
 
     private final AtomicInteger mTaskId = new AtomicInteger(0);
 
+    private long mClearTaskRequestedTimeMills;
+
     private final Map<Integer, TaskRecord> mTaskLockMap;
 
     private ExecutorService mLoadingService;
+
+    private Freezer mFreezer;
+    private LoaderState mState;
 
     private static ImageLoader sLoader;
 
@@ -83,6 +90,7 @@ public class ImageLoader implements Handler.Callback, RequestHandler<LoadingTask
         this.mLoadingService = Executors.newFixedThreadPool(config.getLoadingThreads());
         this.mStackService = RequestStackService.createStarted(this);
         this.mTaskLockMap = new HashMap<>();
+        this.mState = LoaderState.RUNNING;
         this.mLogger = LoggerManager.getLogger(getClass());
         this.DEBUG = config.isDebug();
     }
@@ -108,21 +116,53 @@ public class ImageLoader implements Handler.Callback, RequestHandler<LoadingTask
         return sLoader;
     }
 
+    /**
+     * Clear all pending tasks.
+     */
+    public void clearTasks() {
+        mClearTaskRequestedTimeMills = System.currentTimeMillis();
+    }
+
+    /**
+     * Display image from the url to the view.
+     *
+     * @param url  Image source url, one of {@link dev.nick.imageloader.loader.ImageSource}
+     * @param view Target view to display the image.
+     */
     public void displayImage(String url, ImageView view) {
         ImageViewDelegate viewDelegate = new ImageViewDelegate(view);
         displayImage(url, viewDelegate, null);
     }
 
+    /**
+     * Display image from the url to the view.
+     *
+     * @param url    Image source url, one of {@link dev.nick.imageloader.loader.ImageSource}
+     * @param view   Target view to display the image.
+     * @param option {@link DisplayOption} is options using when display the image.
+     */
     public void displayImage(String url, ImageView view, DisplayOption option) {
         ImageViewDelegate viewDelegate = new ImageViewDelegate(view);
         displayImage(url, viewDelegate, option);
     }
 
+    /**
+     * Display image from the url to the view.
+     *
+     * @param url      Image source url, one of {@link dev.nick.imageloader.loader.ImageSource}
+     * @param settable Target {@link ImageSettable} to display the image.
+     */
     public void displayImage(String url, ImageSettable settable) {
         displayImage(url, settable, null);
     }
 
-
+    /**
+     * Display image from the url to the view.
+     *
+     * @param url      Image source url, one of {@link dev.nick.imageloader.loader.ImageSource}
+     * @param settable Target {@link ImageSettable} to display the image.
+     * @param option   {@link DisplayOption} is options using when display the image.
+     */
     public void displayImage(final String url,
                              final ImageSettable settable,
                              final DisplayOption option) {
@@ -155,9 +195,7 @@ public class ImageLoader implements Handler.Callback, RequestHandler<LoadingTask
 
         DisplayOption.ImageQuality quality = option.getQuality();
 
-        ImageSpec spec = quality == DisplayOption.ImageQuality.FIT_VIEW ?
-                new ImageSpec(settable.getWidth(), settable.getHeight())
-                : null;
+        ImageSpec spec = new ImageSpec(settable.getWidth(), settable.getHeight());
 
         int viewId = getIdOfImageSettable(settable);
         int taskId = nextTaskId();
@@ -196,6 +234,13 @@ public class ImageLoader implements Handler.Callback, RequestHandler<LoadingTask
     }
 
     private boolean isTaskDirty(LoadingTask task) {
+
+        boolean outDated = task.getUpTime() <= mClearTaskRequestedTimeMills;
+
+        if (outDated) {
+            return true;
+        }
+
         synchronized (mTaskLockMap) {
             TaskRecord lock = mTaskLockMap.get(task.getSettableId());
             if (lock != null) {
@@ -246,7 +291,32 @@ public class ImageLoader implements Handler.Callback, RequestHandler<LoadingTask
         return true;
     }
 
+    public void freeze() {
+        if (mState == LoaderState.TERMINATED) {
+            throw new IllegalStateException("Loader has been terminated.");
+        }
+        mState = LoaderState.FREEZED;
+        mLogger.funcExit();
+    }
+
+    public boolean isFreezed() {
+        return mState == LoaderState.FREEZED;
+    }
+
+    public void resume() {
+        if (mState == LoaderState.TERMINATED) {
+            throw new IllegalStateException("Loader has been terminated.");
+        }
+        mState = LoaderState.RUNNING;
+        mFreezer.resume();
+        mLogger.funcExit();
+    }
+
     public void terminate() {
+        if (mState == LoaderState.TERMINATED) {
+            throw new IllegalStateException("Loader has already been terminated.");
+        }
+        mState = LoaderState.TERMINATED;
         mStackService.terminate();
         mLoadingService.shutdown();
         synchronized (mTaskLockMap) {
@@ -292,6 +362,7 @@ public class ImageLoader implements Handler.Callback, RequestHandler<LoadingTask
 
         @Override
         public boolean onPreStart(LoadingTask task) {
+            if (!checkState()) return false;
             // Check if this task is dirty.
             boolean isTaskDirty = isTaskDirty(task);
             if (isTaskDirty) {
@@ -335,6 +406,17 @@ public class ImageLoader implements Handler.Callback, RequestHandler<LoadingTask
                     applyImageSettings(defaultImgRes, settable, null);
                 }
             }
+        }
+
+        boolean checkState() {
+            if (mState == LoaderState.TERMINATED) {
+                return false;
+            }
+            if (mState == LoaderState.FREEZED) {
+                if (mFreezer == null) mFreezer = new Freezer();
+                mFreezer.freeze();
+            }
+            return true;
         }
     }
 

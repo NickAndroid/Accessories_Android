@@ -14,31 +14,29 @@
  * limitations under the License.
  */
 
-package dev.nick.imageloader.display.processor;
+package dev.nick.twenty;
 
-import android.graphics.Bitmap;
-import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 
-import dev.nick.imageloader.display.BitmapUtils;
+import dev.nick.imageloader.ImageLoader;
 
-public class BlurBitmapProcessor implements BitmapProcessor {
-
-    int radius = 0;
-
-    public BlurBitmapProcessor() {
-    }
-
-    public BlurBitmapProcessor(int radius) {
-        this.radius = radius;
-    }
-
-    @NonNull
+public class BaseTest extends AppCompatActivity {
     @Override
-    public Bitmap process(@NonNull Bitmap in) {
-        if (radius > 0) {
-            return BitmapUtils.createBlurredBitmap(in, radius);
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.clear, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (ImageLoader.getInstance().isFreezed()) {
+            ImageLoader.getInstance().resume();
         } else {
-            return BitmapUtils.createBlurredBitmap(in);
+            ImageLoader.getInstance().freeze();
+            ImageLoader.getInstance().clearTasks();
         }
+        return true;
     }
 }

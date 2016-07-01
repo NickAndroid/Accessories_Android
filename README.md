@@ -3,7 +3,11 @@ Android image loader library
 
 [ ![Download](https://api.bintray.com/packages/nickandroid/maven/imageloader/images/download.svg) ](https://bintray.com/nickandroid/maven/imageloader/_latestVersion)
 
-![Logo](art/screen1.png)
+![Logo](art/1.png)
+![Logo](art/2.png)
+![Logo](art/3.png)
+![Logo](art/4.png)
+![Logo](art/5.png)
 
 ### Usage
 mvn:
@@ -44,7 +48,7 @@ public class MyApp extends Application {
 }
 ```
 
-Easy useage:
+Example usage:
 ```java
 ImageLoader.getInstance().displayImage(uri, holder.imageView,
                         new DisplayOption.Builder()
@@ -54,6 +58,21 @@ ImageLoader.getInstance().displayImage(uri, holder.imageView,
                                 .bitmapProcessor(new BlackWhiteBitmapProcessor())
                                 .imageAnimator(new FadeInImageAnimator())
                                 .build());
+```
+
+Freeze:
+```java
+ImageLoader.getInstance().freeze();
+```
+
+Resume:
+```java
+ImageLoader.getInstance().resume();
+```
+
+Clear tasks:
+```java
+ImageLoader.getInstance().clearTasks();
 ```
 
 Supported content:
