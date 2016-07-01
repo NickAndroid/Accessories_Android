@@ -9,14 +9,14 @@ Android image loader library
 ![Logo](art/4.png)
 ![Logo](art/5.png)
 
-### Usage
+## Usage
 
 Download:
 
 [ ![Download](https://api.bintray.com/packages/nickandroid/maven/imageloader/images/download.svg) ](https://bintray.com/nickandroid/maven/imageloader/_latestVersion)
 
 
-mvn:
+### mvn:
 ```
 <dependency>
   <groupId>dev.nick</groupId>
@@ -26,14 +26,14 @@ mvn:
 </dependency>
 ```
 
-gradle
+### gradle
 ```
 compile 'dev.nick:imageloader:0.2'
 ```
 
-### Samples
+## Samples
 
-Config:
+### Config:
 ```java
 public class MyApp extends Application {
     @Override
@@ -54,7 +54,7 @@ public class MyApp extends Application {
 }
 ```
 
-Example usage:
+### Loading:
 ```java
 ImageLoader.getInstance().displayImage(uri, holder.imageView,
                         new DisplayOption.Builder()
@@ -66,27 +66,27 @@ ImageLoader.getInstance().displayImage(uri, holder.imageView,
                                 .build());
 ```
 
-Freeze:
+### Freeze:
 ```java
 ImageLoader.getInstance().freeze();
 ```
 
-Resume:
+### Resume:
 ```java
 ImageLoader.getInstance().resume();
 ```
 
-Clear tasks:
+### Clear tasks:
 ```java
 ImageLoader.getInstance().clearTasks();
 ```
 
-Terminate:
+### Terminate:
 ```java
 ImageLoader.getInstance().terminate();
 ```
 
-Clear cache:
+### Clear cache:
 ```java
  @Override
     public void onTrimMemory(int level) {
@@ -102,7 +102,7 @@ Clear cache:
     }
 ```
 
-### Supported content:
+## Supported content:
 ```java
 file://
 ```
@@ -117,4 +117,10 @@ assets://
 ```
 ```java
 drawable://
+```
+
+### Contact me
+```java
+nick.guo.dev@icloud.com
+nick.guo.dev@gmail.com
 ```
