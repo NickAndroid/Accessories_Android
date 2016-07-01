@@ -7,7 +7,7 @@ def siteUrl = 'http://nickandroid.github.io/Logger/'    // project homepage
 def gitUrl = 'https://github.com/NickAndroid/Logger.git' // project git
 
 group = "dev.nick"
-version = "0.3"
+version = "0.4"
 
 android {
     compileSdkVersion 23

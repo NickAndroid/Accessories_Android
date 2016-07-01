@@ -75,7 +75,28 @@ Clear tasks:
 ImageLoader.getInstance().clearTasks();
 ```
 
-Supported content:
+Terminate:
+```java
+ImageLoader.getInstance().terminate();
+```
+
+Clear cache:
+```java
+ @Override
+    public void onTrimMemory(int level) {
+        super.onTrimMemory(level);
+        ImageLoader.getInstance().clearMemCache();
+    }
+```
+```java
+@Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ImageLoader.getInstance().clearAllCache();
+    }
+```
+
+### Supported content:
 ```java
 file://
 ```
