@@ -164,7 +164,7 @@ public class ImageLoader implements Handler.Callback, RequestHandler<LoadingTask
 
         LoadingTask.TaskCallback<Bitmap> callback = new ImageTaskCallback(settable, option, url, spec);
 
-        LoadingTask task = new LoadingTask(mContext, callback, taskId, viewId, spec, quality, url);
+        LoadingTask task = new LoadingTask(mContext, callback, mConfig, taskId, viewId, spec, quality, url);
 
         onTaskCreated(viewId, task);
 

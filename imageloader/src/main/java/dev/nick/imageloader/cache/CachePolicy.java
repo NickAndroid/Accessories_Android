@@ -27,6 +27,7 @@ public class CachePolicy {
 
     public static final FileNameGenerator DEFAULT_FILENAME_GENERATOR = new HeadlessFileNameGenerator();
     public static final KeyGenerator DEFAULT_KEY_GENERATOR = new HashcodeKeyGenerator();
+
     public static final CachePolicy DEFAULT_CACHE_POLICY = new CachePolicy.Builder()
             .compressFormat(Bitmap.CompressFormat.PNG)
             .quality(Quality.BEST)
@@ -72,6 +73,17 @@ public class CachePolicy {
 
     public int getQuality() {
         return quality;
+    }
+
+    @Override
+    public String toString() {
+        return "CachePolicy{" +
+                "compressFormat=" + compressFormat +
+                ", preferredLocation=" + preferredLocation +
+                ", keyGenerator=" + keyGenerator +
+                ", fileNameGenerator=" + fileNameGenerator +
+                ", quality=" + quality +
+                '}';
     }
 
     public static class Builder {

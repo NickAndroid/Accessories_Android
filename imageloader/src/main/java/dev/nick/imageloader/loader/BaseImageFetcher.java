@@ -21,6 +21,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 
+import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.logger.LoggerManager;
 
@@ -34,6 +35,8 @@ class BaseImageFetcher implements ImageFetcher {
     protected PathSplitter<String> splitter;
 
     protected Context context;
+
+    protected LoaderConfig loaderConfig;
 
     protected boolean debug;
 
@@ -51,8 +54,10 @@ class BaseImageFetcher implements ImageFetcher {
     }
 
     @Override
-    public void attachContext(Context context) {
+    public ImageFetcher prepare(Context context, LoaderConfig config) {
         this.context = context;
+        this.loaderConfig = config;
+        return this;
     }
 
     protected void logW(Object msg) {

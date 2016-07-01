@@ -20,6 +20,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 
 import dev.nick.imageloader.cache.CachePolicy;
+import dev.nick.imageloader.loader.network.NetworkPolicy;
 import dev.nick.logger.LoggerManager;
 
 /**
@@ -28,8 +29,9 @@ import dev.nick.logger.LoggerManager;
  */
 public class LoaderConfig {
 
-    public static final LoaderConfig DEFAULT_CONFIG = new LoaderConfig.Builder()
+    public static final LoaderConfig DEFAULT_CONFIG = new Builder()
             .cachePolicy(CachePolicy.DEFAULT_CACHE_POLICY)
+            .networkPolicy(NetworkPolicy.DEFAULT_NETWORK_POLICY)
             .cachingThreads(Runtime.getRuntime().availableProcessors())
             .loadingThreads(Runtime.getRuntime().availableProcessors())
             .debug(Build.TYPE.equals("eng"))
@@ -40,9 +42,16 @@ public class LoaderConfig {
     private int nLoadingThreads, nCachingThreads;
     private boolean memCacheEnabled, diskCacheEnabled, debug;
 
+    private CachePolicy cachePolicy;
+    private NetworkPolicy networkPolicy;
+
     @NonNull
     public CachePolicy getCachePolicy() {
         return cachePolicy;
+    }
+
+    public NetworkPolicy getNetworkPolicy() {
+        return networkPolicy;
     }
 
     public boolean isDebug() {
@@ -65,12 +74,16 @@ public class LoaderConfig {
         return nLoadingThreads;
     }
 
-    private CachePolicy cachePolicy;
 
-    private LoaderConfig(CachePolicy cachePolicy, boolean diskCacheEnabled, boolean memCacheEnabled,
+    private LoaderConfig(CachePolicy cachePolicy,
+                         NetworkPolicy networkPolicy,
+                         boolean diskCacheEnabled,
+                         boolean memCacheEnabled,
                          boolean debug,
-                         int nCachingThreads, int nLoadingThreads) {
+                         int nCachingThreads,
+                         int nLoadingThreads) {
         this.cachePolicy = cachePolicy;
+        this.networkPolicy = networkPolicy;
         this.diskCacheEnabled = diskCacheEnabled;
         this.memCacheEnabled = memCacheEnabled;
         this.debug = debug;
@@ -85,6 +98,7 @@ public class LoaderConfig {
                 diskCacheEnabled,
                 debug;
         private CachePolicy cachePolicy;
+        private NetworkPolicy networkPolicy;
 
         /**
          * @param cachePolicy The {@link CachePolicy} using to cache.
@@ -93,6 +107,16 @@ public class LoaderConfig {
          */
         public Builder cachePolicy(CachePolicy cachePolicy) {
             this.cachePolicy = cachePolicy;
+            return Builder.this;
+        }
+
+        /**
+         * @param networkPolicy The {@link NetworkPolicy} using to download images.
+         * @return Builder instance.
+         * @see CachePolicy
+         */
+        public Builder networkPolicy(NetworkPolicy networkPolicy) {
+            this.networkPolicy = networkPolicy;
             return Builder.this;
         }
 
@@ -139,13 +163,25 @@ public class LoaderConfig {
 
         public LoaderConfig build() {
             invalidate();
-            return new LoaderConfig(cachePolicy, diskCacheEnabled, memCacheEnabled,
-                    debug, nCachingThreads, nLoadingThreads);
+            return new LoaderConfig(
+                    cachePolicy,
+                    networkPolicy,
+                    diskCacheEnabled,
+                    memCacheEnabled,
+                    debug,
+                    nCachingThreads,
+                    nLoadingThreads);
         }
 
         void invalidate() {
-            if (cachePolicy == null)
-                throw new NullPointerException("cachePolicy should not be null.");
+            if (cachePolicy == null) {
+                cachePolicy = CachePolicy.DEFAULT_CACHE_POLICY;
+                LoggerManager.getLogger(ImageLoader.class).warn("Using default cache policy:" + cachePolicy);
+            }
+            if (networkPolicy == null) {
+                networkPolicy = NetworkPolicy.DEFAULT_NETWORK_POLICY;
+                LoggerManager.getLogger(ImageLoader.class).warn("Using default network policy:" + networkPolicy);
+            }
             if (nCachingThreads == 0) {
                 LoggerManager.getLogger(ImageLoader.class).warn("Using [Runtime.availableProcessors] as nCachingThreads");
                 nCachingThreads = Runtime.getRuntime().availableProcessors();

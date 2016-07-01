@@ -26,6 +26,7 @@ import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.Volley;
 
 import dev.nick.imageloader.display.DisplayOption;
+import dev.nick.imageloader.loader.network.NetworkUtils;
 
 public class NetworkImageFetcher extends BaseImageFetcher {
 
@@ -37,6 +38,14 @@ public class NetworkImageFetcher extends BaseImageFetcher {
 
     @Override
     public Bitmap fetchFromUrl(@NonNull String url, DisplayOption.ImageQuality quality, ImageSpec info) throws Exception {
+
+        boolean wifiOnly = loaderConfig.getNetworkPolicy().isOnlyOnWifi();
+        boolean isOnLine = NetworkUtils.isOnline(context, wifiOnly);
+
+        // No connection.
+        if (!isOnLine) {
+            return null;
+        }
 
         RequestFuture<Bitmap> future = RequestFuture.newFuture();
 

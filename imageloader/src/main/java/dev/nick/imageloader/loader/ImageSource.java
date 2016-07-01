@@ -21,6 +21,7 @@ import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.display.DisplayOption;
 
 public enum ImageSource {
@@ -73,8 +74,8 @@ public enum ImageSource {
         }
 
         @Override
-        public void attachContext(Context context) {
-            // Nothing.
+        public ImageFetcher prepare(Context context, LoaderConfig config) {
+            return this;
         }
     }, null);
 
@@ -87,9 +88,9 @@ public enum ImageSource {
     }
 
     @NonNull
-    public ImageFetcher getFetcher(Context context) {
-        fetcher.attachContext(context);
-        return fetcher;
+    public ImageFetcher getFetcher(Context context, LoaderConfig config) {
+        return fetcher.prepare(context, config);
+
     }
 
     public String getPrefix() {

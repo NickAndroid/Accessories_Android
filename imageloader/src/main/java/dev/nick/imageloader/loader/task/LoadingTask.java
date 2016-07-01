@@ -22,6 +22,7 @@ import android.os.Process;
 import android.util.Log;
 
 import dev.nick.imageloader.ImageLoader;
+import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.loader.ImageSpec;
 import dev.nick.imageloader.loader.ImageSource;
@@ -34,6 +35,7 @@ public class LoadingTask implements Runnable {
     ImageSpec spec;
     DisplayOption.ImageQuality quality;
     TaskCallback<Bitmap> callback;
+    LoaderConfig loaderConfig;
 
     Context mContext;
 
@@ -75,9 +77,14 @@ public class LoadingTask implements Runnable {
                 '}';
     }
 
-    public LoadingTask(Context context, TaskCallback<Bitmap> callback, int taskId, int settableId,
-                       ImageSpec spec, DisplayOption.ImageQuality quality, String url) {
+    public LoadingTask(Context context,
+                       TaskCallback<Bitmap> callback,
+                       LoaderConfig loaderConfig,
+                       int taskId, int settableId,
+                       ImageSpec spec, DisplayOption.ImageQuality quality,
+                       String url) {
         this.callback = callback;
+        this.loaderConfig = loaderConfig;
         this.id = taskId;
         this.settableId = settableId;
         this.spec = spec;
@@ -100,7 +107,7 @@ public class LoadingTask implements Runnable {
 
         Bitmap bitmap;
         try {
-            bitmap = source.getFetcher(mContext).fetchFromUrl(url, quality, spec);
+            bitmap = source.getFetcher(mContext, loaderConfig).fetchFromUrl(url, quality, spec);
             callback.onComplete(bitmap, this);
         } catch (Exception e) {
             callback.onError("Error when fetch image:" + Log.getStackTraceString(e));
