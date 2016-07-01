@@ -1,8 +1,8 @@
 # ImageLoader
 Android image loader library
 
-[ ![Download](https://api.bintray.com/packages/nickandroid/maven/imageloader/images/download.svg) ](https://bintray.com/nickandroid/maven/imageloader/_latestVersion)
 
+## Arts
 ![Logo](art/1.png)
 ![Logo](art/2.png)
 ![Logo](art/3.png)
@@ -10,19 +10,24 @@ Android image loader library
 ![Logo](art/5.png)
 
 ### Usage
+
+Download:
+[ ![Download](https://api.bintray.com/packages/nickandroid/maven/imageloader/images/download.svg) ](https://bintray.com/nickandroid/maven/imageloader/_latestVersion)
+
+
 mvn:
 ```
 <dependency>
   <groupId>dev.nick</groupId>
   <artifactId>imageloader</artifactId>
-  <version>0.1</version>
+  <version>0.2</version>
   <type>pom</type>
 </dependency>
 ```
 
 gradle
 ```
-compile 'dev.nick:imageloader:0.1'
+compile 'dev.nick:imageloader:0.2'
 ```
 
 ### Samples
