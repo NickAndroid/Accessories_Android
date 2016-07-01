@@ -31,7 +31,8 @@ public class TwentyApp extends ScalpelApplication {
         super.onCreate();
         EventBus.create(this);
         ImageLoader.init(getApplicationContext(), new LoaderConfig.Builder()
-                .cachePolicy(new CachePolicy.Builder().preferredLocation(CachePolicy.Location.EXTERNAL)
+                .cachePolicy(new CachePolicy.Builder()
+                        .preferredLocation(CachePolicy.Location.EXTERNAL)
                         .compressFormat(Bitmap.CompressFormat.PNG)
                         .build())
                 .cachingThreads(Runtime.getRuntime().availableProcessors())
