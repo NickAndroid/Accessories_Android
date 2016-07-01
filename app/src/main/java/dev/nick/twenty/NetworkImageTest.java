@@ -31,7 +31,7 @@ import dev.nick.imageloader.display.processor.BlurBitmapProcessor;
 
 public class NetworkImageTest extends BaseTest {
 
-    final String urlHttp = "http://tse2.mm.bing.net/th?id=OIP.M960c6796f4870a8764558c39e9148afao2&pid=15.1";
+    final String urlHttp = "https://tse2.mm.bing.net/th?id=OIP.M960c6796f4870a8764558c39e9148afao2&pid=15.1";
 
     @FindView(id = R.id.image)
     ImageView imageView;

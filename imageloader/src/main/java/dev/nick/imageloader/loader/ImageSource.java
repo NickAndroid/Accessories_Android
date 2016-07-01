@@ -59,12 +59,19 @@ public enum ImageSource {
         }
     }), "drawable://"),
 
-    NETWORK(new NetworkImageFetcher(new PathSplitter<String>() {
+    NETWORK_HTTP(new NetworkImageFetcher(new PathSplitter<String>() {
         @Override
         public String getRealPath(@NonNull String fullPath) {
             return fullPath;
         }
     }), "http://"),
+
+    NETWORK_HTTPS(new NetworkImageFetcher(new PathSplitter<String>() {
+        @Override
+        public String getRealPath(@NonNull String fullPath) {
+            return fullPath;
+        }
+    }), "https://"),
 
     UNKNOWN(new ImageFetcher() {
         @Override
