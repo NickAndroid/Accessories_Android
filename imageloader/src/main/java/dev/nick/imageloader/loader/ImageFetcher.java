@@ -20,8 +20,10 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
+import dev.nick.imageloader.display.DisplayOption;
+
 public interface ImageFetcher {
-    Bitmap fetchFromUrl(@NonNull String url, ImageInfo info) throws Exception;
+    Bitmap fetchFromUrl(@NonNull String url, DisplayOption.ImageQuality quality, ImageSpec info) throws Exception;
 
     void attachContext(Context context);
 }

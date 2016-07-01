@@ -19,8 +19,6 @@ package dev.nick.imageloader.display;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
-import java.lang.ref.WeakReference;
-
 import dev.nick.imageloader.display.animator.ImageAnimator;
 
 public class BitmapImageSettings implements Runnable {
@@ -28,9 +26,9 @@ public class BitmapImageSettings implements Runnable {
     ImageAnimator animator;
     @NonNull
     ImageSettable settable;
-    WeakReference<Bitmap> bitmap;
+    Bitmap bitmap;
 
-    public BitmapImageSettings(ImageAnimator animator, WeakReference<Bitmap> bitmap,
+    public BitmapImageSettings(ImageAnimator animator, Bitmap bitmap,
                                @NonNull ImageSettable settable) {
         this.animator = animator;
         this.bitmap = bitmap;
@@ -38,11 +36,10 @@ public class BitmapImageSettings implements Runnable {
     }
 
     void apply() {
-        applyImageSetting(bitmap.get(), settable, animator);
+        applyImageSetting(bitmap, settable, animator);
     }
 
-    void applyImageSetting(Bitmap bitmap, ImageSettable settable,
-                           ImageAnimator animator) {
+    void applyImageSetting(Bitmap bitmap, ImageSettable settable, ImageAnimator animator) {
         if (bitmap != null) {
             settable.setImageBitmap(bitmap);
             if (animator != null) {

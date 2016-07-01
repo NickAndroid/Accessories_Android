@@ -16,6 +16,8 @@
 
 package dev.nick.twenty;
 
+import android.graphics.Bitmap;
+
 import com.nick.scalpel.ScalpelApplication;
 
 import dev.nick.eventbus.EventBus;
@@ -30,6 +32,7 @@ public class TwentyApp extends ScalpelApplication {
         EventBus.create(this);
         ImageLoader.init(getApplicationContext(), new LoaderConfig.Builder()
                 .cachePolicy(new CachePolicy.Builder().preferredLocation(CachePolicy.Location.EXTERNAL)
+                        .compressFormat(Bitmap.CompressFormat.PNG)
                         .build())
                 .cachingThreads(Runtime.getRuntime().availableProcessors())
                 .loadingThreads(Runtime.getRuntime().availableProcessors() * 2)

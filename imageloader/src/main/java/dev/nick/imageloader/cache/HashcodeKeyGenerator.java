@@ -18,12 +18,12 @@ package dev.nick.imageloader.cache;
 
 import android.support.annotation.NonNull;
 
-import dev.nick.imageloader.loader.ImageInfo;
+import dev.nick.imageloader.loader.ImageSpec;
 
 class HashcodeKeyGenerator implements KeyGenerator {
     @Override
     @NonNull
-    public String fromUrl(@NonNull String url, ImageInfo info) {
+    public String fromUrl(@NonNull String url, ImageSpec info) {
         return String.valueOf(url.hashCode() + info.hashCode());
     }
 }

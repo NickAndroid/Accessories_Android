@@ -18,14 +18,14 @@ package dev.nick.imageloader.cache;
 
 import android.support.annotation.NonNull;
 
-import dev.nick.imageloader.loader.ImageInfo;
+import dev.nick.imageloader.loader.ImageSpec;
 
 public interface KeyGenerator {
     /**
      * @param url  Give url of the image request.
-     * @param info Image settable info {@link ImageInfo}
+     * @param info Image settable info {@link ImageSpec}
      * @return A key.
      */
     @NonNull
-    String fromUrl(@NonNull String url, ImageInfo info);
+    String fromUrl(@NonNull String url, ImageSpec info);
 }

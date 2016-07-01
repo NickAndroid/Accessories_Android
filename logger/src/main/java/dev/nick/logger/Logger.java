@@ -28,6 +28,8 @@ public interface Logger {
 
     void debug(Object o);
 
+    void verbose(Object o);
+
     void warn(Object o);
 
     void error(Object o);

@@ -25,7 +25,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
 import android.widget.ImageView;
 
-import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -40,7 +39,7 @@ import dev.nick.imageloader.display.ImageViewDelegate;
 import dev.nick.imageloader.display.ResImageSettings;
 import dev.nick.imageloader.display.animator.ImageAnimator;
 import dev.nick.imageloader.display.processor.BitmapProcessor;
-import dev.nick.imageloader.loader.ImageInfo;
+import dev.nick.imageloader.loader.ImageSpec;
 import dev.nick.imageloader.loader.task.LoadingTask;
 import dev.nick.logger.Logger;
 import dev.nick.logger.LoggerManager;
@@ -51,6 +50,8 @@ import dev.nick.stack.RequestStackService;
  * Main class of {@link ImageLoader} library.
  */
 public class ImageLoader implements Handler.Callback, RequestHandler<LoadingTask> {
+
+    private static final int MSG_APPLY_IMAGE_SETTINGS = 0x1;
 
     private Context mContext;
 
@@ -68,7 +69,7 @@ public class ImageLoader implements Handler.Callback, RequestHandler<LoadingTask
 
     private final AtomicInteger mTaskId = new AtomicInteger(0);
 
-    private final Map<Integer, TaskLock> mTaskLockMap;
+    private final Map<Integer, TaskRecord> mTaskLockMap;
 
     private ExecutorService mLoadingService;
 
@@ -108,12 +109,12 @@ public class ImageLoader implements Handler.Callback, RequestHandler<LoadingTask
     }
 
     public void displayImage(String url, ImageView view) {
-        ImageViewDelegate viewDelegate = new ImageViewDelegate(new WeakReference<>(view));
+        ImageViewDelegate viewDelegate = new ImageViewDelegate(view);
         displayImage(url, viewDelegate, null);
     }
 
     public void displayImage(String url, ImageView view, DisplayOption option) {
-        ImageViewDelegate viewDelegate = new ImageViewDelegate(new WeakReference<>(view));
+        ImageViewDelegate viewDelegate = new ImageViewDelegate(view);
         displayImage(url, viewDelegate, option);
     }
 
@@ -129,13 +130,13 @@ public class ImageLoader implements Handler.Callback, RequestHandler<LoadingTask
         // 2. If no cache, start a loading task.
         // 3. Cache the loaded.
         if (mConfig.isMemCacheEnabled() || mConfig.isDiskCacheEnabled()) {
-            ImageInfo info = new ImageInfo(settable.getWidth(), settable.getHeight());
+            ImageSpec info = new ImageSpec(settable.getWidth(), settable.getHeight());
             mCacheManager.get(url, info, new CacheManager.Callback() {
                 @Override
                 public void onResult(final Bitmap cached) {
                     if (cached != null) {
-                        if (DEBUG) mLogger.info("Using cached bitmap:" + cached);
-                        postApplyImageSettings(cached,
+                        if (DEBUG) mLogger.verbose("Using cached bitmap:" + cached);
+                        applyImageSettings(cached,
                                 option == null ? null : option.getProcessor(),
                                 settable, option == null ? null : option.getAnimator());
                     } else {
@@ -152,42 +153,27 @@ public class ImageLoader implements Handler.Callback, RequestHandler<LoadingTask
                               final ImageSettable settable,
                               final DisplayOption option) {
 
-        ImageInfo info = new ImageInfo(settable.getWidth(), settable.getHeight());
+        DisplayOption.ImageQuality quality = option.getQuality();
 
-        int viewId = createIdOfImageSettable(settable);
+        ImageSpec spec = quality == DisplayOption.ImageQuality.FIT_VIEW ?
+                new ImageSpec(settable.getWidth(), settable.getHeight())
+                : null;
+
+        int viewId = getIdOfImageSettable(settable);
         int taskId = nextTaskId();
 
-        LoadingTask.TaskCallback<Bitmap> callback = new ImageTaskCallback(settable, option, url, info);
+        LoadingTask.TaskCallback<Bitmap> callback = new ImageTaskCallback(settable, option, url, spec);
 
-        LoadingTask task = new LoadingTask(mContext, callback, taskId, viewId, info, url);
+        LoadingTask task = new LoadingTask(mContext, callback, taskId, viewId, spec, quality, url);
+
         onTaskCreated(viewId, task);
+
+        // Push it to the request stack.
         mStackService.push(task);
     }
 
-    private int createIdOfImageSettable(ImageSettable view) {
+    private int getIdOfImageSettable(ImageSettable view) {
         return view.hashCode();
-    }
-
-    private void postApplyImageSettings(Bitmap bitmap, BitmapProcessor processor, ImageSettable settable, ImageAnimator animator) {
-        if (settable != null) {
-            BitmapImageSettings settings = new BitmapImageSettings(animator,
-                    new WeakReference<>(processor == null ? bitmap : processor.process(bitmap)), settable);
-            mUIThreadHandler.obtainMessage(0, settings).sendToTarget();
-        }
-    }
-
-    private void postApplyImageSettings(int resId, ImageSettable settable, ImageAnimator animator) {
-        if (settable != null) {
-            ResImageSettings settings = new ResImageSettings(animator, resId, settable);
-            mUIThreadHandler.obtainMessage(0, settings).sendToTarget();
-        }
-    }
-
-    @Override
-    public boolean handleMessage(Message message) {
-        Runnable settings = (Runnable) message.obj;
-        settings.run();
-        return true;
     }
 
     private int nextTaskId() {
@@ -196,14 +182,14 @@ public class ImageLoader implements Handler.Callback, RequestHandler<LoadingTask
 
     private void onTaskCreated(int settableId, LoadingTask task) {
         if (DEBUG)
-            mLogger.info("Created task, settable:" + settableId + ", tid:" + task.getTaskId());
+            mLogger.verbose("Created task, settable:" + settableId + ", tid:" + task.getTaskId());
         int taskId = task.getTaskId();
         synchronized (mTaskLockMap) {
-            TaskLock exists = mTaskLockMap.get(settableId);
+            TaskRecord exists = mTaskLockMap.get(settableId);
             if (exists != null) {
                 exists.taskId = taskId;
             } else {
-                TaskLock lock = new TaskLock(taskId);
+                TaskRecord lock = new TaskRecord(taskId);
                 mTaskLockMap.put(settableId, lock);
             }
         }
@@ -211,7 +197,7 @@ public class ImageLoader implements Handler.Callback, RequestHandler<LoadingTask
 
     private boolean isTaskDirty(LoadingTask task) {
         synchronized (mTaskLockMap) {
-            TaskLock lock = mTaskLockMap.get(task.getSettableId());
+            TaskRecord lock = mTaskLockMap.get(task.getSettableId());
             if (lock != null) {
                 int taskId = lock.taskId;
                 // We have new task to load for this settle.
@@ -221,6 +207,37 @@ public class ImageLoader implements Handler.Callback, RequestHandler<LoadingTask
             }
         }
         return false;
+    }
+
+    @WorkerThread
+    private void applyImageSettings(Bitmap bitmap, BitmapProcessor processor, ImageSettable settable, ImageAnimator animator) {
+        if (settable != null) {
+            if (DEBUG)
+                mLogger.debug("applyImageSettings, Bitmap:" + bitmap + ", for settle:" + getIdOfImageSettable(settable));
+            BitmapImageSettings settings = new BitmapImageSettings(animator, (processor == null ? bitmap : processor.process(bitmap)), settable);
+            mUIThreadHandler.obtainMessage(MSG_APPLY_IMAGE_SETTINGS, settings).sendToTarget();
+        }
+    }
+
+    @WorkerThread
+    private void applyImageSettings(int resId, ImageSettable settable, ImageAnimator animator) {
+        if (settable != null) {
+            if (DEBUG)
+                mLogger.debug("applyImageSettings, Res:" + resId + ", for settle:" + getIdOfImageSettable(settable));
+            ResImageSettings settings = new ResImageSettings(animator, resId, settable);
+            mUIThreadHandler.obtainMessage(MSG_APPLY_IMAGE_SETTINGS, settings).sendToTarget();
+        }
+    }
+
+    private void onApplyImageSettings(Runnable settings) {
+        settings.run();
+    }
+
+    @Override
+    public boolean handleMessage(Message message) {
+        // It's our message:)
+        onApplyImageSettings((Runnable) message.obj);
+        return true;
     }
 
     @Override
@@ -263,10 +280,10 @@ public class ImageLoader implements Handler.Callback, RequestHandler<LoadingTask
         ImageSettable settable;
         String url;
         DisplayOption option;
-        ImageInfo info;
+        ImageSpec info;
 
         public ImageTaskCallback(@NonNull ImageSettable settable,
-                                 DisplayOption option, String url, ImageInfo info) {
+                                 DisplayOption option, String url, ImageSpec info) {
             this.option = option;
             this.url = url;
             this.info = info;
@@ -281,13 +298,11 @@ public class ImageLoader implements Handler.Callback, RequestHandler<LoadingTask
                 if (DEBUG) mLogger.info("Won't run task, id" + task.getTaskId());
                 return false;
             }
+            int showWhenLoading = 0;
             if (option != null) {
-                int showWhenLoading = option.getLoadingImgRes();
-                if (showWhenLoading > 0)
-                    postApplyImageSettings(showWhenLoading, settable, null);
-            } else {
-                postApplyImageSettings(null, null, settable, null);
+                showWhenLoading = option.getLoadingImgRes();
             }
+            applyImageSettings(showWhenLoading, settable, null);
             return true;
         }
 
@@ -299,7 +314,7 @@ public class ImageLoader implements Handler.Callback, RequestHandler<LoadingTask
                 return;
             }
             if (!isTaskDirty(task)) {
-                postApplyImageSettings(result, option == null ? null : option.getProcessor(), settable,
+                applyImageSettings(result, option == null ? null : option.getProcessor(), settable,
                         option == null ? null : option.getAnimator());
             } else if (DEBUG) {
                 mLogger.info("Won't apply image settings for task:" + task.getTaskId());
@@ -309,23 +324,24 @@ public class ImageLoader implements Handler.Callback, RequestHandler<LoadingTask
 
         @Override
         public void onError(String errMsg) {
-            if (mConfig.isDebug()) mLogger.error(errMsg);
+            if (DEBUG) mLogger.error(errMsg);
             onNoImageGot();
         }
 
         void onNoImageGot() {
             if (option != null) {
                 int defaultImgRes = option.getDefaultImgRes();
-                if (defaultImgRes > 0)
-                    postApplyImageSettings(defaultImgRes, settable, null);
+                if (defaultImgRes > 0) {
+                    applyImageSettings(defaultImgRes, settable, null);
+                }
             }
         }
     }
 
-    class TaskLock {
+    class TaskRecord {
         int taskId;
 
-        TaskLock(int taskId) {
+        TaskRecord(int taskId) {
             this.taskId = taskId;
         }
     }

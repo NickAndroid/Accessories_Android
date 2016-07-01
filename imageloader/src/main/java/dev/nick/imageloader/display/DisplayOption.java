@@ -26,12 +26,15 @@ public class DisplayOption {
     private int defaultImgRes;
     private int loadingImgRes;
 
+    private ImageQuality quality;
+
     private BitmapProcessor processor;
     private ImageAnimator animator;
 
-    public DisplayOption(int defaultImgRes, int loadingImgRes, BitmapProcessor processor, ImageAnimator animator) {
+    public DisplayOption(int defaultImgRes, int loadingImgRes, ImageQuality quality, BitmapProcessor processor, ImageAnimator animator) {
         this.defaultImgRes = defaultImgRes;
         this.loadingImgRes = loadingImgRes;
+        this.quality = quality;
         this.processor = processor;
         this.animator = animator;
     }
@@ -42,6 +45,10 @@ public class DisplayOption {
 
     public int getLoadingImgRes() {
         return loadingImgRes;
+    }
+
+    public ImageQuality getQuality() {
+        return quality;
     }
 
     public BitmapProcessor getProcessor() {
@@ -56,6 +63,8 @@ public class DisplayOption {
 
         private int defaultImgRes;
         private int loadingImgRes;
+
+        private ImageQuality quality = ImageQuality.FIT_VIEW;
 
         private BitmapProcessor processor;
         private ImageAnimator animator;
@@ -92,9 +101,25 @@ public class DisplayOption {
             return this;
         }
 
+        public Builder imageQuality(ImageQuality quality) {
+            this.quality = quality;
+            return this;
+        }
+
         public DisplayOption build() {
-            return new DisplayOption(loadingImgRes, defaultImgRes, processor, animator);
+            return new DisplayOption(defaultImgRes, loadingImgRes, quality, processor, animator);
         }
     }
 
+    public enum ImageQuality {
+        /**
+         * Using raw image when decode and display the image.
+         */
+        RAW,
+
+        /**
+         * Decrease the size of the image to fit the view dimen.
+         */
+        FIT_VIEW
+    }
 }

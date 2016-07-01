@@ -22,7 +22,8 @@ import android.os.Process;
 import android.util.Log;
 
 import dev.nick.imageloader.ImageLoader;
-import dev.nick.imageloader.loader.ImageInfo;
+import dev.nick.imageloader.display.DisplayOption;
+import dev.nick.imageloader.loader.ImageSpec;
 import dev.nick.imageloader.loader.ImageSource;
 import dev.nick.logger.Logger;
 import dev.nick.logger.LoggerManager;
@@ -30,7 +31,8 @@ import dev.nick.logger.LoggerManager;
 public class LoadingTask implements Runnable {
 
     String url;
-    ImageInfo info;
+    ImageSpec spec;
+    DisplayOption.ImageQuality quality;
     TaskCallback<Bitmap> callback;
 
     Context mContext;
@@ -50,13 +52,13 @@ public class LoadingTask implements Runnable {
 
         if (id != loadingTask.id) return false;
         if (!url.equals(loadingTask.url)) return false;
-        return info != null ? info.equals(loadingTask.info) : loadingTask.info == null;
+        return spec != null ? spec.equals(loadingTask.spec) : loadingTask.spec == null;
     }
 
     @Override
     public int hashCode() {
         int result = url.hashCode();
-        result = 31 * result + (info != null ? info.hashCode() : 0);
+        result = 31 * result + (spec != null ? spec.hashCode() : 0);
         result = 31 * result + id;
         return result;
     }
@@ -64,16 +66,22 @@ public class LoadingTask implements Runnable {
     @Override
     public String toString() {
         return "LoadingTask{" +
-                "id=" + id +
+                ", url='" + url + '\'' +
+                ", spec=" + spec +
+                ", quality=" + quality +
+                ", id=" + id +
+                ", settableId=" + settableId +
                 ", upTime=" + upTime +
                 '}';
     }
 
-    public LoadingTask(Context context, TaskCallback<Bitmap> callback, int id, int settableId, ImageInfo info, String url) {
+    public LoadingTask(Context context, TaskCallback<Bitmap> callback, int taskId, int settableId,
+                       ImageSpec spec, DisplayOption.ImageQuality quality, String url) {
         this.callback = callback;
-        this.id = id;
+        this.id = taskId;
         this.settableId = settableId;
-        this.info = info;
+        this.spec = spec;
+        this.quality = quality;
         this.url = url;
         this.mContext = context;
         this.mLogger = LoggerManager.getLogger(ImageLoader.class);
@@ -86,13 +94,13 @@ public class LoadingTask implements Runnable {
 
         if (!callback.onPreStart(this)) return;
 
-        mLogger.info("Running task:" + getTaskId() + ", for settle:" + getSettableId());
+        mLogger.verbose("Running task:" + getTaskId() + ", for settle:" + getSettableId());
 
         ImageSource source = ImageSource.of(url);
 
         Bitmap bitmap;
         try {
-            bitmap = source.getFetcher(mContext).fetchFromUrl(url, info);
+            bitmap = source.getFetcher(mContext).fetchFromUrl(url, quality, spec);
             callback.onComplete(bitmap, this);
         } catch (Exception e) {
             callback.onError("Error when fetch image:" + Log.getStackTraceString(e));

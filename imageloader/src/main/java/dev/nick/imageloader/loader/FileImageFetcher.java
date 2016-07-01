@@ -24,6 +24,8 @@ import android.util.Log;
 import java.io.File;
 import java.io.FileNotFoundException;
 
+import dev.nick.imageloader.display.DisplayOption;
+
 public class FileImageFetcher extends BaseImageFetcher {
 
     public FileImageFetcher(PathSplitter<String> splitter) {
@@ -31,7 +33,9 @@ public class FileImageFetcher extends BaseImageFetcher {
     }
 
     @Override
-    public Bitmap fetchFromUrl(@NonNull String url, ImageInfo info) throws Exception {
+    public Bitmap fetchFromUrl(@NonNull String url, DisplayOption.ImageQuality quality, ImageSpec info) throws Exception {
+
+        logW(info);
 
         String path = splitter.getRealPath(url);
         File file = new File(path);
@@ -39,19 +43,25 @@ public class FileImageFetcher extends BaseImageFetcher {
             throw new FileNotFoundException("File:" + url);
         }
 
-        BitmapFactory.Options decodeOptions = new BitmapFactory.Options();
+        BitmapFactory.Options decodeOptions = null;
 
-        // If we have to resize this image, first get the natural bounds.
-        decodeOptions.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(path, decodeOptions);
+        switch (quality) {
+            case FIT_VIEW:
+                decodeOptions = new BitmapFactory.Options();
+                // If we have to resize this image, first get the natural bounds.
+                decodeOptions.inJustDecodeBounds = true;
+                BitmapFactory.decodeFile(path, decodeOptions);
 
-        // Decode to the nearest power of two scaling factor.
-        decodeOptions.inJustDecodeBounds = false;
-        decodeOptions.inSampleSize =
-                computeSampleSize(decodeOptions, UNCONSTRAINED,
-                        (info.height * info.height == 0 ?
-                                MAX_NUM_PIXELS_THUMBNAIL
-                                : info.width * info.height));
+                // Decode to the nearest power of two scaling factor.
+                decodeOptions.inJustDecodeBounds = false;
+                decodeOptions.inSampleSize =
+                        computeSampleSize(decodeOptions, UNCONSTRAINED,
+                                (info.height * info.height == 0 ?
+                                        MAX_NUM_PIXELS_THUMBNAIL
+                                        : info.width * info.height));
+            default:
+                break;
+        }
 
         Bitmap tempBitmap;
         try {

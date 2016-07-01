@@ -20,49 +20,48 @@ import android.graphics.Bitmap;
 import android.view.animation.Animation;
 import android.widget.ImageView;
 
-import java.lang.ref.WeakReference;
+import dev.nick.logger.LoggerManager;
 
 /**
  * Wrapper class for a {@link ImageView}
  */
 public class ImageViewDelegate implements ImageSettable {
 
-    WeakReference<ImageView> imageView;
+    private ImageView imageView;
 
-    public ImageViewDelegate(WeakReference<ImageView> imageView) {
+    public ImageViewDelegate(ImageView imageView) {
         this.imageView = imageView;
     }
 
     @Override
     public void setImageBitmap(Bitmap bitmap) {
-        if (imageView.get() != null) imageView.get().setImageBitmap(bitmap);
+        LoggerManager.getLogger(getClass()).verbose("setImageBitmap:" + bitmap + ", view:" + hashCode());
+        imageView.setImageBitmap(bitmap);
     }
 
     @Override
     public void setImageResource(int resId) {
-        if (imageView.get() != null) imageView.get().setImageResource(resId);
+        imageView.setImageResource(resId);
     }
 
     @Override
     public int getWidth() {
-        return imageView.get() == null ? 0 : imageView.get().getWidth();
+        return imageView.getWidth();
     }
 
     @Override
     public int getHeight() {
-        return imageView.get() == null ? 0 : imageView.get().getHeight();
+        return imageView.getHeight();
     }
 
     @Override
     public void startAnimation(Animation animation) {
-        if (imageView.get() != null) {
-            imageView.get().clearAnimation();
-            imageView.get().startAnimation(animation);
-        }
+        imageView.clearAnimation();
+        imageView.startAnimation(animation);
     }
 
     @Override
     public int hashCode() {
-        return imageView.get() == null ? 0 : imageView.get().hashCode();
+        return imageView.hashCode();
     }
 }

@@ -25,16 +25,18 @@ import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.Volley;
 
+import dev.nick.imageloader.display.DisplayOption;
+
 public class NetworkImageFetcher extends BaseImageFetcher {
 
-   private RequestQueue mRequestQueue;
+    private RequestQueue mRequestQueue;
 
     public NetworkImageFetcher(PathSplitter<String> splitter) {
         super(splitter);
     }
 
     @Override
-    public Bitmap fetchFromUrl(@NonNull String url, ImageInfo info) throws Exception {
+    public Bitmap fetchFromUrl(@NonNull String url, DisplayOption.ImageQuality quality, ImageSpec info) throws Exception {
 
         RequestFuture<Bitmap> future = RequestFuture.newFuture();
 

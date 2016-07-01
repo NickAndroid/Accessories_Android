@@ -61,6 +61,13 @@ class LoggerImpl implements Logger {
     }
 
     @Override
+    public void verbose(Object o) {
+        Log.v(mLogTag, mCallingInfoBuilder.getCallingInfo()
+                + "---"
+                + String.valueOf(o));
+    }
+
+    @Override
     public void warn(Object o) {
         Log.d(mLogTag, mCallingInfoBuilder.getCallingInfo()
                 + "---"

@@ -22,6 +22,8 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 
+import dev.nick.imageloader.display.DisplayOption;
+
 public class ContentImageFetcher extends BaseImageFetcher {
 
     @NonNull
@@ -33,7 +35,7 @@ public class ContentImageFetcher extends BaseImageFetcher {
     }
 
     @Override
-    public Bitmap fetchFromUrl(@NonNull String url, ImageInfo info) throws Exception {
+    public Bitmap fetchFromUrl(@NonNull String url, DisplayOption.ImageQuality quality, ImageSpec info) throws Exception {
 
         Uri uri = Uri.parse(url);
 
@@ -58,6 +60,6 @@ public class ContentImageFetcher extends BaseImageFetcher {
 
         cursor.close();
 
-        return fileImageFetcher.fetchFromUrl(ImageSource.FILE.prefix + filePath, info);
+        return fileImageFetcher.fetchFromUrl(ImageSource.FILE.prefix + filePath, quality, info);
     }
 }

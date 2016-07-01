@@ -22,6 +22,8 @@ import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import dev.nick.imageloader.display.DisplayOption;
+
 public class DrawableImageFetcher extends BaseImageFetcher {
 
     public DrawableImageFetcher(PathSplitter<String> splitter) {
@@ -29,7 +31,7 @@ public class DrawableImageFetcher extends BaseImageFetcher {
     }
 
     @Override
-    public Bitmap fetchFromUrl(@NonNull String url, ImageInfo info) throws Exception {
+    public Bitmap fetchFromUrl(@NonNull String url, DisplayOption.ImageQuality quality, ImageSpec info) throws Exception {
 
         Resources resources = this.context.getResources();
 

@@ -23,7 +23,6 @@ import android.media.AudioAttributes;
 import android.media.SoundPool;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -38,7 +37,6 @@ import android.widget.TextView;
 
 import com.nick.scalpel.Scalpel;
 import com.nick.scalpel.annotation.binding.FindView;
-import com.nick.scalpel.annotation.binding.MainThreadHandler;
 import com.nick.scalpel.annotation.request.RequirePermission;
 
 import java.util.ArrayList;
@@ -48,12 +46,10 @@ import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.display.animator.FadeInImageAnimator;
 import dev.nick.imageloader.display.processor.BlackWhiteBitmapProcessor;
+import dev.nick.imageloader.loader.ImageSource;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
 public class StubActivity extends AppCompatActivity {
-
-    @MainThreadHandler
-    Handler mHandler;
 
     @FindView(id = R.id.list)
     ListView listView;
@@ -113,12 +109,13 @@ public class StubActivity extends AppCompatActivity {
                 holder.textView.setText(tracks.get(position).getTitle());
 
                 // String uri = mArtworkUri + File.separator + tracks.get(position).getAlbumId();
-                String uri = "file://" + tracks.get(position).getUrl();
+                String uri = ImageSource.FILE.getPrefix() + tracks.get(position).getUrl();
 
                 ImageLoader.getInstance().displayImage(uri, holder.imageView,
                         new DisplayOption.Builder()
-                                .loadingImgRes(R.drawable.ic_cloud_download_black_24dp)
-                                .defaultImgRes(R.drawable.ic_broken_image_black_24dp)
+                                .imageQuality(DisplayOption.ImageQuality.FIT_VIEW)
+                                //.loadingImgRes(R.drawable.ic_cloud_download_black_24dp)
+                                //.defaultImgRes(R.drawable.ic_broken_image_black_24dp)
                                 .bitmapProcessor(new BlackWhiteBitmapProcessor())
                                 .imageAnimator(new FadeInImageAnimator())
                                 .build());

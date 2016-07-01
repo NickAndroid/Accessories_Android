@@ -39,6 +39,7 @@ import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.cache.Cache;
 import dev.nick.imageloader.cache.CachePolicy;
 import dev.nick.imageloader.cache.FileNameGenerator;
+import dev.nick.logger.LoggerManager;
 
 public class DiskCache implements Cache<String, Bitmap> {
 
@@ -46,6 +47,9 @@ public class DiskCache implements Cache<String, Bitmap> {
     String mInternalCacheDir;
 
     boolean preferToExternal;
+
+    Bitmap.CompressFormat format;
+    int quality;
 
     boolean debug;
 
@@ -64,6 +68,8 @@ public class DiskCache implements Cache<String, Bitmap> {
         }
         mRunningOps = new ArrayList<>();
         fileNameGenerator = config.getCachePolicy().getFileNameGenerator();
+        format = config.getCachePolicy().getCompressFormat();
+        quality = config.getCachePolicy().getQuality();
     }
 
     @Override
@@ -144,7 +150,7 @@ public class DiskCache implements Cache<String, Bitmap> {
 
             if (!in.exists()) {
                 if (debug)
-                    Log.e("DiskCache", "Cache file do not exists:" + in.getAbsolutePath());
+                    LoggerManager.getLogger(getClass()).debug("Cache file do not exists:" + in.getAbsolutePath());
                 return null;
             }
 
@@ -160,10 +166,10 @@ public class DiskCache implements Cache<String, Bitmap> {
                 return out;
             } catch (FileNotFoundException e) {
                 if (debug)
-                    Log.e("DiskCache", "Cache file do not exists:" + Log.getStackTraceString(e));
+                    LoggerManager.getLogger(getClass()).debug("Cache file do not exists:" + Log.getStackTraceString(e));
                 return null;
             } catch (IOException e) {
-                Log.e("DiskCache", "Failed to close fis:" + Log.getStackTraceString(e));
+                LoggerManager.getLogger(getClass()).debug("Failed to close fis:" + Log.getStackTraceString(e));
                 return null;
             }
         }
@@ -215,7 +221,7 @@ public class DiskCache implements Cache<String, Bitmap> {
 
             if (out.exists()) {
                 if (debug)
-                    Log.e("DiskCache", "Skip cache exists file:" + out.getAbsolutePath());
+                    LoggerManager.getLogger(getClass()).debug("Skip cache exists file:" + out.getAbsolutePath());
                 removeOp(this);
                 return true;
             }
@@ -223,7 +229,7 @@ public class DiskCache implements Cache<String, Bitmap> {
             if (!out.getParentFile().exists() && !out.getParentFile().mkdirs()) {
                 // Something went wrong, nothing to do.
                 if (debug)
-                    Log.e("DiskCache", "Failed to create dirs:" + out.getParentFile().getAbsolutePath());
+                    LoggerManager.getLogger(getClass()).debug("Failed to create dirs:" + out.getParentFile().getAbsolutePath());
                 removeOp(this);
                 return false;
             }
@@ -231,15 +237,15 @@ public class DiskCache implements Cache<String, Bitmap> {
                 if (!out.createNewFile()) {
                     // Something went wrong, nothing to do.
                     if (debug)
-                        Log.e("DiskCache", "Failed to create file:" + out.getAbsolutePath());
+                        LoggerManager.getLogger(getClass()).debug("Failed to create file:" + out.getAbsolutePath());
                     removeOp(this);
                     return false;
                 }
                 AtomicFileCompat atomicFile = new AtomicFileCompat(out);
                 FileOutputStream fos = atomicFile.startWrite();
-                if (!in.compress(Bitmap.CompressFormat.PNG, 100 /*full*/, fos)) {
+                if (!in.compress(DiskCache.this.format, DiskCache.this.quality, fos)) {
                     if (debug)
-                        Log.e("DiskCache", "Failed to compress bitmap to file:" + out.getAbsolutePath());
+                        LoggerManager.getLogger(getClass()).debug("Failed to compress bitmap to file:" + out.getAbsolutePath());
                     removeOp(this);
                     atomicFile.failWrite(fos);
                     return false;
@@ -248,7 +254,7 @@ public class DiskCache implements Cache<String, Bitmap> {
             } catch (IOException e) {
                 // Something went wrong, nothing to do.
                 if (debug)
-                    Log.e("DiskCache", "IOException when create file:" + Log.getStackTraceString(e));
+                    LoggerManager.getLogger(getClass()).debug("IOException when create file:" + Log.getStackTraceString(e));
                 removeOp(this);
                 return false;
             }

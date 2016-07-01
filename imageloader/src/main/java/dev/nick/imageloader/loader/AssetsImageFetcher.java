@@ -25,6 +25,8 @@ import android.util.Log;
 
 import java.io.InputStream;
 
+import dev.nick.imageloader.display.DisplayOption;
+
 public class AssetsImageFetcher extends BaseImageFetcher {
 
     AssetManager assets;
@@ -34,7 +36,7 @@ public class AssetsImageFetcher extends BaseImageFetcher {
     }
 
     @Override
-    public Bitmap fetchFromUrl(@NonNull String url, ImageInfo info) throws Exception {
+    public Bitmap fetchFromUrl(@NonNull String url, DisplayOption.ImageQuality quality, ImageSpec info) throws Exception {
         String path = splitter.getRealPath(url);
 
         if (assets == null) assets = context.getAssets();

@@ -28,7 +28,7 @@ import java.util.concurrent.Executors;
 import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.cache.disk.DiskCache;
 import dev.nick.imageloader.cache.mem.MemCache;
-import dev.nick.imageloader.loader.ImageInfo;
+import dev.nick.imageloader.loader.ImageSpec;
 
 public class CacheManager {
 
@@ -49,7 +49,7 @@ public class CacheManager {
         keyGenerator = config.getCachePolicy().getKeyGenerator();
     }
 
-    public void cache(@NonNull String url, ImageInfo info, Bitmap value) {
+    public void cache(@NonNull String url, ImageSpec info, Bitmap value) {
         String key = keyGenerator.fromUrl(url, info);
         cacheByKey(key, value);
     }
@@ -75,7 +75,7 @@ public class CacheManager {
         return out;
     }
 
-    public void get(@NonNull final String url, @NonNull ImageInfo info, @NonNull final Callback callback) {
+    public void get(@NonNull final String url, @NonNull ImageSpec info, @NonNull final Callback callback) {
         if (!mConfig.isDiskCacheEnabled() && !mConfig.isMemCacheEnabled()) {
             callback.onResult(null);
             return;

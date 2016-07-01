@@ -21,6 +21,8 @@ import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import dev.nick.imageloader.display.DisplayOption;
+
 public enum ImageSource {
 
     FILE(new FileImageFetcher(new PathSplitter<String>() {
@@ -65,7 +67,7 @@ public enum ImageSource {
 
     UNKNOWN(new ImageFetcher() {
         @Override
-        public Bitmap fetchFromUrl(@NonNull String url, ImageInfo info) throws Exception {
+        public Bitmap fetchFromUrl(@NonNull String url, DisplayOption.ImageQuality quality, ImageSpec info) throws Exception {
             Log.w("ImageLoader.ImgSource", "Using UNKNOWN ImageSource for url:" + url);
             return null;
         }
@@ -88,6 +90,10 @@ public enum ImageSource {
     public ImageFetcher getFetcher(Context context) {
         fetcher.attachContext(context);
         return fetcher;
+    }
+
+    public String getPrefix() {
+        return prefix;
     }
 
     public static ImageSource of(@NonNull String url) {

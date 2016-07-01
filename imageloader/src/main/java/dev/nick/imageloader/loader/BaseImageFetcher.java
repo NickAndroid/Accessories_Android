@@ -20,15 +20,16 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
-import android.util.Log;
+
+import dev.nick.imageloader.display.DisplayOption;
+import dev.nick.logger.LoggerManager;
 
 class BaseImageFetcher implements ImageFetcher {
 
     static final int UNCONSTRAINED = -1;
 
     /* Maximum pixels size for created bitmap. */
-    static final int MAX_NUM_PIXELS_THUMBNAIL = 512 * 384;
-    static final int MAX_NUM_PIXELS_MICRO_THUMBNAIL = 160 * 120;
+    static final int MAX_NUM_PIXELS_THUMBNAIL = 512 * 512;
 
     protected PathSplitter<String> splitter;
 
@@ -41,7 +42,7 @@ class BaseImageFetcher implements ImageFetcher {
     }
 
     @Override
-    public Bitmap fetchFromUrl(@NonNull String url, ImageInfo info) throws Exception {
+    public Bitmap fetchFromUrl(@NonNull String url, DisplayOption.ImageQuality quality, ImageSpec info) throws Exception {
         return null;
     }
 
@@ -55,7 +56,7 @@ class BaseImageFetcher implements ImageFetcher {
     }
 
     protected void logW(Object msg) {
-        Log.d("Nick", String.valueOf(msg));
+        LoggerManager.getLogger(getClass()).warn(msg);
     }
 
     /*

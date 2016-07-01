@@ -16,17 +16,31 @@
 
 package dev.nick.imageloader;
 
+import android.os.Build;
+import android.support.annotation.NonNull;
+
 import dev.nick.imageloader.cache.CachePolicy;
+import dev.nick.logger.LoggerManager;
 
 /**
  * Configuration for {@link ImageLoader}, use a {@link Builder}
- * to build one.
+ * to build one, or using {@link #DEFAULT_CONFIG} as a default config.
  */
 public class LoaderConfig {
+
+    public static final LoaderConfig DEFAULT_CONFIG = new LoaderConfig.Builder()
+            .cachePolicy(CachePolicy.DEFAULT_CACHE_POLICY)
+            .cachingThreads(Runtime.getRuntime().availableProcessors())
+            .loadingThreads(Runtime.getRuntime().availableProcessors())
+            .debug(Build.TYPE.equals("eng"))
+            .diskCacheEnabled(true)
+            .memCacheEnabled(true)
+            .build();
 
     private int nLoadingThreads, nCachingThreads;
     private boolean memCacheEnabled, diskCacheEnabled, debug;
 
+    @NonNull
     public CachePolicy getCachePolicy() {
         return cachePolicy;
     }
@@ -66,9 +80,11 @@ public class LoaderConfig {
 
     public static class Builder {
 
-        int nLoadingThreads, nCachingThreads;
-        boolean memCacheEnabled, diskCacheEnabled, debug;
-        CachePolicy cachePolicy;
+        private int nLoadingThreads, nCachingThreads;
+        private boolean memCacheEnabled,
+                diskCacheEnabled,
+                debug;
+        private CachePolicy cachePolicy;
 
         /**
          * @param cachePolicy The {@link CachePolicy} using to cache.
@@ -122,8 +138,22 @@ public class LoaderConfig {
         }
 
         public LoaderConfig build() {
+            invalidate();
             return new LoaderConfig(cachePolicy, diskCacheEnabled, memCacheEnabled,
                     debug, nCachingThreads, nLoadingThreads);
+        }
+
+        void invalidate() {
+            if (cachePolicy == null)
+                throw new NullPointerException("cachePolicy should not be null.");
+            if (nCachingThreads == 0) {
+                LoggerManager.getLogger(ImageLoader.class).warn("Using [Runtime.availableProcessors] as nCachingThreads");
+                nCachingThreads = Runtime.getRuntime().availableProcessors();
+            }
+            if (nLoadingThreads == 0) {
+                LoggerManager.getLogger(ImageLoader.class).warn("Using [Runtime.availableProcessors] as nLoadingThreads");
+                nLoadingThreads = Runtime.getRuntime().availableProcessors();
+            }
         }
     }
 }
