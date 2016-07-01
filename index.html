@@ -1,88 +1,162 @@
-<!DOCTYPE html>
-<html lang="en-us">
+<!doctype html>
+<html>
   <head>
-    <meta charset="UTF-8">
-    <title>Zimageloader by NickAndroid</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Imageloader by NickAndroid</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-dark.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
   </head>
   <body>
-    <section class="page-header">
-      <h1 class="project-name">Zimageloader</h1>
-      <h2 class="project-tagline">Android image loader library</h2>
-      <a href="https://github.com/NickAndroid/ZImageLoader" class="btn">View on GitHub</a>
-      <a href="https://github.com/NickAndroid/ZImageLoader/zipball/master" class="btn">Download .zip</a>
-      <a href="https://github.com/NickAndroid/ZImageLoader/tarball/master" class="btn">Download .tar.gz</a>
-    </section>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/NickAndroid/ImageLoader_Android">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/NickAndroid/ImageLoader_Android/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/NickAndroid/ImageLoader_Android/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
 
-    <section class="main-content">
-      <h1>
-<a id="zimageloader" class="anchor" href="#zimageloader" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>ZImageLoader</h1>
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>Imageloader</h1>
+          <p>Android image loader library</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/NickAndroid">NickAndroid</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h1>
+<a id="imageloader" class="anchor" href="#imageloader" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>ImageLoader</h1>
 
 <p>Android image loader library</p>
 
-<h3>
-<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h3>
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h2>
 
-<p>mvn:</p>
+<h3>
+<a id="mvn" class="anchor" href="#mvn" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>mvn:</h3>
 
 <pre><code>&lt;dependency&gt;
   &lt;groupId&gt;dev.nick&lt;/groupId&gt;
   &lt;artifactId&gt;imageloader&lt;/artifactId&gt;
-  &lt;version&gt;0.1&lt;/version&gt;
+  &lt;version&gt;0.2&lt;/version&gt;
   &lt;type&gt;pom&lt;/type&gt;
 &lt;/dependency&gt;
 </code></pre>
 
-<p>gradle</p>
+<h3>
+<a id="gradle" class="anchor" href="#gradle" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>gradle</h3>
 
-<pre><code>compile 'dev.nick:imageloader:0.1'
+<pre><code>compile 'dev.nick:imageloader:0.2'
 </code></pre>
 
-<h3>
-<a id="samples" class="anchor" href="#samples" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Samples</h3>
+<h2>
+<a id="samples" class="anchor" href="#samples" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Samples</h2>
 
-<p>Config:</p>
+<h3>
+<a id="config" class="anchor" href="#config" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Config:</h3>
 
 <div class="highlight highlight-source-java"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">MyApp</span> <span class="pl-k">extends</span> <span class="pl-e">Application</span> {
     <span class="pl-k">@Override</span>
     <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">onCreate</span>() {
         <span class="pl-v">super</span><span class="pl-k">.</span>onCreate();
-        <span class="pl-smi">ZImageLoader</span><span class="pl-k">.</span>init(<span class="pl-v">this</span>, <span class="pl-k">new</span> <span class="pl-smi">ZImageLoader</span>.<span class="pl-smi">Config</span>()
-                .setDebug(<span class="pl-c1">true</span>)
-                .setPreferExternalStorageCache(<span class="pl-c1">true</span>)
-                .setCacheThreads(<span class="pl-c1">2</span>)
-                .setLoadingThreads(<span class="pl-c1">2</span>)
-                .setEnableFileCache(<span class="pl-c1">true</span>)
-                .setEnableMemCache(<span class="pl-c1">true</span>));
+        <span class="pl-smi">ImageLoader</span><span class="pl-k">.</span>init(getApplicationContext(), <span class="pl-k">new</span> <span class="pl-smi">LoaderConfig</span>.<span class="pl-smi">Builder</span>()
+                        .cachePolicy(<span class="pl-k">new</span> <span class="pl-smi">CachePolicy</span>.<span class="pl-smi">Builder</span>()
+                        .preferredLocation(<span class="pl-smi">CachePolicy</span><span class="pl-k">.</span><span class="pl-smi">Location</span><span class="pl-c1"><span class="pl-k">.</span>EXTERNAL</span>)
+                                .compressFormat(<span class="pl-smi">Bitmap</span><span class="pl-k">.</span><span class="pl-smi">CompressFormat</span><span class="pl-c1"><span class="pl-k">.</span>PNG</span>)
+                                .build())
+                        .cachingThreads(<span class="pl-smi">Runtime</span><span class="pl-k">.</span>getRuntime()<span class="pl-k">.</span>availableProcessors())
+                        .loadingThreads(<span class="pl-smi">Runtime</span><span class="pl-k">.</span>getRuntime()<span class="pl-k">.</span>availableProcessors() <span class="pl-k">*</span> <span class="pl-c1">2</span>)
+                        .diskCacheEnabled(<span class="pl-c1">true</span>)
+                        .memCacheEnabled(<span class="pl-c1">true</span>)
+                        .debug(<span class="pl-c1">true</span>)
+                        .build());
     }
 }</pre></div>
 
-<p>Easy useage:</p>
+<h3>
+<a id="loading" class="anchor" href="#loading" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Loading:</h3>
 
-<div class="highlight highlight-source-java"><pre> <span class="pl-smi">ZImageLoader</span><span class="pl-k">.</span>getInstance()<span class="pl-k">.</span>displayImage(uri, holder<span class="pl-k">.</span>imageView,
-                        <span class="pl-k">new</span> <span class="pl-smi">DisplayOption</span>(<span class="pl-smi">R</span><span class="pl-k">.</span>drawable<span class="pl-k">.</span>ic_broken_image_black_24dp,
-                                <span class="pl-smi">R</span><span class="pl-k">.</span>drawable<span class="pl-k">.</span>ic_cloud_download_black_24dp));</pre></div>
+<div class="highlight highlight-source-java"><pre><span class="pl-smi">ImageLoader</span><span class="pl-k">.</span>getInstance()<span class="pl-k">.</span>displayImage(uri, holder<span class="pl-k">.</span>imageView,
+                        <span class="pl-k">new</span> <span class="pl-smi">DisplayOption</span>.<span class="pl-smi">Builder</span>()
+                                .imageQuality(<span class="pl-smi">DisplayOption</span><span class="pl-k">.</span><span class="pl-smi">ImageQuality</span><span class="pl-c1"><span class="pl-k">.</span>FIT_VIEW</span>)
+                                .loadingImgRes(<span class="pl-smi">R</span><span class="pl-k">.</span>drawable<span class="pl-k">.</span>ic_cloud_download_black_24dp)
+                                .defaultImgRes(<span class="pl-smi">R</span><span class="pl-k">.</span>drawable<span class="pl-k">.</span>ic_broken_image_black_24dp)
+                                .bitmapProcessor(<span class="pl-k">new</span> <span class="pl-smi">BlackWhiteBitmapProcessor</span>())
+                                .imageAnimator(<span class="pl-k">new</span> <span class="pl-smi">FadeInImageAnimator</span>())
+                                .build());</pre></div>
 
-<p>Supported content:</p>
+<h3>
+<a id="freeze" class="anchor" href="#freeze" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Freeze:</h3>
 
-<div class="highlight highlight-source-java"><pre>file<span class="pl-k">:</span><span class="pl-c">//</span>
-content<span class="pl-k">:</span><span class="pl-c">//</span>
-http<span class="pl-k">:</span><span class="pl-c">//</span>
-assets<span class="pl-k">:</span><span class="pl-c">//</span>
-drawable<span class="pl-k">:</span><span class="pl-c">//</span></pre></div>
+<div class="highlight highlight-source-java"><pre><span class="pl-smi">ImageLoader</span><span class="pl-k">.</span>getInstance()<span class="pl-k">.</span>freeze();</pre></div>
 
-      <footer class="site-footer">
-        <span class="site-footer-owner"><a href="https://github.com/NickAndroid/ZImageLoader">Zimageloader</a> is maintained by <a href="https://github.com/NickAndroid">NickAndroid</a>.</span>
+<h3>
+<a id="resume" class="anchor" href="#resume" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Resume:</h3>
 
-        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
-      </footer>
+<div class="highlight highlight-source-java"><pre><span class="pl-smi">ImageLoader</span><span class="pl-k">.</span>getInstance()<span class="pl-k">.</span>resume();</pre></div>
 
-    </section>
+<h3>
+<a id="clear-tasks" class="anchor" href="#clear-tasks" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Clear tasks:</h3>
 
-  
+<div class="highlight highlight-source-java"><pre><span class="pl-smi">ImageLoader</span><span class="pl-k">.</span>getInstance()<span class="pl-k">.</span>clearTasks();</pre></div>
+
+<h3>
+<a id="terminate" class="anchor" href="#terminate" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Terminate:</h3>
+
+<div class="highlight highlight-source-java"><pre><span class="pl-smi">ImageLoader</span><span class="pl-k">.</span>getInstance()<span class="pl-k">.</span>terminate();</pre></div>
+
+<h3>
+<a id="clear-cache" class="anchor" href="#clear-cache" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Clear cache:</h3>
+
+<div class="highlight highlight-source-java"><pre> @<span class="pl-smi">Override</span>
+    <span class="pl-k">public</span> <span class="pl-k">void</span> onTrimMemory(<span class="pl-k">int</span> level) {
+        <span class="pl-v">super</span><span class="pl-k">.</span>onTrimMemory(level);
+        <span class="pl-smi">ImageLoader</span><span class="pl-k">.</span>getInstance()<span class="pl-k">.</span>clearMemCache();
+    }</pre></div>
+
+<div class="highlight highlight-source-java"><pre>@<span class="pl-smi">Override</span>
+    <span class="pl-k">protected</span> <span class="pl-k">void</span> onDestroy() {
+        <span class="pl-v">super</span><span class="pl-k">.</span>onDestroy();
+        <span class="pl-smi">ImageLoader</span><span class="pl-k">.</span>getInstance()<span class="pl-k">.</span>clearAllCache();
+    }</pre></div>
+
+<h2>
+<a id="supported-content" class="anchor" href="#supported-content" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Supported content:</h2>
+
+<div class="highlight highlight-source-java"><pre>file<span class="pl-k">:</span><span class="pl-c">//</span></pre></div>
+
+<div class="highlight highlight-source-java"><pre>content<span class="pl-k">:</span><span class="pl-c">//</span></pre></div>
+
+<div class="highlight highlight-source-java"><pre>http<span class="pl-k">:</span><span class="pl-c">//</span></pre></div>
+
+<div class="highlight highlight-source-java"><pre>assets<span class="pl-k">:</span><span class="pl-c">//</span></pre></div>
+
+<div class="highlight highlight-source-java"><pre>drawable<span class="pl-k">:</span><span class="pl-c">//</span></pre></div>
+
+<h3>
+<a id="contact-me" class="anchor" href="#contact-me" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Contact me</h3>
+
+<div class="highlight highlight-source-java"><pre>nick<span class="pl-k">.</span>guo<span class="pl-k">.</span>dev@icloud<span class="pl-k">.</span>com</pre></div>
+
+<div class="highlight highlight-source-java"><pre>nick<span class="pl-k">.</span>guo<span class="pl-k">.</span>dev@gmail<span class="pl-k">.</span>com</pre></div>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
   </body>
 </html>
