@@ -182,11 +182,11 @@ public class LoaderConfig {
                 networkPolicy = NetworkPolicy.DEFAULT_NETWORK_POLICY;
                 LoggerManager.getLogger(ImageLoader.class).warn("Using default network policy:" + networkPolicy);
             }
-            if (nCachingThreads == 0) {
+            if (nCachingThreads <= 0) {
                 LoggerManager.getLogger(ImageLoader.class).warn("Using [Runtime.availableProcessors] as nCachingThreads");
                 nCachingThreads = Runtime.getRuntime().availableProcessors();
             }
-            if (nLoadingThreads == 0) {
+            if (nLoadingThreads <= 0) {
                 LoggerManager.getLogger(ImageLoader.class).warn("Using [Runtime.availableProcessors] as nLoadingThreads");
                 nLoadingThreads = Runtime.getRuntime().availableProcessors();
             }

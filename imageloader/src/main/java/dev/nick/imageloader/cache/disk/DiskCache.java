@@ -16,14 +16,12 @@
 
 package dev.nick.imageloader.cache.disk;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.support.annotation.NonNull;
-import android.support.annotation.RequiresPermission;
 import android.support.annotation.WorkerThread;
 import android.util.Log;
 
@@ -43,44 +41,44 @@ import dev.nick.logger.LoggerManager;
 
 public class DiskCache implements Cache<String, Bitmap> {
 
-    String mExternalCacheDir;
-    String mInternalCacheDir;
+    private String mExternalCacheDir;
+    private String mInternalCacheDir;
 
-    boolean preferToExternal;
+    private boolean mPreferToExternal;
 
-    Bitmap.CompressFormat format;
-    int quality;
+    private Bitmap.CompressFormat mFormat;
+    private int mQuality;
 
-    boolean debug;
+    private boolean mDebug;
 
-    final List<FileOperator> mRunningOps;
+    private final List<FileOperator> mRunningOps;
 
-    FileNameGenerator fileNameGenerator;
+    private FileNameGenerator mFileNameGenerator;
 
     public DiskCache(LoaderConfig config, Context context) {
-        preferToExternal = config.getCachePolicy().getPreferredLocation() == CachePolicy.Location.EXTERNAL;
-        debug = config.isDebug();
+        mPreferToExternal = config.getCachePolicy().getPreferredLocation() == CachePolicy.Location.EXTERNAL;
+        mDebug = config.isDebug();
         mInternalCacheDir = context.getCacheDir().getPath();
-        if (preferToExternal) {
+        if (mPreferToExternal) {
             File externalCache = context.getExternalCacheDir();
             if (externalCache != null)
                 mExternalCacheDir = externalCache.getPath();
         }
         mRunningOps = new ArrayList<>();
-        fileNameGenerator = config.getCachePolicy().getFileNameGenerator();
-        format = config.getCachePolicy().getCompressFormat();
-        quality = config.getCachePolicy().getQuality();
+        mFileNameGenerator = config.getCachePolicy().getFileNameGenerator();
+        mFormat = config.getCachePolicy().getCompressFormat();
+        mQuality = config.getCachePolicy().getQuality();
     }
 
     @Override
     @WorkerThread
     public void cache(@NonNull String key, Bitmap value) {
 
-        if (debug) {
+        if (mDebug) {
             Log.d("DiskCache", "Trying to cache:" + key);
         }
 
-        if (preferToExternal && mExternalCacheDir != null
+        if (mPreferToExternal && mExternalCacheDir != null
                 && Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             if (!new FileWriter(mExternalCacheDir, value, key).write())
                 new FileWriter(mInternalCacheDir, value, key).write();
@@ -101,7 +99,7 @@ public class DiskCache implements Cache<String, Bitmap> {
 
         Bitmap result;
 
-        if (preferToExternal) {
+        if (mPreferToExternal) {
             result = new FileReader(mExternalCacheDir, key).read();
             if (result != null) return result;
         }
@@ -119,8 +117,8 @@ public class DiskCache implements Cache<String, Bitmap> {
     }
 
     private String getFilePathByKey(String key) {
-        String dir = preferToExternal ? mExternalCacheDir : mInternalCacheDir;
-        return dir + File.separator + fileNameGenerator.fromKey(key);
+        String dir = mPreferToExternal ? mExternalCacheDir : mInternalCacheDir;
+        return dir + File.separator + mFileNameGenerator.fromKey(key);
     }
 
     @Override
@@ -140,7 +138,7 @@ public class DiskCache implements Cache<String, Bitmap> {
 
     abstract class FileOperator {
         String getFileNameByKey(String key) {
-            return fileNameGenerator.fromKey(key);
+            return mFileNameGenerator.fromKey(key);
         }
     }
 
@@ -162,7 +160,7 @@ public class DiskCache implements Cache<String, Bitmap> {
             File in = new File(dir + File.separator + fileName);
 
             if (!in.exists()) {
-                if (debug)
+                if (mDebug)
                     LoggerManager.getLogger(getClass()).debug("Cache file do not exists:" + in.getAbsolutePath());
                 return null;
             }
@@ -172,13 +170,13 @@ public class DiskCache implements Cache<String, Bitmap> {
             try {
                 FileInputStream fis = atomicFile.openRead();
                 Bitmap out = BitmapFactory.decodeStream(fis);
-                if (debug) {
+                if (mDebug) {
                     Log.d("DiskCache", "Success read file cache:" + in.getAbsolutePath());
                 }
                 fis.close();
                 return out;
             } catch (FileNotFoundException e) {
-                if (debug)
+                if (mDebug)
                     LoggerManager.getLogger(getClass()).debug("Cache file do not exists:" + Log.getStackTraceString(e));
                 return null;
             } catch (IOException e) {
@@ -222,7 +220,7 @@ public class DiskCache implements Cache<String, Bitmap> {
         public boolean write() {
 
             if (hasOp(this)) {
-                if (debug) {
+                if (mDebug) {
                     Log.d("", "Ignore dup task for:" + fileName);
                 }
                 return true;
@@ -233,7 +231,7 @@ public class DiskCache implements Cache<String, Bitmap> {
             File out = new File(dir + File.separator + fileName);
 
             if (out.exists()) {
-                if (debug)
+                if (mDebug)
                     LoggerManager.getLogger(getClass()).debug("Skip cache exists file:" + out.getAbsolutePath());
                 removeOp(this);
                 return true;
@@ -241,7 +239,7 @@ public class DiskCache implements Cache<String, Bitmap> {
 
             if (!out.getParentFile().exists() && !out.getParentFile().mkdirs()) {
                 // Something went wrong, nothing to do.
-                if (debug)
+                if (mDebug)
                     LoggerManager.getLogger(getClass()).debug("Failed to create dirs:" + out.getParentFile().getAbsolutePath());
                 removeOp(this);
                 return false;
@@ -249,15 +247,15 @@ public class DiskCache implements Cache<String, Bitmap> {
             try {
                 if (!out.createNewFile()) {
                     // Something went wrong, nothing to do.
-                    if (debug)
+                    if (mDebug)
                         LoggerManager.getLogger(getClass()).debug("Failed to create file:" + out.getAbsolutePath());
                     removeOp(this);
                     return false;
                 }
                 AtomicFileCompat atomicFile = new AtomicFileCompat(out);
                 FileOutputStream fos = atomicFile.startWrite();
-                if (!in.compress(DiskCache.this.format, DiskCache.this.quality, fos)) {
-                    if (debug)
+                if (!in.compress(DiskCache.this.mFormat, DiskCache.this.mQuality, fos)) {
+                    if (mDebug)
                         LoggerManager.getLogger(getClass()).debug("Failed to compress bitmap to file:" + out.getAbsolutePath());
                     removeOp(this);
                     atomicFile.failWrite(fos);
@@ -266,13 +264,13 @@ public class DiskCache implements Cache<String, Bitmap> {
                 atomicFile.finishWrite(fos);
             } catch (IOException e) {
                 // Something went wrong, nothing to do.
-                if (debug)
+                if (mDebug)
                     LoggerManager.getLogger(getClass()).debug("IOException when create file:" + Log.getStackTraceString(e));
                 removeOp(this);
                 return false;
             }
 
-            if (debug) {
+            if (mDebug) {
                 Log.d("DiskCache", "Success write bitmap to:" + out.getAbsolutePath());
             }
             removeOp(this);

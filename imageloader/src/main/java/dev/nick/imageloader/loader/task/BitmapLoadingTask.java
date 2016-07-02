@@ -70,7 +70,7 @@ public class BitmapLoadingTask implements Runnable {
         return "BitmapLoadingTask{" +
                 ", url='" + url + '\'' +
                 ", spec=" + spec +
-                ", quality=" + quality +
+                ", imageQuality=" + quality +
                 ", id=" + id +
                 ", settableId=" + settableId +
                 ", upTime=" + upTime +

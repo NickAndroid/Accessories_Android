@@ -27,41 +27,41 @@ import dev.nick.logger.LoggerManager;
  */
 public class ImageViewDelegate implements ImageSettable {
 
-    private ImageView imageView;
+    private ImageView mImageView;
 
     public ImageViewDelegate(ImageView imageView) {
-        this.imageView = imageView;
+        this.mImageView = imageView;
     }
 
     @Override
     public void setImageBitmap(Bitmap bitmap) {
         LoggerManager.getLogger(getClass()).verbose("setImageBitmap:" + bitmap + ", view:" + hashCode());
-        imageView.setImageBitmap(bitmap);
+        mImageView.setImageBitmap(bitmap);
     }
 
     @Override
     public void setImageResource(int resId) {
-        imageView.setImageResource(resId);
+        mImageView.setImageResource(resId);
     }
 
     @Override
     public int getWidth() {
-        return imageView.getWidth();
+        return mImageView.getWidth();
     }
 
     @Override
     public int getHeight() {
-        return imageView.getHeight();
+        return mImageView.getHeight();
     }
 
     @Override
     public void startAnimation(Animation animation) {
-        imageView.clearAnimation();
-        imageView.startAnimation(animation);
+        mImageView.clearAnimation();
+        mImageView.startAnimation(animation);
     }
 
     @Override
     public int hashCode() {
-        return imageView.hashCode();
+        return mImageView.hashCode();
     }
 }

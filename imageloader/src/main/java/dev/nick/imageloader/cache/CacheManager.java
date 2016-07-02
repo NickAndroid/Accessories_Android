@@ -35,7 +35,7 @@ public class CacheManager {
     private DiskCache mDiskCache;
     private Cache<String, Bitmap> mMemCache;
 
-    private KeyGenerator keyGenerator;
+    private KeyGenerator mKeyGenerator;
 
     private LoaderConfig mConfig;
 
@@ -43,14 +43,14 @@ public class CacheManager {
 
     public CacheManager(LoaderConfig config, Context context) {
         mDiskCache = new DiskCache(config, context);
-        mMemCache = new MemCache();
+        mMemCache = new MemCache(config);
         mConfig = config;
         mCacheService = Executors.newFixedThreadPool(config.getCachingThreads());
-        keyGenerator = config.getCachePolicy().getKeyGenerator();
+        mKeyGenerator = config.getCachePolicy().getKeyGenerator();
     }
 
     public void cache(@NonNull String url, ImageSpec info, Bitmap value) {
-        String key = keyGenerator.fromUrl(url, info);
+        String key = mKeyGenerator.fromUrl(url, info);
         cacheByKey(key, value);
     }
 
@@ -75,15 +75,15 @@ public class CacheManager {
 
 
     public boolean isDiskCacheExists(@NonNull final String url, @NonNull ImageSpec info) {
-        return mDiskCache.getCachePath(keyGenerator.fromUrl(url, info)) != null;
+        return mDiskCache.getCachePath(mKeyGenerator.fromUrl(url, info)) != null;
     }
 
     public String getDiskCachePath(@NonNull final String url, @NonNull ImageSpec info) {
-        return mDiskCache.getCachePath(keyGenerator.fromUrl(url, info));
+        return mDiskCache.getCachePath(mKeyGenerator.fromUrl(url, info));
     }
 
     public Bitmap getMemCache(final String url, ImageSpec info) {
-        return mMemCache.get(keyGenerator.fromUrl(url, info));
+        return mMemCache.get(mKeyGenerator.fromUrl(url, info));
     }
 
     @Deprecated
@@ -93,7 +93,7 @@ public class CacheManager {
             return;
         }
 
-        final String key = keyGenerator.fromUrl(url, info);
+        final String key = mKeyGenerator.fromUrl(url, info);
 
         Bitmap out = mMemCache.get(key);
 

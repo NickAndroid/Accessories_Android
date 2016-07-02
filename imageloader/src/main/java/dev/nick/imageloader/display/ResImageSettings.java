@@ -22,19 +22,19 @@ import dev.nick.imageloader.display.animator.ImageAnimator;
 
 public class ResImageSettings implements Runnable {
 
-    ImageAnimator animator;
+    ImageAnimator mAnimator;
     @NonNull
-    ImageSettable settable;
-    int resId;
+    ImageSettable mSettable;
+    int mResId;
 
     public ResImageSettings(ImageAnimator animator, int resId, @NonNull ImageSettable settable) {
-        this.animator = animator;
-        this.resId = resId;
-        this.settable = settable;
+        this.mAnimator = animator;
+        this.mResId = resId;
+        this.mSettable = settable;
     }
 
     void apply() {
-        applyImageSetting(resId, settable, animator);
+        applyImageSetting(mResId, mSettable, mAnimator);
     }
 
     void applyImageSetting(int resId, ImageSettable settable, ImageAnimator animator) {
