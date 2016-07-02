@@ -41,6 +41,7 @@ import dev.nick.imageloader.display.ImageViewDelegate;
 import dev.nick.imageloader.display.ResImageSettings;
 import dev.nick.imageloader.display.animator.ImageAnimator;
 import dev.nick.imageloader.display.processor.BitmapProcessor;
+import dev.nick.imageloader.loader.ImageSource;
 import dev.nick.imageloader.loader.ImageSpec;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.task.BitmapLoadingTask;
@@ -164,30 +165,39 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
      * @param settable Target {@link ImageSettable} to display the image.
      * @param option   {@link DisplayOption} is options using when display the image.
      */
-    public void displayImage(final String url,
-                             final ImageSettable settable,
-                             final DisplayOption option) {
+    public void displayImage(String url,
+                             ImageSettable settable,
+                             DisplayOption option) {
+
+        beforeLoading(settable, option);
+
         // 1. Get from cache.
-        // 2. If no cache, start a loading task.
+        // 2. If no mem cache, start a loading task from disk cache file or perform first loading.
         // 3. Cache the loaded.
-        if (mConfig.isMemCacheEnabled() || mConfig.isDiskCacheEnabled()) {
-            ImageSpec info = new ImageSpec(settable.getWidth(), settable.getHeight());
-            mCacheManager.get(url, info, new CacheManager.Callback() {
-                @Override
-                public void onResult(final Bitmap cached) {
-                    if (cached != null) {
-                        if (DEBUG) mLogger.verbose("Using cached bitmap:" + cached);
-                        applyImageSettings(cached,
-                                option == null ? null : option.getProcessor(),
-                                settable, option == null ? null : option.getAnimator());
-                    } else {
-                        startLoading(url, settable, option);
-                    }
-                }
-            });
-        } else {
-            startLoading(url, settable, option);
+
+        ImageSpec info = new ImageSpec(settable.getWidth(), settable.getHeight());
+        if (mConfig.isMemCacheEnabled()) {
+            Bitmap cached;
+            if ((cached = mCacheManager.getMemCache(url, info)) != null) {
+                if (DEBUG) mLogger.verbose("Using cached mem bitmap:" + cached);
+                applyImageSettings(cached,
+                        option == null ? null : option.getProcessor(),
+                        settable, option == null ? null : option.getAnimator());
+                return;
+            }
         }
+
+        String loadingUrl = url;
+
+        if (mConfig.isDiskCacheEnabled()) {
+            String cachePath;
+            if ((cachePath = mCacheManager.getDiskCachePath(url, info)) != null) {
+                if (DEBUG) mLogger.verbose("Using cached disk cache:" + cachePath);
+                loadingUrl = ImageSource.FILE.getPrefix() + cachePath;
+            }
+        }
+
+        startLoading(loadingUrl, settable, option);
     }
 
     private void startLoading(final String url,
@@ -256,11 +266,13 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
     }
 
     @WorkerThread
-    private void applyImageSettings(Bitmap bitmap, BitmapProcessor processor, ImageSettable settable, ImageAnimator animator) {
+    private void applyImageSettings(Bitmap bitmap, BitmapProcessor processor, ImageSettable settable,
+                                    ImageAnimator animator) {
         if (settable != null) {
             if (DEBUG)
                 mLogger.debug("applyImageSettings, Bitmap:" + bitmap + ", for settle:" + getIdOfImageSettable(settable));
-            BitmapImageSettings settings = new BitmapImageSettings(animator, (processor == null ? bitmap : processor.process(bitmap)), settable);
+            BitmapImageSettings settings = new BitmapImageSettings(animator,
+                    (processor == null ? bitmap : processor.process(bitmap)), settable);
             mUIThreadHandler.obtainMessage(MSG_APPLY_IMAGE_SETTINGS, settings).sendToTarget();
         }
     }
@@ -269,7 +281,8 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
     private void applyImageSettings(int resId, ImageSettable settable, ImageAnimator animator) {
         if (settable != null) {
             if (DEBUG)
-                mLogger.debug("applyImageSettings, Res:" + resId + ", for settle:" + getIdOfImageSettable(settable));
+                mLogger.debug("applyImageSettings, Res:" + resId + ", for settle:"
+                        + getIdOfImageSettable(settable));
             ResImageSettings settings = new ResImageSettings(animator, resId, settable);
             mUIThreadHandler.obtainMessage(MSG_APPLY_IMAGE_SETTINGS, settings).sendToTarget();
         }
@@ -277,6 +290,14 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
 
     private void onApplyImageSettings(Runnable settings) {
         settings.run();
+    }
+
+    private void beforeLoading(ImageSettable settable, DisplayOption option) {
+        int showWhenLoading = 0;
+        if (option != null) {
+            showWhenLoading = option.getLoadingImgRes();
+        }
+        applyImageSettings(showWhenLoading, settable, null);
     }
 
     @Override
@@ -370,11 +391,7 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
                 if (DEBUG) mLogger.info("Won't run task, id" + task.getTaskId());
                 return false;
             }
-            int showWhenLoading = 0;
-            if (option != null) {
-                showWhenLoading = option.getLoadingImgRes();
-            }
-            applyImageSettings(showWhenLoading, settable, null);
+            beforeLoading(settable, option);
             return true;
         }
 

@@ -32,8 +32,8 @@ import dev.nick.imageloader.loader.ImageSpec;
 
 public class CacheManager {
 
-    Cache<String, Bitmap> mDiskCache;
-    Cache<String, Bitmap> mMemCache;
+    private DiskCache mDiskCache;
+    private Cache<String, Bitmap> mMemCache;
 
     private KeyGenerator keyGenerator;
 
@@ -68,13 +68,25 @@ public class CacheManager {
     }
 
     private Bitmap getAndCacheFromDisk(@NonNull String key) {
-
         Bitmap out = mDiskCache.get(key);
         if (out != null) mMemCache.cache(key, out);
-
         return out;
     }
 
+
+    public boolean isDiskCacheExists(@NonNull final String url, @NonNull ImageSpec info) {
+        return mDiskCache.getCachePath(keyGenerator.fromUrl(url, info)) != null;
+    }
+
+    public String getDiskCachePath(@NonNull final String url, @NonNull ImageSpec info) {
+        return mDiskCache.getCachePath(keyGenerator.fromUrl(url, info));
+    }
+
+    public Bitmap getMemCache(final String url, ImageSpec info) {
+        return mMemCache.get(keyGenerator.fromUrl(url, info));
+    }
+
+    @Deprecated
     public void get(@NonNull final String url, @NonNull ImageSpec info, @NonNull final Callback callback) {
         if (!mConfig.isDiskCacheEnabled() && !mConfig.isMemCacheEnabled()) {
             callback.onResult(null);

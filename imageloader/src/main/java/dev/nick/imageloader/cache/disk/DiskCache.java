@@ -74,7 +74,6 @@ public class DiskCache implements Cache<String, Bitmap> {
 
     @Override
     @WorkerThread
-    @RequiresPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
     public void cache(@NonNull String key, Bitmap value) {
 
         if (debug) {
@@ -97,7 +96,7 @@ public class DiskCache implements Cache<String, Bitmap> {
     @SuppressLint("InlinedApi")
     @Override
     @WorkerThread
-    @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+    @Deprecated
     public Bitmap get(@NonNull String key) {
 
         Bitmap result;
@@ -108,6 +107,20 @@ public class DiskCache implements Cache<String, Bitmap> {
         }
         // Try to find from internal cache.
         return new FileReader(mInternalCacheDir, key).read();
+    }
+
+    public String getCachePath(@NonNull String key) {
+        File in = new File(getFilePathByKey(key));
+
+        if (!in.exists()) {
+            return null;
+        }
+        return in.getPath();
+    }
+
+    private String getFilePathByKey(String key) {
+        String dir = preferToExternal ? mExternalCacheDir : mInternalCacheDir;
+        return dir + File.separator + fileNameGenerator.fromKey(key);
     }
 
     @Override
