@@ -17,12 +17,13 @@
 package dev.nick.imageloader.loader;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 
 import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.display.DisplayOption;
+import dev.nick.imageloader.loader.result.BitmapResult;
+import dev.nick.imageloader.loader.result.FailedCause;
 import dev.nick.logger.LoggerManager;
 
 class BaseImageFetcher implements ImageFetcher {
@@ -45,7 +46,8 @@ class BaseImageFetcher implements ImageFetcher {
     }
 
     @Override
-    public Bitmap fetchFromUrl(@NonNull String url, DisplayOption.ImageQuality quality, ImageSpec info) throws Exception {
+    public BitmapResult fetchFromUrl(@NonNull String url, DisplayOption.ImageQuality quality, ImageSpec info)
+            throws Exception {
         return null;
     }
 
@@ -58,6 +60,12 @@ class BaseImageFetcher implements ImageFetcher {
         this.context = context;
         this.loaderConfig = config;
         return this;
+    }
+
+    protected BitmapResult createEmptyResult() {
+        BitmapResult result = new BitmapResult();
+        result.cause = FailedCause.NONE;
+        return result;
     }
 
     protected void logW(Object msg) {

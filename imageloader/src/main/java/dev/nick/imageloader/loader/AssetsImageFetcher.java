@@ -21,27 +21,31 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import java.io.InputStream;
 
 import dev.nick.imageloader.display.DisplayOption;
+import dev.nick.imageloader.loader.result.BitmapResult;
+import dev.nick.imageloader.loader.result.FailedCause;
 
 public class AssetsImageFetcher extends BaseImageFetcher {
 
-    AssetManager assets;
+    private AssetManager mAssets;
 
     public AssetsImageFetcher(PathSplitter<String> splitter) {
         super(splitter);
     }
 
     @Override
-    public Bitmap fetchFromUrl(@NonNull String url, DisplayOption.ImageQuality quality, ImageSpec info) throws Exception {
+    public BitmapResult fetchFromUrl(@NonNull String url, DisplayOption.ImageQuality quality, ImageSpec info) throws Exception {
+
+        BitmapResult result = createEmptyResult();
+
         String path = splitter.getRealPath(url);
 
-        if (assets == null) assets = context.getAssets();
+        if (mAssets == null) mAssets = context.getAssets();
 
-        InputStream in = assets.open(path);
+        InputStream in = mAssets.open(path);
 
         BitmapFactory.Options decodeOptions = new BitmapFactory.Options();
 
@@ -62,10 +66,11 @@ public class AssetsImageFetcher extends BaseImageFetcher {
         try {
             tempBitmap = BitmapFactory.decodeStream(in, rect, decodeOptions);
         } catch (OutOfMemoryError error) {
-            throw new RuntimeException("OutOfMemoryError:" + Log.getStackTraceString(error));
+            result.cause = FailedCause.OOM;
         } finally {
             in.close();
         }
-        return tempBitmap;
+        result.result = tempBitmap;
+        return result;
     }
 }

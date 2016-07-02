@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-package dev.nick.imageloader.control;
+package dev.nick.imageloader.loader.result;
 
-public enum LoaderState {
-    RUNNING, PAUSE_REQUESTED, PAUSED, TERMINATED
+public enum FailedCause {
+    NONE, UNKNOWN_URL, FILE_NOT_EXISTS, CONTENT_NOT_EXISTS, RESOURCE_NOT_FOUND, NO_INTERNET_CONNECTION, OOM
 }

@@ -42,7 +42,8 @@ import dev.nick.imageloader.display.ResImageSettings;
 import dev.nick.imageloader.display.animator.ImageAnimator;
 import dev.nick.imageloader.display.processor.BitmapProcessor;
 import dev.nick.imageloader.loader.ImageSpec;
-import dev.nick.imageloader.loader.task.LoadingTask;
+import dev.nick.imageloader.loader.result.BitmapResult;
+import dev.nick.imageloader.loader.task.BitmapLoadingTask;
 import dev.nick.logger.Logger;
 import dev.nick.logger.LoggerManager;
 import dev.nick.stack.RequestHandler;
@@ -51,7 +52,7 @@ import dev.nick.stack.RequestStackService;
 /**
  * Main class of {@link ImageLoader} library.
  */
-public class ImageLoader implements Handler.Callback, RequestHandler<LoadingTask> {
+public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadingTask> {
 
     private static final int MSG_APPLY_IMAGE_SETTINGS = 0x1;
 
@@ -63,7 +64,7 @@ public class ImageLoader implements Handler.Callback, RequestHandler<LoadingTask
 
     private LoaderConfig mConfig;
 
-    private RequestStackService<LoadingTask> mStackService;
+    private RequestStackService<BitmapLoadingTask> mStackService;
 
     private Logger mLogger;
 
@@ -200,9 +201,9 @@ public class ImageLoader implements Handler.Callback, RequestHandler<LoadingTask
         int viewId = getIdOfImageSettable(settable);
         int taskId = nextTaskId();
 
-        LoadingTask.TaskCallback<Bitmap> callback = new ImageTaskCallback(settable, option, url, spec);
+        BitmapLoadingTask.TaskCallback<BitmapResult> callback = new ImageTaskCallback(settable, option, url, spec);
 
-        LoadingTask task = new LoadingTask(mContext, callback, mConfig, taskId, viewId, spec, quality, url);
+        BitmapLoadingTask task = new BitmapLoadingTask(mContext, callback, mConfig, taskId, viewId, spec, quality, url);
 
         onTaskCreated(viewId, task);
 
@@ -218,7 +219,7 @@ public class ImageLoader implements Handler.Callback, RequestHandler<LoadingTask
         return mTaskId.getAndIncrement();
     }
 
-    private void onTaskCreated(int settableId, LoadingTask task) {
+    private void onTaskCreated(int settableId, BitmapLoadingTask task) {
         if (DEBUG)
             mLogger.verbose("Created task, settable:" + settableId + ", tid:" + task.getTaskId());
         int taskId = task.getTaskId();
@@ -233,7 +234,7 @@ public class ImageLoader implements Handler.Callback, RequestHandler<LoadingTask
         }
     }
 
-    private boolean isTaskDirty(LoadingTask task) {
+    private boolean isTaskDirty(BitmapLoadingTask task) {
 
         boolean outDated = task.getUpTime() <= mClearTaskRequestedTimeMills;
 
@@ -286,21 +287,21 @@ public class ImageLoader implements Handler.Callback, RequestHandler<LoadingTask
     }
 
     @Override
-    public boolean handle(LoadingTask request) {
+    public boolean handle(BitmapLoadingTask request) {
         mLoadingService.execute(request);
         return true;
     }
 
-    public void freeze() {
+    public void pause() {
         if (mState == LoaderState.TERMINATED) {
             throw new IllegalStateException("Loader has been terminated.");
         }
-        mState = LoaderState.FREEZED;
+        mState = LoaderState.PAUSE_REQUESTED;
         mLogger.funcExit();
     }
 
-    public boolean isFreezed() {
-        return mState == LoaderState.FREEZED;
+    public boolean isPaused() {
+        return mState == LoaderState.PAUSED || mState == LoaderState.PAUSE_REQUESTED;
     }
 
     public void resume() {
@@ -344,7 +345,7 @@ public class ImageLoader implements Handler.Callback, RequestHandler<LoadingTask
         mLogger.funcExit();
     }
 
-    class ImageTaskCallback implements LoadingTask.TaskCallback<Bitmap> {
+    class ImageTaskCallback implements BitmapLoadingTask.TaskCallback<BitmapResult> {
 
         @NonNull
         ImageSettable settable;
@@ -361,7 +362,7 @@ public class ImageLoader implements Handler.Callback, RequestHandler<LoadingTask
         }
 
         @Override
-        public boolean onPreStart(LoadingTask task) {
+        public boolean onPreStart(BitmapLoadingTask task) {
             if (!checkState()) return false;
             // Check if this task is dirty.
             boolean isTaskDirty = isTaskDirty(task);
@@ -378,19 +379,19 @@ public class ImageLoader implements Handler.Callback, RequestHandler<LoadingTask
         }
 
         @Override
-        public void onComplete(Bitmap result, LoadingTask task) {
-            if (result == null) {
-                if (DEBUG) mLogger.warn("No image got");
+        public void onComplete(BitmapResult result, BitmapLoadingTask task) {
+            if (result.result == null) {
+                if (DEBUG) mLogger.warn("No image got, failed cause:" + result.cause);
                 onNoImageGot();
                 return;
             }
             if (!isTaskDirty(task)) {
-                applyImageSettings(result, option == null ? null : option.getProcessor(), settable,
+                applyImageSettings(result.result, option == null ? null : option.getProcessor(), settable,
                         option == null ? null : option.getAnimator());
             } else if (DEBUG) {
                 mLogger.info("Won't apply image settings for task:" + task.getTaskId());
             }
-            mCacheManager.cache(url, info, result);
+            mCacheManager.cache(url, info, result.result);
         }
 
         @Override
@@ -412,7 +413,8 @@ public class ImageLoader implements Handler.Callback, RequestHandler<LoadingTask
             if (mState == LoaderState.TERMINATED) {
                 return false;
             }
-            if (mState == LoaderState.FREEZED) {
+            if (mState == LoaderState.PAUSE_REQUESTED) {
+                mState = LoaderState.PAUSED;
                 if (mFreezer == null) mFreezer = new Freezer();
                 mFreezer.freeze();
             }

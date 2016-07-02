@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package dev.nick.imageloader.control;
+package dev.nick.imageloader.loader.result;
 
-public enum LoaderState {
-    RUNNING, PAUSE_REQUESTED, PAUSED, TERMINATED
+import android.graphics.Bitmap;
+
+public class BitmapResult extends Result<Bitmap, FailedCause> {
+    // Nothing.
 }

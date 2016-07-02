@@ -27,6 +27,8 @@ import com.android.volley.toolbox.Volley;
 
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.loader.network.NetworkUtils;
+import dev.nick.imageloader.loader.result.BitmapResult;
+import dev.nick.imageloader.loader.result.FailedCause;
 
 public class NetworkImageFetcher extends BaseImageFetcher {
 
@@ -37,14 +39,17 @@ public class NetworkImageFetcher extends BaseImageFetcher {
     }
 
     @Override
-    public Bitmap fetchFromUrl(@NonNull String url, DisplayOption.ImageQuality quality, ImageSpec info) throws Exception {
+    public BitmapResult fetchFromUrl(@NonNull String url, DisplayOption.ImageQuality quality, ImageSpec info) throws Exception {
 
         boolean wifiOnly = loaderConfig.getNetworkPolicy().isOnlyOnWifi();
         boolean isOnLine = NetworkUtils.isOnline(context, wifiOnly);
 
+        BitmapResult result = createEmptyResult();
+
         // No connection.
         if (!isOnLine) {
-            return null;
+            result.cause= FailedCause.NO_INTERNET_CONNECTION;
+            return result;
         }
 
         RequestFuture<Bitmap> future = RequestFuture.newFuture();
@@ -60,6 +65,8 @@ public class NetworkImageFetcher extends BaseImageFetcher {
 
         mRequestQueue.add(imageRequest);
 
-        return future.get();
+        result.result = future.get();
+
+        return result;
     }
 }

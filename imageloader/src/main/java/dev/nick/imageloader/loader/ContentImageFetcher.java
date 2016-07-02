@@ -17,12 +17,13 @@
 package dev.nick.imageloader.loader;
 
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 
 import dev.nick.imageloader.display.DisplayOption;
+import dev.nick.imageloader.loader.result.BitmapResult;
+import dev.nick.imageloader.loader.result.FailedCause;
 
 public class ContentImageFetcher extends BaseImageFetcher {
 
@@ -35,7 +36,9 @@ public class ContentImageFetcher extends BaseImageFetcher {
     }
 
     @Override
-    public Bitmap fetchFromUrl(@NonNull String url, DisplayOption.ImageQuality quality, ImageSpec info) throws Exception {
+    public BitmapResult fetchFromUrl(@NonNull String url, DisplayOption.ImageQuality quality, ImageSpec info) throws Exception {
+
+        BitmapResult result = createEmptyResult();
 
         Uri uri = Uri.parse(url);
 
@@ -44,22 +47,28 @@ public class ContentImageFetcher extends BaseImageFetcher {
         Cursor cursor = context.getContentResolver().query(uri, pro, null, null, null);
 
         if (cursor == null) {
-            if (debug) logW("No cursor found for url:" + url);
-            return null;
+            result.cause = FailedCause.CONTENT_NOT_EXISTS;
+            return result;
         }
 
         if (cursor.getCount() == 0) {
-            if (debug) logW("Cursor count is ZERO for url:" + url);
-            return null;
+            result.cause = FailedCause.CONTENT_NOT_EXISTS;
+            return result;
         }
 
         int index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+
+        if (index < 0) {
+            result.cause = FailedCause.CONTENT_NOT_EXISTS;
+            return result;
+        }
+
         cursor.moveToFirst();
 
         String filePath = cursor.getString(index);
 
         cursor.close();
 
-        return fileImageFetcher.fetchFromUrl(ImageSource.FILE.prefix + filePath, quality, info);
+        return (BitmapResult) fileImageFetcher.fetchFromUrl(ImageSource.FILE.prefix + filePath, quality, info);
     }
 }

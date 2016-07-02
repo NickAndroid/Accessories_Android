@@ -17,12 +17,12 @@
 package dev.nick.imageloader.loader;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.display.DisplayOption;
+import dev.nick.imageloader.loader.result.BitmapResult;
+import dev.nick.imageloader.loader.result.FailedCause;
 
 public enum ImageSource {
 
@@ -75,8 +75,10 @@ public enum ImageSource {
 
     UNKNOWN(new ImageFetcher() {
         @Override
-        public Bitmap fetchFromUrl(@NonNull String url, DisplayOption.ImageQuality quality, ImageSpec info) throws Exception {
-            Log.w("ImageLoader.ImgSource", "Using UNKNOWN ImageSource for url:" + url);
+        public BitmapResult fetchFromUrl(@NonNull String url, DisplayOption.ImageQuality quality, ImageSpec info)
+                throws Exception {
+            BitmapResult result = new BitmapResult();
+            result.cause = FailedCause.UNKNOWN_URL;
             return null;
         }
 

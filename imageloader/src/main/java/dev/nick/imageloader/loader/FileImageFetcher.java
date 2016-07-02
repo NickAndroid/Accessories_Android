@@ -19,12 +19,12 @@ package dev.nick.imageloader.loader;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 
 import dev.nick.imageloader.display.DisplayOption;
+import dev.nick.imageloader.loader.result.BitmapResult;
+import dev.nick.imageloader.loader.result.FailedCause;
 
 public class FileImageFetcher extends BaseImageFetcher {
 
@@ -33,14 +33,15 @@ public class FileImageFetcher extends BaseImageFetcher {
     }
 
     @Override
-    public Bitmap fetchFromUrl(@NonNull String url, DisplayOption.ImageQuality quality, ImageSpec info) throws Exception {
+    public BitmapResult fetchFromUrl(@NonNull String url, DisplayOption.ImageQuality quality, ImageSpec info) throws Exception {
 
-        logW(info);
+        BitmapResult result = createEmptyResult();
 
         String path = splitter.getRealPath(url);
         File file = new File(path);
         if (!file.exists()) {
-            throw new FileNotFoundException("File:" + url);
+            result.cause = FailedCause.FILE_NOT_EXISTS;
+            return result;
         }
 
         BitmapFactory.Options decodeOptions = null;
@@ -63,13 +64,15 @@ public class FileImageFetcher extends BaseImageFetcher {
                 break;
         }
 
-        Bitmap tempBitmap;
+        Bitmap tempBitmap = null;
         try {
             tempBitmap = BitmapFactory.decodeFile(path, decodeOptions);
         } catch (OutOfMemoryError error) {
-            throw new RuntimeException("OutOfMemoryError:" + Log.getStackTraceString(error));
+            result.cause = FailedCause.OOM;
         }
 
-        return tempBitmap;
+        result.result = tempBitmap;
+
+        return result;
     }
 }

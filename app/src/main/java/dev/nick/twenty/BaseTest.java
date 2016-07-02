@@ -31,10 +31,10 @@ public class BaseTest extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (ImageLoader.getInstance().isFreezed()) {
+        if (ImageLoader.getInstance().isPaused()) {
             ImageLoader.getInstance().resume();
         } else {
-            ImageLoader.getInstance().freeze();
+            ImageLoader.getInstance().pause();
             ImageLoader.getInstance().clearTasks();
         }
         return true;

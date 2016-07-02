@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package dev.nick.imageloader.control;
+package dev.nick.imageloader.loader.result;
 
-public enum LoaderState {
-    RUNNING, PAUSE_REQUESTED, PAUSED, TERMINATED
+public class Result<X, Y> {
+    public X result;
+    public Y cause;
 }

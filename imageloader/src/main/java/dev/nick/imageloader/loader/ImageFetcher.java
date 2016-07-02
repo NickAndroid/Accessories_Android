@@ -22,9 +22,10 @@ import android.support.annotation.NonNull;
 
 import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.display.DisplayOption;
+import dev.nick.imageloader.loader.result.Result;
 
 public interface ImageFetcher {
-    Bitmap fetchFromUrl(@NonNull String url, DisplayOption.ImageQuality quality, ImageSpec info) throws Exception;
+    Result fetchFromUrl(@NonNull String url, DisplayOption.ImageQuality quality, ImageSpec info) throws Exception;
 
     ImageFetcher prepare(Context context, LoaderConfig config);
 }

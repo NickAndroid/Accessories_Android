@@ -17,24 +17,24 @@
 package dev.nick.imageloader.loader.task;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.os.Process;
 import android.util.Log;
 
 import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.display.DisplayOption;
-import dev.nick.imageloader.loader.ImageSpec;
 import dev.nick.imageloader.loader.ImageSource;
+import dev.nick.imageloader.loader.ImageSpec;
+import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.logger.Logger;
 import dev.nick.logger.LoggerManager;
 
-public class LoadingTask implements Runnable {
+public class BitmapLoadingTask implements Runnable {
 
     String url;
     ImageSpec spec;
     DisplayOption.ImageQuality quality;
-    TaskCallback<Bitmap> callback;
+    TaskCallback<BitmapResult> callback;
     LoaderConfig loaderConfig;
 
     Context mContext;
@@ -50,11 +50,11 @@ public class LoadingTask implements Runnable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        LoadingTask loadingTask = (LoadingTask) o;
+        BitmapLoadingTask bitmapLoadingTask = (BitmapLoadingTask) o;
 
-        if (id != loadingTask.id) return false;
-        if (!url.equals(loadingTask.url)) return false;
-        return spec != null ? spec.equals(loadingTask.spec) : loadingTask.spec == null;
+        if (id != bitmapLoadingTask.id) return false;
+        if (!url.equals(bitmapLoadingTask.url)) return false;
+        return spec != null ? spec.equals(bitmapLoadingTask.spec) : bitmapLoadingTask.spec == null;
     }
 
     @Override
@@ -67,7 +67,7 @@ public class LoadingTask implements Runnable {
 
     @Override
     public String toString() {
-        return "LoadingTask{" +
+        return "BitmapLoadingTask{" +
                 ", url='" + url + '\'' +
                 ", spec=" + spec +
                 ", quality=" + quality +
@@ -77,12 +77,12 @@ public class LoadingTask implements Runnable {
                 '}';
     }
 
-    public LoadingTask(Context context,
-                       TaskCallback<Bitmap> callback,
-                       LoaderConfig loaderConfig,
-                       int taskId, int settableId,
-                       ImageSpec spec, DisplayOption.ImageQuality quality,
-                       String url) {
+    public BitmapLoadingTask(Context context,
+                             TaskCallback<BitmapResult> callback,
+                             LoaderConfig loaderConfig,
+                             int taskId, int settableId,
+                             ImageSpec spec, DisplayOption.ImageQuality quality,
+                             String url) {
         this.callback = callback;
         this.loaderConfig = loaderConfig;
         this.id = taskId;
@@ -105,10 +105,10 @@ public class LoadingTask implements Runnable {
 
         ImageSource source = ImageSource.of(url);
 
-        Bitmap bitmap;
+        BitmapResult result;
         try {
-            bitmap = source.getFetcher(mContext, loaderConfig).fetchFromUrl(url, quality, spec);
-            callback.onComplete(bitmap, this);
+            result = (BitmapResult) source.getFetcher(mContext, loaderConfig).fetchFromUrl(url, quality, spec);
+            callback.onComplete(result, this);
         } catch (Exception e) {
             callback.onError("Error when fetch image:" + Log.getStackTraceString(e));
         }
@@ -127,9 +127,9 @@ public class LoadingTask implements Runnable {
     }
 
     public interface TaskCallback<T> {
-        boolean onPreStart(LoadingTask task);
+        boolean onPreStart(BitmapLoadingTask task);
 
-        void onComplete(T result, LoadingTask task);
+        void onComplete(T result, BitmapLoadingTask task);
 
         void onError(String errMsg);
     }

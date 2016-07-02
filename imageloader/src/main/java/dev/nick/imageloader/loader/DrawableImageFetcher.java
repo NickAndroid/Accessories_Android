@@ -20,9 +20,10 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import dev.nick.imageloader.display.DisplayOption;
+import dev.nick.imageloader.loader.result.BitmapResult;
+import dev.nick.imageloader.loader.result.FailedCause;
 
 public class DrawableImageFetcher extends BaseImageFetcher {
 
@@ -31,8 +32,10 @@ public class DrawableImageFetcher extends BaseImageFetcher {
     }
 
     @Override
-    public Bitmap fetchFromUrl(@NonNull String url, DisplayOption.ImageQuality quality,
-                               ImageSpec spec) throws Exception {
+    public BitmapResult fetchFromUrl(@NonNull String url, DisplayOption.ImageQuality quality,
+                                     ImageSpec spec) throws Exception {
+
+        BitmapResult result = createEmptyResult();
 
         Resources resources = this.context.getResources();
 
@@ -40,7 +43,10 @@ public class DrawableImageFetcher extends BaseImageFetcher {
                 "drawable",
                 this.context.getPackageName());
 
-        if (resId <= 0) throw new Resources.NotFoundException("Res:" + url);
+        if (resId <= 0) {
+            result.cause = FailedCause.RESOURCE_NOT_FOUND;
+            return result;
+        }
 
         BitmapFactory.Options decodeOptions = null;
 
@@ -63,12 +69,13 @@ public class DrawableImageFetcher extends BaseImageFetcher {
                 break;
         }
 
-        Bitmap tempBitmap;
+        Bitmap tempBitmap = null;
         try {
             tempBitmap = BitmapFactory.decodeResource(resources, resId, decodeOptions);
         } catch (OutOfMemoryError error) {
-            throw new RuntimeException("OutOfMemoryError:" + Log.getStackTraceString(error));
+            result.cause = FailedCause.OOM;
         }
-        return tempBitmap;
+        result.result = tempBitmap;
+        return result;
     }
 }
