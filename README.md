@@ -21,14 +21,14 @@ Android image loader library
 <dependency>
   <groupId>dev.nick</groupId>
   <artifactId>imageloader</artifactId>
-  <version>0.2</version>
+  <version>0.3</version>
   <type>pom</type>
 </dependency>
 ```
 
 ### gradle
 ```
-compile 'dev.nick:imageloader:0.2'
+compile 'dev.nick:imageloader:0.3'
 ```
 
 ## Samples
@@ -66,9 +66,9 @@ ImageLoader.getInstance().displayImage(uri, holder.imageView,
                                 .build());
 ```
 
-### Freeze:
+### Pause:
 ```java
-ImageLoader.getInstance().freeze();
+ImageLoader.getInstance().pause();
 ```
 
 ### Resume:
@@ -102,7 +102,7 @@ ImageLoader.getInstance().terminate();
     }
 ```
 
-## Supported content:
+## Supported images:
 ```java
 file://
 ```
@@ -110,7 +110,7 @@ file://
 content://
 ```
 ```java
-http://
+http(s)://
 ```
 ```java
 assets://
