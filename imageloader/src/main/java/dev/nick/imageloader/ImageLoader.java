@@ -98,6 +98,17 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
     }
 
     /**
+     * Init the image loader with default {@link LoaderConfig}.
+     *
+     * @param context An application {@link Context} is preferred.
+     */
+    public synchronized static void init(Context context) {
+        init(context, LoaderConfig.DEFAULT_CONFIG);
+    }
+
+    /**
+     * Init the image loader with custom {@link LoaderConfig}.
+     *
      * @param context An application {@link Context} is preferred.
      * @param config  Configuration of this loader.
      * @see LoaderConfig

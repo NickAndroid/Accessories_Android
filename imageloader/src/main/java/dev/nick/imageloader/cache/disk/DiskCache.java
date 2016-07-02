@@ -74,10 +74,6 @@ public class DiskCache implements Cache<String, Bitmap> {
     @WorkerThread
     public void cache(@NonNull String key, Bitmap value) {
 
-        if (mDebug) {
-            Log.d("DiskCache", "Trying to cache:" + key);
-        }
-
         if (mPreferToExternal && mExternalCacheDir != null
                 && Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             if (!new FileWriter(mExternalCacheDir, value, key).write())
