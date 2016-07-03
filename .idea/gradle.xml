@@ -10,8 +10,6 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/imageloader" />
-            <option value="$PROJECT_DIR$/logger" />
-            <option value="$PROJECT_DIR$/stack" />
           </set>
         </option>
         <option name="myModules">
@@ -19,8 +17,6 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/imageloader" />
-            <option value="$PROJECT_DIR$/logger" />
-            <option value="$PROJECT_DIR$/stack" />
           </set>
         </option>
       </GradleProjectSettings>

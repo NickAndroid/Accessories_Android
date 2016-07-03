@@ -2,11 +2,11 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
-def siteUrl = 'http://nickandroid.github.io/ImageLoader/'    // project homepage
-def gitUrl = 'https://github.com/NickAndroid/ImageLoader.git' // project git
+def siteUrl = 'http://nickandroid.github.io/ImageLoader/'
+def gitUrl = 'https://github.com/NickAndroid/ImageLoader.git'
 
 group = "dev.nick"
-version = "0.4"
+version = "0.5"
 
 android {
     compileSdkVersion 24
@@ -31,8 +31,6 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:24.0.0'
     compile files('libs/volley.jar')
-    compile project(':stack')
-    compile project(':logger')
 }
 
 install {
@@ -85,6 +83,17 @@ artifacts {
     archives javadocJar
     archives sourcesJar
 }
+
+// Build a jar file in addition to the default aar file
+android.libraryVariants.all { variant ->
+    def name = variant.buildType.name
+    def task = project.tasks.create "jar${name.capitalize()}", Jar
+    task.dependsOn variant.javaCompile
+    task.from variant.javaCompile.destinationDir
+    artifacts.add('archives', task);
+}
+
+apply from: '../gradle/mvn_push.gradle'
 
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
