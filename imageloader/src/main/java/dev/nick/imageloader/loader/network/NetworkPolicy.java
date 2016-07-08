@@ -19,7 +19,7 @@ package dev.nick.imageloader.loader.network;
 public class NetworkPolicy {
 
     public static final NetworkPolicy DEFAULT_NETWORK_POLICY = new NetworkPolicy.Builder()
-            .onlyOnWifi(true)
+            .onlyOnWifi()
             .build();
 
     boolean onlyOnWifi;
@@ -43,11 +43,11 @@ public class NetworkPolicy {
         boolean onlyOnWifi;
 
         /**
-         * @param onlyOnWifi {@code true to load image only under WIFI connection.}
+         * To load image only under WIFI connection.}
          * @return Builder instance.
          */
-        public Builder onlyOnWifi(boolean onlyOnWifi) {
-            this.onlyOnWifi = onlyOnWifi;
+        public Builder onlyOnWifi() {
+            this.onlyOnWifi = true;
             return Builder.this;
         }
 

@@ -37,8 +37,8 @@ public class MyApp extends ScalpelApplication {
                         .build())
                 .cachingThreads(Runtime.getRuntime().availableProcessors())
                 .loadingThreads(Runtime.getRuntime().availableProcessors() * 2)
-                .diskCacheEnabled(true)
-                .memCacheEnabled(true)
+                .enableDiskCache()
+                .enableMemCache()
                 .debug(true)
                 .build());
     }

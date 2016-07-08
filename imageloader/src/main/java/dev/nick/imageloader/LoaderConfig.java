@@ -35,8 +35,8 @@ public class LoaderConfig {
             .cachingThreads(Runtime.getRuntime().availableProcessors())
             .loadingThreads(Runtime.getRuntime().availableProcessors())
             .debug(Build.TYPE.equals("eng"))
-            .diskCacheEnabled(true)
-            .memCacheEnabled(true)
+            .enableDiskCache()
+            .enableMemCache()
             .build();
 
     private int nLoadingThreads, nCachingThreads;
@@ -121,20 +121,20 @@ public class LoaderConfig {
         }
 
         /**
-         * @param diskCacheEnabled {@code true} to enabled disk cache.
+         * To enable disk cache.
          * @return Builder instance.
          */
-        public Builder diskCacheEnabled(boolean diskCacheEnabled) {
-            this.diskCacheEnabled = diskCacheEnabled;
+        public Builder enableDiskCache() {
+            this.diskCacheEnabled = true;
             return Builder.this;
         }
 
         /**
-         * @param memCacheEnabled {@code true} to enabled memory cache.
+         * To enabled memory cache.
          * @return Builder instance.
          */
-        public Builder memCacheEnabled(boolean memCacheEnabled) {
-            this.memCacheEnabled = memCacheEnabled;
+        public Builder enableMemCache() {
+            this.memCacheEnabled = true;
             return Builder.this;
         }
 

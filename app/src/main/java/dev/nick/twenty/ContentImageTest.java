@@ -94,6 +94,7 @@ public class ContentImageTest extends BaseTest {
 
                 ImageLoader.getInstance().displayImage(uri, holder.imageView,
                         new DisplayOption.Builder()
+                                .opt()
                                 .imageQuality(DisplayOption.ImageQuality.RAW)
                                 .imageAnimator(new FadeInImageAnimator())
                                 .build());

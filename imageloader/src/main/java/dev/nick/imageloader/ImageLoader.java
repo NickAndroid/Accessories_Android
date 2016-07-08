@@ -16,6 +16,7 @@
 
 package dev.nick.imageloader;
 
+import android.animation.Animator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Handler;
@@ -27,8 +28,10 @@ import android.widget.ImageView;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import dev.nick.imageloader.cache.CacheManager;
@@ -78,6 +81,7 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
     private final Map<Integer, TaskRecord> mTaskLockMap;
 
     private ExecutorService mLoadingService;
+    private ExecutorService mImageSettingsSchduler;
 
     private Freezer mFreezer;
     private LoaderState mState;
@@ -90,6 +94,7 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
         this.mUIThreadHandler = new Handler(Looper.getMainLooper(), this);
         this.mCacheManager = new CacheManager(config, context);
         this.mLoadingService = Executors.newFixedThreadPool(config.getLoadingThreads());
+        this.mImageSettingsSchduler = Executors.newSingleThreadExecutor();
         this.mStackService = RequestStackService.createStarted(this);
         this.mTaskLockMap = new HashMap<>();
         this.mState = LoaderState.RUNNING;
@@ -407,15 +412,33 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
         }
 
         @Override
-        public void onComplete(BitmapResult result, BitmapLoadingTask task) {
+        public void onComplete(final BitmapResult result, final BitmapLoadingTask task) {
             if (result.result == null) {
                 if (DEBUG) mLogger.warn("No image got, failed cause:" + result.cause);
                 onNoImageGot();
                 return;
             }
             if (!isTaskDirty(task)) {
-                applyImageSettings(result.result, option == null ? null : option.getProcessor(), settable,
-                        option == null ? null : option.getAnimator());
+                if (!option.isApplyImageOneByOne()) {
+                    ImageAnimator animator = (option == null ? null : option.getAnimator());
+                    BitmapProcessor processor = (option == null ? null : option.getProcessor());
+                    applyImageSettings(result.result,processor , settable, animator );
+                    return;
+                }
+                mImageSettingsSchduler.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (isTaskDirty(task)) return;
+                        ImageAnimator animator = (option == null ? null : option.getAnimator());
+                        BitmapProcessor processor = (option == null ? null : option.getProcessor());
+                        applyImageSettings(result.result,processor , settable, animator );
+                        if (animator != null) {
+                            long delay = animator.getDuration();
+                            ImageSettingsLocker locker  = new ImageSettingsLocker(delay / 3);
+                            locker.lock();
+                        }
+                    }
+                });
             } else if (DEBUG) {
                 mLogger.info("Won't apply image settings for task:" + task.getTaskId());
             }
@@ -452,9 +475,35 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
 
     class TaskRecord {
         int taskId;
-
         TaskRecord(int taskId) {
             this.taskId = taskId;
+        }
+    }
+
+
+
+    class ImageSettingsLocker {
+
+        private final static long MAX_DELAY = 2 * 1000;
+
+        private CountDownLatch latch;
+
+        private long unLockDelay;
+
+        public ImageSettingsLocker(long unLockDelay) {
+            this.unLockDelay = unLockDelay;
+            this.latch = new CountDownLatch(1);
+        }
+
+        void lock() {
+            while (true) {
+                try {
+                    latch.await(unLockDelay > MAX_DELAY ? MAX_DELAY : unLockDelay, TimeUnit.MILLISECONDS);
+                    break;
+                } catch (InterruptedException ignored) {
+
+                }
+            }
         }
     }
 }

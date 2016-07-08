@@ -31,13 +31,16 @@ public class DisplayOption {
     private BitmapProcessor processor;
     private ImageAnimator animator;
 
+    private boolean applyImageOneByOne;
+
     private DisplayOption(int defaultImgRes, int loadingImgRes, ImageQuality quality,
-                          BitmapProcessor processor, ImageAnimator animator) {
+                          BitmapProcessor processor, ImageAnimator animator, boolean applyImageOneByOne) {
         this.defaultImgRes = defaultImgRes;
         this.loadingImgRes = loadingImgRes;
         this.quality = quality;
         this.processor = processor;
         this.animator = animator;
+        this.applyImageOneByOne = applyImageOneByOne;
     }
 
     public int getDefaultImgRes() {
@@ -60,6 +63,10 @@ public class DisplayOption {
         return animator;
     }
 
+    public boolean isApplyImageOneByOne() {
+        return applyImageOneByOne;
+    }
+
     public static class Builder {
 
         private int defaultImgRes;
@@ -69,6 +76,8 @@ public class DisplayOption {
 
         private BitmapProcessor processor;
         private ImageAnimator animator;
+
+        private boolean applyImageOneByOne;
 
         /**
          * @param defaultImgRes Image res showing when load failure.
@@ -107,8 +116,13 @@ public class DisplayOption {
             return this;
         }
 
+        public Builder opt() {
+            this.applyImageOneByOne = true;
+            return this;
+        }
+
         public DisplayOption build() {
-            return new DisplayOption(defaultImgRes, loadingImgRes, quality, processor, animator);
+            return new DisplayOption(defaultImgRes, loadingImgRes, quality, processor, animator, applyImageOneByOne);
         }
     }
 
