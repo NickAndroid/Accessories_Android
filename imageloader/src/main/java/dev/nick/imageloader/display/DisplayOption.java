@@ -77,7 +77,7 @@ public class DisplayOption {
         private BitmapProcessor processor;
         private ImageAnimator animator;
 
-        private boolean applyImageOneByOne;
+        private boolean oneAfterOne;
 
         /**
          * @param defaultImgRes Image res showing when load failure.
@@ -106,23 +106,41 @@ public class DisplayOption {
             return this;
         }
 
+        /**
+         * Set a image animator to perform an animation when displaying image.
+         *
+         * @param animator The animator you want to set.
+         * @return @return Instance of this builder.
+         */
         public Builder imageAnimator(ImageAnimator animator) {
             this.animator = animator;
             return this;
         }
 
+        /**
+         * Set the image quality displaying, lower image quality has
+         * a better performance.
+         *
+         * @param quality Image quality when displaying.
+         * @return Instance of this builder.
+         */
         public Builder imageQuality(ImageQuality quality) {
             this.quality = quality;
             return this;
         }
 
-        public Builder opt() {
-            this.applyImageOneByOne = true;
+        /**
+         * Display the image one by one.
+         *
+         * @return Instance of this builder.
+         */
+        public Builder oneAfterOne() {
+            this.oneAfterOne = true;
             return this;
         }
 
         public DisplayOption build() {
-            return new DisplayOption(defaultImgRes, loadingImgRes, quality, processor, animator, applyImageOneByOne);
+            return new DisplayOption(defaultImgRes, loadingImgRes, quality, processor, animator, oneAfterOne);
         }
     }
 
