@@ -18,7 +18,6 @@ package dev.nick.imageloader.loader.task;
 
 import android.content.Context;
 import android.os.Process;
-import android.util.Log;
 
 import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.LoaderConfig;
@@ -26,6 +25,7 @@ import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.loader.ImageSource;
 import dev.nick.imageloader.loader.ImageSpec;
 import dev.nick.imageloader.loader.result.BitmapResult;
+import dev.nick.imageloader.loader.result.FailedCause;
 import dev.nick.logger.Logger;
 import dev.nick.logger.LoggerManager;
 
@@ -110,7 +110,9 @@ public class BitmapLoadingTask implements Runnable {
             result = (BitmapResult) source.getFetcher(mContext, loaderConfig).fetchFromUrl(url, quality, spec);
             callback.onComplete(result, this);
         } catch (Exception e) {
-            callback.onError("Error when fetch image:" + Log.getStackTraceString(e));
+            result = new BitmapResult();
+            result.cause = FailedCause.UNKNOWN;
+            callback.onComplete(result, this);
         }
     }
 
@@ -130,7 +132,5 @@ public class BitmapLoadingTask implements Runnable {
         boolean onPreStart(BitmapLoadingTask task);
 
         void onComplete(T result, BitmapLoadingTask task);
-
-        void onError(String errMsg);
     }
 }

@@ -16,13 +16,13 @@
 
 package dev.nick.imageloader;
 
-import android.animation.Animator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 import android.widget.ImageView;
 
@@ -47,6 +47,7 @@ import dev.nick.imageloader.display.processor.BitmapProcessor;
 import dev.nick.imageloader.loader.ImageSource;
 import dev.nick.imageloader.loader.ImageSpec;
 import dev.nick.imageloader.loader.result.BitmapResult;
+import dev.nick.imageloader.loader.result.FailedCause;
 import dev.nick.imageloader.loader.task.BitmapLoadingTask;
 import dev.nick.logger.Logger;
 import dev.nick.logger.LoggerManager;
@@ -59,6 +60,10 @@ import dev.nick.stack.RequestStackService;
 public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadingTask> {
 
     private static final int MSG_APPLY_IMAGE_SETTINGS = 0x1;
+    private static final int MSG_CALL_ON_START = 0x2;
+    private static final int MSG_CALL_PROGRESS_UPDATE = 0x3;
+    private static final int MSG_CALL_ON_COMPLETE = 0x4;
+    private static final int MSG_CALL_ON_FAILURE = 0x5;
 
     private Context mContext;
 
@@ -184,6 +189,21 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
     public void displayImage(String url,
                              ImageSettable settable,
                              DisplayOption option) {
+        displayImage(url, settable, option, null);
+    }
+
+    /**
+     * Display image from the url to the view.
+     *
+     * @param url      Image source url, one of {@link dev.nick.imageloader.loader.ImageSource}
+     * @param settable Target {@link ImageSettable} to display the image.
+     * @param option   {@link DisplayOption} is options using when display the image.
+     * @param listener The progress listener using to watch the progress of the loading.
+     */
+    public void displayImage(String url,
+                             ImageSettable settable,
+                             DisplayOption option,
+                             ProgressListener listener) {
 
         beforeLoading(settable, option);
 
@@ -213,12 +233,23 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
             }
         }
 
-        startLoading(loadingUrl, settable, option);
+        startLoading(loadingUrl, settable, option, listener);
     }
 
-    private void startLoading(final String url,
-                              final ImageSettable settable,
-                              final DisplayOption option) {
+    private void beforeLoading(ImageSettable settable, DisplayOption option) {
+        int showWhenLoading = 0;
+        if (option != null) {
+            showWhenLoading = option.getLoadingImgRes();
+        }
+        applyImageSettings(showWhenLoading, settable, null);
+    }
+
+    private void startLoading(String url,
+                              ImageSettable settable,
+                              DisplayOption option,
+                              ProgressListener listener) {
+
+        option = createOptionIfNull(option);
 
         DisplayOption.ImageQuality quality = option.getQuality();
 
@@ -227,7 +258,7 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
         int viewId = getIdOfImageSettable(settable);
         int taskId = nextTaskId();
 
-        BitmapLoadingTask.TaskCallback<BitmapResult> callback = new ImageTaskCallback(settable, option, url, spec);
+        BitmapLoadingTask.TaskCallback<BitmapResult> callback = new ImageTaskCallback(settable, option, url, spec, listener);
 
         BitmapLoadingTask task = new BitmapLoadingTask(mContext, callback, mConfig, taskId, viewId, spec, quality, url);
 
@@ -235,6 +266,18 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
 
         // Push it to the request stack.
         mStackService.push(task);
+    }
+
+    private DisplayOption createOptionIfNull(DisplayOption option) {
+        if (option != null) return option;
+        return new DisplayOption.Builder()
+                .imageQuality(DisplayOption.ImageQuality.FIT_VIEW)
+                .imageAnimator(null)
+                .bitmapProcessor(null)
+                .defaultImgRes(0)
+                .loadingImgRes(0)
+                .viewMaybeReused()
+                .build();
     }
 
     private int getIdOfImageSettable(ImageSettable view) {
@@ -281,6 +324,10 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
         return false;
     }
 
+    private void onApplyImageSettings(Runnable settings) {
+        settings.run();
+    }
+
     @WorkerThread
     private void applyImageSettings(Bitmap bitmap, BitmapProcessor processor, ImageSettable settable,
                                     ImageAnimator animator) {
@@ -304,23 +351,61 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
         }
     }
 
-    private void onApplyImageSettings(Runnable settings) {
-        settings.run();
-    }
-
-    private void beforeLoading(ImageSettable settable, DisplayOption option) {
-        int showWhenLoading = 0;
-        if (option != null) {
-            showWhenLoading = option.getLoadingImgRes();
-        }
-        applyImageSettings(showWhenLoading, settable, null);
-    }
-
     @Override
     public boolean handleMessage(Message message) {
-        // It's our message:)
-        onApplyImageSettings((Runnable) message.obj);
+        switch (message.what) {
+            case MSG_APPLY_IMAGE_SETTINGS:
+                onApplyImageSettings((Runnable) message.obj);
+                break;
+            case MSG_CALL_ON_START:
+                onCallOnStart((ProgressListener) message.obj);
+                break;
+            case MSG_CALL_ON_COMPLETE:
+                onCallOnComplete((ProgressListener) message.obj);
+                break;
+            case MSG_CALL_ON_FAILURE:
+                onCallOnFailure((FailureParams) message.obj);
+                break;
+            case MSG_CALL_PROGRESS_UPDATE:
+                onCallOnProgressUpdate((ProgressListener) message.obj, message.arg1);
+                break;
+        }
         return true;
+    }
+
+    private void callOnStart(ProgressListener listener) {
+        mUIThreadHandler.obtainMessage(MSG_CALL_ON_START, listener).sendToTarget();
+    }
+
+    private void callOnProgressUpdate(ProgressListener listener, int progress) {
+        mUIThreadHandler.obtainMessage(MSG_CALL_PROGRESS_UPDATE, progress, 0, listener).sendToTarget();
+    }
+
+    private void callOnComplete(ProgressListener listener) {
+        mUIThreadHandler.obtainMessage(MSG_CALL_ON_COMPLETE, listener).sendToTarget();
+    }
+
+    private void callOnFailure(ProgressListener listener, FailedCause cause) {
+        FailureParams failureParams = new FailureParams();
+        failureParams.cause = cause;
+        failureParams.listener = listener;
+        mUIThreadHandler.obtainMessage(MSG_CALL_ON_FAILURE, failureParams).sendToTarget();
+    }
+
+    private void onCallOnStart(ProgressListener listener) {
+        listener.onStart();
+    }
+
+    private void onCallOnProgressUpdate(ProgressListener listener, int progress) {
+        listener.onProgressUpdate(progress);
+    }
+
+    private void onCallOnComplete(ProgressListener listener) {
+        listener.onComplete();
+    }
+
+    private void onCallOnFailure(FailureParams params) {
+        params.listener.onFailure(params.cause);
     }
 
     @Override
@@ -345,8 +430,8 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
         if (mState == LoaderState.TERMINATED) {
             throw new IllegalStateException("Loader has been terminated.");
         }
-        mState = LoaderState.RUNNING;
         mFreezer.resume();
+        mState = LoaderState.RUNNING;
         mLogger.funcExit();
     }
 
@@ -389,13 +474,19 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
         String url;
         DisplayOption option;
         ImageSpec info;
+        @Nullable
+        ProgressListener listener;
 
         public ImageTaskCallback(@NonNull ImageSettable settable,
-                                 DisplayOption option, String url, ImageSpec info) {
+                                 DisplayOption option,
+                                 String url,
+                                 ImageSpec info,
+                                 @Nullable ProgressListener listener) {
             this.option = option;
             this.url = url;
             this.info = info;
             this.settable = settable;
+            this.listener = listener;
         }
 
         @Override
@@ -407,6 +498,7 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
                 if (DEBUG) mLogger.info("Won't run task, id" + task.getTaskId());
                 return false;
             }
+            if (listener != null) callOnStart(listener);
             beforeLoading(settable, option);
             return true;
         }
@@ -414,15 +506,17 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
         @Override
         public void onComplete(final BitmapResult result, final BitmapLoadingTask task) {
             if (result.result == null) {
-                if (DEBUG) mLogger.warn("No image got, failed cause:" + result.cause);
-                onNoImageGot();
+                onNoImageGot(result.cause);
                 return;
             }
+
+            callOnComplete(listener);
+
             if (!isTaskDirty(task)) {
                 if (!option.isApplyImageOneByOne()) {
                     ImageAnimator animator = (option == null ? null : option.getAnimator());
                     BitmapProcessor processor = (option == null ? null : option.getProcessor());
-                    applyImageSettings(result.result,processor , settable, animator );
+                    applyImageSettings(result.result, processor, settable, animator);
                     return;
                 }
                 mImageSettingsSchduler.execute(new Runnable() {
@@ -431,10 +525,10 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
                         if (isTaskDirty(task)) return;
                         ImageAnimator animator = (option == null ? null : option.getAnimator());
                         BitmapProcessor processor = (option == null ? null : option.getProcessor());
-                        applyImageSettings(result.result,processor , settable, animator );
+                        applyImageSettings(result.result, processor, settable, animator);
                         if (animator != null) {
                             long delay = animator.getDuration();
-                            ImageSettingsLocker locker  = new ImageSettingsLocker(delay / 3);
+                            ImageSettingsLocker locker = new ImageSettingsLocker(delay / 3);
                             locker.lock();
                         }
                     }
@@ -445,13 +539,9 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
             mCacheManager.cache(url, info, result.result);
         }
 
-        @Override
-        public void onError(String errMsg) {
-            if (DEBUG) mLogger.error(errMsg);
-            onNoImageGot();
-        }
-
-        void onNoImageGot() {
+        void onNoImageGot(FailedCause cause) {
+            if (DEBUG) mLogger.warn("No image got, calling back, failed cause:" + cause);
+            if (listener != null) callOnFailure(listener, cause);
             if (option != null) {
                 int defaultImgRes = option.getDefaultImgRes();
                 if (defaultImgRes > 0) {
@@ -467,6 +557,7 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
             if (mState == LoaderState.PAUSE_REQUESTED) {
                 mState = LoaderState.PAUSED;
                 if (mFreezer == null) mFreezer = new Freezer();
+                mLogger.debug("Pausing the loader...");
                 mFreezer.freeze();
             }
             return true;
@@ -475,11 +566,11 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
 
     class TaskRecord {
         int taskId;
+
         TaskRecord(int taskId) {
             this.taskId = taskId;
         }
     }
-
 
 
     class ImageSettingsLocker {
@@ -505,5 +596,43 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
                 }
             }
         }
+    }
+
+    public interface ProgressListener {
+        void onStart();
+
+        void onProgressUpdate(int progress);
+
+        void onComplete();
+
+        void onFailure(FailedCause cause);
+    }
+
+    public static class ProgressListenerStub implements ProgressListener {
+
+        @Override
+        public void onStart() {
+            // To be impl.
+        }
+
+        @Override
+        public void onProgressUpdate(int progress) {
+            // To be impl.
+        }
+
+        @Override
+        public void onComplete() {
+            // To be impl.
+        }
+
+        @Override
+        public void onFailure(FailedCause cause) {
+            // To be impl.
+        }
+    }
+
+    private static class FailureParams {
+        FailedCause cause;
+        ProgressListener listener;
     }
 }

@@ -23,6 +23,7 @@ public class Freezer {
    private CountDownLatch mLatch;
 
     public void freeze() {
+        mLatch = null;
         mLatch = new CountDownLatch(1);
         while (true) {
             try {

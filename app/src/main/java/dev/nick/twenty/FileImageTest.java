@@ -101,6 +101,7 @@ public class FileImageTest extends BaseTest {
                 ImageLoader.getInstance().displayImage(uri, holder.imageView,
                         new DisplayOption.Builder()
                                 .imageQuality(DisplayOption.ImageQuality.FIT_VIEW)
+                                .viewMaybeReused()
                                 .oneAfterOne()
                                 //.loadingImgRes(R.drawable.ic_cloud_download_black_24dp)
                                 //.defaultImgRes(R.drawable.ic_broken_image_black_24dp)
