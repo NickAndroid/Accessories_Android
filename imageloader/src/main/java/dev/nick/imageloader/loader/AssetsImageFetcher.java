@@ -26,7 +26,7 @@ import java.io.InputStream;
 
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.loader.result.BitmapResult;
-import dev.nick.imageloader.loader.result.FailedCause;
+import dev.nick.imageloader.loader.result.Cause;
 
 public class AssetsImageFetcher extends BaseImageFetcher {
 
@@ -39,7 +39,7 @@ public class AssetsImageFetcher extends BaseImageFetcher {
     @Override
     public BitmapResult fetchFromUrl(@NonNull String url,
                                      DisplayOption.ImageQuality quality,
-                                     ImageSpec info,
+                                     ViewSpec spec,
                                      ProgressListener listener) throws Exception {
 
         BitmapResult result = createEmptyResult();
@@ -62,14 +62,14 @@ public class AssetsImageFetcher extends BaseImageFetcher {
         decodeOptions.inJustDecodeBounds = false;
         decodeOptions.inSampleSize =
                 computeSampleSize(decodeOptions, UNCONSTRAINED,
-                        (info.height * info.height == 0 ?
+                        (spec.height * spec.height == 0 ?
                                 MAX_NUM_PIXELS_THUMBNAIL
-                                : info.width * info.height));
+                                : spec.width * spec.height));
         Bitmap tempBitmap = null;
         try {
             tempBitmap = BitmapFactory.decodeStream(in, rect, decodeOptions);
         } catch (OutOfMemoryError error) {
-            result.cause = FailedCause.OOM;
+            result.cause = Cause.OOM;
         } finally {
             in.close();
         }

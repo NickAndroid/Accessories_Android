@@ -28,7 +28,7 @@ import com.android.volley.toolbox.Volley;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.loader.network.NetworkUtils;
 import dev.nick.imageloader.loader.result.BitmapResult;
-import dev.nick.imageloader.loader.result.FailedCause;
+import dev.nick.imageloader.loader.result.Cause;
 
 public class NetworkImageFetcher extends BaseImageFetcher {
 
@@ -41,7 +41,7 @@ public class NetworkImageFetcher extends BaseImageFetcher {
     @Override
     public BitmapResult fetchFromUrl(@NonNull String url,
                                      DisplayOption.ImageQuality quality,
-                                     ImageSpec info,
+                                     ViewSpec spec,
                                      ProgressListener listener)
             throws Exception {
 
@@ -52,7 +52,7 @@ public class NetworkImageFetcher extends BaseImageFetcher {
 
         // No connection.
         if (!isOnLine) {
-            result.cause = FailedCause.NO_INTERNET_CONNECTION;
+            result.cause = Cause.NO_INTERNET_CONNECTION;
             return result;
         }
 
@@ -60,7 +60,7 @@ public class NetworkImageFetcher extends BaseImageFetcher {
 
         ImageRequest imageRequest = new ImageRequest(splitter.getRealPath(url),
                 future,
-                info.width, info.height,
+                spec.width, spec.height,
                 ImageView.ScaleType.FIT_XY,
                 Bitmap.Config.ARGB_8888,
                 future);

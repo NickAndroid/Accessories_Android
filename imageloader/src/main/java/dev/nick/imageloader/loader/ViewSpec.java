@@ -16,12 +16,12 @@
 
 package dev.nick.imageloader.loader;
 
-public class ImageSpec {
+public class ViewSpec {
 
     int width;
     int height;
 
-    public ImageSpec(int width, int height) {
+    public ViewSpec(int width, int height) {
         this.width = width;
         this.height = height;
     }
@@ -31,7 +31,7 @@ public class ImageSpec {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ImageSpec info = (ImageSpec) o;
+        ViewSpec info = (ViewSpec) o;
 
         if (width != info.width) return false;
         return height == info.height;
@@ -46,7 +46,7 @@ public class ImageSpec {
 
     @Override
     public String toString() {
-        return "ImageSpec{" +
+        return "ViewSpec{" +
                 "height=" + height +
                 ", width=" + width +
                 '}';

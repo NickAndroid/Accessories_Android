@@ -18,11 +18,11 @@ package dev.nick.imageloader.loader;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import dev.nick.imageloader.LoaderConfig;
-import dev.nick.imageloader.display.DisplayOption;
-import dev.nick.imageloader.loader.result.BitmapResult;
-import dev.nick.imageloader.loader.result.FailedCause;
+import dev.nick.imageloader.loader.result.Cause;
+import dev.nick.imageloader.loader.result.ErrorListener;
 
 public enum ImageSource {
 
@@ -75,14 +75,14 @@ public enum ImageSource {
 
     UNKNOWN(new ImageFetcher() {
         @Override
-        public BitmapResult fetchFromUrl(@NonNull String url,
-                                         DisplayOption.ImageQuality quality,
-                                         ImageSpec info,
-                                         ProgressListener listener)
+        public void fetchFromUrl(@NonNull String url,
+                                 @NonNull DecodeSpec decodeSpec,
+                                 @Nullable ProgressListener progressListener,
+                                 @Nullable ErrorListener errorListener)
                 throws Exception {
-            BitmapResult result = new BitmapResult();
-            result.cause = FailedCause.UNKNOWN_URL;
-            return null;
+            if (errorListener != null) {
+                errorListener.onError(new Cause(new IllegalArgumentException("Unknown image source.")));
+            }
         }
 
         @Override

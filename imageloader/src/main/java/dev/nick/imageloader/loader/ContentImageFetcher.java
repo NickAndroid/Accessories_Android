@@ -23,7 +23,7 @@ import android.support.annotation.NonNull;
 
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.loader.result.BitmapResult;
-import dev.nick.imageloader.loader.result.FailedCause;
+import dev.nick.imageloader.loader.result.Cause;
 
 public class ContentImageFetcher extends BaseImageFetcher {
 
@@ -38,7 +38,7 @@ public class ContentImageFetcher extends BaseImageFetcher {
     @Override
     public BitmapResult fetchFromUrl(@NonNull String url,
                                      DisplayOption.ImageQuality quality,
-                                     ImageSpec info,
+                                     ViewSpec spec,
                                      ProgressListener listener) throws Exception {
 
         BitmapResult result = createEmptyResult();
@@ -50,19 +50,19 @@ public class ContentImageFetcher extends BaseImageFetcher {
         Cursor cursor = context.getContentResolver().query(uri, pro, null, null, null);
 
         if (cursor == null) {
-            result.cause = FailedCause.CONTENT_NOT_EXISTS;
+            result.cause = Cause.CONTENT_NOT_EXISTS;
             return result;
         }
 
         if (cursor.getCount() == 0) {
-            result.cause = FailedCause.CONTENT_NOT_EXISTS;
+            result.cause = Cause.CONTENT_NOT_EXISTS;
             return result;
         }
 
         int index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
 
         if (index < 0) {
-            result.cause = FailedCause.CONTENT_NOT_EXISTS;
+            result.cause = Cause.CONTENT_NOT_EXISTS;
             return result;
         }
 
@@ -73,6 +73,6 @@ public class ContentImageFetcher extends BaseImageFetcher {
         cursor.close();
 
         return (BitmapResult) fileImageFetcher.fetchFromUrl(ImageSource.FILE.prefix + filePath,
-                quality, info, listener);
+                quality, spec, listener);
     }
 }

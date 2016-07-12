@@ -16,6 +16,11 @@
 
 package dev.nick.imageloader.loader.result;
 
-public enum FailedCause {
-    NONE, UNKNOWN, UNKNOWN_URL, FILE_NOT_EXISTS, CONTENT_NOT_EXISTS, RESOURCE_NOT_FOUND, NO_INTERNET_CONNECTION, OOM
+public class Cause {
+
+    Exception e;
+
+    public Cause(Exception e) {
+        this.e = e;
+    }
 }

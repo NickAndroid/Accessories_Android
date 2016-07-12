@@ -24,7 +24,7 @@ import java.io.File;
 
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.loader.result.BitmapResult;
-import dev.nick.imageloader.loader.result.FailedCause;
+import dev.nick.imageloader.loader.result.Cause;
 
 public class FileImageFetcher extends BaseImageFetcher {
 
@@ -35,7 +35,7 @@ public class FileImageFetcher extends BaseImageFetcher {
     @Override
     public BitmapResult fetchFromUrl(@NonNull String url,
                                      DisplayOption.ImageQuality quality,
-                                     ImageSpec info,
+                                     ViewSpec spec,
                                      ProgressListener listener)
             throws Exception {
 
@@ -44,7 +44,7 @@ public class FileImageFetcher extends BaseImageFetcher {
         String path = splitter.getRealPath(url);
         File file = new File(path);
         if (!file.exists()) {
-            result.cause = FailedCause.FILE_NOT_EXISTS;
+            result.cause = Cause.FILE_NOT_EXISTS;
             return result;
         }
 
@@ -61,9 +61,9 @@ public class FileImageFetcher extends BaseImageFetcher {
                 decodeOptions.inJustDecodeBounds = false;
                 decodeOptions.inSampleSize =
                         computeSampleSize(decodeOptions, UNCONSTRAINED,
-                                (info.height * info.height == 0 ?
+                                (spec.height * spec.height == 0 ?
                                         MAX_NUM_PIXELS_THUMBNAIL
-                                        : info.width * info.height));
+                                        : spec.width * spec.height));
             default:
                 break;
         }
@@ -73,7 +73,7 @@ public class FileImageFetcher extends BaseImageFetcher {
             tempBitmap = BitmapFactory.decodeFile(path, decodeOptions);
             if (listener != null) listener.onProgressUpdate(1);
         } catch (OutOfMemoryError error) {
-            result.cause = FailedCause.OOM;
+            result.cause = Cause.OOM;
         }
 
         result.result = tempBitmap;

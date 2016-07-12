@@ -16,7 +16,6 @@
 
 package dev.nick.imageloader.loader.result;
 
-public class Result<X, Y> {
+public class Result<X> {
     public X result;
-    public Y cause;
 }

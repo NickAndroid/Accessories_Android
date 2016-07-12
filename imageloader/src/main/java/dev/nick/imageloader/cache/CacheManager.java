@@ -28,7 +28,7 @@ import java.util.concurrent.Executors;
 import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.cache.disk.DiskCache;
 import dev.nick.imageloader.cache.mem.MemCache;
-import dev.nick.imageloader.loader.ImageSpec;
+import dev.nick.imageloader.loader.ViewSpec;
 
 public class CacheManager {
 
@@ -49,7 +49,7 @@ public class CacheManager {
         mKeyGenerator = config.getCachePolicy().getKeyGenerator();
     }
 
-    public void cache(@NonNull String url, ImageSpec info, Bitmap value) {
+    public void cache(@NonNull String url, ViewSpec info, Bitmap value) {
         String key = mKeyGenerator.fromUrl(url, info);
         cacheByKey(key, value);
     }
@@ -74,20 +74,20 @@ public class CacheManager {
     }
 
 
-    public boolean isDiskCacheExists(@NonNull final String url, @NonNull ImageSpec info) {
+    public boolean isDiskCacheExists(@NonNull final String url, @NonNull ViewSpec info) {
         return mDiskCache.getCachePath(mKeyGenerator.fromUrl(url, info)) != null;
     }
 
-    public String getDiskCachePath(@NonNull final String url, @NonNull ImageSpec info) {
+    public String getDiskCachePath(@NonNull final String url, @NonNull ViewSpec info) {
         return mDiskCache.getCachePath(mKeyGenerator.fromUrl(url, info));
     }
 
-    public Bitmap getMemCache(final String url, ImageSpec info) {
+    public Bitmap getMemCache(final String url, ViewSpec info) {
         return mMemCache.get(mKeyGenerator.fromUrl(url, info));
     }
 
     @Deprecated
-    public void get(@NonNull final String url, @NonNull ImageSpec info, @NonNull final Callback callback) {
+    public void get(@NonNull final String url, @NonNull ViewSpec info, @NonNull final Callback callback) {
         if (!mConfig.isDiskCacheEnabled() && !mConfig.isMemCacheEnabled()) {
             callback.onResult(null);
             return;

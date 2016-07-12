@@ -23,7 +23,7 @@ import android.support.annotation.NonNull;
 import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.loader.result.BitmapResult;
-import dev.nick.imageloader.loader.result.FailedCause;
+import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.logger.LoggerManager;
 
 class BaseImageFetcher implements ImageFetcher {
@@ -48,7 +48,7 @@ class BaseImageFetcher implements ImageFetcher {
     @Override
     public BitmapResult fetchFromUrl(@NonNull String url,
                                      DisplayOption.ImageQuality quality,
-                                     ImageSpec info,
+                                     ViewSpec spec,
                                      ProgressListener listener)
             throws Exception {
         return null;
@@ -67,7 +67,7 @@ class BaseImageFetcher implements ImageFetcher {
 
     protected BitmapResult createEmptyResult() {
         BitmapResult result = new BitmapResult();
-        result.cause = FailedCause.NONE;
+        result.cause = Cause.NONE;
         return result;
     }
 

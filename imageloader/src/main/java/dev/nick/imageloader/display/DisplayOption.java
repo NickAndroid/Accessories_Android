@@ -165,16 +165,4 @@ public class DisplayOption {
             return new DisplayOption(defaultImgRes, loadingImgRes, quality, processor, animator, oneAfterOne, viewMaybeReused);
         }
     }
-
-    public enum ImageQuality {
-        /**
-         * Using raw image when decode and display the image.
-         */
-        RAW,
-
-        /**
-         * Decrease the size of the image to fit the view dimen.
-         */
-        FIT_VIEW
-    }
 }

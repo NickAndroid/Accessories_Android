@@ -18,6 +18,6 @@ package dev.nick.imageloader.loader.result;
 
 import android.graphics.Bitmap;
 
-public class BitmapResult extends Result<Bitmap, FailedCause> {
+public class BitmapResult extends Result<Bitmap> {
     // Nothing.
 }

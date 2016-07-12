@@ -21,12 +21,13 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import dev.nick.imageloader.LoaderConfig;
-import dev.nick.imageloader.display.DisplayOption;
-import dev.nick.imageloader.loader.result.Result;
+import dev.nick.imageloader.loader.result.ErrorListener;
 
 public interface ImageFetcher {
-    Result fetchFromUrl(@NonNull String url, DisplayOption.ImageQuality quality, ImageSpec info,
-                        @Nullable ProgressListener listener) throws Exception;
+    void fetchFromUrl(@NonNull String url,
+                      @NonNull DecodeSpec decodeSpec,
+                      @Nullable ProgressListener progressListener,
+                      @Nullable ErrorListener errorListener) throws Exception;
 
     ImageFetcher prepare(Context context, LoaderConfig config);
 }

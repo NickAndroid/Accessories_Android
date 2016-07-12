@@ -20,6 +20,7 @@ import android.Manifest;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,15 +38,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dev.nick.imageloader.ImageLoader;
+import dev.nick.imageloader.LoadingListener;
 import dev.nick.imageloader.display.DisplayOption;
+import dev.nick.imageloader.display.ImageQuality;
 import dev.nick.imageloader.display.animator.FadeInImageAnimator;
 import dev.nick.imageloader.display.processor.BlackWhiteBitmapProcessor;
 import dev.nick.imageloader.loader.ImageSource;
-import dev.nick.imageloader.loader.result.FailedCause;
-import dev.nick.logger.LoggerManager;
+import dev.nick.imageloader.loader.result.BitmapResult;
+import dev.nick.imageloader.loader.result.Cause;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
-public class FileImageTest extends BaseTest {
+public class FileImageTest extends BaseTest implements LoadingListener {
 
     @FindView(id = R.id.list)
     ListView listView;
@@ -55,6 +58,26 @@ public class FileImageTest extends BaseTest {
         setContentView(R.layout.file_image);
         setTitle(getClass().getSimpleName());
         Scalpel.getInstance().wire(this);
+    }
+
+    @Override
+    public void onError(@NonNull Cause cause) {
+
+    }
+
+    @Override
+    public void onComplete(BitmapResult result) {
+
+    }
+
+    @Override
+    public void onProgressUpdate(int progress) {
+
+    }
+
+    @Override
+    public void onStartLoading() {
+
     }
 
     @Override
@@ -102,34 +125,14 @@ public class FileImageTest extends BaseTest {
 
                 ImageLoader.getInstance().displayImage(uri, holder.imageView,
                         new DisplayOption.Builder()
-                                .imageQuality(DisplayOption.ImageQuality.FIT_VIEW)
+                                .imageQuality(ImageQuality.FIT_VIEW)
                                 .viewMaybeReused()
                                 .oneAfterOne()
                                 //.loadingImgRes(R.drawable.ic_cloud_download_black_24dp)
                                 //.defaultImgRes(R.drawable.ic_broken_image_black_24dp)
                                 .bitmapProcessor(new BlackWhiteBitmapProcessor())
                                 .imageAnimator(new FadeInImageAnimator())
-                                .build(), new ImageLoader.LoadingListener() {
-                            @Override
-                            public void onStart() {
-                                LoggerManager.getLogger(FileImageTest.class).funcEnter();
-                            }
-
-                            @Override
-                            public void onComplete() {
-                                LoggerManager.getLogger(FileImageTest.class).funcEnter();
-                            }
-
-                            @Override
-                            public void onFailure(FailedCause cause) {
-                                LoggerManager.getLogger(FileImageTest.class).funcEnter();
-                            }
-
-                            @Override
-                            public void onProgressUpdate(int progress) {
-                                LoggerManager.getLogger(FileImageTest.class).funcEnter();
-                            }
-                        });
+                                .build());
 
                 return convertView;
             }

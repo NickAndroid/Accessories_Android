@@ -23,7 +23,7 @@ import android.support.annotation.NonNull;
 
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.loader.result.BitmapResult;
-import dev.nick.imageloader.loader.result.FailedCause;
+import dev.nick.imageloader.loader.result.Cause;
 
 public class DrawableImageFetcher extends BaseImageFetcher {
 
@@ -34,7 +34,7 @@ public class DrawableImageFetcher extends BaseImageFetcher {
     @Override
     public BitmapResult fetchFromUrl(@NonNull String url,
                                      DisplayOption.ImageQuality quality,
-                                     ImageSpec spec,
+                                     ViewSpec spec,
                                      ProgressListener listener)
             throws Exception {
 
@@ -47,7 +47,7 @@ public class DrawableImageFetcher extends BaseImageFetcher {
                 this.context.getPackageName());
 
         if (resId <= 0) {
-            result.cause = FailedCause.RESOURCE_NOT_FOUND;
+            result.cause = Cause.RESOURCE_NOT_FOUND;
             return result;
         }
 
@@ -76,7 +76,7 @@ public class DrawableImageFetcher extends BaseImageFetcher {
         try {
             tempBitmap = BitmapFactory.decodeResource(resources, resId, decodeOptions);
         } catch (OutOfMemoryError error) {
-            result.cause = FailedCause.OOM;
+            result.cause = Cause.OOM;
         }
         result.result = tempBitmap;
         return result;
