@@ -32,15 +32,22 @@ public class DisplayOption {
     private ImageAnimator animator;
 
     private boolean applyImageOneByOne;
+    private boolean viewMaybeReused;
 
-    private DisplayOption(int defaultImgRes, int loadingImgRes, ImageQuality quality,
-                          BitmapProcessor processor, ImageAnimator animator, boolean applyImageOneByOne) {
+    private DisplayOption(int defaultImgRes,
+                          int loadingImgRes,
+                          ImageQuality quality,
+                          BitmapProcessor processor,
+                          ImageAnimator animator,
+                          boolean applyImageOneByOne,
+                          boolean viewMaybeReused) {
         this.defaultImgRes = defaultImgRes;
         this.loadingImgRes = loadingImgRes;
         this.quality = quality;
         this.processor = processor;
         this.animator = animator;
         this.applyImageOneByOne = applyImageOneByOne;
+        this.viewMaybeReused = viewMaybeReused;
     }
 
     public int getDefaultImgRes() {
@@ -67,6 +74,10 @@ public class DisplayOption {
         return applyImageOneByOne;
     }
 
+    public boolean isViewMaybeReused() {
+        return viewMaybeReused;
+    }
+
     public static class Builder {
 
         private int defaultImgRes;
@@ -78,6 +89,7 @@ public class DisplayOption {
         private ImageAnimator animator;
 
         private boolean oneAfterOne;
+        private boolean viewMaybeReused;
 
         /**
          * @param defaultImgRes Image res showing when load failure.
@@ -139,8 +151,18 @@ public class DisplayOption {
             return this;
         }
 
+        /**
+         * Indicate that the view may be reused, the image won't be set if there is a new request for the same view.
+         *
+         * @return Instance of this builder.
+         */
+        public Builder viewMaybeReused() {
+            this.viewMaybeReused = true;
+            return this;
+        }
+
         public DisplayOption build() {
-            return new DisplayOption(defaultImgRes, loadingImgRes, quality, processor, animator, oneAfterOne);
+            return new DisplayOption(defaultImgRes, loadingImgRes, quality, processor, animator, oneAfterOne, viewMaybeReused);
         }
     }
 
