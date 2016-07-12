@@ -165,8 +165,19 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
      * @param option {@link DisplayOption} is options using when display the image.
      */
     public void displayImage(String url, ImageView view, DisplayOption option) {
+        displayImage(url, view, option, null);
+    }
+
+    /**
+     * Display image from the url to the view.
+     *
+     * @param url    Image source url, one of {@link dev.nick.imageloader.loader.ImageSource}
+     * @param view   Target view to display the image.
+     * @param option {@link DisplayOption} is options using when display the image.
+     */
+    public void displayImage(String url, ImageView view, DisplayOption option, LoadingListener loadingListener) {
         ImageViewDelegate viewDelegate = new ImageViewDelegate(view);
-        displayImage(url, viewDelegate, option);
+        displayImage(url, viewDelegate, option, loadingListener);
     }
 
     /**
@@ -203,7 +214,7 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
     public void displayImage(String url,
                              ImageSettable settable,
                              DisplayOption option,
-                             ProgressListener listener) {
+                             LoadingListener listener) {
 
         beforeLoading(settable, option);
 
@@ -247,7 +258,7 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
     private void startLoading(String url,
                               ImageSettable settable,
                               DisplayOption option,
-                              ProgressListener listener) {
+                              LoadingListener listener) {
 
         option = createOptionIfNull(option);
 
@@ -260,7 +271,12 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
 
         BitmapLoadingTask.TaskCallback<BitmapResult> callback = new ImageTaskCallback(settable, option, url, spec, listener);
 
-        BitmapLoadingTask task = new BitmapLoadingTask(mContext, callback, mConfig, taskId, viewId, spec, quality, url);
+        ProgressListenerDelegate progressListenerDelegate = null;
+        if (listener != null) {
+            progressListenerDelegate = new ProgressListenerDelegate(listener);
+        }
+
+        BitmapLoadingTask task = new BitmapLoadingTask(mContext, callback, mConfig, taskId, viewId, spec, quality, url, progressListenerDelegate);
 
         onTaskCreated(viewId, task);
 
@@ -358,10 +374,10 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
                 onApplyImageSettings((Runnable) message.obj);
                 break;
             case MSG_CALL_ON_START:
-                onCallOnStart((ProgressListener) message.obj);
+                onCallOnStart((LoadingListener) message.obj);
                 break;
             case MSG_CALL_ON_COMPLETE:
-                onCallOnComplete((ProgressListener) message.obj);
+                onCallOnComplete((LoadingListener) message.obj);
                 break;
             case MSG_CALL_ON_FAILURE:
                 onCallOnFailure((FailureParams) message.obj);
@@ -373,26 +389,34 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
         return true;
     }
 
-    private void callOnStart(ProgressListener listener) {
-        mUIThreadHandler.obtainMessage(MSG_CALL_ON_START, listener).sendToTarget();
+    private void callOnStart(LoadingListener listener) {
+        if (listener != null) {
+            mUIThreadHandler.obtainMessage(MSG_CALL_ON_START, listener).sendToTarget();
+        }
     }
 
     private void callOnProgressUpdate(ProgressListener listener, int progress) {
-        mUIThreadHandler.obtainMessage(MSG_CALL_PROGRESS_UPDATE, progress, 0, listener).sendToTarget();
+        if (listener != null) {
+            mUIThreadHandler.obtainMessage(MSG_CALL_PROGRESS_UPDATE, progress, 0, listener).sendToTarget();
+        }
     }
 
-    private void callOnComplete(ProgressListener listener) {
-        mUIThreadHandler.obtainMessage(MSG_CALL_ON_COMPLETE, listener).sendToTarget();
+    private void callOnComplete(LoadingListener listener) {
+        if (listener != null) {
+            mUIThreadHandler.obtainMessage(MSG_CALL_ON_COMPLETE, listener).sendToTarget();
+        }
     }
 
-    private void callOnFailure(ProgressListener listener, FailedCause cause) {
-        FailureParams failureParams = new FailureParams();
-        failureParams.cause = cause;
-        failureParams.listener = listener;
-        mUIThreadHandler.obtainMessage(MSG_CALL_ON_FAILURE, failureParams).sendToTarget();
+    private void callOnFailure(LoadingListener listener, FailedCause cause) {
+        if (listener != null) {
+            FailureParams failureParams = new FailureParams();
+            failureParams.cause = cause;
+            failureParams.listener = listener;
+            mUIThreadHandler.obtainMessage(MSG_CALL_ON_FAILURE, failureParams).sendToTarget();
+        }
     }
 
-    private void onCallOnStart(ProgressListener listener) {
+    private void onCallOnStart(LoadingListener listener) {
         listener.onStart();
     }
 
@@ -400,7 +424,7 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
         listener.onProgressUpdate(progress);
     }
 
-    private void onCallOnComplete(ProgressListener listener) {
+    private void onCallOnComplete(LoadingListener listener) {
         listener.onComplete();
     }
 
@@ -475,13 +499,13 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
         DisplayOption option;
         ImageSpec info;
         @Nullable
-        ProgressListener listener;
+        LoadingListener listener;
 
         public ImageTaskCallback(@NonNull ImageSettable settable,
                                  DisplayOption option,
                                  String url,
                                  ImageSpec info,
-                                 @Nullable ProgressListener listener) {
+                                 @Nullable LoadingListener listener) {
             this.option = option;
             this.url = url;
             this.info = info;
@@ -512,7 +536,9 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
 
             callOnComplete(listener);
 
-            if (!option.isViewMaybeReused() || !isTaskDirty(task)) {
+            final boolean isViewMaybeReused = option.isViewMaybeReused();
+
+            if (!isViewMaybeReused || !isTaskDirty(task)) {
                 if (!option.isApplyImageOneByOne()) {
                     ImageAnimator animator = (option == null ? null : option.getAnimator());
                     BitmapProcessor processor = (option == null ? null : option.getProcessor());
@@ -522,7 +548,7 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
                 mImageSettingsSchduler.execute(new Runnable() {
                     @Override
                     public void run() {
-                        if (isTaskDirty(task)) return;
+                        if (isViewMaybeReused && isTaskDirty(task)) return;
                         ImageAnimator animator = (option == null ? null : option.getAnimator());
                         BitmapProcessor processor = (option == null ? null : option.getProcessor());
                         applyImageSettings(result.result, processor, settable, animator);
@@ -598,41 +624,34 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
         }
     }
 
-    public interface ProgressListener {
+    public interface LoadingListener extends ProgressListener {
         void onStart();
-
-        void onProgressUpdate(int progress);
 
         void onComplete();
 
         void onFailure(FailedCause cause);
     }
 
-    public static class ProgressListenerStub implements ProgressListener {
+    public interface ProgressListener {
+        void onProgressUpdate(int progress);
+    }
 
-        @Override
-        public void onStart() {
-            // To be impl.
+    private class ProgressListenerDelegate implements ProgressListener {
+
+        ProgressListener listener;
+
+        public ProgressListenerDelegate(ProgressListener listener) {
+            this.listener = listener;
         }
 
         @Override
         public void onProgressUpdate(int progress) {
-            // To be impl.
-        }
-
-        @Override
-        public void onComplete() {
-            // To be impl.
-        }
-
-        @Override
-        public void onFailure(FailedCause cause) {
-            // To be impl.
+            callOnProgressUpdate(listener, progress);
         }
     }
 
     private static class FailureParams {
         FailedCause cause;
-        ProgressListener listener;
+        LoadingListener listener;
     }
 }

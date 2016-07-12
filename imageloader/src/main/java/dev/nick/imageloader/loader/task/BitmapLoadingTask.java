@@ -36,6 +36,7 @@ public class BitmapLoadingTask implements Runnable {
     DisplayOption.ImageQuality quality;
     TaskCallback<BitmapResult> callback;
     LoaderConfig loaderConfig;
+    ImageLoader.ProgressListener listener;
 
     Context mContext;
 
@@ -81,8 +82,10 @@ public class BitmapLoadingTask implements Runnable {
                              TaskCallback<BitmapResult> callback,
                              LoaderConfig loaderConfig,
                              int taskId, int settableId,
-                             ImageSpec spec, DisplayOption.ImageQuality quality,
-                             String url) {
+                             ImageSpec spec,
+                             DisplayOption.ImageQuality quality,
+                             String url,
+                             ImageLoader.ProgressListener listener) {
         this.callback = callback;
         this.loaderConfig = loaderConfig;
         this.id = taskId;
@@ -90,6 +93,7 @@ public class BitmapLoadingTask implements Runnable {
         this.spec = spec;
         this.quality = quality;
         this.url = url;
+        this.listener = listener;
         this.mContext = context;
         this.mLogger = LoggerManager.getLogger(ImageLoader.class);
     }
@@ -107,7 +111,7 @@ public class BitmapLoadingTask implements Runnable {
 
         BitmapResult result;
         try {
-            result = (BitmapResult) source.getFetcher(mContext, loaderConfig).fetchFromUrl(url, quality, spec);
+            result = (BitmapResult) source.getFetcher(mContext, loaderConfig).fetchFromUrl(url, quality, spec, listener);
             callback.onComplete(result, this);
         } catch (Exception e) {
             result = new BitmapResult();

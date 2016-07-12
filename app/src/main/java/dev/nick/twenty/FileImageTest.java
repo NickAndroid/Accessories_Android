@@ -41,6 +41,8 @@ import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.display.animator.FadeInImageAnimator;
 import dev.nick.imageloader.display.processor.BlackWhiteBitmapProcessor;
 import dev.nick.imageloader.loader.ImageSource;
+import dev.nick.imageloader.loader.result.FailedCause;
+import dev.nick.logger.LoggerManager;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
 public class FileImageTest extends BaseTest {
@@ -107,7 +109,27 @@ public class FileImageTest extends BaseTest {
                                 //.defaultImgRes(R.drawable.ic_broken_image_black_24dp)
                                 .bitmapProcessor(new BlackWhiteBitmapProcessor())
                                 .imageAnimator(new FadeInImageAnimator())
-                                .build());
+                                .build(), new ImageLoader.LoadingListener() {
+                            @Override
+                            public void onStart() {
+                                LoggerManager.getLogger(FileImageTest.class).funcEnter();
+                            }
+
+                            @Override
+                            public void onComplete() {
+                                LoggerManager.getLogger(FileImageTest.class).funcEnter();
+                            }
+
+                            @Override
+                            public void onFailure(FailedCause cause) {
+                                LoggerManager.getLogger(FileImageTest.class).funcEnter();
+                            }
+
+                            @Override
+                            public void onProgressUpdate(int progress) {
+                                LoggerManager.getLogger(FileImageTest.class).funcEnter();
+                            }
+                        });
 
                 return convertView;
             }

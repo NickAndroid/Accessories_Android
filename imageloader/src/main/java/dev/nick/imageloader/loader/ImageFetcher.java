@@ -17,15 +17,17 @@
 package dev.nick.imageloader.loader;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
+import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.loader.result.Result;
 
 public interface ImageFetcher {
-    Result fetchFromUrl(@NonNull String url, DisplayOption.ImageQuality quality, ImageSpec info) throws Exception;
+    Result fetchFromUrl(@NonNull String url, DisplayOption.ImageQuality quality, ImageSpec info,
+                        @Nullable ImageLoader.ProgressListener listener) throws Exception;
 
     ImageFetcher prepare(Context context, LoaderConfig config);
 }

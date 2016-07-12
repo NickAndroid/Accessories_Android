@@ -20,6 +20,7 @@ import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 
+import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.loader.result.BitmapResult;
@@ -46,7 +47,10 @@ class BaseImageFetcher implements ImageFetcher {
     }
 
     @Override
-    public BitmapResult fetchFromUrl(@NonNull String url, DisplayOption.ImageQuality quality, ImageSpec info)
+    public BitmapResult fetchFromUrl(@NonNull String url,
+                                     DisplayOption.ImageQuality quality,
+                                     ImageSpec info,
+                                     ImageLoader.ProgressListener listener)
             throws Exception {
         return null;
     }

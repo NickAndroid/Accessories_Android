@@ -22,6 +22,7 @@ import android.support.annotation.NonNull;
 
 import java.io.File;
 
+import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.FailedCause;
@@ -33,7 +34,11 @@ public class FileImageFetcher extends BaseImageFetcher {
     }
 
     @Override
-    public BitmapResult fetchFromUrl(@NonNull String url, DisplayOption.ImageQuality quality, ImageSpec info) throws Exception {
+    public BitmapResult fetchFromUrl(@NonNull String url,
+                                     DisplayOption.ImageQuality quality,
+                                     ImageSpec info,
+                                     ImageLoader.ProgressListener listener)
+            throws Exception {
 
         BitmapResult result = createEmptyResult();
 
@@ -67,6 +72,7 @@ public class FileImageFetcher extends BaseImageFetcher {
         Bitmap tempBitmap = null;
         try {
             tempBitmap = BitmapFactory.decodeFile(path, decodeOptions);
+            if (listener != null) listener.onProgressUpdate(1);
         } catch (OutOfMemoryError error) {
             result.cause = FailedCause.OOM;
         }
