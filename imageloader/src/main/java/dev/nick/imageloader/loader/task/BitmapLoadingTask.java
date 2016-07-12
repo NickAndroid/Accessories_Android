@@ -24,6 +24,7 @@ import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.loader.ImageSource;
 import dev.nick.imageloader.loader.ImageSpec;
+import dev.nick.imageloader.loader.ProgressListener;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.FailedCause;
 import dev.nick.logger.Logger;
@@ -36,7 +37,7 @@ public class BitmapLoadingTask implements Runnable {
     DisplayOption.ImageQuality quality;
     TaskCallback<BitmapResult> callback;
     LoaderConfig loaderConfig;
-    ImageLoader.ProgressListener listener;
+    ProgressListener listener;
 
     Context mContext;
 
@@ -85,7 +86,7 @@ public class BitmapLoadingTask implements Runnable {
                              ImageSpec spec,
                              DisplayOption.ImageQuality quality,
                              String url,
-                             ImageLoader.ProgressListener listener) {
+                             ProgressListener listener) {
         this.callback = callback;
         this.loaderConfig = loaderConfig;
         this.id = taskId;

@@ -13,20 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package dev.nick.imageloader.loader;
 
-import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-
-import dev.nick.imageloader.LoaderConfig;
-import dev.nick.imageloader.display.DisplayOption;
-import dev.nick.imageloader.loader.result.Result;
-
-public interface ImageFetcher {
-    Result fetchFromUrl(@NonNull String url, DisplayOption.ImageQuality quality, ImageSpec info,
-                        @Nullable ProgressListener listener) throws Exception;
-
-    ImageFetcher prepare(Context context, LoaderConfig config);
+public interface ProgressListener {
+    void onProgressUpdate(int progress);
 }

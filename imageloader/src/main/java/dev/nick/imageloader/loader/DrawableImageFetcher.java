@@ -21,7 +21,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 
-import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.FailedCause;
@@ -36,7 +35,7 @@ public class DrawableImageFetcher extends BaseImageFetcher {
     public BitmapResult fetchFromUrl(@NonNull String url,
                                      DisplayOption.ImageQuality quality,
                                      ImageSpec spec,
-                                     ImageLoader.ProgressListener listener)
+                                     ProgressListener listener)
             throws Exception {
 
         BitmapResult result = createEmptyResult();

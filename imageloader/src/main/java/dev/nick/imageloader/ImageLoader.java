@@ -46,6 +46,7 @@ import dev.nick.imageloader.display.animator.ImageAnimator;
 import dev.nick.imageloader.display.processor.BitmapProcessor;
 import dev.nick.imageloader.loader.ImageSource;
 import dev.nick.imageloader.loader.ImageSpec;
+import dev.nick.imageloader.loader.ProgressListener;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.FailedCause;
 import dev.nick.imageloader.loader.task.BitmapLoadingTask;
@@ -276,7 +277,15 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
             progressListenerDelegate = new ProgressListenerDelegate(listener);
         }
 
-        BitmapLoadingTask task = new BitmapLoadingTask(mContext, callback, mConfig, taskId, viewId, spec, quality, url, progressListenerDelegate);
+        BitmapLoadingTask task = new BitmapLoadingTask(mContext,
+                callback,
+                mConfig,
+                taskId,
+                viewId,
+                spec,
+                quality,
+                url,
+                progressListenerDelegate);
 
         onTaskCreated(viewId, task);
 
@@ -630,10 +639,6 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
         void onComplete();
 
         void onFailure(FailedCause cause);
-    }
-
-    public interface ProgressListener {
-        void onProgressUpdate(int progress);
     }
 
     private class ProgressListenerDelegate implements ProgressListener {

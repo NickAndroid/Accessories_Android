@@ -19,7 +19,6 @@ package dev.nick.imageloader.loader;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.loader.result.BitmapResult;
@@ -79,7 +78,7 @@ public enum ImageSource {
         public BitmapResult fetchFromUrl(@NonNull String url,
                                          DisplayOption.ImageQuality quality,
                                          ImageSpec info,
-                                         ImageLoader.ProgressListener listener)
+                                         ProgressListener listener)
                 throws Exception {
             BitmapResult result = new BitmapResult();
             result.cause = FailedCause.UNKNOWN_URL;

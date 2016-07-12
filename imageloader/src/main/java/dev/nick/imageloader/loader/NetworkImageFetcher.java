@@ -25,7 +25,6 @@ import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.Volley;
 
-import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.loader.network.NetworkUtils;
 import dev.nick.imageloader.loader.result.BitmapResult;
@@ -43,7 +42,7 @@ public class NetworkImageFetcher extends BaseImageFetcher {
     public BitmapResult fetchFromUrl(@NonNull String url,
                                      DisplayOption.ImageQuality quality,
                                      ImageSpec info,
-                                     ImageLoader.ProgressListener listener)
+                                     ProgressListener listener)
             throws Exception {
 
         boolean wifiOnly = loaderConfig.getNetworkPolicy().isOnlyOnWifi();

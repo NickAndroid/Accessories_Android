@@ -24,7 +24,6 @@ import android.support.annotation.NonNull;
 
 import java.io.InputStream;
 
-import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.FailedCause;
@@ -41,7 +40,7 @@ public class AssetsImageFetcher extends BaseImageFetcher {
     public BitmapResult fetchFromUrl(@NonNull String url,
                                      DisplayOption.ImageQuality quality,
                                      ImageSpec info,
-                                     ImageLoader.ProgressListener listener) throws Exception {
+                                     ProgressListener listener) throws Exception {
 
         BitmapResult result = createEmptyResult();
 
