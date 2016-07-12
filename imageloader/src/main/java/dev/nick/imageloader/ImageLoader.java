@@ -512,7 +512,7 @@ public class ImageLoader implements Handler.Callback, RequestHandler<BitmapLoadi
 
             callOnComplete(listener);
 
-            if (!isTaskDirty(task)) {
+            if (!option.isViewMaybeReused() || !isTaskDirty(task)) {
                 if (!option.isApplyImageOneByOne()) {
                     ImageAnimator animator = (option == null ? null : option.getAnimator());
                     BitmapProcessor processor = (option == null ? null : option.getProcessor());
