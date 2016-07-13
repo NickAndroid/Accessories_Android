@@ -16,35 +16,44 @@
 
 package dev.nick.twenty;
 
+import android.Manifest;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import com.nick.scalpel.Scalpel;
 import com.nick.scalpel.annotation.binding.FindView;
+import com.nick.scalpel.annotation.request.RequirePermission;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.LoadingListener;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.display.ImageQuality;
 import dev.nick.imageloader.display.animator.FadeInImageAnimator;
-import dev.nick.imageloader.display.processor.BlurBitmapProcessor;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
-import dev.nick.logger.LoggerManager;
 
+@RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
 public class NetworkImageTest extends BaseTest {
 
-    final String urlHttp = "https://tse2.mm.bing.net/th?id=OIP.M960c6796f4870a8764558c39e9148afao2&pid=15.1";
+    @FindView(id = R.id.list)
+    ListView listView;
 
-    @FindView(id = R.id.image)
-    ImageView imageView;
+    static String mArtworkUri = "content://media/external/audio/albumart";
 
-    @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.drawable_list);
+        setContentView(R.layout.file_image);
         setTitle(getClass().getSimpleName());
         Scalpel.getInstance().wire(this);
     }
@@ -52,35 +61,110 @@ public class NetworkImageTest extends BaseTest {
     @Override
     protected void onStart() {
         super.onStart();
-        ImageLoader.getInstance().displayImage(urlHttp, imageView, new DisplayOption.Builder()
-                .defaultImgRes(R.drawable.ic_launcher)
-                .bitmapProcessor(new BlurBitmapProcessor())
-                .imageQuality(ImageQuality.RAW)
-                .imageAnimator(new FadeInImageAnimator())
-                .build(), new LoadingListener() {
+
+        final List<Track> tracks = getTrackList();
+
+        BaseAdapter adapter = new BaseAdapter() {
             @Override
-            public void onError(@NonNull Cause cause) {
-                LoggerManager.getLogger(getClass()).info("onError:" + cause.exception + "\n" + cause.error);
-                setTitle("onError");
+            public int getCount() {
+                return tracks.size();
             }
 
             @Override
-            public void onComplete(@Nullable BitmapResult result) {
-                LoggerManager.getLogger(getClass()).info("onComplete");
-                setTitle("onComplete");
+            public Object getItem(int position) {
+                return null;
             }
 
             @Override
-            public void onProgressUpdate(float progress) {
-                LoggerManager.getLogger(getClass()).info("onProgressUpdate: " + progress);
-                setTitle("Progress:" + progress);
+            public long getItemId(int position) {
+                return position;
             }
 
             @Override
-            public void onStartLoading() {
-                LoggerManager.getLogger(getClass()).info("onStartLoading");
-                setTitle("onStartLoading");
+            public View getView(int position, View convertView, ViewGroup parent) {
+
+                final ViewHolder holder;
+
+                if (convertView == null) {
+                    convertView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.net_image, parent, false);
+                    holder = new ViewHolder(convertView);
+                    convertView.setTag(holder);
+                } else {
+                    holder = (ViewHolder) convertView.getTag();
+                }
+
+                String uri = tracks.get(position).getUrl();
+
+                ImageLoader.getInstance().displayImage(uri, holder.imageView,
+                        new DisplayOption.Builder()
+                                .oneAfterOne()
+                                .imageQuality(ImageQuality.RAW)
+                                .viewMaybeReused()
+                                .imageAnimator(new FadeInImageAnimator())
+                                .build(), new LoadingListener() {
+                            @Override
+                            public void onError(@NonNull Cause cause) {
+
+                            }
+
+                            @Override
+                            public void onComplete(@Nullable BitmapResult result) {
+
+                            }
+
+                            @Override
+                            public void onProgressUpdate(float progress) {
+                                holder.progressBar.setProgress((int) (progress * 100));
+                            }
+
+                            @Override
+                            public void onStartLoading() {
+
+                            }
+                        });
+
+                return convertView;
             }
-        });
+        };
+
+        listView.setAdapter(adapter);
+    }
+
+    final String[] urls = new String[]{
+            "http://i.imgur.com/ZXVlev9.jpg",
+            "http://i.imgur.com/LT6RmQU.png",
+            "http://i.imgur.com/8w0hWDS.jpg",
+            "http://i.imgur.com/wCbQpOr.jpg",
+            "http://i.imgur.com/rUcXDip.jpg",
+            "http://i.imgur.com/bzuhIg4.png",
+            "http://i.imgur.com/LsEW9kS.png",
+    };
+
+    List<Track> getTrackList() {
+        List<Track> out = new ArrayList<>(urls.length);
+        for (String s : urls) {
+            Track t = new Track();
+            t.setUrl(s);
+            t.setTitle(s);
+            out.add(t);
+        }
+        return out;
+    }
+
+    class ViewHolder {
+        @FindView(id = R.id.image)
+        ImageView imageView;
+        @FindView(id = R.id.progressBar)
+        ProgressBar progressBar;
+
+        public ViewHolder(View convert) {
+            Scalpel.getInstance().wire(convert, this);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ImageLoader.getInstance().clearAllCache();
     }
 }

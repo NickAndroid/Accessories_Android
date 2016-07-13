@@ -27,6 +27,7 @@ public class HttpImageDownloader implements ImageDownloader<Boolean> {
         try {
             URL u = new URL(url);
             URLConnection conn = u.openConnection();
+            conn.setConnectTimeout(6 * 1000);
             conn.connect();
             InputStream is = conn.getInputStream();
             float fileSize = (float) conn.getContentLength();
@@ -49,7 +50,6 @@ public class HttpImageDownloader implements ImageDownloader<Boolean> {
                 }
                 is.close();
                 fos.close();
-
                 return Boolean.TRUE;
             }
         } catch (Exception e) {

@@ -107,7 +107,7 @@ public class NetworkImageFetcher extends BaseImageFetcher {
         }
 
         // Delete the tmp file.
-        if (!new File(tmpPath).delete()) {
+        if (ok && !new File(tmpPath).delete()) {
             LoggerManager.getLogger(getClass()).warn("Failed to delete the tmp file:" + tmpPath);
         }
     }
