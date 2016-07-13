@@ -39,7 +39,6 @@ public class MyApp extends ScalpelApplication {
                         .compressFormat(Bitmap.CompressFormat.PNG)
                         .build())
                 .loadingThreads(Runtime.getRuntime().availableProcessors() * 2)
-                .debug(true)
                 .build());
     }
 

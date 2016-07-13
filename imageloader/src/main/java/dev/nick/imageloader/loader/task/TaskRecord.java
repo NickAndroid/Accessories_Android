@@ -14,6 +14,10 @@ public class TaskRecord {
         return taskId;
     }
 
+    public void setTaskId(int taskId) {
+        this.taskId = taskId;
+    }
+
     public long upTime() {
         return upTime;
     }

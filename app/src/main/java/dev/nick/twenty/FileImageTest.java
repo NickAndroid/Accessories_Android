@@ -62,22 +62,22 @@ public class FileImageTest extends BaseTest implements LoadingListener {
 
     @Override
     public void onError(@NonNull Cause cause) {
-
+        setTitle("onError:" + cause);
     }
 
     @Override
     public void onComplete(BitmapResult result) {
-
+        setTitle("onComplete:" + result.result);
     }
 
     @Override
     public void onProgressUpdate(int progress) {
-
+        setTitle("onProgressUpdate:" + progress);
     }
 
     @Override
     public void onStartLoading() {
-
+        setTitle("onStartLoading");
     }
 
     @Override
@@ -132,7 +132,7 @@ public class FileImageTest extends BaseTest implements LoadingListener {
                                 //.defaultImgRes(R.drawable.ic_broken_image_black_24dp)
                                 .bitmapProcessor(new BlackWhiteBitmapProcessor())
                                 .imageAnimator(new FadeInImageAnimator())
-                                .build());
+                                .build(), FileImageTest.this);
 
                 return convertView;
             }

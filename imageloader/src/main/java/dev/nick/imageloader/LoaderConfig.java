@@ -16,7 +16,6 @@
 
 package dev.nick.imageloader;
 
-import android.os.Build;
 import android.support.annotation.NonNull;
 
 import dev.nick.imageloader.cache.CachePolicy;
@@ -33,11 +32,9 @@ public class LoaderConfig {
             .cachePolicy(CachePolicy.DEFAULT_CACHE_POLICY)
             .networkPolicy(NetworkPolicy.DEFAULT_NETWORK_POLICY)
             .loadingThreads(Runtime.getRuntime().availableProcessors())
-            .debug(Build.TYPE.equals("eng"))
             .build();
 
     private int nLoadingThreads;
-    private boolean debug;
 
     private CachePolicy cachePolicy;
     private NetworkPolicy networkPolicy;
@@ -51,10 +48,6 @@ public class LoaderConfig {
         return networkPolicy;
     }
 
-    public boolean isDebug() {
-        return debug;
-    }
-
     public int getLoadingThreads() {
         return nLoadingThreads;
     }
@@ -62,18 +55,15 @@ public class LoaderConfig {
 
     private LoaderConfig(CachePolicy cachePolicy,
                          NetworkPolicy networkPolicy,
-                         boolean debug,
                          int nLoadingThreads) {
         this.cachePolicy = cachePolicy;
         this.networkPolicy = networkPolicy;
-        this.debug = debug;
         this.nLoadingThreads = nLoadingThreads;
     }
 
     public static class Builder {
 
         private int nLoadingThreads;
-        private boolean debug;
         private CachePolicy cachePolicy;
         private NetworkPolicy networkPolicy;
 
@@ -100,11 +90,6 @@ public class LoaderConfig {
             return Builder.this;
         }
 
-        public Builder debug(boolean debug) {
-            this.debug = debug;
-            return Builder.this;
-        }
-
         /**
          * @param nLoadingThreads Number of threads when loading.
          * @return Builder instance.
@@ -119,7 +104,6 @@ public class LoaderConfig {
             return new LoaderConfig(
                     cachePolicy,
                     networkPolicy,
-                    debug,
                     nLoadingThreads);
         }
 

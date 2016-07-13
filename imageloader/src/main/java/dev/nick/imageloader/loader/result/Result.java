@@ -16,6 +16,9 @@
 
 package dev.nick.imageloader.loader.result;
 
+import android.support.annotation.Nullable;
+
 public class Result<X> {
+    @Nullable
     public X result;
 }

@@ -31,7 +31,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import dev.nick.imageloader.cache.CacheManager;
 import dev.nick.imageloader.control.Freezer;
@@ -40,6 +39,8 @@ import dev.nick.imageloader.display.BitmapImageSettings;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.display.ImageQuality;
 import dev.nick.imageloader.display.ImageSettable;
+import dev.nick.imageloader.display.ImageSettableIdCreator;
+import dev.nick.imageloader.display.ImageSettableIdCreatorImpl;
 import dev.nick.imageloader.display.ImageViewDelegate;
 import dev.nick.imageloader.display.ResImageSettings;
 import dev.nick.imageloader.display.animator.ImageAnimator;
@@ -53,6 +54,8 @@ import dev.nick.imageloader.loader.result.ErrorListener;
 import dev.nick.imageloader.loader.task.ImageTask;
 import dev.nick.imageloader.loader.task.ImageTaskImpl;
 import dev.nick.imageloader.loader.task.ImageTaskRecord;
+import dev.nick.imageloader.loader.task.TaskManager;
+import dev.nick.imageloader.loader.task.TaskManagerImpl;
 import dev.nick.imageloader.loader.task.TaskMonitor;
 import dev.nick.logger.Logger;
 import dev.nick.logger.LoggerManager;
@@ -84,32 +87,35 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
 
     private final boolean DEBUG;
 
-    private final AtomicInteger mTaskId = new AtomicInteger(0);
-
     private long mClearTaskRequestedTimeMills;
 
-    private final Map<Integer, TaskRecord> mTaskLockMap;
+    private final Map<Integer, ImageTaskRecord> mTaskLockMap;
 
     private ExecutorService mLoadingService;
-    private ExecutorService mImageSettingsSchduler;
+    private ExecutorService mImageSettingsScheduler;
 
     private Freezer mFreezer;
     private LoaderState mState;
+
+    private TaskManager mTaskManager;
+    private ImageSettableIdCreator mSettableIdCreator;
 
     private static ImageLoader sLoader;
 
     private ImageLoader(Context context, LoaderConfig config) {
         this.mContext = context;
         this.mConfig = config;
+        mTaskManager = new TaskManagerImpl();
+        mSettableIdCreator = new ImageSettableIdCreatorImpl();
         this.mUIThreadHandler = new Handler(Looper.getMainLooper(), this);
         this.mCacheManager = new CacheManager(config.getCachePolicy(), context);
         this.mLoadingService = Executors.newFixedThreadPool(config.getLoadingThreads());
-        this.mImageSettingsSchduler = Executors.newSingleThreadExecutor();
+        this.mImageSettingsScheduler = Executors.newSingleThreadExecutor();
         this.mStackService = RequestStackService.createStarted(this);
         this.mTaskLockMap = new HashMap<>();
         this.mState = LoaderState.RUNNING;
         this.mLogger = LoggerManager.getLogger(getClass());
-        this.DEBUG = config.isDebug();
+        this.DEBUG = BuildConfig.DEBUG;
     }
 
     /**
@@ -272,8 +278,8 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
 
         ViewSpec viewSpec = new ViewSpec(settable.getWidth(), settable.getHeight());
 
-        int settableId = getSettableId(settable);
-        int taskId = getNextTaskId();
+        int settableId = mSettableIdCreator.createSettableId(settable);
+        int taskId = mTaskManager.nextTaskId();
 
 
         ImageTaskRecord imageTaskRecord = new ImageTaskRecord(settableId, taskId);
@@ -321,26 +327,17 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
                 .build();
     }
 
-    private int getSettableId(ImageSettable view) {
-        return view.hashCode();
-    }
-
-    private int getNextTaskId() {
-        return mTaskId.getAndIncrement();
-    }
-
     private void onTaskCreated(ImageTaskRecord record) {
         if (DEBUG)
             mLogger.verbose("Created task:" + record);
         int taskId = record.getTaskId();
         int settableId = record.getSettableId();
         synchronized (mTaskLockMap) {
-            TaskRecord exists = mTaskLockMap.get(settableId);
+            ImageTaskRecord exists = mTaskLockMap.get(settableId);
             if (exists != null) {
-                exists.taskId = taskId;
+                exists.setTaskId(taskId);
             } else {
-                TaskRecord lock = new TaskRecord(taskId);
-                mTaskLockMap.put(settableId, lock);
+                mTaskLockMap.put(settableId, record);
             }
         }
     }
@@ -354,9 +351,9 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
         }
 
         synchronized (mTaskLockMap) {
-            TaskRecord lock = mTaskLockMap.get(task.getSettableId());
+            ImageTaskRecord lock = mTaskLockMap.get(task.getSettableId());
             if (lock != null) {
-                int taskId = lock.taskId;
+                int taskId = lock.getTaskId();
                 // We have new task to load for this settle.
                 if (taskId > task.getTaskId()) {
                     return true;
@@ -374,8 +371,12 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
     private void applyImageSettings(Bitmap bitmap, BitmapProcessor processor, ImageSettable settable,
                                     ImageAnimator animator) {
         if (settable != null) {
-            if (DEBUG)
-                mLogger.debug("applyImageSettings, Bitmap:" + bitmap + ", for settle:" + getSettableId(settable));
+            if (DEBUG) {
+                mLogger.debug("applyImageSettings, Bitmap:"
+                        + bitmap
+                        + ", for settle:"
+                        + mSettableIdCreator.createSettableId(settable));
+            }
             BitmapImageSettings settings = new BitmapImageSettings(animator,
                     (processor == null ? bitmap : processor.process(bitmap)), settable);
             mUIThreadHandler.obtainMessage(MSG_APPLY_IMAGE_SETTINGS, settings).sendToTarget();
@@ -385,14 +386,16 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
     @WorkerThread
     private void applyImageSettings(int resId, ImageSettable settable, ImageAnimator animator) {
         if (settable != null) {
-            if (DEBUG)
+            if (DEBUG) {
                 mLogger.debug("applyImageSettings, Res:" + resId + ", for settle:"
-                        + getSettableId(settable));
+                        + mSettableIdCreator.createSettableId(settable));
+            }
             ResImageSettings settings = new ResImageSettings(animator, resId, settable);
             mUIThreadHandler.obtainMessage(MSG_APPLY_IMAGE_SETTINGS, settings).sendToTarget();
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public boolean handleMessage(Message message) {
         switch (message.what) {
@@ -400,16 +403,15 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
                 onApplyImageSettings((Runnable) message.obj);
                 break;
             case MSG_CALL_ON_START:
-                onCallOnStart((LoadingListener) message.obj);
+                onCallOnStart((ProgressListener<BitmapResult>) message.obj);
                 break;
             case MSG_CALL_ON_COMPLETE:
-                onCallOnComplete((LoadingListener) message.obj);
+                onCallOnComplete((CompleteParams) message.obj);
                 break;
             case MSG_CALL_ON_FAILURE:
                 onCallOnFailure((FailureParams) message.obj);
                 break;
             case MSG_CALL_PROGRESS_UPDATE:
-                //noinspection unchecked
                 onCallOnProgressUpdate((ProgressListener<BitmapResult>) message.obj, message.arg1);
                 break;
         }
@@ -428,9 +430,12 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
         }
     }
 
-    private void callOnComplete(ProgressListener listener) {
+    private void callOnComplete(ProgressListener<BitmapResult> listener, BitmapResult result) {
         if (listener != null) {
-            mUIThreadHandler.obtainMessage(MSG_CALL_ON_COMPLETE, listener).sendToTarget();
+            CompleteParams completeParams = new CompleteParams();
+            completeParams.progressListener = listener;
+            completeParams.result = result;
+            mUIThreadHandler.obtainMessage(MSG_CALL_ON_COMPLETE, completeParams).sendToTarget();
         }
     }
 
@@ -451,8 +456,8 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
         listener.onProgressUpdate(progress);
     }
 
-    private void onCallOnComplete(ProgressListener<BitmapResult> listener) {
-        listener.onComplete(null);
+    private void onCallOnComplete(CompleteParams params) {
+        params.progressListener.onComplete(params.result);
     }
 
     private void onCallOnFailure(FailureParams params) {
@@ -543,15 +548,6 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
         return true;
     }
 
-    class TaskRecord {
-        int taskId;
-
-        TaskRecord(int taskId) {
-            this.taskId = taskId;
-        }
-    }
-
-
     class ImageSettingsLocker {
 
         private final static long MAX_DELAY = 2 * 1000;
@@ -579,7 +575,7 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
 
     private class ProgressListenerDelegate implements ProgressListener<BitmapResult> {
 
-        private ProgressListener listener;
+        private ProgressListener<BitmapResult> listener;
 
         @NonNull
         private ImageSettable settable;
@@ -589,7 +585,7 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
 
         private ImageTaskRecord taskRecord;
 
-        public ProgressListenerDelegate(ProgressListener listener,
+        public ProgressListenerDelegate(ProgressListener<BitmapResult> listener,
                                         ViewSpec viewSpec,
                                         DisplayOption option,
                                         @NonNull ImageSettable settable,
@@ -616,7 +612,6 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
         @Override
         public void onComplete(final BitmapResult result) {
 
-
             if (result.result == null) {
                 return;
             }
@@ -630,7 +625,7 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
                     applyImageSettings(result.result, processor, settable, animator);
                     return;
                 }
-                mImageSettingsSchduler.execute(new Runnable() {
+                mImageSettingsScheduler.execute(new Runnable() {
                     @Override
                     public void run() {
                         if (isViewMaybeReused && isTaskDirty(taskRecord)) return;
@@ -650,7 +645,7 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
 
             mCacheManager.cache(url, viewSpec, result.result);
 
-            callOnComplete(listener);
+            callOnComplete(listener, result);
         }
     }
 
@@ -671,5 +666,10 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
     private static class FailureParams {
         Cause cause;
         ErrorListener listener;
+    }
+
+    private static class CompleteParams {
+        BitmapResult result;
+        ProgressListener<BitmapResult> progressListener;
     }
 }
