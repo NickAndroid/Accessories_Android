@@ -16,13 +16,16 @@
 
 package dev.nick.imageloader.loader;
 
+import android.content.Context;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.io.File;
-import java.util.Random;
+import java.util.UUID;
 
+import dev.nick.imageloader.LoaderConfig;
+import dev.nick.imageloader.cache.CachePolicy;
 import dev.nick.imageloader.loader.network.HttpImageDownloader;
 import dev.nick.imageloader.loader.network.ImageDownloader;
 import dev.nick.imageloader.loader.network.NetworkUtils;
@@ -35,9 +38,35 @@ public class NetworkImageFetcher extends BaseImageFetcher {
 
     private ImageFetcher mFileImageFetcher;
 
+    private String mTmpDir;
+
     public NetworkImageFetcher(PathSplitter<String> splitter, ImageFetcher fileImageFetcher) {
         super(splitter);
         mFileImageFetcher = fileImageFetcher;
+    }
+
+    private void ensurePolicy() {
+        CachePolicy policy = loaderConfig.getCachePolicy();
+        boolean preferredExternal = policy.getPreferredLocation() == CachePolicy.Location.EXTERNAL;
+        mTmpDir = context.getCacheDir().getPath();
+        if (preferredExternal && Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            File externalCache = context.getExternalCacheDir();
+            if (externalCache != null) {
+                mTmpDir = externalCache.getPath();
+            }
+        }
+        if (debug) LoggerManager.getLogger(getClass()).info("Using tmp fir:" + mTmpDir);
+    }
+
+    private String buildTmpFilePath() {
+        return mTmpDir + File.separator + UUID.randomUUID();
+    }
+
+    @Override
+    public ImageFetcher prepare(Context context, LoaderConfig config) {
+        super.prepare(context, config);
+        ensurePolicy();
+        return this;
     }
 
     @Override
@@ -61,7 +90,11 @@ public class NetworkImageFetcher extends BaseImageFetcher {
         LoggerManager.getLogger(getClass()).info("callOnStart:" + progressListener);
         callOnStart(progressListener);
 
-        String tmpPath = Environment.getExternalStorageDirectory().getPath() + File.separator + new Random().nextInt(1000);
+        String tmpPath = buildTmpFilePath();
+
+        if (debug) {
+            LoggerManager.getLogger(getClass()).debug("Using tmp path for image download:" + tmpPath);
+        }
 
         ImageDownloader<Boolean> downloader = new HttpImageDownloader(tmpPath);
 
@@ -71,6 +104,11 @@ public class NetworkImageFetcher extends BaseImageFetcher {
             mFileImageFetcher.fetchFromUrl(ImageSource.FILE.prefix + tmpPath, decodeSpec, progressListener, errorListener);
         } else {
             callOnError(errorListener, new Cause(new UnknownError()));
+        }
+
+        // Delete the tmp file.
+        if (!new File(tmpPath).delete()) {
+            LoggerManager.getLogger(getClass()).warn("Failed to delete the tmp file:" + tmpPath);
         }
     }
 }

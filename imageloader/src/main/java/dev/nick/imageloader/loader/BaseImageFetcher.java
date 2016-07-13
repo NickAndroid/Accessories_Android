@@ -22,6 +22,7 @@ import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import dev.nick.imageloader.BuildConfig;
 import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
@@ -41,14 +42,10 @@ class BaseImageFetcher implements ImageFetcher {
 
     protected LoaderConfig loaderConfig;
 
-    protected boolean debug;
+    protected final boolean debug = BuildConfig.DEBUG;
 
     public BaseImageFetcher(PathSplitter<String> splitter) {
         this.splitter = splitter;
-    }
-
-    public void setDebug(boolean debug) {
-        this.debug = debug;
     }
 
     @Override
