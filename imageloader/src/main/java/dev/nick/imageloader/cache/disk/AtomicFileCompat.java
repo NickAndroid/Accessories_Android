@@ -63,7 +63,7 @@ public class AtomicFileCompat {
      * with the new data.  You <em>must not</em> directly close the given
      * FileOutputStream; instead call either {@link #finishWrite(FileOutputStream)}
      * or {@link #failWrite(FileOutputStream)}.
-     *
+     * <p/>
      * Note that if another thread is currently performing
      * a write, this will simply replace whatever that thread is writing
      * with the new file being written by this thread, and when the other
@@ -180,7 +180,7 @@ public class AtomicFileCompat {
      * incomplete write, this will roll back to the last good data before
      * opening for read.  You should call close() on the FileInputStream when
      * you are done reading from it.
-     *
+     * <p/>
      * Note that if another thread is currently performing
      * a write, this will incorrectly consider it to be in the state of a bad
      * write and roll back, causing the new data currently being written to

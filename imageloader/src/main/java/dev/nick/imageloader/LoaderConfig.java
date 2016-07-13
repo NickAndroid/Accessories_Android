@@ -122,6 +122,7 @@ public class LoaderConfig {
 
         /**
          * To enable disk cache.
+         *
          * @return Builder instance.
          */
         public Builder enableDiskCache() {
@@ -131,6 +132,7 @@ public class LoaderConfig {
 
         /**
          * To enabled memory cache.
+         *
          * @return Builder instance.
          */
         public Builder enableMemCache() {

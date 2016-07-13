@@ -36,6 +36,7 @@ import java.util.List;
 
 import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.display.DisplayOption;
+import dev.nick.imageloader.display.ImageQuality;
 import dev.nick.imageloader.display.animator.FadeInImageAnimator;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
@@ -95,7 +96,8 @@ public class ContentImageTest extends BaseTest {
                 ImageLoader.getInstance().displayImage(uri, holder.imageView,
                         new DisplayOption.Builder()
                                 .oneAfterOne()
-                                .imageQuality(DisplayOption.ImageQuality.RAW)
+                                .imageQuality(ImageQuality.RAW)
+                                .viewMaybeReused()
                                 .imageAnimator(new FadeInImageAnimator())
                                 .build());
 

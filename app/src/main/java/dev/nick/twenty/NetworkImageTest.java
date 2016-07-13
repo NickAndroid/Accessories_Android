@@ -18,7 +18,6 @@ package dev.nick.twenty;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 
 import com.nick.scalpel.Scalpel;
@@ -26,6 +25,7 @@ import com.nick.scalpel.annotation.binding.FindView;
 
 import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.display.DisplayOption;
+import dev.nick.imageloader.display.ImageQuality;
 import dev.nick.imageloader.display.animator.FadeInImageAnimator;
 import dev.nick.imageloader.display.processor.BlurBitmapProcessor;
 
@@ -50,7 +50,7 @@ public class NetworkImageTest extends BaseTest {
         ImageLoader.getInstance().displayImage(urlHttp, imageView, new DisplayOption.Builder()
                 .defaultImgRes(R.drawable.ic_launcher)
                 .bitmapProcessor(new BlurBitmapProcessor())
-                .imageQuality(DisplayOption.ImageQuality.RAW)
+                .imageQuality(ImageQuality.RAW)
                 .imageAnimator(new FadeInImageAnimator())
                 .build());
     }

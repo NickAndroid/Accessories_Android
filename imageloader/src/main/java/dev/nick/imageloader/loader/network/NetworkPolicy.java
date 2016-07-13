@@ -44,6 +44,7 @@ public class NetworkPolicy {
 
         /**
          * To load image only under WIFI connection.}
+         *
          * @return Builder instance.
          */
         public Builder onlyOnWifi() {

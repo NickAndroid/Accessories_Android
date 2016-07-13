@@ -21,12 +21,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
+import java.io.IOException;
 import java.io.InputStream;
 
-import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
+import dev.nick.imageloader.loader.result.ErrorListener;
 
 public class AssetsImageFetcher extends BaseImageFetcher {
 
@@ -37,22 +39,32 @@ public class AssetsImageFetcher extends BaseImageFetcher {
     }
 
     @Override
-    public BitmapResult fetchFromUrl(@NonNull String url,
-                                     DisplayOption.ImageQuality quality,
-                                     ViewSpec spec,
-                                     ProgressListener listener) throws Exception {
+    public void fetchFromUrl(@NonNull String url,
+                             @NonNull DecodeSpec decodeSpec,
+                             @Nullable ProgressListener<BitmapResult> progressListener,
+                             @Nullable ErrorListener errorListener) throws Exception {
 
-        BitmapResult result = createEmptyResult();
+        super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);
 
         String path = splitter.getRealPath(url);
 
         if (mAssets == null) mAssets = context.getAssets();
 
-        InputStream in = mAssets.open(path);
+        InputStream in;
+        try {
+            in = mAssets.open(path);
+        } catch (IOException e) {
+            callOnError(errorListener, new Cause(e));
+            return;
+        }
+
+        callOnStart(progressListener);
 
         BitmapFactory.Options decodeOptions = new BitmapFactory.Options();
 
         Rect rect = new Rect(0, 0, 0, 0);
+
+        ViewSpec viewSpec = decodeSpec.viewSpec;
 
         // If we have to resize this image, first get the natural bounds.
         decodeOptions.inJustDecodeBounds = true;
@@ -60,20 +72,25 @@ public class AssetsImageFetcher extends BaseImageFetcher {
 
         // Decode to the nearest power of two scaling factor.
         decodeOptions.inJustDecodeBounds = false;
-        decodeOptions.inSampleSize =
-                computeSampleSize(decodeOptions, UNCONSTRAINED,
-                        (spec.height * spec.height == 0 ?
-                                MAX_NUM_PIXELS_THUMBNAIL
-                                : spec.width * spec.height));
+        decodeOptions.inSampleSize = computeSampleSize(
+                decodeOptions,
+                UNCONSTRAINED,
+                (viewSpec.height * viewSpec.height == 0 ?
+                        MAX_NUM_PIXELS_THUMBNAIL
+                        : viewSpec.width * viewSpec.height));
+
         Bitmap tempBitmap = null;
+
         try {
             tempBitmap = BitmapFactory.decodeStream(in, rect, decodeOptions);
         } catch (OutOfMemoryError error) {
-            result.cause = Cause.OOM;
+            callOnError(errorListener, new Cause(error));
+            return;
         } finally {
-            in.close();
+            if (in != null) {
+                in.close();
+            }
         }
-        result.result = tempBitmap;
-        return result;
+        callOnComplete(progressListener, newResult(tempBitmap));
     }
 }

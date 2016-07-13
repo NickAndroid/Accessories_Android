@@ -19,12 +19,14 @@ package dev.nick.imageloader.loader;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
-import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
+import dev.nick.imageloader.loader.result.ErrorListener;
 
 public class FileImageFetcher extends BaseImageFetcher {
 
@@ -33,24 +35,26 @@ public class FileImageFetcher extends BaseImageFetcher {
     }
 
     @Override
-    public BitmapResult fetchFromUrl(@NonNull String url,
-                                     DisplayOption.ImageQuality quality,
-                                     ViewSpec spec,
-                                     ProgressListener listener)
-            throws Exception {
+    public void fetchFromUrl(@NonNull String url,
+                             @NonNull DecodeSpec decodeSpec,
+                             @Nullable ProgressListener<BitmapResult> progressListener,
+                             @Nullable ErrorListener errorListener) throws Exception {
 
-        BitmapResult result = createEmptyResult();
+        super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);
 
         String path = splitter.getRealPath(url);
         File file = new File(path);
         if (!file.exists()) {
-            result.cause = Cause.FILE_NOT_EXISTS;
-            return result;
+            callOnError(errorListener, new Cause(new FileNotFoundException(String.format("File %s not found.", url))));
+            return;
         }
 
         BitmapFactory.Options decodeOptions = null;
+        ViewSpec viewSpec = decodeSpec.viewSpec;
 
-        switch (quality) {
+        callOnStart(progressListener);
+
+        switch (decodeSpec.quality) {
             case FIT_VIEW:
                 decodeOptions = new BitmapFactory.Options();
                 // If we have to resize this image, first get the natural bounds.
@@ -61,23 +65,22 @@ public class FileImageFetcher extends BaseImageFetcher {
                 decodeOptions.inJustDecodeBounds = false;
                 decodeOptions.inSampleSize =
                         computeSampleSize(decodeOptions, UNCONSTRAINED,
-                                (spec.height * spec.height == 0 ?
+                                (viewSpec.height * viewSpec.height == 0 ?
                                         MAX_NUM_PIXELS_THUMBNAIL
-                                        : spec.width * spec.height));
+                                        : viewSpec.width * viewSpec.height));
             default:
                 break;
         }
 
-        Bitmap tempBitmap = null;
+        Bitmap tempBitmap;
+
         try {
             tempBitmap = BitmapFactory.decodeFile(path, decodeOptions);
-            if (listener != null) listener.onProgressUpdate(1);
         } catch (OutOfMemoryError error) {
-            result.cause = Cause.OOM;
+            callOnError(errorListener, new Cause(error));
+            return;
         }
 
-        result.result = tempBitmap;
-
-        return result;
+        callOnComplete(progressListener, newResult(tempBitmap));
     }
 }

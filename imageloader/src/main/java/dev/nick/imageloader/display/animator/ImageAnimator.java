@@ -17,7 +17,6 @@
 package dev.nick.imageloader.display.animator;
 
 import android.support.annotation.NonNull;
-import android.widget.ImageView;
 
 import dev.nick.imageloader.display.ImageSettable;
 

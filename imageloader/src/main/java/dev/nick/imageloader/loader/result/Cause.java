@@ -16,11 +16,25 @@
 
 package dev.nick.imageloader.loader.result;
 
+import android.support.annotation.Nullable;
+
 public class Cause {
 
-    Exception e;
+    @Nullable
+    public Exception exception;
+    @Nullable
+    public Error error;
 
-    public Cause(Exception e) {
-        this.e = e;
+    public Cause(@Nullable Exception e) {
+        this.exception = e;
+    }
+
+    public Cause(@Nullable Error error) {
+        this.error = error;
+    }
+
+    public Cause(@Nullable Error error, @Nullable Exception exception) {
+        this.error = error;
+        this.exception = exception;
     }
 }

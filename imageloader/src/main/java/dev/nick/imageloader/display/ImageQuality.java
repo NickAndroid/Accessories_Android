@@ -1,6 +1,6 @@
 package dev.nick.imageloader.display;
 
-public enum  ImageQuality {
+public enum ImageQuality {
     /**
      * Using raw image when decode and display the image.
      */

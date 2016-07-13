@@ -25,6 +25,7 @@ import com.nick.scalpel.annotation.binding.FindView;
 
 import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.display.DisplayOption;
+import dev.nick.imageloader.display.ImageQuality;
 import dev.nick.imageloader.display.animator.FadeInImageAnimator;
 import dev.nick.imageloader.display.processor.BlackWhiteBitmapProcessor;
 
@@ -49,7 +50,7 @@ public class AssetsImageTest extends BaseTest {
         ImageLoader.getInstance().displayImage(urlAssets, imageView, new DisplayOption.Builder()
                 .defaultImgRes(R.drawable.ic_launcher)
                 .bitmapProcessor(new BlackWhiteBitmapProcessor())
-                .imageQuality(DisplayOption.ImageQuality.RAW)
+                .imageQuality(ImageQuality.RAW)
                 .imageAnimator(new FadeInImageAnimator())
                 .build());
     }
