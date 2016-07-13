@@ -18,6 +18,7 @@ package dev.nick.imageloader.cache;
 
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 import dev.nick.imageloader.ImageLoader;
 import dev.nick.logger.LoggerManager;
@@ -39,6 +40,7 @@ public class CachePolicy {
             .memCachePoolSize(DEFAULT_MEM_CACHE_POOL_SIZE)
             .compressFormat(Bitmap.CompressFormat.PNG)
             .imageQuality(Quality.BEST)
+            .cacheDirName("images")
             .fileNameGenerator(CachePolicy.DEFAULT_FILENAME_GENERATOR)
             .keyGenerator(CachePolicy.DEFAULT_KEY_GENERATOR)
             .preferredLocation(CachePolicy.Location.EXTERNAL)
@@ -48,6 +50,7 @@ public class CachePolicy {
                         boolean diskCacheEnabled,
                         int nCachingThreads,
                         int memCachePoolSize,
+                        String cacheDirName,
                         FileNameGenerator fileNameGenerator,
                         KeyGenerator keyGenerator,
                         Bitmap.CompressFormat compressFormat,
@@ -57,6 +60,7 @@ public class CachePolicy {
         this.diskCacheEnabled = diskCacheEnabled;
         this.nCachingThreads = nCachingThreads;
         this.memCachePoolSize = memCachePoolSize;
+        this.cacheDirName = cacheDirName;
         this.fileNameGenerator = fileNameGenerator;
         this.keyGenerator = keyGenerator;
         this.preferredLocation = preferredLocation;
@@ -69,6 +73,7 @@ public class CachePolicy {
     private int nCachingThreads;
     private int memCachePoolSize;
     private int preferredLocation;
+    private String cacheDirName;
     private KeyGenerator keyGenerator;
     private FileNameGenerator fileNameGenerator;
     private Bitmap.CompressFormat compressFormat;
@@ -92,6 +97,10 @@ public class CachePolicy {
 
     public int getCachingThreads() {
         return nCachingThreads;
+    }
+
+    public String getCacheDirName() {
+        return cacheDirName;
     }
 
     @NonNull
@@ -131,6 +140,7 @@ public class CachePolicy {
         private int nCachingThreads;
         private int memCachePoolSize;
         private int preferredLocation;
+        private String cacheDirName;
         private KeyGenerator keyGenerator;
         private FileNameGenerator fileNameGenerator;
         private Bitmap.CompressFormat compressFormat;
@@ -184,6 +194,11 @@ public class CachePolicy {
             return Builder.this;
         }
 
+        public Builder cacheDirName(String cacheDirName) {
+            this.cacheDirName = cacheDirName;
+            return Builder.this;
+        }
+
         /**
          * @param keyGenerator {@link KeyGenerator}
          * @return Builder instance.
@@ -219,6 +234,7 @@ public class CachePolicy {
                     diskCacheEnabled,
                     nCachingThreads,
                     memCachePoolSize,
+                    cacheDirName,
                     fileNameGenerator,
                     keyGenerator,
                     compressFormat,
@@ -238,6 +254,7 @@ public class CachePolicy {
                 LoggerManager.getLogger(CachePolicy.class).error("You set too large mem pool size, " +
                         "using default size:" + DEFAULT_MEM_CACHE_POOL_SIZE);
             }
+            if (TextUtils.isEmpty(cacheDirName)) cacheDirName("images");
             if (keyGenerator == null) keyGenerator(DEFAULT_KEY_GENERATOR);
             if (fileNameGenerator == null) fileNameGenerator(DEFAULT_FILENAME_GENERATOR);
             if (compressFormat == null) compressFormat(Bitmap.CompressFormat.PNG);

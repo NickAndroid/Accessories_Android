@@ -57,11 +57,11 @@ public class DiskCache implements Cache<String, Bitmap> {
 
     public DiskCache(CachePolicy cachePolicy, Context context) {
         mPreferToExternal = cachePolicy.getPreferredLocation() == CachePolicy.Location.EXTERNAL;
-        mInternalCacheDir = context.getCacheDir().getPath();
+        mInternalCacheDir = context.getCacheDir().getPath() + File.separator + cachePolicy.getCacheDirName();
         if (mPreferToExternal) {
             File externalCache = context.getExternalCacheDir();
             if (externalCache != null)
-                mExternalCacheDir = externalCache.getPath();
+                mExternalCacheDir = externalCache.getPath() + File.separator + cachePolicy.getCacheDirName();
         }
         mRunningOps = new ArrayList<>();
         mFileNameGenerator = cachePolicy.getFileNameGenerator();
