@@ -61,21 +61,25 @@ public class NetworkImageTest extends BaseTest {
             @Override
             public void onError(@NonNull Cause cause) {
                 LoggerManager.getLogger(getClass()).info("onError:" + cause.exception + "\n" + cause.error);
+                setTitle("onError");
             }
 
             @Override
             public void onComplete(@Nullable BitmapResult result) {
                 LoggerManager.getLogger(getClass()).info("onComplete");
+                setTitle("onComplete");
             }
 
             @Override
             public void onProgressUpdate(float progress) {
                 LoggerManager.getLogger(getClass()).info("onProgressUpdate: " + progress);
+                setTitle("Progress:" + progress);
             }
 
             @Override
             public void onStartLoading() {
                 LoggerManager.getLogger(getClass()).info("onStartLoading");
+                setTitle("onStartLoading");
             }
         });
     }

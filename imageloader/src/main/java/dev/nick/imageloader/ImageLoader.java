@@ -545,7 +545,7 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
         if (mState == LoaderState.PAUSE_REQUESTED) {
             mState = LoaderState.PAUSED;
             if (mFreezer == null) mFreezer = new Freezer();
-            mLogger.debug("Pausing the loader...");
+            if (DEBUG) mLogger.debug("Pausing the loader...");
             mFreezer.freeze();
         }
         return true;
