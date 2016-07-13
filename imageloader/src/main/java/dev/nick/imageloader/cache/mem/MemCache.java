@@ -4,15 +4,15 @@ import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.v4.util.LruCache;
 
-import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.cache.Cache;
+import dev.nick.imageloader.cache.CachePolicy;
 
 public class MemCache implements Cache<String, Bitmap> {
 
     private LruCache<String, Bitmap> mLruCache;
 
-    public MemCache(LoaderConfig config) {
-        int poolSize = config.getCachePolicy().getMemCachePoolSize();
+    public MemCache(CachePolicy cachePolicy) {
+        int poolSize = cachePolicy.getMemCachePoolSize();
         mLruCache = new LruCache<String, Bitmap>(poolSize) {
             @Override
             protected int sizeOf(String key, Bitmap value) {

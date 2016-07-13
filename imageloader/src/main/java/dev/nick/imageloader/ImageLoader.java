@@ -102,7 +102,7 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
         this.mContext = context;
         this.mConfig = config;
         this.mUIThreadHandler = new Handler(Looper.getMainLooper(), this);
-        this.mCacheManager = new CacheManager(config, context);
+        this.mCacheManager = new CacheManager(config.getCachePolicy(), context);
         this.mLoadingService = Executors.newFixedThreadPool(config.getLoadingThreads());
         this.mImageSettingsSchduler = Executors.newSingleThreadExecutor();
         this.mStackService = RequestStackService.createStarted(this);
@@ -228,7 +228,8 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
         // 3. Cache the loaded.
 
         ViewSpec info = new ViewSpec(settable.getWidth(), settable.getHeight());
-        if (mConfig.isMemCacheEnabled()) {
+
+        if (mCacheManager.isMemCacheEnabled()) {
             Bitmap cached;
             if ((cached = mCacheManager.getMemCache(url, info)) != null) {
                 if (DEBUG) mLogger.verbose("Using cached mem bitmap:" + cached);
@@ -241,7 +242,7 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
 
         String loadingUrl = url;
 
-        if (mConfig.isDiskCacheEnabled()) {
+        if (mCacheManager.isDiskCacheEnabled()) {
             String cachePath;
             if ((cachePath = mCacheManager.getDiskCachePath(url, info)) != null) {
                 if (DEBUG) mLogger.verbose("Using cached disk cache:" + cachePath);
@@ -408,7 +409,8 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
                 onCallOnFailure((FailureParams) message.obj);
                 break;
             case MSG_CALL_PROGRESS_UPDATE:
-                onCallOnProgressUpdate((ProgressListener) message.obj, message.arg1);
+                //noinspection unchecked
+                onCallOnProgressUpdate((ProgressListener<BitmapResult>) message.obj, message.arg1);
                 break;
         }
         return true;

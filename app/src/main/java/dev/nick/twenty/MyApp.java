@@ -32,13 +32,13 @@ public class MyApp extends ScalpelApplication {
         EventBus.create(this);
         ImageLoader.init(getApplicationContext(), new LoaderConfig.Builder()
                 .cachePolicy(new CachePolicy.Builder()
+                        .cachingThreads(Runtime.getRuntime().availableProcessors())
+                        .enableDiskCache()
+                        .enableMemCache()
                         .preferredLocation(CachePolicy.Location.EXTERNAL)
                         .compressFormat(Bitmap.CompressFormat.PNG)
                         .build())
-                .cachingThreads(Runtime.getRuntime().availableProcessors())
                 .loadingThreads(Runtime.getRuntime().availableProcessors() * 2)
-                .enableDiskCache()
-                .enableMemCache()
                 .debug(true)
                 .build());
     }

@@ -25,7 +25,6 @@ import android.support.annotation.WorkerThread;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.cache.disk.DiskCache;
 import dev.nick.imageloader.cache.mem.MemCache;
 import dev.nick.imageloader.loader.ViewSpec;
@@ -37,16 +36,26 @@ public class CacheManager {
 
     private KeyGenerator mKeyGenerator;
 
-    private LoaderConfig mConfig;
-
     private ExecutorService mCacheService;
 
-    public CacheManager(LoaderConfig config, Context context) {
-        mDiskCache = new DiskCache(config, context);
-        mMemCache = new MemCache(config);
-        mConfig = config;
-        mCacheService = Executors.newFixedThreadPool(config.getCachingThreads());
-        mKeyGenerator = config.getCachePolicy().getKeyGenerator();
+    private boolean isMemCacheEnabled;
+    private boolean isDiskCacheEnabled;
+
+    public CacheManager(CachePolicy cachePolicy, Context context) {
+        isDiskCacheEnabled = cachePolicy.isDiskCacheEnabled();
+        isMemCacheEnabled = cachePolicy.isMemCacheEnabled();
+        mDiskCache = new DiskCache(cachePolicy, context);
+        mMemCache = new MemCache(cachePolicy);
+        mCacheService = Executors.newFixedThreadPool(cachePolicy.getCachingThreads());
+        mKeyGenerator = cachePolicy.getKeyGenerator();
+    }
+
+    public boolean isMemCacheEnabled() {
+        return isMemCacheEnabled;
+    }
+
+    public boolean isDiskCacheEnabled() {
+        return isDiskCacheEnabled;
     }
 
     public void cache(@NonNull String url, ViewSpec info, Bitmap value) {
@@ -55,9 +64,9 @@ public class CacheManager {
     }
 
     private void cacheByKey(final String key, final Bitmap value) {
-        if (mConfig.isMemCacheEnabled())
+        if (isMemCacheEnabled)
             mMemCache.cache(key, value);
-        if (mConfig.isDiskCacheEnabled())
+        if (isDiskCacheEnabled)
             mCacheService.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -88,7 +97,7 @@ public class CacheManager {
 
     @Deprecated
     public void get(@NonNull final String url, @NonNull ViewSpec info, @NonNull final Callback callback) {
-        if (!mConfig.isDiskCacheEnabled() && !mConfig.isMemCacheEnabled()) {
+        if (!isDiskCacheEnabled && !isMemCacheEnabled) {
             callback.onResult(null);
             return;
         }

@@ -19,6 +19,7 @@ package dev.nick.imageloader.cache;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
+import dev.nick.imageloader.ImageLoader;
 import dev.nick.logger.LoggerManager;
 
 /**
@@ -32,6 +33,9 @@ public class CachePolicy {
     public static final KeyGenerator DEFAULT_KEY_GENERATOR = new HashcodeKeyGenerator();
 
     public static final CachePolicy DEFAULT_CACHE_POLICY = new CachePolicy.Builder()
+            .enableDiskCache()
+            .enableMemCache()
+            .cachingThreads(Runtime.getRuntime().availableProcessors())
             .memCachePoolSize(DEFAULT_MEM_CACHE_POOL_SIZE)
             .compressFormat(Bitmap.CompressFormat.PNG)
             .imageQuality(Quality.BEST)
@@ -40,12 +44,18 @@ public class CachePolicy {
             .preferredLocation(CachePolicy.Location.EXTERNAL)
             .build();
 
-    private CachePolicy(int memCachePoolSize,
+    private CachePolicy(boolean memCacheEnabled,
+                        boolean diskCacheEnabled,
+                        int nCachingThreads,
+                        int memCachePoolSize,
                         FileNameGenerator fileNameGenerator,
                         KeyGenerator keyGenerator,
                         Bitmap.CompressFormat compressFormat,
                         int quality,
                         int preferredLocation) {
+        this.memCacheEnabled = memCacheEnabled;
+        this.diskCacheEnabled = diskCacheEnabled;
+        this.nCachingThreads = nCachingThreads;
         this.memCachePoolSize = memCachePoolSize;
         this.fileNameGenerator = fileNameGenerator;
         this.keyGenerator = keyGenerator;
@@ -54,6 +64,9 @@ public class CachePolicy {
         this.quality = quality;
     }
 
+    private boolean memCacheEnabled;
+    private boolean diskCacheEnabled;
+    private int nCachingThreads;
     private int memCachePoolSize;
     private int preferredLocation;
     private KeyGenerator keyGenerator;
@@ -61,12 +74,24 @@ public class CachePolicy {
     private Bitmap.CompressFormat compressFormat;
     private int quality;
 
+    public boolean isDiskCacheEnabled() {
+        return diskCacheEnabled;
+    }
+
+    public boolean isMemCacheEnabled() {
+        return memCacheEnabled;
+    }
+
     public int getMemCachePoolSize() {
         return memCachePoolSize;
     }
 
     public int getPreferredLocation() {
         return preferredLocation;
+    }
+
+    public int getCachingThreads() {
+        return nCachingThreads;
     }
 
     @NonNull
@@ -101,12 +126,44 @@ public class CachePolicy {
 
     public static class Builder {
 
+        private boolean memCacheEnabled;
+        private boolean diskCacheEnabled;
+        private int nCachingThreads;
         private int memCachePoolSize;
         private int preferredLocation;
         private KeyGenerator keyGenerator;
         private FileNameGenerator fileNameGenerator;
         private Bitmap.CompressFormat compressFormat;
         private int imageQuality;
+
+        /**
+         * To enable disk cache.
+         *
+         * @return Builder instance.
+         */
+        public Builder enableDiskCache() {
+            this.diskCacheEnabled = true;
+            return Builder.this;
+        }
+
+        /**
+         * To enabled memory cache.
+         *
+         * @return Builder instance.
+         */
+        public Builder enableMemCache() {
+            this.memCacheEnabled = true;
+            return Builder.this;
+        }
+
+        /**
+         * @param nCachingThreads Number of threads when caching.
+         * @return Builder instance.
+         */
+        public Builder cachingThreads(int nCachingThreads) {
+            this.nCachingThreads = nCachingThreads;
+            return Builder.this;
+        }
 
         /**
          * @param memCachePoolSize Pool size of the mem cache, default is {@link #DEFAULT_MEM_CACHE_POOL_SIZE}
@@ -157,10 +214,23 @@ public class CachePolicy {
 
         public CachePolicy build() {
             invalidate();
-            return new CachePolicy(memCachePoolSize, fileNameGenerator, keyGenerator, compressFormat, imageQuality, preferredLocation);
+            return new CachePolicy(
+                    memCacheEnabled,
+                    diskCacheEnabled,
+                    nCachingThreads,
+                    memCachePoolSize,
+                    fileNameGenerator,
+                    keyGenerator,
+                    compressFormat,
+                    imageQuality,
+                    preferredLocation);
         }
 
         void invalidate() {
+            if (nCachingThreads <= 0) {
+                LoggerManager.getLogger(ImageLoader.class).warn("Using [Runtime.availableProcessors] as nCachingThreads");
+                nCachingThreads = Runtime.getRuntime().availableProcessors();
+            }
             if (memCachePoolSize == 0) {
                 memCachePoolSize(DEFAULT_MEM_CACHE_POOL_SIZE);
             } else if (memCachePoolSize >= Runtime.getRuntime().maxMemory()) {
