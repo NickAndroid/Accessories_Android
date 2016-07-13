@@ -17,6 +17,7 @@
 package dev.nick.twenty;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.widget.ImageView;
 
@@ -24,10 +25,14 @@ import com.nick.scalpel.Scalpel;
 import com.nick.scalpel.annotation.binding.FindView;
 
 import dev.nick.imageloader.ImageLoader;
+import dev.nick.imageloader.LoadingListener;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.display.ImageQuality;
 import dev.nick.imageloader.display.animator.FadeInImageAnimator;
 import dev.nick.imageloader.display.processor.BlurBitmapProcessor;
+import dev.nick.imageloader.loader.result.BitmapResult;
+import dev.nick.imageloader.loader.result.Cause;
+import dev.nick.logger.LoggerManager;
 
 public class NetworkImageTest extends BaseTest {
 
@@ -52,6 +57,26 @@ public class NetworkImageTest extends BaseTest {
                 .bitmapProcessor(new BlurBitmapProcessor())
                 .imageQuality(ImageQuality.RAW)
                 .imageAnimator(new FadeInImageAnimator())
-                .build());
+                .build(), new LoadingListener() {
+            @Override
+            public void onError(@NonNull Cause cause) {
+                LoggerManager.getLogger(getClass()).info("onError:" + cause.exception + "\n" + cause.error);
+            }
+
+            @Override
+            public void onComplete(@Nullable BitmapResult result) {
+                LoggerManager.getLogger(getClass()).info("onComplete");
+            }
+
+            @Override
+            public void onProgressUpdate(float progress) {
+                LoggerManager.getLogger(getClass()).info("onProgressUpdate: " + progress);
+            }
+
+            @Override
+            public void onStartLoading() {
+                LoggerManager.getLogger(getClass()).info("onStartLoading");
+            }
+        });
     }
 }

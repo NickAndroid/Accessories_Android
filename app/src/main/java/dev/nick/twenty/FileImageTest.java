@@ -71,7 +71,7 @@ public class FileImageTest extends BaseTest implements LoadingListener {
     }
 
     @Override
-    public void onProgressUpdate(int progress) {
+    public void onProgressUpdate(float progress) {
         setTitle("onProgressUpdate:" + progress);
     }
 

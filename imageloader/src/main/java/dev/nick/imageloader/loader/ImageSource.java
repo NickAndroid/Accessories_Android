@@ -21,6 +21,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import dev.nick.imageloader.LoaderConfig;
+import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
 
@@ -43,7 +44,12 @@ public enum ImageSource {
         public String getRealPath(@NonNull String fullPath) {
             return fullPath.substring(FILE.prefix.length(), fullPath.length());
         }
-    })), "content://"),
+    })) {
+        @Override
+        protected void callOnStart(ProgressListener<BitmapResult> listener) {
+            // Ignored.
+        }
+    }, "content://"),
 
     ASSETS(new AssetsImageFetcher(new PathSplitter<String>() {
         @Override
@@ -64,14 +70,24 @@ public enum ImageSource {
         public String getRealPath(@NonNull String fullPath) {
             return fullPath;
         }
-    }), "http://"),
+    }, new HookedFileImageFetcher(new PathSplitter<String>() {
+        @Override
+        public String getRealPath(@NonNull String fullPath) {
+            return fullPath.substring(FILE.prefix.length(), fullPath.length());
+        }
+    })), "http://"),
 
     NETWORK_HTTPS(new NetworkImageFetcher(new PathSplitter<String>() {
         @Override
         public String getRealPath(@NonNull String fullPath) {
             return fullPath;
         }
-    }), "https://"),
+    }, new HookedFileImageFetcher(new PathSplitter<String>() {
+        @Override
+        public String getRealPath(@NonNull String fullPath) {
+            return fullPath.substring(FILE.prefix.length(), fullPath.length());
+        }
+    })), "https://"),
 
     UNKNOWN(new ImageFetcher() {
         @Override
@@ -114,5 +130,17 @@ public enum ImageSource {
             if (url.startsWith(source.prefix)) return source;
         }
         return ImageSource.UNKNOWN;
+    }
+
+    private static class HookedFileImageFetcher extends FileImageFetcher {
+
+        public HookedFileImageFetcher(PathSplitter<String> splitter) {
+            super(splitter);
+        }
+
+        @Override
+        protected void callOnStart(ProgressListener<BitmapResult> listener) {
+            // Hooked, won't call.
+        }
     }
 }

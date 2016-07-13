@@ -16,35 +16,36 @@
 
 package dev.nick.imageloader.loader;
 
-import android.graphics.Bitmap;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.widget.ImageView;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.ImageRequest;
-import com.android.volley.toolbox.RequestFuture;
-import com.android.volley.toolbox.Volley;
+import java.io.File;
+import java.util.Random;
 
+import dev.nick.imageloader.loader.network.HttpImageDownloader;
+import dev.nick.imageloader.loader.network.ImageDownloader;
 import dev.nick.imageloader.loader.network.NetworkUtils;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
+import dev.nick.logger.LoggerManager;
 
 public class NetworkImageFetcher extends BaseImageFetcher {
 
-    private RequestQueue mRequestQueue;
+    private ImageFetcher mFileImageFetcher;
 
-    public NetworkImageFetcher(PathSplitter<String> splitter) {
+    public NetworkImageFetcher(PathSplitter<String> splitter, ImageFetcher fileImageFetcher) {
         super(splitter);
+        mFileImageFetcher = fileImageFetcher;
     }
-
 
     @Override
     public void fetchFromUrl(@NonNull String url,
                              @NonNull DecodeSpec decodeSpec,
                              @Nullable ProgressListener<BitmapResult> progressListener,
-                             @Nullable ErrorListener errorListener) throws Exception {
+                             @Nullable ErrorListener errorListener)
+            throws Exception {
 
         super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);
 
@@ -57,25 +58,19 @@ public class NetworkImageFetcher extends BaseImageFetcher {
             return;
         }
 
+        LoggerManager.getLogger(getClass()).info("callOnStart:" + progressListener);
         callOnStart(progressListener);
 
-        RequestFuture<Bitmap> future = RequestFuture.newFuture();
-        ViewSpec viewSpec = decodeSpec.viewSpec;
+        String tmpPath = Environment.getExternalStorageDirectory().getPath() + File.separator + new Random().nextInt(1000);
 
-        ImageRequest imageRequest = new ImageRequest(splitter.getRealPath(url),
-                future,
-                viewSpec.width, viewSpec.height,
-                ImageView.ScaleType.FIT_XY,
-                Bitmap.Config.ARGB_8888,
-                future);
+        ImageDownloader<Boolean> downloader = new HttpImageDownloader(tmpPath);
 
-        if (mRequestQueue == null) mRequestQueue = Volley.newRequestQueue(context);
+        boolean ok = downloader.download(url, progressListener, errorListener);
 
-        mRequestQueue.add(imageRequest);
-
-        Bitmap bitmap = future.get();
-
-        callOnComplete(progressListener, newResult(bitmap));
+        if (ok) {
+            mFileImageFetcher.fetchFromUrl(ImageSource.FILE.prefix + tmpPath, decodeSpec, progressListener, errorListener);
+        } else {
+            callOnError(errorListener, new Cause(new UnknownError()));
+        }
     }
-
 }

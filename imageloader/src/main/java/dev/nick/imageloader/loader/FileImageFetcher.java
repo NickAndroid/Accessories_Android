@@ -83,4 +83,9 @@ public class FileImageFetcher extends BaseImageFetcher {
 
         callOnComplete(progressListener, newResult(tempBitmap));
     }
+
+    @Override
+    protected void callOnStart(ProgressListener<BitmapResult> listener) {
+        super.callOnStart(listener);
+    }
 }

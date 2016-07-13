@@ -18,7 +18,7 @@ package dev.nick.imageloader.loader;
 public interface ProgressListener<T> {
     void onStartLoading();
 
-    void onProgressUpdate(int progress);
+    void onProgressUpdate(float progress);
 
     void onComplete(T result);
 }

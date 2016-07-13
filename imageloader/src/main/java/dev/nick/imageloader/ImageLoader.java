@@ -412,7 +412,7 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
                 onCallOnFailure((FailureParams) message.obj);
                 break;
             case MSG_CALL_PROGRESS_UPDATE:
-                onCallOnProgressUpdate((ProgressListener<BitmapResult>) message.obj, message.arg1);
+                onCallOnProgressUpdate((ProgressParams) message.obj);
                 break;
         }
         return true;
@@ -424,9 +424,12 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
         }
     }
 
-    private void callOnProgressUpdate(ProgressListener listener, int progress) {
+    private void callOnProgressUpdate(ProgressListener<BitmapResult> listener, float progress) {
         if (listener != null) {
-            mUIThreadHandler.obtainMessage(MSG_CALL_PROGRESS_UPDATE, progress, 0, listener).sendToTarget();
+            ProgressParams progressParams = new ProgressParams();
+            progressParams.progress = progress;
+            progressParams.progressListener = listener;
+            mUIThreadHandler.obtainMessage(MSG_CALL_PROGRESS_UPDATE, progressParams).sendToTarget();
         }
     }
 
@@ -452,8 +455,8 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
         listener.onStartLoading();
     }
 
-    private void onCallOnProgressUpdate(ProgressListener<BitmapResult> listener, int progress) {
-        listener.onProgressUpdate(progress);
+    private void onCallOnProgressUpdate(ProgressParams progressParams) {
+        progressParams.progressListener.onProgressUpdate(progressParams.progress);
     }
 
     private void onCallOnComplete(CompleteParams params) {
@@ -605,12 +608,14 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
         }
 
         @Override
-        public void onProgressUpdate(int progress) {
+        public void onProgressUpdate(float progress) {
             callOnProgressUpdate(listener, progress);
         }
 
         @Override
         public void onComplete(final BitmapResult result) {
+
+            callOnComplete(listener, result);
 
             if (result.result == null) {
                 return;
@@ -644,8 +649,6 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
             }
 
             mCacheManager.cache(url, viewSpec, result.result);
-
-            callOnComplete(listener, result);
         }
     }
 
@@ -670,6 +673,11 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
 
     private static class CompleteParams {
         BitmapResult result;
+        ProgressListener<BitmapResult> progressListener;
+    }
+
+    private static class ProgressParams {
+        float progress;
         ProgressListener<BitmapResult> progressListener;
     }
 }

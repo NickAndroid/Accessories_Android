@@ -21,7 +21,7 @@ public interface LoadingListener extends ProgressListener<BitmapResult>, ErrorLi
 
     @Override
     @CallingOnUIThread
-    void onProgressUpdate(int progress);
+    void onProgressUpdate(float progress);
 
     @Override
     @CallingOnUIThread

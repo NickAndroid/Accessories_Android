@@ -31,7 +31,7 @@ public class ContentImageFetcher extends BaseImageFetcher {
     @NonNull
     ImageFetcher fileImageFetcher;
 
-    public ContentImageFetcher(PathSplitter<String> splitter, @NonNull ImageFetcher fileImageFetcher) {
+    public ContentImageFetcher(PathSplitter<String> splitter, @NonNull final ImageFetcher fileImageFetcher) {
         super(splitter);
         this.fileImageFetcher = fileImageFetcher;
     }
@@ -68,6 +68,8 @@ public class ContentImageFetcher extends BaseImageFetcher {
                 callOnError(errorListener, new Cause(new Exception(String.format("Cursor index for %s is 0.", url))));
                 return;
             }
+
+            callOnStart(progressListener);
 
             cursor.moveToFirst();
 
