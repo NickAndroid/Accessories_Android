@@ -56,25 +56,27 @@ public class ContentImageFetcher extends BaseImageFetcher {
             return;
         }
 
-        if (cursor.getCount() == 0) {
-            callOnError(errorListener, new Cause(new Exception(String.format("Cursor count for %s is 0.", url))));
-            return;
+        try {
+            if (cursor.getCount() == 0) {
+                callOnError(errorListener, new Cause(new Exception(String.format("Cursor count for %s is 0.", url))));
+                return;
+            }
+
+            int index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+
+            if (index < 0) {
+                callOnError(errorListener, new Cause(new Exception(String.format("Cursor index for %s is 0.", url))));
+                return;
+            }
+
+            cursor.moveToFirst();
+
+            String filePath = cursor.getString(index);
+
+            fileImageFetcher.fetchFromUrl(ImageSource.FILE.prefix + filePath,
+                    decodeSpec, progressListener, errorListener);
+        } finally {
+            cursor.close();
         }
-
-        int index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-
-        if (index < 0) {
-            callOnError(errorListener, new Cause(new Exception(String.format("Cursor index for %s is 0.", url))));
-            return;
-        }
-
-        cursor.moveToFirst();
-
-        String filePath = cursor.getString(index);
-
-        cursor.close();
-
-        fileImageFetcher.fetchFromUrl(ImageSource.FILE.prefix + filePath,
-                decodeSpec, progressListener, errorListener);
     }
 }
