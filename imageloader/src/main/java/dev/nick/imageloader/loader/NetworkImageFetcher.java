@@ -18,6 +18,7 @@ package dev.nick.imageloader.loader;
 
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.widget.ImageView;
 
 import com.android.volley.RequestQueue;
@@ -25,10 +26,10 @@ import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.Volley;
 
-import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.loader.network.NetworkUtils;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
+import dev.nick.imageloader.loader.result.ErrorListener;
 
 public class NetworkImageFetcher extends BaseImageFetcher {
 
@@ -38,29 +39,32 @@ public class NetworkImageFetcher extends BaseImageFetcher {
         super(splitter);
     }
 
+
     @Override
-    public BitmapResult fetchFromUrl(@NonNull String url,
-                                     DisplayOption.ImageQuality quality,
-                                     ViewSpec spec,
-                                     ProgressListener listener)
-            throws Exception {
+    public void fetchFromUrl(@NonNull String url,
+                             @NonNull DecodeSpec decodeSpec,
+                             @Nullable ProgressListener<BitmapResult> progressListener,
+                             @Nullable ErrorListener errorListener) throws Exception {
+
+        super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);
 
         boolean wifiOnly = loaderConfig.getNetworkPolicy().isOnlyOnWifi();
         boolean isOnLine = NetworkUtils.isOnline(context, wifiOnly);
 
-        BitmapResult result = createEmptyResult();
-
         // No connection.
         if (!isOnLine) {
-            result.cause = Cause.NO_INTERNET_CONNECTION;
-            return result;
+            callOnError(errorListener, new Cause(new IllegalStateException("No network is available.")));
+            return;
         }
 
+        callOnStart(progressListener);
+
         RequestFuture<Bitmap> future = RequestFuture.newFuture();
+        ViewSpec viewSpec = decodeSpec.viewSpec;
 
         ImageRequest imageRequest = new ImageRequest(splitter.getRealPath(url),
                 future,
-                spec.width, spec.height,
+                viewSpec.width, viewSpec.height,
                 ImageView.ScaleType.FIT_XY,
                 Bitmap.Config.ARGB_8888,
                 future);
@@ -69,8 +73,9 @@ public class NetworkImageFetcher extends BaseImageFetcher {
 
         mRequestQueue.add(imageRequest);
 
-        result.result = future.get();
+        Bitmap bitmap = future.get();
 
-        return result;
+        callOnComplete(progressListener, newResult(bitmap));
     }
+
 }

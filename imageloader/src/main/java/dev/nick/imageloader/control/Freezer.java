@@ -20,7 +20,7 @@ import java.util.concurrent.CountDownLatch;
 
 public class Freezer {
 
-   private CountDownLatch mLatch;
+    private CountDownLatch mLatch;
 
     public void freeze() {
         mLatch = null;

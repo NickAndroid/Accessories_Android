@@ -20,10 +20,11 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
+import dev.nick.imageloader.loader.result.ErrorListener;
 
 public class DrawableImageFetcher extends BaseImageFetcher {
 
@@ -32,13 +33,13 @@ public class DrawableImageFetcher extends BaseImageFetcher {
     }
 
     @Override
-    public BitmapResult fetchFromUrl(@NonNull String url,
-                                     DisplayOption.ImageQuality quality,
-                                     ViewSpec spec,
-                                     ProgressListener listener)
+    public void fetchFromUrl(@NonNull String url,
+                             @NonNull DecodeSpec decodeSpec,
+                             @Nullable ProgressListener<BitmapResult> progressListener,
+                             @Nullable ErrorListener errorListener)
             throws Exception {
 
-        BitmapResult result = createEmptyResult();
+        super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);
 
         Resources resources = this.context.getResources();
 
@@ -47,13 +48,16 @@ public class DrawableImageFetcher extends BaseImageFetcher {
                 this.context.getPackageName());
 
         if (resId <= 0) {
-            result.cause = Cause.RESOURCE_NOT_FOUND;
-            return result;
+            callOnError(errorListener, new Cause(new Resources.NotFoundException(String.format("Res of id-%s not found.", resId))));
+            return;
         }
 
-        BitmapFactory.Options decodeOptions = null;
+        callOnStart(progressListener);
 
-        switch (quality) {
+        BitmapFactory.Options decodeOptions = null;
+        ViewSpec viewSpec = decodeSpec.viewSpec;
+
+        switch (decodeSpec.quality) {
             case FIT_VIEW:
                 decodeOptions = new BitmapFactory.Options();
 
@@ -65,20 +69,22 @@ public class DrawableImageFetcher extends BaseImageFetcher {
                 decodeOptions.inJustDecodeBounds = false;
                 decodeOptions.inSampleSize =
                         computeSampleSize(decodeOptions, UNCONSTRAINED,
-                                (spec.height * spec.height == 0 ?
+                                (viewSpec.height * viewSpec.height == 0 ?
                                         MAX_NUM_PIXELS_THUMBNAIL
-                                        : spec.width * spec.height));
+                                        : viewSpec.width * viewSpec.height));
             default:
                 break;
         }
 
-        Bitmap tempBitmap = null;
+        Bitmap tempBitmap;
+
         try {
             tempBitmap = BitmapFactory.decodeResource(resources, resId, decodeOptions);
         } catch (OutOfMemoryError error) {
-            result.cause = Cause.OOM;
+            callOnError(errorListener, new Cause(error));
+            return;
         }
-        result.result = tempBitmap;
-        return result;
+
+        callOnComplete(progressListener, newResult(tempBitmap));
     }
 }

@@ -332,13 +332,14 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
         if (DEBUG)
             mLogger.verbose("Created task:" + record);
         int taskId = record.getTaskId();
+        int settableId = record.getSettableId();
         synchronized (mTaskLockMap) {
-            TaskRecord exists = mTaskLockMap.get(record.getSettableId());
+            TaskRecord exists = mTaskLockMap.get(settableId);
             if (exists != null) {
                 exists.taskId = taskId;
             } else {
                 TaskRecord lock = new TaskRecord(taskId);
-                mTaskLockMap.put(record.getSettableId(), lock);
+                mTaskLockMap.put(settableId, lock);
             }
         }
     }
@@ -440,15 +441,15 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
         }
     }
 
-    private void onCallOnStart(ProgressListener listener) {
+    private void onCallOnStart(ProgressListener<BitmapResult> listener) {
         listener.onStartLoading();
     }
 
-    private void onCallOnProgressUpdate(ProgressListener listener, int progress) {
+    private void onCallOnProgressUpdate(ProgressListener<BitmapResult> listener, int progress) {
         listener.onProgressUpdate(progress);
     }
 
-    private void onCallOnComplete(ProgressListener listener) {
+    private void onCallOnComplete(ProgressListener<BitmapResult> listener) {
         listener.onComplete(null);
     }
 

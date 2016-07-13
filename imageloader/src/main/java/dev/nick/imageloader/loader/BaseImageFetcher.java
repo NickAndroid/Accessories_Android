@@ -17,13 +17,15 @@
 package dev.nick.imageloader.loader;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import dev.nick.imageloader.LoaderConfig;
-import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
+import dev.nick.imageloader.loader.result.ErrorListener;
 import dev.nick.logger.LoggerManager;
 
 class BaseImageFetcher implements ImageFetcher {
@@ -45,17 +47,19 @@ class BaseImageFetcher implements ImageFetcher {
         this.splitter = splitter;
     }
 
-    @Override
-    public BitmapResult fetchFromUrl(@NonNull String url,
-                                     DisplayOption.ImageQuality quality,
-                                     ViewSpec spec,
-                                     ProgressListener listener)
-            throws Exception {
-        return null;
-    }
-
     public void setDebug(boolean debug) {
         this.debug = debug;
+    }
+
+    @Override
+    public void fetchFromUrl(@NonNull String url,
+                             @NonNull DecodeSpec decodeSpec,
+                             @Nullable ProgressListener<BitmapResult> progressListener,
+                             @Nullable ErrorListener errorListener)
+            throws Exception {
+        if (debug) {
+            LoggerManager.getLogger(getClass()).funcEnter();
+        }
     }
 
     @Override
@@ -65,14 +69,26 @@ class BaseImageFetcher implements ImageFetcher {
         return this;
     }
 
-    protected BitmapResult createEmptyResult() {
+    protected BitmapResult newResult(Bitmap bitmap) {
         BitmapResult result = new BitmapResult();
-        result.cause = Cause.NONE;
+        result.result = bitmap;
         return result;
     }
 
-    protected void logW(Object msg) {
-        LoggerManager.getLogger(getClass()).warn(msg);
+    protected void callOnStart(ProgressListener<BitmapResult> listener) {
+        if (listener != null) listener.onStartLoading();
+    }
+
+    protected void callOnComplete(ProgressListener<BitmapResult> listener, BitmapResult result) {
+        if (listener != null) listener.onComplete(result);
+    }
+
+    protected void callOnError(ErrorListener listener, @NonNull Cause cause) {
+        if (listener != null) listener.onError(cause);
+    }
+
+    protected void callOnProgress(ProgressListener<BitmapResult> listener, int progress) {
+        if (listener != null) listener.onProgressUpdate(progress);
     }
 
     /*

@@ -20,10 +20,11 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
+import dev.nick.imageloader.loader.result.ErrorListener;
 
 public class ContentImageFetcher extends BaseImageFetcher {
 
@@ -36,12 +37,13 @@ public class ContentImageFetcher extends BaseImageFetcher {
     }
 
     @Override
-    public BitmapResult fetchFromUrl(@NonNull String url,
-                                     DisplayOption.ImageQuality quality,
-                                     ViewSpec spec,
-                                     ProgressListener listener) throws Exception {
+    public void fetchFromUrl(@NonNull String url,
+                             @NonNull DecodeSpec decodeSpec,
+                             @Nullable ProgressListener<BitmapResult> progressListener,
+                             @Nullable ErrorListener errorListener)
+            throws Exception {
 
-        BitmapResult result = createEmptyResult();
+        super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);
 
         Uri uri = Uri.parse(url);
 
@@ -50,20 +52,20 @@ public class ContentImageFetcher extends BaseImageFetcher {
         Cursor cursor = context.getContentResolver().query(uri, pro, null, null, null);
 
         if (cursor == null) {
-            result.cause = Cause.CONTENT_NOT_EXISTS;
-            return result;
+            callOnError(errorListener, new Cause(new Exception(String.format("Cursor for %s is null.", url))));
+            return;
         }
 
         if (cursor.getCount() == 0) {
-            result.cause = Cause.CONTENT_NOT_EXISTS;
-            return result;
+            callOnError(errorListener, new Cause(new Exception(String.format("Cursor count for %s is 0.", url))));
+            return;
         }
 
         int index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
 
         if (index < 0) {
-            result.cause = Cause.CONTENT_NOT_EXISTS;
-            return result;
+            callOnError(errorListener, new Cause(new Exception(String.format("Cursor index for %s is 0.", url))));
+            return;
         }
 
         cursor.moveToFirst();
@@ -72,7 +74,7 @@ public class ContentImageFetcher extends BaseImageFetcher {
 
         cursor.close();
 
-        return (BitmapResult) fileImageFetcher.fetchFromUrl(ImageSource.FILE.prefix + filePath,
-                quality, spec, listener);
+        fileImageFetcher.fetchFromUrl(ImageSource.FILE.prefix + filePath,
+                decodeSpec, progressListener, errorListener);
     }
 }
