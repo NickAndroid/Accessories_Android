@@ -20,5 +20,7 @@ public interface ProgressListener<T> {
 
     void onProgressUpdate(float progress);
 
+    void onCancel();
+
     void onComplete(T result);
 }

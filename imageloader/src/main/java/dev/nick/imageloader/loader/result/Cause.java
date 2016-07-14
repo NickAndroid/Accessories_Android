@@ -17,6 +17,7 @@
 package dev.nick.imageloader.loader.result;
 
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 public class Cause {
 
@@ -36,5 +37,13 @@ public class Cause {
     public Cause(@Nullable Error error, @Nullable Exception exception) {
         this.error = error;
         this.exception = exception;
+    }
+
+    @Override
+    public String toString() {
+        return "Cause{" +
+                "error=" + (error == null ? "NULL" : Log.getStackTraceString(error)) +
+                ", exception=" + (exception == null ? "NULL" : Log.getStackTraceString(exception)) +
+                '}';
     }
 }

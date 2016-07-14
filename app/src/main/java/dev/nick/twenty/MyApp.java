@@ -33,8 +33,6 @@ public class MyApp extends ScalpelApplication {
         ImageLoader.init(getApplicationContext(), new LoaderConfig.Builder()
                 .cachePolicy(new CachePolicy.Builder()
                         .cachingThreads(Runtime.getRuntime().availableProcessors())
-                        .enableDiskCache()
-                        .enableMemCache()
                         .cacheDirName("tests")
                         .preferredLocation(CachePolicy.Location.EXTERNAL)
                         .compressFormat(Bitmap.CompressFormat.PNG)

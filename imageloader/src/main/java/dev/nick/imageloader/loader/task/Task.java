@@ -1,5 +1,7 @@
 package dev.nick.imageloader.loader.task;
 
-public interface Task<T extends TaskRecord> extends Runnable {
+import java.util.concurrent.Callable;
+
+public interface Task<T extends TaskRecord, X> extends Callable<X>, Runnable {
     T getTaskRecord();
 }

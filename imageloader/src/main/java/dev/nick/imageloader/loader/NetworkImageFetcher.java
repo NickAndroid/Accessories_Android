@@ -87,7 +87,6 @@ public class NetworkImageFetcher extends BaseImageFetcher {
             return;
         }
 
-        LoggerManager.getLogger(getClass()).info("callOnStart:" + progressListener);
         callOnStart(progressListener);
 
         String tmpPath = buildTmpFilePath();

@@ -18,6 +18,7 @@ package dev.nick.imageloader.loader.task;
 
 import android.content.Context;
 import android.os.Process;
+import android.support.annotation.NonNull;
 
 import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.display.ImageQuality;
@@ -90,5 +91,22 @@ public class ImageTaskImpl implements ImageTask {
     @Override
     public ImageTaskRecord getTaskRecord() {
         return mTaskRecord;
+    }
+
+    @Override
+    public Void call() throws Exception {
+        run();
+        return null;
+    }
+
+    @NonNull
+    @Override
+    public String getUrl() {
+        return mUrl;
+    }
+
+    @Override
+    public ProgressListener<BitmapResult> getProgressListener() {
+        return mProgressListener;
     }
 }

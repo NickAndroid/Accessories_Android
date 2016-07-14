@@ -76,6 +76,11 @@ public class FileImageTest extends BaseTest implements LoadingListener {
     }
 
     @Override
+    public void onCancel() {
+        setTitle("onCancel");
+    }
+
+    @Override
     public void onStartLoading() {
         setTitle("onStartLoading");
     }

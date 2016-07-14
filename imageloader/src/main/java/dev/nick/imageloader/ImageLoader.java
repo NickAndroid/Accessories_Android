@@ -25,7 +25,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
 import android.widget.ImageView;
 
+import java.io.InterruptedIOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -51,6 +54,7 @@ import dev.nick.imageloader.loader.ViewSpec;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
+import dev.nick.imageloader.loader.task.FutureImageTask;
 import dev.nick.imageloader.loader.task.ImageTask;
 import dev.nick.imageloader.loader.task.ImageTaskImpl;
 import dev.nick.imageloader.loader.task.ImageTaskRecord;
@@ -65,13 +69,14 @@ import dev.nick.stack.RequestStackService;
 /**
  * Main class of {@link ImageLoader} library.
  */
-public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandler<ImageTaskImpl> {
+public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandler<FutureImageTask>, FutureImageTask.DoneListener {
 
     private static final int MSG_APPLY_IMAGE_SETTINGS = 0x1;
     private static final int MSG_CALL_ON_START = 0x2;
     private static final int MSG_CALL_PROGRESS_UPDATE = 0x3;
     private static final int MSG_CALL_ON_COMPLETE = 0x4;
     private static final int MSG_CALL_ON_FAILURE = 0x5;
+    private static final int MSG_CALL_ON_CANCEL = 0x6;
 
     private Context mContext;
 
@@ -81,15 +86,14 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
 
     private LoaderConfig mConfig;
 
-    private RequestStackService<ImageTaskImpl> mStackService;
+    private RequestStackService<FutureImageTask> mStackService;
 
     private Logger mLogger;
-
-    private final boolean DEBUG;
 
     private long mClearTaskRequestedTimeMills;
 
     private final Map<Integer, ImageTaskRecord> mTaskLockMap;
+    private final List<FutureImageTask> mFutures;
 
     private ExecutorService mLoadingService;
     private ExecutorService mImageSettingsScheduler;
@@ -113,9 +117,9 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
         this.mImageSettingsScheduler = Executors.newSingleThreadExecutor();
         this.mStackService = RequestStackService.createStarted(this);
         this.mTaskLockMap = new HashMap<>();
+        this.mFutures = new ArrayList<>();
         this.mState = LoaderState.RUNNING;
         this.mLogger = LoggerManager.getLogger(getClass());
-        this.DEBUG = BuildConfig.DEBUG;
     }
 
     /**
@@ -238,7 +242,7 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
         if (mCacheManager.isMemCacheEnabled()) {
             Bitmap cached;
             if ((cached = mCacheManager.getMemCache(url, info)) != null) {
-                if (DEBUG) mLogger.verbose("Using cached mem bitmap:" + cached);
+                mLogger.verbose("Using cached mem bitmap:" + cached);
                 applyImageSettings(cached,
                         option == null ? null : option.getProcessor(),
                         settable, option == null ? null : option.getAnimator());
@@ -251,7 +255,7 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
         if (mCacheManager.isDiskCacheEnabled()) {
             String cachePath;
             if ((cachePath = mCacheManager.getDiskCachePath(url, info)) != null) {
-                if (DEBUG) mLogger.verbose("Using cached disk cache:" + cachePath);
+                mLogger.verbose("Using cached disk cache:" + cachePath);
                 loadingUrl = ImageSource.FILE.getPrefix() + cachePath;
             }
         }
@@ -298,7 +302,7 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
             errorListenerDelegate = new ErrorListenerDelegate(listener);
         }
 
-        ImageTaskImpl task = new ImageTaskImpl(
+        ImageTaskImpl imageTask = new ImageTaskImpl(
                 mContext,
                 mConfig,
                 this,
@@ -311,8 +315,10 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
 
         onTaskCreated(imageTaskRecord);
 
+        FutureImageTask future = new FutureImageTask(imageTask, this);
+
         // Push it to the request stack.
-        mStackService.push(task);
+        mStackService.push(future);
     }
 
     private DisplayOption createOptionIfNull(DisplayOption option) {
@@ -328,8 +334,8 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
     }
 
     private void onTaskCreated(ImageTaskRecord record) {
-        if (DEBUG)
-            mLogger.verbose("Created task:" + record);
+
+        mLogger.verbose("Created task:" + record);
         int taskId = record.getTaskId();
         int settableId = record.getSettableId();
         synchronized (mTaskLockMap) {
@@ -339,6 +345,18 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
             } else {
                 mTaskLockMap.put(settableId, record);
             }
+        }
+    }
+
+    private void onFutureSubmit(FutureImageTask futureImageTask) {
+        synchronized (mFutures) {
+            mFutures.add(futureImageTask);
+        }
+    }
+
+    private void onFutureDone(FutureImageTask futureImageTask) {
+        synchronized (mFutures) {
+            //  mFutures.remove(futureImageTask);
         }
     }
 
@@ -371,7 +389,7 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
     private void applyImageSettings(Bitmap bitmap, BitmapProcessor processor, ImageSettable settable,
                                     ImageAnimator animator) {
         if (settable != null) {
-            if (DEBUG) {
+            {
                 mLogger.debug("applyImageSettings, Bitmap:"
                         + bitmap
                         + ", for settle:"
@@ -386,7 +404,7 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
     @WorkerThread
     private void applyImageSettings(int resId, ImageSettable settable, ImageAnimator animator) {
         if (settable != null) {
-            if (DEBUG) {
+            {
                 mLogger.debug("applyImageSettings, Res:" + resId + ", for settle:"
                         + mSettableIdCreator.createSettableId(settable));
             }
@@ -411,6 +429,9 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
             case MSG_CALL_ON_FAILURE:
                 onCallOnFailure((FailureParams) message.obj);
                 break;
+            case MSG_CALL_ON_CANCEL:
+                onCallOnCancel((ProgressListener<BitmapResult>) message.obj);
+                break;
             case MSG_CALL_PROGRESS_UPDATE:
                 onCallOnProgressUpdate((ProgressParams) message.obj);
                 break;
@@ -421,6 +442,12 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
     private void callOnStart(ProgressListener listener) {
         if (listener != null) {
             mUIThreadHandler.obtainMessage(MSG_CALL_ON_START, listener).sendToTarget();
+        }
+    }
+
+    private void callOnCancel(ProgressListener listener) {
+        if (listener != null) {
+            mUIThreadHandler.obtainMessage(MSG_CALL_ON_CANCEL, listener).sendToTarget();
         }
     }
 
@@ -455,6 +482,10 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
         listener.onStartLoading();
     }
 
+    private void onCallOnCancel(ProgressListener<BitmapResult> listener) {
+        listener.onCancel();
+    }
+
     private void onCallOnProgressUpdate(ProgressParams progressParams) {
         progressParams.progressListener.onProgressUpdate(progressParams.progress);
     }
@@ -468,8 +499,9 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
     }
 
     @Override
-    public boolean handle(ImageTaskImpl request) {
-        mLoadingService.execute(request);
+    public boolean handle(FutureImageTask future) {
+        onFutureSubmit(future);
+        mLoadingService.submit(future);
         return true;
     }
 
@@ -504,7 +536,60 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
         synchronized (mTaskLockMap) {
             mTaskLockMap.clear();
         }
+        cancelAllTasks();
         mLogger.funcExit();
+    }
+
+    public void cancelAllTasks() {
+        synchronized (mFutures) {
+            for (FutureImageTask futureImageTask : mFutures) {
+                futureImageTask.cancel(true);
+            }
+            mFutures.clear();
+        }
+    }
+
+    public void cancel(@NonNull String url) {
+        synchronized (mFutures) {
+            for (FutureImageTask futureImageTask : mFutures) {
+                if (!futureImageTask.isCancelled()
+                        && !futureImageTask.isDone()
+                        && url.equals(futureImageTask.getImageTask().getUrl())) {
+                    futureImageTask.cancel(true);
+                    LoggerManager.getLogger(getClass()).info("Cancel task for url:" + url);
+                }
+            }
+        }
+    }
+
+    public void cancel(@NonNull ImageView view) {
+        synchronized (mFutures) {
+            for (FutureImageTask futureImageTask : mFutures) {
+                if (!futureImageTask.isCancelled()
+                        && !futureImageTask.isDone()
+                        && mSettableIdCreator.createSettableId(new ImageViewDelegate(view))
+                        == futureImageTask.getImageTask().getTaskRecord().getSettableId()) {
+                    futureImageTask.cancel(true);
+                    LoggerManager.getLogger(getClass()).info("Cancel task for view:" + view);
+                }
+            }
+        }
+    }
+
+    public void cancel(@NonNull ImageSettable settable) {
+        synchronized (mFutures) {
+            for (FutureImageTask futureImageTask : mFutures) {
+                if (!futureImageTask.isCancelled()
+                        && !futureImageTask.isDone()
+                        && mSettableIdCreator.createSettableId(settable)
+                        == futureImageTask.getImageTask().getTaskRecord().getSettableId()) {
+                    futureImageTask.cancel(true);
+                    callOnCancel(futureImageTask.getImageTask().getProgressListener());
+
+                    LoggerManager.getLogger(getClass()).info("Cancel task for settable:" + settable);
+                }
+            }
+        }
     }
 
     @WorkerThread
@@ -532,7 +617,7 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
         // Check if this task is dirty.
         boolean isTaskDirty = isTaskDirty(task.getTaskRecord());
         if (isTaskDirty) {
-            if (DEBUG) mLogger.info("Won't run task:" + task);
+            mLogger.info("Won't run task:" + task);
             return false;
         }
         return true;
@@ -545,10 +630,15 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
         if (mState == LoaderState.PAUSE_REQUESTED) {
             mState = LoaderState.PAUSED;
             if (mFreezer == null) mFreezer = new Freezer();
-            if (DEBUG) mLogger.debug("Pausing the loader...");
+            mLogger.debug("Pausing the loader...");
             mFreezer.freeze();
         }
         return true;
+    }
+
+    @Override
+    public void onDone(FutureImageTask futureImageTask) {
+        onFutureDone(futureImageTask);
     }
 
     class ImageSettingsLocker {
@@ -613,6 +703,11 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
         }
 
         @Override
+        public void onCancel() {
+            callOnCancel(listener);
+        }
+
+        @Override
         public void onComplete(final BitmapResult result) {
 
             callOnComplete(listener, result);
@@ -644,7 +739,7 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
                         }
                     }
                 });
-            } else if (DEBUG) {
+            } else {
                 mLogger.info("Won't apply image settings for task:" + taskRecord);
             }
 
@@ -662,7 +757,11 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
 
         @Override
         public void onError(@NonNull Cause cause) {
-            callOnFailure(listener, cause);
+            if (cause.exception instanceof InterruptedIOException) {
+                // We canceled this task.
+            } else {
+                callOnFailure(listener, cause);
+            }
         }
     }
 
