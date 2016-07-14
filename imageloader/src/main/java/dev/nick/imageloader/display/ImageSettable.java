@@ -17,6 +17,9 @@
 package dev.nick.imageloader.display;
 
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.view.animation.Animation;
 
@@ -26,7 +29,9 @@ import android.view.animation.Animation;
  */
 public interface ImageSettable {
     @UiThread
-    void setImageBitmap(Bitmap bitmap);
+    void setImageBitmap(@NonNull Bitmap bitmap);
+
+    boolean setBackgroundDrawable(@Nullable Drawable drawable);
 
     @UiThread
     void setImageResource(int resId);

@@ -397,7 +397,7 @@ public class ImageLoader implements TaskMonitor,
     private void applyImageSettings(Bitmap bitmap, BitmapProcessor processor, ImageSettable settable,
                                     ImageAnimator animator) {
         if (settable != null) {
-            BitmapImageSettings settings = new BitmapImageSettings(animator,
+            BitmapImageSettings settings = new BitmapImageSettings(mContext.getResources(), animator,
                     (processor == null ? bitmap : processor.process(bitmap)), settable);
             mUIThreadHandler.obtainMessage(MSG_APPLY_IMAGE_SETTINGS, settings).sendToTarget();
         }

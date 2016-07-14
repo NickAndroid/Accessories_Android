@@ -42,7 +42,6 @@ import dev.nick.imageloader.LoadingListener;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.display.ImageQuality;
 import dev.nick.imageloader.display.animator.FadeInImageAnimator;
-import dev.nick.imageloader.display.processor.BlackWhiteBitmapProcessor;
 import dev.nick.imageloader.loader.ImageSource;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
@@ -128,10 +127,12 @@ public class FileImageTest extends BaseTest implements LoadingListener {
                                 .imageQuality(ImageQuality.FIT_VIEW)
                                 .viewMaybeReused()
                                 .oneAfterOne()
-                                //.loadingImgRes(R.drawable.ic_cloud_download_black_24dp)
-                                //.defaultImgRes(R.drawable.ic_broken_image_black_24dp)
-                                .bitmapProcessor(new BlackWhiteBitmapProcessor())
-                                .imageAnimator(new FadeInImageAnimator())
+                                .imageAnimator(new FadeInImageAnimator() {
+                                    @Override
+                                    public long getDuration() {
+                                        return 300;
+                                    }
+                                })
                                 .build(), FileImageTest.this);
 
                 return convertView;

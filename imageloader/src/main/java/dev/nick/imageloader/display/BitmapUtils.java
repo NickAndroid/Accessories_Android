@@ -12,13 +12,19 @@
  */
 package dev.nick.imageloader.display;
 
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.TransitionDrawable;
 
 /**
  * {@link Bitmap} specific helpers.
@@ -347,5 +353,67 @@ public final class BitmapUtils {
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(in, rect, rect, paint);
         return newBmp;
+    }
+
+    /**
+     * Parses the drawable for instances of TransitionDrawable and breaks them open until it finds
+     * a drawable that isn't a transition drawable
+     *
+     * @param drawable to parse
+     * @return the target drawable that isn't a TransitionDrawable
+     */
+    public static Drawable getTopDrawable(final Drawable drawable) {
+        if (drawable == null) {
+            return null;
+        }
+
+        Drawable retDrawable = drawable;
+        while (retDrawable instanceof TransitionDrawable) {
+            TransitionDrawable transition = (TransitionDrawable) retDrawable;
+            retDrawable = transition.getDrawable(transition.getNumberOfLayers() - 1);
+        }
+
+        return retDrawable;
+    }
+
+    /**
+     * Creates a transition drawable to Bitmap with params
+     *
+     * @param resources    Android Resources!
+     * @param fromDrawable the drawable to transition from
+     * @param bitmap       the bitmap to transition to
+     * @param fadeTime     the fade time in MS to fade in
+     * @param dither       setting
+     * @param force        force create a transition even if bitmap == null (fade to transparent)
+     * @return the drawable if created, null otherwise
+     */
+    public static TransitionDrawable createImageTransitionDrawable(final Resources resources,
+                                                                   final Drawable fromDrawable, final Bitmap bitmap, final int fadeTime,
+                                                                   final boolean dither, final boolean force) {
+        if (bitmap != null || force) {
+            final Drawable[] arrayDrawable = new Drawable[2];
+            arrayDrawable[0] = getTopDrawable(fromDrawable);
+
+            // Add the transition to drawable
+            Drawable layerTwo;
+            if (bitmap != null) {
+                layerTwo = new BitmapDrawable(resources, bitmap);
+                layerTwo.setFilterBitmap(false);
+                layerTwo.setDither(dither);
+            } else {
+                // if no bitmap (forced) then transition to transparent
+                layerTwo = new ColorDrawable(Color.TRANSPARENT);
+            }
+
+            arrayDrawable[1] = layerTwo;
+
+            // Finally, return the image
+            final TransitionDrawable result = new TransitionDrawable(arrayDrawable);
+            result.setCrossFadeEnabled(true);
+            result.startTransition(fadeTime);
+            return result;
+        }
+
+        return null;
     }
 }

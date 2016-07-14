@@ -17,6 +17,9 @@
 package dev.nick.imageloader.display;
 
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.animation.Animation;
 import android.widget.ImageView;
 
@@ -32,8 +35,13 @@ public class ImageViewDelegate implements ImageSettable {
     }
 
     @Override
-    public void setImageBitmap(Bitmap bitmap) {
+    public void setImageBitmap(@NonNull Bitmap bitmap) {
         mImageView.setImageBitmap(bitmap);
+    }
+
+    @Override
+    public boolean setBackgroundDrawable(@Nullable Drawable drawable) {
+        return false;
     }
 
     @Override

@@ -16,10 +16,12 @@
 
 package dev.nick.imageloader.display;
 
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
 import dev.nick.imageloader.display.animator.ImageAnimator;
+import dev.nick.imageloader.display.transaction.BitmapTransaction;
 
 public class BitmapImageSettings implements Runnable {
 
@@ -28,11 +30,14 @@ public class BitmapImageSettings implements Runnable {
     ImageSettable settable;
     Bitmap bitmap;
 
-    public BitmapImageSettings(ImageAnimator animator, Bitmap bitmap,
+    Resources resources;
+
+    public BitmapImageSettings(Resources resources, ImageAnimator animator, Bitmap bitmap,
                                @NonNull ImageSettable settable) {
         this.animator = animator;
         this.bitmap = bitmap;
         this.settable = settable;
+        this.resources = resources;
     }
 
     void apply() {
@@ -41,6 +46,11 @@ public class BitmapImageSettings implements Runnable {
 
     void applyImageSetting(Bitmap bitmap, ImageSettable settable, ImageAnimator animator) {
         if (bitmap != null) {
+            if (settable.setBackgroundDrawable(null)) {
+                BitmapTransaction transaction = new BitmapTransaction(resources);
+                settable.setBackgroundDrawable(transaction.createImageTransitionDrawable(bitmap));
+                return;
+            }
             settable.setImageBitmap(bitmap);
             if (animator != null) {
                 animator.animate(settable);
