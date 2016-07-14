@@ -40,16 +40,17 @@ public class MyApp extends Application {
     public void onCreate() {
         super.onCreate();
         ImageLoader.init(getApplicationContext(), new LoaderConfig.Builder()
-                        .cachePolicy(new CachePolicy.Builder()
-                        .preferredLocation(CachePolicy.Location.EXTERNAL)
-                                .compressFormat(Bitmap.CompressFormat.PNG)
-                                .build())
+                .cachePolicy(new CachePolicy.Builder()
+                        .enableMemCache()
+                        .enableDiskCache()
                         .cachingThreads(Runtime.getRuntime().availableProcessors())
-                        .loadingThreads(Runtime.getRuntime().availableProcessors() * 2)
-                        .diskCacheEnabled(true)
-                        .memCacheEnabled(true)
-                        .debug(true)
-                        .build());
+                        .cacheDirName("tests")
+                        .preferredLocation(CachePolicy.Location.EXTERNAL)
+                        .compressFormat(Bitmap.CompressFormat.PNG)
+                        .build())
+                .debugLevel(Log.VERBOSE)
+                .loadingThreads(Runtime.getRuntime().availableProcessors() * 2)
+                .build());
     }
 }
 ```
@@ -64,26 +65,6 @@ ImageLoader.getInstance().displayImage(uri, holder.imageView,
                                 .bitmapProcessor(new BlackWhiteBitmapProcessor())
                                 .imageAnimator(new FadeInImageAnimator())
                                 .build());
-```
-
-### Pause:
-```java
-ImageLoader.getInstance().pause();
-```
-
-### Resume:
-```java
-ImageLoader.getInstance().resume();
-```
-
-### Clear tasks:
-```java
-ImageLoader.getInstance().clearTasks();
-```
-
-### Terminate:
-```java
-ImageLoader.getInstance().terminate();
 ```
 
 ### Clear cache:
@@ -102,27 +83,20 @@ ImageLoader.getInstance().terminate();
     }
 ```
 
-## Supported images:
-```java
-file://
-```
-```java
-content://
-```
-```java
-http(s)://
-```
-```java
-assets://
-```
-```java
-drawable://
-```
+## Supported url:
+- [x] http://
+- [x] https://
+- [x] file://
+- [x] content://
+- [x] drawable://
+- [x] assets://
+
+## Supported media format:
+- [x] All image formats android supported.
+- [] Video
+- [] Gif
+
 
 ## Contact me
-```java
-nick.guo.dev@icloud.com
-```
-```java
-nick.guo.dev@gmail.com
-```
+[nick.guo.dev@icloud.com]() :email:
+[nick.guo.dev@gmail.com]() :email:
