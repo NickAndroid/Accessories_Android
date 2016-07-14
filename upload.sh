@@ -1,1 +1,1 @@
-./gradlew bintrayUpload --viewSpec
+./gradlew bintrayUpload

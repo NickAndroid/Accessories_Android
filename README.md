@@ -21,14 +21,14 @@ Android image loader library
 <dependency>
   <groupId>dev.nick</groupId>
   <artifactId>imageloader</artifactId>
-  <version>0.7</version>
+  <version>0.8</version>
   <type>pom</type>
 </dependency>
 ```
 
 ### gradle
 ```
-compile 'dev.nick:imageloader:0.7@aar'
+compile 'dev.nick:imageloader:0.8@aar'
 ```
 
 ## Samples

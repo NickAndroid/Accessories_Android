@@ -100,7 +100,7 @@ public class NetworkImageTest extends BaseTest {
                 ImageLoader.getInstance().displayImage(uri, holder.imageView,
                         new DisplayOption.Builder()
                                 .oneAfterOne()
-                                .imageQuality(ImageQuality.RAW)
+                                .imageQuality(ImageQuality.FIT_VIEW)
                                 .viewMaybeReused()
                                 .imageAnimator(new FadeInImageAnimator())
                                 .build(), new LoadingListener() {
