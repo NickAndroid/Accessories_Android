@@ -96,7 +96,7 @@ public class NetworkImageTest extends BaseTest {
 
                 String uri = tracks.get(position).getUrl();
 
-                ImageLoader.getInstance().cancel(holder.imageView);
+               // ImageLoader.getInstance().cancel(holder.imageView);
                 ImageLoader.getInstance().displayImage(uri, holder.imageView,
                         new DisplayOption.Builder()
                                 .oneAfterOne()

@@ -14,10 +14,13 @@ public class FutureImageTask extends FutureTask<Void> {
     private DoneListener mListener;
     private ImageTask mImageTask;
 
-    public FutureImageTask(ImageTask task, @Nullable DoneListener listener) {
+    private boolean mCancelOthersBeforeRun;
+
+    public FutureImageTask(ImageTask task, @Nullable DoneListener listener, boolean cancelOthersBeforeRun) {
         super(task);
         this.mImageTask = task;
         this.mListener = listener;
+        this.mCancelOthersBeforeRun = cancelOthersBeforeRun;
     }
 
     @Override
@@ -29,6 +32,10 @@ public class FutureImageTask extends FutureTask<Void> {
 
     public interface DoneListener {
         void onDone(FutureImageTask futureImageTask);
+    }
+
+    public boolean shouldCancelOthersBeroreRun() {
+        return mCancelOthersBeforeRun;
     }
 
     public ImageTask getImageTask() {

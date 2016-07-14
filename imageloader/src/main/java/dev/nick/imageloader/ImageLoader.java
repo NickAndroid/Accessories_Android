@@ -22,6 +22,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 import android.widget.ImageView;
 
@@ -167,7 +168,7 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
      * @param url  Image source url, one of {@link dev.nick.imageloader.loader.ImageSource}
      * @param view Target view to display the image.
      */
-    public void displayImage(String url, ImageView view) {
+    public void displayImage(@NonNull String url, @NonNull ImageView view) {
         ImageViewDelegate viewDelegate = new ImageViewDelegate(view);
         displayImage(url, viewDelegate, null);
     }
@@ -179,7 +180,7 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
      * @param view   Target view to display the image.
      * @param option {@link DisplayOption} is options using when display the image.
      */
-    public void displayImage(String url, ImageView view, DisplayOption option) {
+    public void displayImage(@NonNull String url, @NonNull ImageView view, @Nullable DisplayOption option) {
         displayImage(url, view, option, null);
     }
 
@@ -190,7 +191,8 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
      * @param view   Target view to display the image.
      * @param option {@link DisplayOption} is options using when display the image.
      */
-    public void displayImage(String url, ImageView view, DisplayOption option, LoadingListener loadingListener) {
+    public void displayImage(@NonNull String url, @NonNull ImageView view,
+                             @Nullable DisplayOption option, @Nullable LoadingListener loadingListener) {
         ImageViewDelegate viewDelegate = new ImageViewDelegate(view);
         displayImage(url, viewDelegate, option, loadingListener);
     }
@@ -201,7 +203,7 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
      * @param url      Image source url, one of {@link dev.nick.imageloader.loader.ImageSource}
      * @param settable Target {@link ImageSettable} to display the image.
      */
-    public void displayImage(String url, ImageSettable settable) {
+    public void displayImage(@NonNull String url, @NonNull ImageSettable settable) {
         displayImage(url, settable, null);
     }
 
@@ -212,9 +214,9 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
      * @param settable Target {@link ImageSettable} to display the image.
      * @param option   {@link DisplayOption} is options using when display the image.
      */
-    public void displayImage(String url,
-                             ImageSettable settable,
-                             DisplayOption option) {
+    public void displayImage(@NonNull String url,
+                             @NonNull ImageSettable settable,
+                             @Nullable DisplayOption option) {
         displayImage(url, settable, option, null);
     }
 
@@ -226,10 +228,12 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
      * @param option   {@link DisplayOption} is options using when display the image.
      * @param listener The progress listener using to watch the progress of the loading.
      */
-    public void displayImage(String url,
-                             ImageSettable settable,
-                             DisplayOption option,
-                             LoadingListener listener) {
+    public void displayImage(@NonNull String url,
+                             @NonNull ImageSettable settable,
+                             @Nullable DisplayOption option,
+                             @Nullable LoadingListener listener) {
+
+        option = createOptionIfNull(option);
 
         beforeLoading(settable, option);
 
@@ -243,9 +247,7 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
             Bitmap cached;
             if ((cached = mCacheManager.getMemCache(url, info)) != null) {
                 mLogger.verbose("Using cached mem bitmap:" + cached);
-                applyImageSettings(cached,
-                        option == null ? null : option.getProcessor(),
-                        settable, option == null ? null : option.getAnimator());
+                applyImageSettings(cached, option.getProcessor(), settable, option.getAnimator());
                 return;
             }
         }
@@ -264,10 +266,7 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
     }
 
     private void beforeLoading(ImageSettable settable, DisplayOption option) {
-        int showWhenLoading = 0;
-        if (option != null) {
-            showWhenLoading = option.getLoadingImgRes();
-        }
+        int showWhenLoading = option.getLoadingImgRes();
         applyImageSettings(showWhenLoading, settable, null);
     }
 
@@ -275,8 +274,6 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
                               ImageSettable settable,
                               DisplayOption option,
                               LoadingListener listener) {
-
-        option = createOptionIfNull(option);
 
         ImageQuality imageQuality = option.getQuality();
 
@@ -315,7 +312,7 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
 
         onTaskCreated(imageTaskRecord);
 
-        FutureImageTask future = new FutureImageTask(imageTask, this);
+        FutureImageTask future = new FutureImageTask(imageTask, this, option.isViewMaybeReused());
 
         // Push it to the request stack.
         mStackService.push(future);
@@ -334,7 +331,6 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
     }
 
     private void onTaskCreated(ImageTaskRecord record) {
-
         mLogger.verbose("Created task:" + record);
         int taskId = record.getTaskId();
         int settableId = record.getSettableId();
@@ -349,6 +345,9 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
     }
 
     private void onFutureSubmit(FutureImageTask futureImageTask) {
+        if (futureImageTask.shouldCancelOthersBeroreRun()) {
+            cancel(futureImageTask.getImageTask().getTaskRecord().getSettableId());
+        }
         synchronized (mFutures) {
             mFutures.add(futureImageTask);
         }
@@ -597,13 +596,16 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
     }
 
     public void cancel(@NonNull ImageSettable settable) {
+        cancel(mSettableIdCreator.createSettableId(settable));
+    }
+
+    public void cancel(int settableId) {
         List<FutureImageTask> pendingCancels = null;
         synchronized (mFutures) {
             for (FutureImageTask futureImageTask : mFutures) {
                 if (!futureImageTask.isCancelled()
                         && !futureImageTask.isDone()
-                        && mSettableIdCreator.createSettableId(settable)
-                        == futureImageTask.getImageTask().getTaskRecord().getSettableId()) {
+                        && settableId == futureImageTask.getImageTask().getTaskRecord().getSettableId()) {
                     if (pendingCancels == null) pendingCancels = new ArrayList<>();
                     pendingCancels.add(futureImageTask);
                 }
@@ -613,7 +615,7 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
             for (FutureImageTask toBeCanceled : pendingCancels) {
                 toBeCanceled.cancel(true);
                 callOnCancel(toBeCanceled.getImageTask().getProgressListener());
-                LoggerManager.getLogger(getClass()).info("Cancel task for settable:" + settable);
+                LoggerManager.getLogger(getClass()).info("Cancel task for settable:" + settableId);
             }
             pendingCancels.clear();
             pendingCancels = null;
