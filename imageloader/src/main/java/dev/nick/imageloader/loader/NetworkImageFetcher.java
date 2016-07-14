@@ -55,7 +55,7 @@ public class NetworkImageFetcher extends BaseImageFetcher {
                 mTmpDir = externalCache.getPath();
             }
         }
-        if (debug) LoggerManager.getLogger(getClass()).info("Using tmp fir:" + mTmpDir);
+        LoggerManager.getLogger(getClass()).verbose("Using tmp fir:" + mTmpDir);
     }
 
     private String buildTmpFilePath() {
@@ -91,9 +91,7 @@ public class NetworkImageFetcher extends BaseImageFetcher {
 
         String tmpPath = buildTmpFilePath();
 
-        if (debug) {
-            LoggerManager.getLogger(getClass()).debug("Using tmp path for image download:" + tmpPath);
-        }
+        LoggerManager.getLogger(getClass()).verbose("Using tmp path for image download:" + tmpPath);
 
         ImageDownloader<Boolean> downloader = new HttpImageDownloader(tmpPath);
 

@@ -22,7 +22,6 @@ import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import dev.nick.imageloader.BuildConfig;
 import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
@@ -42,8 +41,6 @@ class BaseImageFetcher implements ImageFetcher {
 
     protected LoaderConfig loaderConfig;
 
-    protected final boolean debug = BuildConfig.DEBUG;
-
     public BaseImageFetcher(PathSplitter<String> splitter) {
         this.splitter = splitter;
     }
@@ -54,9 +51,7 @@ class BaseImageFetcher implements ImageFetcher {
                              @Nullable ProgressListener<BitmapResult> progressListener,
                              @Nullable ErrorListener errorListener)
             throws Exception {
-        if (debug) {
-            LoggerManager.getLogger(getClass()).funcEnter();
-        }
+        LoggerManager.getLogger(getClass()).funcEnter();
     }
 
     @Override

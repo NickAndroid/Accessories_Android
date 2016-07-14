@@ -17,6 +17,7 @@
 package dev.nick.imageloader;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import dev.nick.imageloader.cache.CachePolicy;
 import dev.nick.imageloader.loader.network.NetworkPolicy;
@@ -39,6 +40,8 @@ public class LoaderConfig {
     private CachePolicy cachePolicy;
     private NetworkPolicy networkPolicy;
 
+    private int debugLevel;
+
     @NonNull
     public CachePolicy getCachePolicy() {
         return cachePolicy;
@@ -52,13 +55,18 @@ public class LoaderConfig {
         return nLoadingThreads;
     }
 
+    public int getDebugLevel() {
+        return debugLevel;
+    }
 
     private LoaderConfig(CachePolicy cachePolicy,
                          NetworkPolicy networkPolicy,
-                         int nLoadingThreads) {
+                         int nLoadingThreads,
+                         int debugLevel) {
         this.cachePolicy = cachePolicy;
         this.networkPolicy = networkPolicy;
         this.nLoadingThreads = nLoadingThreads;
+        this.debugLevel = debugLevel;
     }
 
     public static class Builder {
@@ -66,6 +74,7 @@ public class LoaderConfig {
         private int nLoadingThreads;
         private CachePolicy cachePolicy;
         private NetworkPolicy networkPolicy;
+        private int debugLevel;
 
         public Builder() {
         }
@@ -99,12 +108,22 @@ public class LoaderConfig {
             return Builder.this;
         }
 
+        /**
+         * @param debugLevel Debug level of {@link dev.nick.logger.Logger}
+         * @return Builder instance.
+         */
+        public Builder debugLevel(int debugLevel) {
+            this.debugLevel = debugLevel;
+            return Builder.this;
+        }
+
         public LoaderConfig build() {
             invalidate();
             return new LoaderConfig(
                     cachePolicy,
                     networkPolicy,
-                    nLoadingThreads);
+                    nLoadingThreads,
+                    debugLevel);
         }
 
         void invalidate() {
@@ -119,6 +138,10 @@ public class LoaderConfig {
             if (nLoadingThreads <= 0) {
                 LoggerManager.getLogger(ImageLoader.class).warn("Using [Runtime.availableProcessors] as nLoadingThreads");
                 nLoadingThreads = Runtime.getRuntime().availableProcessors();
+            }
+            if (debugLevel < Log.VERBOSE) {
+                debugLevel = Log.VERBOSE;
+                LoggerManager.getLogger(ImageLoader.class).warn("Using debug level:" + debugLevel);
             }
         }
     }

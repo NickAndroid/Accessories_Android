@@ -16,13 +16,19 @@
 
 package dev.nick.logger;
 
+import android.util.Log;
+
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class LoggerManager {
 
-
     final static HashMap<String, Logger> sLoggers = new HashMap<>();
+    final static AtomicInteger sDebugLevel = new AtomicInteger(Log.DEBUG);
 
+    public static void setDebugLevel(int level) {
+        sDebugLevel.set(level);
+    }
 
     public static Logger getLogger(Class propertyClz) {
 
@@ -36,6 +42,8 @@ public class LoggerManager {
                     return prop;
                 }
             }, new CallingInfoBuilderImpl(), propName);
+
+            logger.setDebugLevel(sDebugLevel.get());
 
             sLoggers.put(propName, logger);
 

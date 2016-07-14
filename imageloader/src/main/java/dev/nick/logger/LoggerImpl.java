@@ -20,6 +20,8 @@ import android.util.Log;
 
 class LoggerImpl implements Logger {
 
+    int debugLevel = Log.VERBOSE;
+
     LogTagBuilder mLogTagBuilder;
     CallingInfoBuilder mCallingInfoBuilder;
 
@@ -33,59 +35,72 @@ class LoggerImpl implements Logger {
 
     @Override
     public boolean isDebuggable(int level) {
-        return true;
+        return level >= debugLevel;
+    }
+
+    @Override
+    public void setDebugLevel(int level) {
+        debugLevel = level;
     }
 
     @Override
     public void funcEnter() {
-        Log.d(mLogTag, mCallingInfoBuilder.getCallingInfo() + "---ENTER");
+        if (isDebuggable(Log.VERBOSE))
+            Log.d(mLogTag, mCallingInfoBuilder.getCallingInfo() + "\tENTER");
     }
 
     @Override
     public void funcExit() {
-        Log.d(mLogTag, mCallingInfoBuilder.getCallingInfo() + "---EXIT");
+        if (isDebuggable(Log.VERBOSE))
+            Log.d(mLogTag, mCallingInfoBuilder.getCallingInfo() + "\tEXIT");
     }
 
     @Override
     public void info(Object o) {
-        Log.d(mLogTag, mCallingInfoBuilder.getCallingInfo()
-                + "---"
-                + String.valueOf(o));
+        if (isDebuggable(Log.INFO))
+            Log.d(mLogTag, mCallingInfoBuilder.getCallingInfo()
+                    + "---"
+                    + String.valueOf(o));
     }
 
     @Override
     public void debug(Object o) {
-        Log.d(mLogTag, mCallingInfoBuilder.getCallingInfo()
-                + "---"
-                + String.valueOf(o));
+        if (isDebuggable(Log.DEBUG))
+            Log.d(mLogTag, mCallingInfoBuilder.getCallingInfo()
+                    + "---"
+                    + String.valueOf(o));
     }
 
     @Override
     public void verbose(Object o) {
-        Log.v(mLogTag, mCallingInfoBuilder.getCallingInfo()
-                + "---"
-                + String.valueOf(o));
+        if (isDebuggable(Log.VERBOSE))
+            Log.v(mLogTag, mCallingInfoBuilder.getCallingInfo()
+                    + "---"
+                    + String.valueOf(o));
     }
 
     @Override
     public void warn(Object o) {
-        Log.d(mLogTag, mCallingInfoBuilder.getCallingInfo()
-                + "---"
-                + String.valueOf(o));
+        if (isDebuggable(Log.WARN))
+            Log.d(mLogTag, mCallingInfoBuilder.getCallingInfo()
+                    + "---"
+                    + String.valueOf(o));
     }
 
     @Override
     public void error(Object o) {
-        Log.d(mLogTag, mCallingInfoBuilder.getCallingInfo()
-                + "---"
-                + String.valueOf(o));
+        if (isDebuggable(Log.ERROR))
+            Log.d(mLogTag, mCallingInfoBuilder.getCallingInfo()
+                    + "---"
+                    + String.valueOf(o));
     }
 
     @Override
     public void trace(String traceMsg, Throwable throwable) {
-        Log.d(mLogTag, traceMsg
-                + mCallingInfoBuilder.getCallingInfo()
-                + "---"
-                + Log.getStackTraceString(throwable));
+        if (isDebuggable(Log.ASSERT))
+            Log.d(mLogTag, traceMsg
+                    + mCallingInfoBuilder.getCallingInfo()
+                    + "---"
+                    + Log.getStackTraceString(throwable));
     }
 }

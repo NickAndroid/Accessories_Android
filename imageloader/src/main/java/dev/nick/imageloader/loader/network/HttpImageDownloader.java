@@ -6,15 +6,12 @@ import java.io.InterruptedIOException;
 import java.net.URL;
 import java.net.URLConnection;
 
-import dev.nick.imageloader.BuildConfig;
 import dev.nick.imageloader.loader.ProgressListener;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
 import dev.nick.logger.LoggerManager;
 
 public class HttpImageDownloader implements ImageDownloader<Boolean> {
-
-    static final boolean DEBUG = BuildConfig.DEBUG;
 
     String mTmpFilePath;
 
@@ -24,7 +21,7 @@ public class HttpImageDownloader implements ImageDownloader<Boolean> {
 
     @Override
     public Boolean download(String url, ProgressListener progressListener, ErrorListener errorListener) {
-        if (DEBUG) LoggerManager.getLogger(getClass()).info("download:" + url);
+        LoggerManager.getLogger(getClass()).info("download:" + url);
         try {
             URL u = new URL(url);
             URLConnection conn = u.openConnection();
