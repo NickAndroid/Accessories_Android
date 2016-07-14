@@ -93,10 +93,9 @@ ImageLoader.getInstance().displayImage(uri, holder.imageView,
 
 ## Supported media format:
 - [x] All image formats android supported.
-- [] Video
-- [] Gif
+- [ ] Video
+- [ ] Gif
 
 
 ## Contact me
-[nick.guo.dev@icloud.com]() :email:
-[nick.guo.dev@gmail.com]() :email:
+**nick.guo.dev@icloud.com** :email:
