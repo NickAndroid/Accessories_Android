@@ -520,9 +520,11 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
         if (mState == LoaderState.TERMINATED) {
             throw new IllegalStateException("Loader has been terminated.");
         }
-        mFreezer.resume();
-        mState = LoaderState.RUNNING;
-        mLogger.funcExit();
+        if (mState == LoaderState.PAUSED) {
+            mFreezer.resume();
+            mState = LoaderState.RUNNING;
+            mLogger.funcExit();
+        }
     }
 
     public void terminate() {
