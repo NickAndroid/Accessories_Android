@@ -3,6 +3,8 @@ Android image loader library
 
 
 ## Arts
+![Video 1](art/files.gif)
+![Video 2](art/nets.gif)
 
 ## Usage
 

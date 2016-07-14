@@ -62,27 +62,22 @@ public class FileImageTest extends BaseTest implements LoadingListener {
 
     @Override
     public void onError(@NonNull Cause cause) {
-        setTitle("onError:" + cause);
     }
 
     @Override
     public void onComplete(BitmapResult result) {
-        setTitle("onComplete:" + result.result);
     }
 
     @Override
     public void onProgressUpdate(float progress) {
-        setTitle("onProgressUpdate:" + progress);
     }
 
     @Override
     public void onCancel() {
-        setTitle("onCancel");
     }
 
     @Override
     public void onStartLoading() {
-        setTitle("onStartLoading");
     }
 
     @Override
