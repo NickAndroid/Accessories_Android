@@ -101,10 +101,7 @@ public class NetworkImageFetcher extends BaseImageFetcher {
 
         if (ok) {
             mFileImageFetcher.fetchFromUrl(ImageSource.FILE.prefix + tmpPath, decodeSpec, progressListener, errorListener);
-        } else {
-            callOnError(errorListener, new Cause(new UnknownError()));
         }
-
         // Delete the tmp file.
         if (ok && !new File(tmpPath).delete()) {
             LoggerManager.getLogger(getClass()).warn("Failed to delete the tmp file:" + tmpPath);

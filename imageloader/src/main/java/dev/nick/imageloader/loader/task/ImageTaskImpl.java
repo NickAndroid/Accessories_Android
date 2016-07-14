@@ -20,6 +20,8 @@ import android.content.Context;
 import android.os.Process;
 import android.support.annotation.NonNull;
 
+import java.io.InterruptedIOException;
+
 import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.display.ImageQuality;
 import dev.nick.imageloader.loader.DecodeSpec;
@@ -83,6 +85,8 @@ public class ImageTaskImpl implements ImageTask {
         DecodeSpec decodeSpec = new DecodeSpec(mQuality, mViewSpec);
         try {
             fetcher.fetchFromUrl(mUrl, decodeSpec, mProgressListener, mErrorListener);
+        } catch (InterruptedIOException | InterruptedException ignored) {
+
         } catch (Exception e) {
             mErrorListener.onError(new Cause(e));
         }

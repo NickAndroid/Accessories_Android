@@ -126,7 +126,9 @@ public class NetworkImageTest extends BaseTest {
 
                             @Override
                             public void onCancel() {
-
+                                LoggerManager.getLogger(getClass()).debug("onCancel");
+                                holder.progressBar.setProgress(0);
+                                holder.textView.setText("Canceled");
                             }
 
                             @Override

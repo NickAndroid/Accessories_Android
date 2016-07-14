@@ -2,6 +2,7 @@ package dev.nick.imageloader.loader.network;
 
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.InterruptedIOException;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -52,6 +53,7 @@ public class HttpImageDownloader implements ImageDownloader<Boolean> {
                 fos.close();
                 return Boolean.TRUE;
             }
+        } catch (InterruptedIOException ignored) {
         } catch (Exception e) {
             if (errorListener != null) {
                 errorListener.onError(new Cause(e));
