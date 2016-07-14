@@ -28,6 +28,7 @@ import java.util.concurrent.Executors;
 import dev.nick.imageloader.cache.disk.DiskCache;
 import dev.nick.imageloader.cache.mem.MemCache;
 import dev.nick.imageloader.loader.ViewSpec;
+import dev.nick.logger.LoggerManager;
 
 public class CacheManager {
 
@@ -59,13 +60,15 @@ public class CacheManager {
     }
 
     public void cache(@NonNull String url, ViewSpec info, Bitmap value) {
+        LoggerManager.getLogger(getClass()).verbose(String.format("Caching %s for %s", value, url));
         String key = mKeyGenerator.fromUrl(url, info);
         cacheByKey(key, value);
     }
 
     private void cacheByKey(final String key, final Bitmap value) {
-        if (isMemCacheEnabled)
+        if (isMemCacheEnabled) {
             mMemCache.cache(key, value);
+        }
         if (isDiskCacheEnabled)
             mCacheService.execute(new Runnable() {
                 @Override

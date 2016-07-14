@@ -69,7 +69,6 @@ public class DiskCache implements Cache<String, Bitmap> {
     @Override
     @WorkerThread
     public void cache(@NonNull String key, Bitmap value) {
-
         if (mPreferToExternal && mExternalCacheDir != null
                 && Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             if (!new FileWriter(mExternalCacheDir, value, key).write())
@@ -103,6 +102,7 @@ public class DiskCache implements Cache<String, Bitmap> {
         File in = new File(getFilePathByKey(key));
 
         if (!in.exists()) {
+            LoggerManager.getLogger(getClass()).info("No disk file:" + in.getAbsolutePath());
             return null;
         }
         return in.getPath();

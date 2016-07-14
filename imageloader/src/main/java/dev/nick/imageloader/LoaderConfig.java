@@ -42,6 +42,16 @@ public class LoaderConfig {
 
     private int debugLevel;
 
+    @Override
+    public String toString() {
+        return "LoaderConfig{" +
+                "cachePolicy=" + cachePolicy +
+                ", nLoadingThreads=" + nLoadingThreads +
+                ", networkPolicy=" + networkPolicy +
+                ", debugLevel=" + debugLevel +
+                '}';
+    }
+
     @NonNull
     public CachePolicy getCachePolicy() {
         return cachePolicy;

@@ -18,16 +18,23 @@ package dev.nick.logger;
 
 import android.util.Log;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class LoggerManager {
 
     final static HashMap<String, Logger> sLoggers = new HashMap<>();
-    final static AtomicInteger sDebugLevel = new AtomicInteger(Log.DEBUG);
+    final static AtomicInteger sDebugLevel = new AtomicInteger(Log.VERBOSE);
+
+    static String TAG_PREFIX = "LoggerManager";
 
     public static void setDebugLevel(int level) {
         sDebugLevel.set(level);
+    }
+
+    public static void setTagPrefix(String tagPrefix) {
+        TAG_PREFIX = tagPrefix;
     }
 
     public static Logger getLogger(Class propertyClz) {
@@ -39,7 +46,7 @@ public class LoggerManager {
             Logger logger = new LoggerImpl(new LogTagBuilder() {
                 @Override
                 public String buildLogTag(String prop) {
-                    return prop;
+                    return (TAG_PREFIX == null) ? prop : TAG_PREFIX + File.separator + prop;
                 }
             }, new CallingInfoBuilderImpl(), propName);
 

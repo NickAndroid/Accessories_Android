@@ -44,10 +44,4 @@ public class MyApp extends ScalpelApplication {
                 .loadingThreads(Runtime.getRuntime().availableProcessors() * 2)
                 .build());
     }
-
-    @Override
-    public void onTrimMemory(int level) {
-        super.onTrimMemory(level);
-        ImageLoader.getInstance().clearMemCache();
-    }
 }

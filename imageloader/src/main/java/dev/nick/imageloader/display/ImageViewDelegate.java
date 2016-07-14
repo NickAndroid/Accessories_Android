@@ -20,8 +20,6 @@ import android.graphics.Bitmap;
 import android.view.animation.Animation;
 import android.widget.ImageView;
 
-import dev.nick.logger.LoggerManager;
-
 /**
  * Wrapper class for a {@link ImageView}
  */
@@ -35,7 +33,6 @@ public class ImageViewDelegate implements ImageSettable {
 
     @Override
     public void setImageBitmap(Bitmap bitmap) {
-        LoggerManager.getLogger(getClass()).verbose("setImageBitmap:" + bitmap + ", view:" + hashCode());
         mImageView.setImageBitmap(bitmap);
     }
 

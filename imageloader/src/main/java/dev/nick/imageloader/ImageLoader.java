@@ -147,6 +147,8 @@ public class ImageLoader implements TaskMonitor,
         if (sLoader == null) {
             int debugLevel = config.getDebugLevel();
             LoggerManager.setDebugLevel(debugLevel);
+            LoggerManager.setTagPrefix("ImageLoader");
+            LoggerManager.getLogger(ImageLoader.class).warn("Configure ImageLoader:" + config.toString());
             sLoader = new ImageLoader(context, config);
             return;
         }
@@ -251,7 +253,7 @@ public class ImageLoader implements TaskMonitor,
         if (mCacheManager.isMemCacheEnabled()) {
             Bitmap cached;
             if ((cached = mCacheManager.getMemCache(url, info)) != null) {
-                mLogger.verbose("Using cached mem bitmap:" + cached);
+                mLogger.verbose("MemCache, Using cached mem bitmap:" + cached);
                 applyImageSettings(cached, option.getProcessor(), settable, option.getAnimator());
                 return;
             }
@@ -262,7 +264,7 @@ public class ImageLoader implements TaskMonitor,
         if (mCacheManager.isDiskCacheEnabled()) {
             String cachePath;
             if ((cachePath = mCacheManager.getDiskCachePath(url, info)) != null) {
-                mLogger.verbose("Using cached disk cache:" + cachePath);
+                mLogger.verbose("DiskCache, Using cached disk cache:" + cachePath);
                 loadingUrl = ImageSource.FILE.getPrefix() + cachePath;
             }
         }
@@ -279,6 +281,8 @@ public class ImageLoader implements TaskMonitor,
                               ImageSettable settable,
                               DisplayOption option,
                               LoadingListener listener) {
+
+        mLogger.funcEnter();
 
         ImageQuality imageQuality = option.getQuality();
 
@@ -393,12 +397,6 @@ public class ImageLoader implements TaskMonitor,
     private void applyImageSettings(Bitmap bitmap, BitmapProcessor processor, ImageSettable settable,
                                     ImageAnimator animator) {
         if (settable != null) {
-            {
-                mLogger.debug("applyImageSettings, Bitmap:"
-                        + bitmap
-                        + ", for settle:"
-                        + mSettableIdCreator.createSettableId(settable));
-            }
             BitmapImageSettings settings = new BitmapImageSettings(animator,
                     (processor == null ? bitmap : processor.process(bitmap)), settable);
             mUIThreadHandler.obtainMessage(MSG_APPLY_IMAGE_SETTINGS, settings).sendToTarget();
@@ -408,10 +406,6 @@ public class ImageLoader implements TaskMonitor,
     @WorkerThread
     private void applyImageSettings(int resId, ImageSettable settable, ImageAnimator animator) {
         if (settable != null) {
-            {
-                mLogger.debug("applyImageSettings, Res:" + resId + ", for settle:"
-                        + mSettableIdCreator.createSettableId(settable));
-            }
             ResImageSettings settings = new ResImageSettings(animator, resId, settable);
             mUIThreadHandler.obtainMessage(MSG_APPLY_IMAGE_SETTINGS, settings).sendToTarget();
         }
@@ -572,7 +566,7 @@ public class ImageLoader implements TaskMonitor,
             for (FutureImageTask toBeCanceled : pendingCancels) {
                 toBeCanceled.cancel(true);
                 callOnCancel(toBeCanceled.getImageTask().getProgressListener());
-                LoggerManager.getLogger(getClass()).info("Cancel task for url:" + url);
+                mLogger.info("Cancel task for url:" + url);
             }
             pendingCancels.clear();
             pendingCancels = null;
@@ -596,7 +590,7 @@ public class ImageLoader implements TaskMonitor,
             for (FutureImageTask toBeCanceled : pendingCancels) {
                 toBeCanceled.cancel(true);
                 callOnCancel(toBeCanceled.getImageTask().getProgressListener());
-                LoggerManager.getLogger(getClass()).info("Cancel task for view:" + view);
+                mLogger.info("Cancel task for view:" + view);
             }
             pendingCancels.clear();
             pendingCancels = null;
@@ -623,7 +617,7 @@ public class ImageLoader implements TaskMonitor,
             for (FutureImageTask toBeCanceled : pendingCancels) {
                 toBeCanceled.cancel(true);
                 callOnCancel(toBeCanceled.getImageTask().getProgressListener());
-                LoggerManager.getLogger(getClass()).info("Cancel task for settable:" + settableId);
+                mLogger.info("Cancel task for settable:" + settableId);
             }
             pendingCancels.clear();
             pendingCancels = null;
@@ -753,13 +747,16 @@ public class ImageLoader implements TaskMonitor,
         @Override
         public void onComplete(final BitmapResult result) {
 
-            if (canceled) return;
-
-            callOnComplete(listener, result);
-
             if (result.result == null) {
                 return;
             }
+
+            if (canceled) {
+                mCacheManager.cache(url, viewSpec, result.result);
+                return;
+            }
+
+            callOnComplete(listener, result);
 
             final boolean isViewMaybeReused = option.isViewMaybeReused();
 
@@ -768,26 +765,25 @@ public class ImageLoader implements TaskMonitor,
                     ImageAnimator animator = (option == null ? null : option.getAnimator());
                     BitmapProcessor processor = (option == null ? null : option.getProcessor());
                     applyImageSettings(result.result, processor, settable, animator);
-                    return;
-                }
-                mImageSettingsScheduler.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (isViewMaybeReused && isTaskDirty(taskRecord)) return;
-                        ImageAnimator animator = (option == null ? null : option.getAnimator());
-                        BitmapProcessor processor = (option == null ? null : option.getProcessor());
-                        applyImageSettings(result.result, processor, settable, animator);
-                        if (animator != null) {
-                            long delay = animator.getDuration();
-                            ImageSettingsLocker locker = new ImageSettingsLocker(delay / 3);
-                            locker.lock();
+                } else {
+                    mImageSettingsScheduler.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (isViewMaybeReused && isTaskDirty(taskRecord)) return;
+                            ImageAnimator animator = (option == null ? null : option.getAnimator());
+                            BitmapProcessor processor = (option == null ? null : option.getProcessor());
+                            applyImageSettings(result.result, processor, settable, animator);
+                            if (animator != null) {
+                                long delay = animator.getDuration();
+                                ImageSettingsLocker locker = new ImageSettingsLocker(delay / 5);
+                                locker.lock();
+                            }
                         }
-                    }
-                });
+                    });
+                }
             } else {
                 mLogger.info("Won't apply image settings for task:" + taskRecord);
             }
-
             mCacheManager.cache(url, viewSpec, result.result);
         }
     }

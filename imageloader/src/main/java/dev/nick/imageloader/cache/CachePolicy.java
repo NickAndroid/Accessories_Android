@@ -125,11 +125,16 @@ public class CachePolicy {
     @Override
     public String toString() {
         return "CachePolicy{" +
-                "compressFormat=" + compressFormat +
+                "cacheDirName='" + cacheDirName + '\'' +
+                ", memCacheEnabled=" + memCacheEnabled +
+                ", diskCacheEnabled=" + diskCacheEnabled +
+                ", nCachingThreads=" + nCachingThreads +
+                ", memCachePoolSize=" + memCachePoolSize +
                 ", preferredLocation=" + preferredLocation +
                 ", keyGenerator=" + keyGenerator +
                 ", fileNameGenerator=" + fileNameGenerator +
-                ", imageQuality=" + quality +
+                ", compressFormat=" + compressFormat +
+                ", quality=" + quality +
                 '}';
     }
 
