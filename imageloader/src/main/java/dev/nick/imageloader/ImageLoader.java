@@ -70,7 +70,10 @@ import dev.nick.stack.RequestStackService;
 /**
  * Main class of {@link ImageLoader} library.
  */
-public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandler<FutureImageTask>, FutureImageTask.DoneListener {
+public class ImageLoader implements TaskMonitor,
+        Handler.Callback,
+        RequestHandler<FutureImageTask>,
+        FutureImageTask.DoneListener {
 
     private static final int MSG_APPLY_IMAGE_SETTINGS = 0x1;
     private static final int MSG_CALL_ON_START = 0x2;
@@ -110,8 +113,8 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
     private ImageLoader(Context context, LoaderConfig config) {
         this.mContext = context;
         this.mConfig = config;
-        mTaskManager = new TaskManagerImpl();
-        mSettableIdCreator = new ImageSettableIdCreatorImpl();
+        this.mTaskManager = new TaskManagerImpl();
+        this.mSettableIdCreator = new ImageSettableIdCreatorImpl();
         this.mUIThreadHandler = new Handler(Looper.getMainLooper(), this);
         this.mCacheManager = new CacheManager(config.getCachePolicy(), context);
         this.mLoadingService = Executors.newFixedThreadPool(config.getLoadingThreads());
@@ -142,6 +145,8 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
     public synchronized static void init(Context context, LoaderConfig config) {
         if (config == null) throw new NullPointerException("config is null.");
         if (sLoader == null) {
+            int debugLevel = config.getDebugLevel();
+            LoggerManager.setDebugLevel(debugLevel);
             sLoader = new ImageLoader(context, config);
             return;
         }
@@ -499,6 +504,7 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
 
     @Override
     public boolean handle(FutureImageTask future) {
+        freezeIfRequested();
         onFutureSubmit(future);
         mLoadingService.submit(future);
         return true;
@@ -656,16 +662,16 @@ public class ImageLoader implements TaskMonitor, Handler.Callback, RequestHandle
     }
 
     boolean checkInRunningState() {
-        if (mState == LoaderState.TERMINATED) {
-            return false;
-        }
+        return mState != LoaderState.TERMINATED;
+    }
+
+    void freezeIfRequested() {
         if (mState == LoaderState.PAUSE_REQUESTED) {
             mState = LoaderState.PAUSED;
             if (mFreezer == null) mFreezer = new Freezer();
-            mLogger.debug("Pausing the loader...");
+            mLogger.debug("Freezing the loader...");
             mFreezer.freeze();
         }
-        return true;
     }
 
     @Override
