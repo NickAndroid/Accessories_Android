@@ -17,6 +17,7 @@
 package dev.nick.twenty;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import com.nick.scalpel.ScalpelApplication;
 
@@ -32,11 +33,14 @@ public class MyApp extends ScalpelApplication {
         EventBus.create(this);
         ImageLoader.init(getApplicationContext(), new LoaderConfig.Builder()
                 .cachePolicy(new CachePolicy.Builder()
+                        .enableMemCache()
+                        .enableDiskCache()
                         .cachingThreads(Runtime.getRuntime().availableProcessors())
                         .cacheDirName("tests")
                         .preferredLocation(CachePolicy.Location.EXTERNAL)
                         .compressFormat(Bitmap.CompressFormat.PNG)
                         .build())
+                .debugLevel(Log.VERBOSE)
                 .loadingThreads(Runtime.getRuntime().availableProcessors() * 2)
                 .build());
     }
