@@ -61,6 +61,28 @@ ImageLoader.getInstance().displayImage(uri, holder.imageView,
                                 .imageAnimator(new FadeInImageAnimator())
                                 .build());
 ```
+**Or**
+```java
+ImageLoader.getInstance().displayImage(uri, holder.imageView);
+```
+
+### Listening:
+```java
+ImageLoader.getInstance().displayImage(uri, holder.imageView, new LoaderListener(){...});
+```
+
+### CustomView support:
+```java
+class CustomView implements ImageSettable {}
+```
+```java
+ImageLoader.getInstance().displayImage(uri, customView);
+```
+
+### Cancel tasks:
+```java
+ImageLoader.getInstance().cancel(ImageView/ImageSettable/Url);
+```
 
 ### Clear cache:
 ```java
