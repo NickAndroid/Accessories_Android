@@ -40,7 +40,7 @@ public class CachePolicy {
             .memCachePoolSize(DEFAULT_MEM_CACHE_POOL_SIZE)
             .compressFormat(Bitmap.CompressFormat.PNG)
             .imageQuality(Quality.BEST)
-            .cacheDirName("images")
+            .cacheDirName("disk.cache")
             .fileNameGenerator(CachePolicy.DEFAULT_FILENAME_GENERATOR)
             .keyGenerator(CachePolicy.DEFAULT_KEY_GENERATOR)
             .preferredLocation(CachePolicy.Location.EXTERNAL)

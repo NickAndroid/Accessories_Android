@@ -36,7 +36,7 @@ public class MyApp extends ScalpelApplication {
                         .enableMemCache()
                         .enableDiskCache()
                         .cachingThreads(Runtime.getRuntime().availableProcessors())
-                        .cacheDirName("tests")
+                        .cacheDirName("dis.cache.tests")
                         .preferredLocation(CachePolicy.Location.EXTERNAL)
                         .compressFormat(Bitmap.CompressFormat.PNG)
                         .build())
