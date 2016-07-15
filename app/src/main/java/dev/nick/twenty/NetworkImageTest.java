@@ -37,8 +37,8 @@ import com.nick.scalpel.annotation.request.RequirePermission;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.DisplayListener;
+import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.display.ImageQuality;
 import dev.nick.imageloader.display.animator.FadeInImageAnimator;
@@ -99,48 +99,50 @@ public class NetworkImageTest extends BaseTest {
                 holder.progressBar.setProgress(0);
                 holder.textView.setText("");
 
-                ImageLoader.getInstance().cancel(holder.imageView);
-                ImageLoader.getInstance().displayImage(uri, holder.imageView,
-                        new DisplayOption.Builder()
-                                .oneAfterOne()
-                                .imageQuality(ImageQuality.FIT_VIEW)
-                                .viewMaybeReused()
-                                .imageAnimator(new FadeInImageAnimator())
-                                .build(), new DisplayListener() {
-                            @Override
-                            public void onError(@NonNull Cause cause) {
-                                LoggerManager.getLogger(getClass()).error(cause);
-                                holder.textView.setText("Error");
-                            }
+                ImageLoader
+                        .getInstance()
+                        .cancel(holder.imageView)
+                        .displayImage(uri, holder.imageView,
+                                new DisplayOption.Builder()
+                                        .oneAfterOne()
+                                        .imageQuality(ImageQuality.FIT_VIEW)
+                                        .viewMaybeReused()
+                                        .imageAnimator(new FadeInImageAnimator())
+                                        .build(), new DisplayListener() {
+                                    @Override
+                                    public void onError(@NonNull Cause cause) {
+                                        LoggerManager.getLogger(getClass()).error(cause);
+                                        holder.textView.setText("Error");
+                                    }
 
-                            @Override
-                            public void onComplete(@Nullable BitmapResult result) {
-                                if (result != null) {
-                                    holder.progressBar.setProgress((int) (1 * 100));
-                                    LoggerManager.getLogger(getClass()).debug("onComplete:" + result.result);
-                                    holder.textView.setText("Completed");
-                                }
-                            }
+                                    @Override
+                                    public void onComplete(@Nullable BitmapResult result) {
+                                        if (result != null) {
+                                            holder.progressBar.setProgress((int) (1 * 100));
+                                            LoggerManager.getLogger(getClass()).debug("onComplete:" + result.result);
+                                            holder.textView.setText("Completed");
+                                        }
+                                    }
 
-                            @Override
-                            public void onProgressUpdate(float progress) {
-                                holder.progressBar.setProgress((int) (progress * 100));
-                                holder.textView.setText("" + (int) (progress * 100));
-                            }
+                                    @Override
+                                    public void onProgressUpdate(float progress) {
+                                        holder.progressBar.setProgress((int) (progress * 100));
+                                        holder.textView.setText("" + (int) (progress * 100));
+                                    }
 
-                            @Override
-                            public void onCancel() {
-                                LoggerManager.getLogger(getClass()).debug("onCancel");
-                                holder.progressBar.setProgress(0);
-                                holder.textView.setText("Canceled");
-                            }
+                                    @Override
+                                    public void onCancel() {
+                                        LoggerManager.getLogger(getClass()).debug("onCancel");
+                                        holder.progressBar.setProgress(0);
+                                        holder.textView.setText("Canceled");
+                                    }
 
-                            @Override
-                            public void onStartLoading() {
-                                holder.textView.setText("Start");
-                                holder.progressBar.setProgress(0);
-                            }
-                        });
+                                    @Override
+                                    public void onStartLoading() {
+                                        holder.textView.setText("Start");
+                                        holder.progressBar.setProgress(0);
+                                    }
+                                });
 
                 return convertView;
             }
@@ -157,6 +159,94 @@ public class NetworkImageTest extends BaseTest {
     }
 
     final String[] urls = new String[]{
+            "http://i.imgur.com/ZXVlev9.jpg",
+            "http://i.imgur.com/LT6RmQU.png",
+            "http://i.imgur.com/8w0hWDS.jpg",
+            "http://i.imgur.com/wCbQpOr.jpg",
+            "http://i.imgur.com/rUcXDip.jpg",
+            "http://i.imgur.com/bzuhIg4.png",
+            "http://i.imgur.com/LsEW9kS.png",
+            "http://i.imgur.com/MyAcXe5.png",
+            "http://i.imgur.com/PwErqAf.png",
+            "http://i.imgur.com/jz1zgXU.png",
+            "http://i.imgur.com/8PQ43ov.jpg",
+            "http://i.imgur.com/vxAIMJt.png",
+            "http://i.imgur.com/ZXVlev9.jpg",
+            "http://i.imgur.com/LT6RmQU.png",
+            "http://i.imgur.com/8w0hWDS.jpg",
+            "http://i.imgur.com/wCbQpOr.jpg",
+            "http://i.imgur.com/LsEW9kS.png",
+            "http://i.imgur.com/MyAcXe5.png",
+            "http://i.imgur.com/PwErqAf.png",
+            "http://i.imgur.com/jz1zgXU.png",
+            "http://i.imgur.com/moer0PI.jpg",
+            "http://i.imgur.com/vRUz3TD.jpg",
+            "http://i.imgur.com/ZXVlev9.jpg",
+            "http://i.imgur.com/LT6RmQU.png",
+            "http://i.imgur.com/8w0hWDS.jpg",
+            "http://i.imgur.com/wCbQpOr.jpg",
+            "http://i.imgur.com/rUcXDip.jpg",
+            "http://i.imgur.com/bzuhIg4.png",
+            "http://i.imgur.com/LsEW9kS.png",
+            "http://i.imgur.com/MyAcXe5.png",
+            "http://i.imgur.com/PwErqAf.png",
+            "http://i.imgur.com/jz1zgXU.png",
+            "http://i.imgur.com/8PQ43ov.jpg",
+            "http://i.imgur.com/vxAIMJt.png",
+            "http://i.imgur.com/ZXVlev9.jpg",
+            "http://i.imgur.com/LT6RmQU.png",
+            "http://i.imgur.com/8w0hWDS.jpg",
+            "http://i.imgur.com/wCbQpOr.jpg",
+            "http://i.imgur.com/LsEW9kS.png",
+            "http://i.imgur.com/MyAcXe5.png",
+            "http://i.imgur.com/PwErqAf.png",
+            "http://i.imgur.com/jz1zgXU.png",
+            "http://i.imgur.com/moer0PI.jpg",
+            "http://i.imgur.com/vRUz3TD.jpg",
+            "http://i.imgur.com/ZXVlev9.jpg",
+            "http://i.imgur.com/LT6RmQU.png",
+            "http://i.imgur.com/8w0hWDS.jpg",
+            "http://i.imgur.com/wCbQpOr.jpg",
+            "http://i.imgur.com/rUcXDip.jpg",
+            "http://i.imgur.com/bzuhIg4.png",
+            "http://i.imgur.com/LsEW9kS.png",
+            "http://i.imgur.com/MyAcXe5.png",
+            "http://i.imgur.com/PwErqAf.png",
+            "http://i.imgur.com/jz1zgXU.png",
+            "http://i.imgur.com/8PQ43ov.jpg",
+            "http://i.imgur.com/vxAIMJt.png",
+            "http://i.imgur.com/ZXVlev9.jpg",
+            "http://i.imgur.com/LT6RmQU.png",
+            "http://i.imgur.com/8w0hWDS.jpg",
+            "http://i.imgur.com/wCbQpOr.jpg",
+            "http://i.imgur.com/LsEW9kS.png",
+            "http://i.imgur.com/MyAcXe5.png",
+            "http://i.imgur.com/PwErqAf.png",
+            "http://i.imgur.com/jz1zgXU.png",
+            "http://i.imgur.com/moer0PI.jpg",
+            "http://i.imgur.com/vRUz3TD.jpg",
+            "http://i.imgur.com/ZXVlev9.jpg",
+            "http://i.imgur.com/LT6RmQU.png",
+            "http://i.imgur.com/8w0hWDS.jpg",
+            "http://i.imgur.com/wCbQpOr.jpg",
+            "http://i.imgur.com/rUcXDip.jpg",
+            "http://i.imgur.com/bzuhIg4.png",
+            "http://i.imgur.com/LsEW9kS.png",
+            "http://i.imgur.com/MyAcXe5.png",
+            "http://i.imgur.com/PwErqAf.png",
+            "http://i.imgur.com/jz1zgXU.png",
+            "http://i.imgur.com/8PQ43ov.jpg",
+            "http://i.imgur.com/vxAIMJt.png",
+            "http://i.imgur.com/ZXVlev9.jpg",
+            "http://i.imgur.com/LT6RmQU.png",
+            "http://i.imgur.com/8w0hWDS.jpg",
+            "http://i.imgur.com/wCbQpOr.jpg",
+            "http://i.imgur.com/LsEW9kS.png",
+            "http://i.imgur.com/MyAcXe5.png",
+            "http://i.imgur.com/PwErqAf.png",
+            "http://i.imgur.com/jz1zgXU.png",
+            "http://i.imgur.com/moer0PI.jpg",
+            "http://i.imgur.com/vRUz3TD.jpg",
             "http://i.imgur.com/ZXVlev9.jpg",
             "http://i.imgur.com/LT6RmQU.png",
             "http://i.imgur.com/8w0hWDS.jpg",

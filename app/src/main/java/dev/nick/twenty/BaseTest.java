@@ -25,13 +25,25 @@ import dev.nick.imageloader.ImageLoader;
 public class BaseTest extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.clear, menu);
+        getMenuInflater().inflate(R.menu.menus, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.pause:
+                ImageLoader.getInstance().pause();
+                break;
+            case R.id.resume:
+                ImageLoader.getInstance().resume();
+                break;
+            case R.id.terminate:
+                ImageLoader.getInstance().terminate();
+                break;
+            case R.id.cancel:
+                ImageLoader.getInstance().cancelAllTasks();
+                break;
             case R.id.clear:
                 ImageLoader.getInstance().clearAllCache();
                 break;

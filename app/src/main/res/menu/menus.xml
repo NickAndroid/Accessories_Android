@@ -17,9 +17,29 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
     <item
+        android:id="@+id/pause"
+        android:showAsAction="never"
+        android:title="Pause"
+        tools:ignore="AppCompatResource" />
+    <item
+        android:id="@+id/resume"
+        android:showAsAction="never"
+        android:title="Resume"
+        tools:ignore="AppCompatResource" />
+    <item
+        android:id="@+id/terminate"
+        android:showAsAction="never"
+        android:title="Terminate"
+        tools:ignore="AppCompatResource" />
+    <item
+        android:id="@+id/cancel"
+        android:showAsAction="never"
+        android:title="Cancel all tasks"
+        tools:ignore="AppCompatResource" />
+    <item
         android:id="@+id/clear"
         android:showAsAction="never"
-        android:title="Clear cache"
+        android:title="Clear all cache"
         tools:ignore="AppCompatResource" />
     <item
         android:id="@+id/clear_mem"
