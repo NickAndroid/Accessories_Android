@@ -5,7 +5,7 @@ Android image loader library
 ## Arts
 ![Video 1](art/files.gif)
 ![Video 2](art/nets.gif)
-![Video 3](art/animations.avi)
+![Video 3](art/animations.gif)
 
 ## Usage
 
@@ -19,14 +19,14 @@ Android image loader library
 <dependency>
   <groupId>dev.nick</groupId>
   <artifactId>imageloader</artifactId>
-  <version>0.8</version>
+  <version>0.9</version>
   <type>pom</type>
 </dependency>
 ```
 
 ### gradle
 ```
-compile 'dev.nick:imageloader:0.8@aar'
+compile 'dev.nick:imageloader:0.9@aar'
 ```
 
 ## Samples
