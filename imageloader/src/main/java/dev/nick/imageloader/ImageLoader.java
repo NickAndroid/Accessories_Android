@@ -571,15 +571,15 @@ public class ImageLoader implements TaskMonitor,
         }
     }
 
-    public void cancel(@NonNull ImageView view) {
-        cancel(new ImageViewDelegate(view));
+    public ImageLoader cancel(@NonNull ImageView view) {
+        return cancel(new ImageViewDelegate(view));
     }
 
-    public void cancel(@NonNull ImageSettable settable) {
-        cancel(mSettableIdCreator.createSettableId(settable));
+    public ImageLoader cancel(@NonNull ImageSettable settable) {
+        return cancel(mSettableIdCreator.createSettableId(settable));
     }
 
-    public void cancel(int settableId) {
+    public ImageLoader cancel(int settableId) {
         List<FutureImageTask> pendingCancels = findTasks(settableId);
         if (pendingCancels.size() > 0) {
             for (FutureImageTask toBeCanceled : pendingCancels) {
@@ -590,6 +590,7 @@ public class ImageLoader implements TaskMonitor,
             pendingCancels.clear();
             pendingCancels = null;
         }
+        return this;
     }
 
     private List<FutureImageTask> findTasks(@NonNull String url) {
@@ -732,14 +733,16 @@ public class ImageLoader implements TaskMonitor,
 
         @Override
         public void onStartLoading() {
-            if (!canceled)
+            if (!canceled && !isTaskDirty(taskRecord)) {
                 callOnStart(listener);
+            }
         }
 
         @Override
         public void onProgressUpdate(float progress) {
-            if (!canceled)
+            if (!canceled && !isTaskDirty(taskRecord)) {
                 callOnProgressUpdate(listener, progress);
+            }
         }
 
         @Override

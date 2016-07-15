@@ -99,7 +99,7 @@ public class NetworkImageTest extends BaseTest {
                 holder.progressBar.setProgress(0);
                 holder.textView.setText("");
 
-                // ImageLoader.getInstance().cancel(holder.imageView);
+                ImageLoader.getInstance().cancel(holder.imageView);
                 ImageLoader.getInstance().displayImage(uri, holder.imageView,
                         new DisplayOption.Builder()
                                 .oneAfterOne()
