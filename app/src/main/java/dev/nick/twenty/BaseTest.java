@@ -16,6 +16,8 @@
 
 package dev.nick.twenty;
 
+import android.content.pm.PackageManager;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,10 +25,28 @@ import android.view.MenuItem;
 import dev.nick.imageloader.ImageLoader;
 
 public class BaseTest extends AppCompatActivity {
+
+    boolean mPermRequired;
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menus, menu);
         return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        mPermRequired = true;
+        for (int i : grantResults) {
+            if (i != PackageManager.PERMISSION_GRANTED) {
+                mPermRequired = false;
+            }
+        }
+    }
+
+    public boolean isPermRequired() {
+        return mPermRequired;
     }
 
     @Override

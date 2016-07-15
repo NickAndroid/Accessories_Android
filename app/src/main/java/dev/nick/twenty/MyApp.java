@@ -21,7 +21,6 @@ import android.util.Log;
 
 import com.nick.scalpel.ScalpelApplication;
 
-import dev.nick.eventbus.EventBus;
 import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.cache.CachePolicy;
@@ -30,7 +29,6 @@ public class MyApp extends ScalpelApplication {
     @Override
     public void onCreate() {
         super.onCreate();
-        EventBus.create(this);
         ImageLoader.init(getApplicationContext(), new LoaderConfig.Builder()
                 .cachePolicy(new CachePolicy.Builder()
                         .enableMemCache()

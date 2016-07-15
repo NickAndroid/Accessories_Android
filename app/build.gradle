@@ -23,7 +23,6 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:24.0.0'
-    compile 'com.nick.scalpel:scalpel:1.0.5'
-    compile 'dev.nick:eventbus:0.2'
+    compile 'com.nick.scalpel:scalpel:1.0.6'
     compile project(':imageloader')
 }
