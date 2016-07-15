@@ -14,32 +14,19 @@
  * limitations under the License.
  */
 
-package dev.nick.imageloader;
+package dev.nick.imageloader.loader.task;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import dev.nick.imageloader.annotation.CallingOnUIThread;
 import dev.nick.imageloader.loader.ProgressListener;
-import dev.nick.imageloader.loader.result.Cause;
-import dev.nick.imageloader.loader.result.ErrorListener;
-import dev.nick.imageloader.loader.result.FileResult;
+import dev.nick.imageloader.loader.result.BitmapResult;
 
-public interface LoadingListener extends ProgressListener<FileResult>, ErrorListener {
+public interface DisplayTask extends Task<DisplayTaskRecord, Void> {
+    @NonNull
+    String getUrl();
 
-    @Override
-    @CallingOnUIThread
-    void onError(@NonNull Cause cause);
+    @Nullable ProgressListener<BitmapResult> getProgressListener();
 
-    @Override
-    @CallingOnUIThread
-    void onComplete(@Nullable FileResult result);
-
-    @Override
-    @CallingOnUIThread
-    void onProgressUpdate(float progress);
-
-    @Override
-    @CallingOnUIThread
-    void onStartLoading();
+    void setProgressListener(@Nullable ProgressListener<BitmapResult> listener);
 }

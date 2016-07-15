@@ -55,10 +55,10 @@ import dev.nick.imageloader.loader.ViewSpec;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
+import dev.nick.imageloader.loader.task.DisplayTask;
+import dev.nick.imageloader.loader.task.DisplayTaskRecord;
 import dev.nick.imageloader.loader.task.FutureImageTask;
-import dev.nick.imageloader.loader.task.ImageTask;
-import dev.nick.imageloader.loader.task.ImageTaskImpl;
-import dev.nick.imageloader.loader.task.ImageTaskRecord;
+import dev.nick.imageloader.loader.task.ImageDisplayTask;
 import dev.nick.imageloader.loader.task.TaskManager;
 import dev.nick.imageloader.loader.task.TaskManagerImpl;
 import dev.nick.imageloader.loader.task.TaskMonitor;
@@ -96,7 +96,7 @@ public class ImageLoader implements TaskMonitor,
 
     private long mClearTaskRequestedTimeMills;
 
-    private final Map<Integer, ImageTaskRecord> mTaskLockMap;
+    private final Map<Integer, DisplayTaskRecord> mTaskLockMap;
     private final List<FutureImageTask> mFutures;
 
     private ExecutorService mLoadingService;
@@ -199,7 +199,7 @@ public class ImageLoader implements TaskMonitor,
      * @param option {@link DisplayOption} is options using when display the image.
      */
     public void displayImage(@NonNull String url, @NonNull ImageView view,
-                             @Nullable DisplayOption option, @Nullable LoadingListener loadingListener) {
+                             @Nullable DisplayOption option, @Nullable DisplayListener loadingListener) {
         ImageViewDelegate viewDelegate = new ImageViewDelegate(view);
         displayImage(url, viewDelegate, option, loadingListener);
     }
@@ -238,7 +238,9 @@ public class ImageLoader implements TaskMonitor,
     public void displayImage(@NonNull String url,
                              @NonNull ImageSettable settable,
                              @Nullable DisplayOption option,
-                             @Nullable LoadingListener listener) {
+                             @Nullable DisplayListener listener) {
+
+        DisplayTaskRecord record = createTaskRecord(settable);
 
         option = createOptionIfNull(option);
 
@@ -253,7 +255,7 @@ public class ImageLoader implements TaskMonitor,
         if (mCacheManager.isMemCacheEnabled()) {
             Bitmap cached;
             if ((cached = mCacheManager.getMemCache(url, info)) != null) {
-                mLogger.verbose("MemCache, Using cached mem bitmap:" + cached);
+                mLogger.verbose("MemCache, Load cached mem bitmap:" + cached);
                 applyImageSettings(cached, option.getProcessor(), settable, option.getAnimator());
                 return;
             }
@@ -264,12 +266,20 @@ public class ImageLoader implements TaskMonitor,
         if (mCacheManager.isDiskCacheEnabled()) {
             String cachePath;
             if ((cachePath = mCacheManager.getDiskCachePath(url, info)) != null) {
-                mLogger.verbose("DiskCache, Using cached disk cache:" + cachePath);
+                mLogger.verbose("DiskCache, Load cached disk cache:" + cachePath);
                 loadingUrl = ImageSource.FILE.getPrefix() + cachePath;
             }
         }
 
-        startLoading(loadingUrl, settable, option, listener);
+        loadAndDisplay(loadingUrl, settable, option, listener, record);
+    }
+
+    private DisplayTaskRecord createTaskRecord(ImageSettable settable) {
+        int settableId = mSettableIdCreator.createSettableId(settable);
+        int taskId = mTaskManager.nextTaskId();
+        DisplayTaskRecord displayTaskRecord = new DisplayTaskRecord(settableId, taskId);
+        onTaskCreated(displayTaskRecord);
+        return displayTaskRecord;
     }
 
     private void beforeLoading(ImageSettable settable, DisplayOption option) {
@@ -277,10 +287,11 @@ public class ImageLoader implements TaskMonitor,
         applyImageSettings(showWhenLoading, settable, null);
     }
 
-    private void startLoading(String url,
-                              ImageSettable settable,
-                              DisplayOption option,
-                              LoadingListener listener) {
+    private void loadAndDisplay(String url,
+                                ImageSettable settable,
+                                DisplayOption option,
+                                DisplayListener listener,
+                                DisplayTaskRecord record) {
 
         mLogger.funcEnter();
 
@@ -288,18 +299,12 @@ public class ImageLoader implements TaskMonitor,
 
         ViewSpec viewSpec = new ViewSpec(settable.getWidth(), settable.getHeight());
 
-        int settableId = mSettableIdCreator.createSettableId(settable);
-        int taskId = mTaskManager.nextTaskId();
-
-
-        ImageTaskRecord imageTaskRecord = new ImageTaskRecord(settableId, taskId);
-
         ProgressListenerDelegate progressListenerDelegate = new ProgressListenerDelegate(
                 listener,
                 viewSpec,
                 option,
                 settable,
-                imageTaskRecord,
+                record,
                 url);
 
         ErrorListenerDelegate errorListenerDelegate = null;
@@ -308,7 +313,7 @@ public class ImageLoader implements TaskMonitor,
             errorListenerDelegate = new ErrorListenerDelegate(listener);
         }
 
-        ImageTaskImpl imageTask = new ImageTaskImpl(
+        ImageDisplayTask imageTask = new ImageDisplayTask(
                 mContext,
                 mConfig,
                 this,
@@ -317,9 +322,7 @@ public class ImageLoader implements TaskMonitor,
                 imageQuality,
                 progressListenerDelegate,
                 errorListenerDelegate,
-                imageTaskRecord);
-
-        onTaskCreated(imageTaskRecord);
+                record);
 
         FutureImageTask future = new FutureImageTask(imageTask, this, option.isViewMaybeReused());
 
@@ -339,12 +342,12 @@ public class ImageLoader implements TaskMonitor,
                 .build();
     }
 
-    private void onTaskCreated(ImageTaskRecord record) {
+    private void onTaskCreated(DisplayTaskRecord record) {
         mLogger.verbose("Created task:" + record);
         int taskId = record.getTaskId();
         int settableId = record.getSettableId();
         synchronized (mTaskLockMap) {
-            ImageTaskRecord exists = mTaskLockMap.get(settableId);
+            DisplayTaskRecord exists = mTaskLockMap.get(settableId);
             if (exists != null) {
                 exists.setTaskId(taskId);
             } else {
@@ -369,7 +372,7 @@ public class ImageLoader implements TaskMonitor,
         }
     }
 
-    private boolean isTaskDirty(ImageTaskRecord task) {
+    private boolean isTaskDirty(DisplayTaskRecord task) {
 
         boolean outDated = task.upTime() <= mClearTaskRequestedTimeMills;
 
@@ -378,7 +381,7 @@ public class ImageLoader implements TaskMonitor,
         }
 
         synchronized (mTaskLockMap) {
-            ImageTaskRecord lock = mTaskLockMap.get(task.getSettableId());
+            DisplayTaskRecord lock = mTaskLockMap.get(task.getSettableId());
             if (lock != null) {
                 int taskId = lock.getTaskId();
                 // We have new task to load for this settle.
@@ -503,6 +506,10 @@ public class ImageLoader implements TaskMonitor,
         if (!onFutureSubmit(future)) return false;
         mLoadingService.submit(future);
         return true;
+    }
+
+    public void loadImage(@NonNull String url, @NonNull LoadingListener loadingListener) {
+
     }
 
     public void pause() {
@@ -641,7 +648,7 @@ public class ImageLoader implements TaskMonitor,
     }
 
     @Override
-    public boolean shouldRun(@NonNull ImageTask task) {
+    public boolean shouldRun(@NonNull DisplayTask task) {
         if (!checkInRunningState()) return false;
         // Check if this task is dirty.
         boolean isTaskDirty = isTaskDirty(task.getTaskRecord());
@@ -705,7 +712,7 @@ public class ImageLoader implements TaskMonitor,
         private DisplayOption option;
         private ViewSpec viewSpec;
 
-        private ImageTaskRecord taskRecord;
+        private DisplayTaskRecord taskRecord;
 
         private Boolean canceled = Boolean.FALSE;
 
@@ -713,7 +720,7 @@ public class ImageLoader implements TaskMonitor,
                                         ViewSpec viewSpec,
                                         DisplayOption option,
                                         @NonNull ImageSettable settable,
-                                        ImageTaskRecord taskRecord,
+                                        DisplayTaskRecord taskRecord,
                                         String url) {
             this.viewSpec = viewSpec;
             this.listener = listener;

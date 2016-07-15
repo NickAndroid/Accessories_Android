@@ -16,17 +16,23 @@
 
 package dev.nick.imageloader.loader.task;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+public class DisplayTaskRecord extends TaskRecord {
 
-import dev.nick.imageloader.loader.ProgressListener;
-import dev.nick.imageloader.loader.result.BitmapResult;
+    private int settableId;
 
-public interface ImageTask extends Task<ImageTaskRecord, Void> {
-    @NonNull
-    String getUrl();
+    public DisplayTaskRecord(int settableId, int taskId) {
+        super(taskId);
+        this.settableId = settableId;
+    }
 
-    @Nullable ProgressListener<BitmapResult> getProgressListener();
+    public int getSettableId() {
+        return settableId;
+    }
 
-    void setProgressListener(@Nullable ProgressListener<BitmapResult> listener);
+    @Override
+    public String toString() {
+        return "DisplayTaskRecord{" +
+                "settableId=" + settableId +
+                "} " + super.toString();
+    }
 }

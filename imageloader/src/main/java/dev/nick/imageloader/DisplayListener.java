@@ -21,11 +21,11 @@ import android.support.annotation.Nullable;
 
 import dev.nick.imageloader.annotation.CallingOnUIThread;
 import dev.nick.imageloader.loader.ProgressListener;
+import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
-import dev.nick.imageloader.loader.result.FileResult;
 
-public interface LoadingListener extends ProgressListener<FileResult>, ErrorListener {
+public interface DisplayListener extends ProgressListener<BitmapResult>, ErrorListener {
 
     @Override
     @CallingOnUIThread
@@ -33,7 +33,7 @@ public interface LoadingListener extends ProgressListener<FileResult>, ErrorList
 
     @Override
     @CallingOnUIThread
-    void onComplete(@Nullable FileResult result);
+    void onComplete(@Nullable BitmapResult result);
 
     @Override
     @CallingOnUIThread

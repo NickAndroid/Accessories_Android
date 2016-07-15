@@ -38,7 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dev.nick.imageloader.ImageLoader;
-import dev.nick.imageloader.LoadingListener;
+import dev.nick.imageloader.DisplayListener;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.display.ImageQuality;
 import dev.nick.imageloader.display.animator.FadeInImageAnimator;
@@ -106,7 +106,7 @@ public class NetworkImageTest extends BaseTest {
                                 .imageQuality(ImageQuality.FIT_VIEW)
                                 .viewMaybeReused()
                                 .imageAnimator(new FadeInImageAnimator())
-                                .build(), new LoadingListener() {
+                                .build(), new DisplayListener() {
                             @Override
                             public void onError(@NonNull Cause cause) {
                                 LoggerManager.getLogger(getClass()).error(cause);

@@ -38,7 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dev.nick.imageloader.ImageLoader;
-import dev.nick.imageloader.LoadingListener;
+import dev.nick.imageloader.DisplayListener;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.display.ImageQuality;
 import dev.nick.imageloader.display.animator.FadeInImageAnimator;
@@ -47,7 +47,7 @@ import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
-public class FileImageTest extends BaseTest implements LoadingListener {
+public class FileImageTest extends BaseTest implements DisplayListener {
 
     @FindView(id = R.id.list)
     ListView listView;

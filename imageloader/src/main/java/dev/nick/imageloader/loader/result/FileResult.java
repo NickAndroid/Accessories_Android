@@ -14,25 +14,10 @@
  * limitations under the License.
  */
 
-package dev.nick.imageloader.loader.task;
+package dev.nick.imageloader.loader.result;
 
-public class ImageTaskRecord extends TaskRecord {
+import java.io.File;
 
-    private int settableId;
-
-    public ImageTaskRecord(int settableId, int taskId) {
-        super(taskId);
-        this.settableId = settableId;
-    }
-
-    public int getSettableId() {
-        return settableId;
-    }
-
-    @Override
-    public String toString() {
-        return "ImageTaskRecord{" +
-                "settableId=" + settableId +
-                "} " + super.toString();
-    }
+public class FileResult extends Result<File> {
+    // Nothing.
 }

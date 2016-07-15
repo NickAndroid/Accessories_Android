@@ -34,7 +34,7 @@ import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
 
-public class ImageTaskImpl implements ImageTask {
+public class ImageDisplayTask implements DisplayTask {
 
     private String mUrl;
 
@@ -48,19 +48,19 @@ public class ImageTaskImpl implements ImageTask {
 
     private TaskMonitor mTaskMonitor;
 
-    private ImageTaskRecord mTaskRecord;
+    private DisplayTaskRecord mTaskRecord;
 
     private Context mContext;
 
-    public ImageTaskImpl(Context context,
-                         LoaderConfig loaderConfig,
-                         TaskMonitor taskMonitor,
-                         String url,
-                         ViewSpec spec,
-                         ImageQuality quality,
-                         ProgressListener<BitmapResult> progressListener,
-                         ErrorListener errorListener,
-                         ImageTaskRecord taskRecord) {
+    public ImageDisplayTask(Context context,
+                            LoaderConfig loaderConfig,
+                            TaskMonitor taskMonitor,
+                            String url,
+                            ViewSpec spec,
+                            ImageQuality quality,
+                            ProgressListener<BitmapResult> progressListener,
+                            ErrorListener errorListener,
+                            DisplayTaskRecord taskRecord) {
         this.mContext = context;
         this.mLoaderConfig = loaderConfig;
         this.mTaskMonitor = taskMonitor;
@@ -94,7 +94,7 @@ public class ImageTaskImpl implements ImageTask {
     }
 
     @Override
-    public ImageTaskRecord getTaskRecord() {
+    public DisplayTaskRecord getTaskRecord() {
         return mTaskRecord;
     }
 
