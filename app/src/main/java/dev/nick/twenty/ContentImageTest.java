@@ -38,6 +38,7 @@ import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.display.ImageQuality;
 import dev.nick.imageloader.display.animator.FadeInImageAnimator;
+import dev.nick.imageloader.display.animator.ZoomInAnimator;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
 public class ContentImageTest extends BaseTest {
@@ -98,7 +99,7 @@ public class ContentImageTest extends BaseTest {
                                 .oneAfterOne()
                                 .imageQuality(ImageQuality.RAW)
                                 .viewMaybeReused()
-                                .imageAnimator(new FadeInImageAnimator())
+                                .imageAnimator(new ZoomInAnimator(getApplicationContext()))
                                 .build());
 
                 return convertView;

@@ -34,13 +34,16 @@ public class DisplayOption {
     private boolean applyImageOneByOne;
     private boolean viewMaybeReused;
 
+    private boolean animateOnlyNewLoaded;
+
     private DisplayOption(int defaultImgRes,
                           int loadingImgRes,
                           ImageQuality quality,
                           BitmapProcessor processor,
                           ImageAnimator animator,
                           boolean applyImageOneByOne,
-                          boolean viewMaybeReused) {
+                          boolean viewMaybeReused,
+                          boolean animateOnlyNewLoaded) {
         this.defaultImgRes = defaultImgRes;
         this.loadingImgRes = loadingImgRes;
         this.quality = quality;
@@ -48,6 +51,7 @@ public class DisplayOption {
         this.animator = animator;
         this.applyImageOneByOne = applyImageOneByOne;
         this.viewMaybeReused = viewMaybeReused;
+        this.animateOnlyNewLoaded = animateOnlyNewLoaded;
     }
 
     public int getDefaultImgRes() {
@@ -78,6 +82,10 @@ public class DisplayOption {
         return viewMaybeReused;
     }
 
+    public boolean isAnimateOnlyNewLoaded() {
+        return animateOnlyNewLoaded;
+    }
+
     public static class Builder {
 
         private int defaultImgRes;
@@ -90,6 +98,8 @@ public class DisplayOption {
 
         private boolean oneAfterOne;
         private boolean viewMaybeReused;
+
+        private boolean animateOnlyNewLoaded;
 
         /**
          * @param defaultImgRes Image res showing when load failure.
@@ -161,8 +171,26 @@ public class DisplayOption {
             return this;
         }
 
+        /**
+         * Indicate that only start an animation for new loaded images.
+         *
+         * @return Instance of this builder.
+         */
+        public Builder animateOnlyNewLoaded() {
+            this.animateOnlyNewLoaded = true;
+            return this;
+        }
+
         public DisplayOption build() {
-            return new DisplayOption(defaultImgRes, loadingImgRes, quality, processor, animator, oneAfterOne, viewMaybeReused);
+            return new DisplayOption(
+                    defaultImgRes,
+                    loadingImgRes,
+                    quality,
+                    processor,
+                    animator,
+                    oneAfterOne,
+                    viewMaybeReused,
+                    animateOnlyNewLoaded);
         }
     }
 }

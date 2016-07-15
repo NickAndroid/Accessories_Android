@@ -37,11 +37,11 @@ import com.nick.scalpel.annotation.request.RequirePermission;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.DisplayListener;
+import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.display.ImageQuality;
-import dev.nick.imageloader.display.animator.FadeInImageAnimator;
+import dev.nick.imageloader.display.animator.GrowFadeInBottom;
 import dev.nick.imageloader.loader.ImageSource;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
@@ -126,13 +126,9 @@ public class FileImageTest extends BaseTest implements DisplayListener {
                         new DisplayOption.Builder()
                                 .imageQuality(ImageQuality.FIT_VIEW)
                                 .viewMaybeReused()
+                                .animateOnlyNewLoaded()
                                 .oneAfterOne()
-                                .imageAnimator(new FadeInImageAnimator() {
-                                    @Override
-                                    public long getDuration() {
-                                        return 300;
-                                    }
-                                })
+                                .imageAnimator(new GrowFadeInBottom(getApplicationContext()))
                                 .build(), FileImageTest.this);
 
                 return convertView;

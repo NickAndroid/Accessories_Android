@@ -256,7 +256,11 @@ public class ImageLoader implements TaskMonitor,
             Bitmap cached;
             if ((cached = mCacheManager.getMemCache(url, info)) != null) {
                 mLogger.verbose("MemCache, Load cached mem bitmap:" + cached);
-                applyImageSettings(cached, option.getProcessor(), settable, option.getAnimator());
+                applyImageSettings(
+                        cached,
+                        option.getProcessor(),
+                        settable,
+                        option.isAnimateOnlyNewLoaded() ? null : option.getAnimator());
                 return;
             }
         }
