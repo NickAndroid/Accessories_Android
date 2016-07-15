@@ -16,12 +16,14 @@
 
 package dev.nick.imageloader.loader;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
@@ -29,11 +31,17 @@ import dev.nick.imageloader.loader.result.ErrorListener;
 public class ContentImageFetcher extends BaseImageFetcher {
 
     @NonNull
-    ImageFetcher fileImageFetcher;
+    ImageFetcher mFileImageFetcher;
 
     public ContentImageFetcher(PathSplitter<String> splitter, @NonNull final ImageFetcher fileImageFetcher) {
         super(splitter);
-        this.fileImageFetcher = fileImageFetcher;
+        this.mFileImageFetcher = fileImageFetcher;
+    }
+
+    @Override
+    public ImageFetcher prepare(Context context, LoaderConfig config) {
+        mFileImageFetcher.prepare(context, config);
+        return super.prepare(context, config);
     }
 
     @Override
@@ -75,7 +83,7 @@ public class ContentImageFetcher extends BaseImageFetcher {
 
             String filePath = cursor.getString(index);
 
-            fileImageFetcher.fetchFromUrl(ImageSource.FILE.prefix + filePath,
+            mFileImageFetcher.fetchFromUrl(ImageSource.FILE.prefix + filePath,
                     decodeSpec, progressListener, errorListener);
         } finally {
             cursor.close();

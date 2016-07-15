@@ -87,6 +87,7 @@ public class NetworkImageFetcher extends BaseImageFetcher {
     @Override
     public ImageFetcher prepare(Context context, LoaderConfig config) {
         super.prepare(context, config);
+        mFileImageFetcher.prepare(context, config);
         ensurePolicy();
         return this;
     }
