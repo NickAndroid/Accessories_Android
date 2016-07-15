@@ -716,6 +716,7 @@ public class ImageLoader implements TaskMonitor,
         private DisplayTaskRecord taskRecord;
 
         private Boolean canceled = Boolean.FALSE;
+        private Boolean isTaskDirty = null;
 
         public ProgressListenerDelegate(ProgressListener<BitmapResult> listener,
                                         ViewSpec viewSpec,
@@ -733,14 +734,14 @@ public class ImageLoader implements TaskMonitor,
 
         @Override
         public void onStartLoading() {
-            if (!canceled && !isTaskDirty(taskRecord)) {
+            if (!canceled && !checkTaskDirty()) {
                 callOnStart(listener);
             }
         }
 
         @Override
         public void onProgressUpdate(float progress) {
-            if (!canceled && !isTaskDirty(taskRecord)) {
+            if (!canceled && !checkTaskDirty()) {
                 callOnProgressUpdate(listener, progress);
             }
         }
@@ -748,7 +749,9 @@ public class ImageLoader implements TaskMonitor,
         @Override
         public void onCancel() {
             canceled = Boolean.TRUE;
-            callOnCancel(listener);
+            if (!checkTaskDirty()) {
+                callOnCancel(listener);
+            }
         }
 
         @Override
@@ -792,6 +795,13 @@ public class ImageLoader implements TaskMonitor,
                 mLogger.info("Won't apply image settings for task:" + taskRecord);
             }
             mCacheManager.cache(url, viewSpec, result.result);
+        }
+
+        synchronized boolean checkTaskDirty() {
+            if (isTaskDirty == null || !isTaskDirty) {
+                isTaskDirty = isTaskDirty(taskRecord);
+            }
+            return isTaskDirty;
         }
     }
 
