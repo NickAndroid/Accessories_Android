@@ -353,13 +353,14 @@ public class ImageLoader implements TaskMonitor,
         }
     }
 
-    private void onFutureSubmit(FutureImageTask futureImageTask) {
+    private boolean onFutureSubmit(FutureImageTask futureImageTask) {
         if (futureImageTask.shouldCancelOthersBeroreRun()) {
             cancel(futureImageTask.getImageTask().getTaskRecord().getSettableId());
         }
         synchronized (mFutures) {
             mFutures.add(futureImageTask);
         }
+        return true;
     }
 
     private void onFutureDone(FutureImageTask futureImageTask) {
@@ -499,7 +500,7 @@ public class ImageLoader implements TaskMonitor,
     @Override
     public boolean handle(FutureImageTask future) {
         freezeIfRequested();
-        onFutureSubmit(future);
+        if (!onFutureSubmit(future)) return false;
         mLoadingService.submit(future);
         return true;
     }
@@ -551,18 +552,8 @@ public class ImageLoader implements TaskMonitor,
     }
 
     public void cancel(@NonNull String url) {
-        List<FutureImageTask> pendingCancels = null;
-        synchronized (mFutures) {
-            for (FutureImageTask futureImageTask : mFutures) {
-                if (!futureImageTask.isCancelled()
-                        && !futureImageTask.isDone()
-                        && url.equals(futureImageTask.getImageTask().getUrl())) {
-                    if (pendingCancels == null) pendingCancels = new ArrayList<>();
-                    pendingCancels.add(futureImageTask);
-                }
-            }
-        }
-        if (pendingCancels != null) {
+        List<FutureImageTask> pendingCancels = findTasks(url);
+        if (pendingCancels.size() > 0) {
             for (FutureImageTask toBeCanceled : pendingCancels) {
                 toBeCanceled.cancel(true);
                 callOnCancel(toBeCanceled.getImageTask().getProgressListener());
@@ -574,27 +565,7 @@ public class ImageLoader implements TaskMonitor,
     }
 
     public void cancel(@NonNull ImageView view) {
-        List<FutureImageTask> pendingCancels = null;
-        synchronized (mFutures) {
-            for (FutureImageTask futureImageTask : mFutures) {
-                if (!futureImageTask.isCancelled()
-                        && !futureImageTask.isDone()
-                        && mSettableIdCreator.createSettableId(new ImageViewDelegate(view))
-                        == futureImageTask.getImageTask().getTaskRecord().getSettableId()) {
-                    if (pendingCancels == null) pendingCancels = new ArrayList<>();
-                    pendingCancels.add(futureImageTask);
-                }
-            }
-        }
-        if (pendingCancels != null) {
-            for (FutureImageTask toBeCanceled : pendingCancels) {
-                toBeCanceled.cancel(true);
-                callOnCancel(toBeCanceled.getImageTask().getProgressListener());
-                mLogger.info("Cancel task for view:" + view);
-            }
-            pendingCancels.clear();
-            pendingCancels = null;
-        }
+        cancel(new ImageViewDelegate(view));
     }
 
     public void cancel(@NonNull ImageSettable settable) {
@@ -602,18 +573,8 @@ public class ImageLoader implements TaskMonitor,
     }
 
     public void cancel(int settableId) {
-        List<FutureImageTask> pendingCancels = null;
-        synchronized (mFutures) {
-            for (FutureImageTask futureImageTask : mFutures) {
-                if (!futureImageTask.isCancelled()
-                        && !futureImageTask.isDone()
-                        && settableId == futureImageTask.getImageTask().getTaskRecord().getSettableId()) {
-                    if (pendingCancels == null) pendingCancels = new ArrayList<>();
-                    pendingCancels.add(futureImageTask);
-                }
-            }
-        }
-        if (pendingCancels != null) {
+        List<FutureImageTask> pendingCancels = findTasks(settableId);
+        if (pendingCancels.size() > 0) {
             for (FutureImageTask toBeCanceled : pendingCancels) {
                 toBeCanceled.cancel(true);
                 callOnCancel(toBeCanceled.getImageTask().getProgressListener());
@@ -622,6 +583,42 @@ public class ImageLoader implements TaskMonitor,
             pendingCancels.clear();
             pendingCancels = null;
         }
+    }
+
+    private List<FutureImageTask> findTasks(@NonNull String url) {
+        List<FutureImageTask> pendingCancels = new ArrayList<>();
+        synchronized (mFutures) {
+            for (FutureImageTask futureImageTask : mFutures) {
+                if (!futureImageTask.isCancelled()
+                        && !futureImageTask.isDone()
+                        && url.equals(futureImageTask.getImageTask().getUrl())) {
+                    pendingCancels.add(futureImageTask);
+                }
+            }
+        }
+        return pendingCancels;
+    }
+
+    private List<FutureImageTask> findTasks(@NonNull ImageView view) {
+        return findTasks(new ImageViewDelegate(view));
+    }
+
+    private List<FutureImageTask> findTasks(@NonNull ImageSettable settable) {
+        return findTasks(mSettableIdCreator.createSettableId(settable));
+    }
+
+    private List<FutureImageTask> findTasks(int settableId) {
+        List<FutureImageTask> pendingCancels = new ArrayList<>();
+        synchronized (mFutures) {
+            for (FutureImageTask futureImageTask : mFutures) {
+                if (!futureImageTask.isCancelled()
+                        && !futureImageTask.isDone()
+                        && settableId == futureImageTask.getImageTask().getTaskRecord().getSettableId()) {
+                    pendingCancels.add(futureImageTask);
+                }
+            }
+        }
+        return pendingCancels;
     }
 
     @WorkerThread

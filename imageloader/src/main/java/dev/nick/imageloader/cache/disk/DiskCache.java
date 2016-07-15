@@ -36,6 +36,7 @@ import java.util.List;
 import dev.nick.imageloader.cache.Cache;
 import dev.nick.imageloader.cache.CachePolicy;
 import dev.nick.imageloader.cache.FileNameGenerator;
+import dev.nick.logger.Logger;
 import dev.nick.logger.LoggerManager;
 
 public class DiskCache implements Cache<String, Bitmap> {
@@ -52,6 +53,8 @@ public class DiskCache implements Cache<String, Bitmap> {
 
     private FileNameGenerator mFileNameGenerator;
 
+    private Logger mLogger;
+
     public DiskCache(CachePolicy cachePolicy, Context context) {
         mPreferToExternal = cachePolicy.getPreferredLocation() == CachePolicy.Location.EXTERNAL;
         mInternalCacheDir = context.getCacheDir().getPath() + File.separator + cachePolicy.getCacheDirName();
@@ -64,11 +67,13 @@ public class DiskCache implements Cache<String, Bitmap> {
         mFileNameGenerator = cachePolicy.getFileNameGenerator();
         mFormat = cachePolicy.getCompressFormat();
         mQuality = cachePolicy.getQuality();
+        mLogger = LoggerManager.getLogger(getClass());
     }
 
     @Override
     @WorkerThread
     public void cache(@NonNull String key, Bitmap value) {
+        mLogger.verbose(String.format("Caching for key %s", key));
         if (mPreferToExternal && mExternalCacheDir != null
                 && Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             if (!new FileWriter(mExternalCacheDir, value, key).write())
@@ -102,7 +107,7 @@ public class DiskCache implements Cache<String, Bitmap> {
         File in = new File(getFilePathByKey(key));
 
         if (!in.exists()) {
-            LoggerManager.getLogger(getClass()).info("No disk file:" + in.getAbsolutePath());
+            mLogger.info("No disk file:" + in.getAbsolutePath());
             return null;
         }
         return in.getPath();
@@ -152,7 +157,7 @@ public class DiskCache implements Cache<String, Bitmap> {
             File in = new File(dir + File.separator + fileName);
 
             if (!in.exists()) {
-                LoggerManager.getLogger(getClass()).debug("Cache file do not exists:" + in.getAbsolutePath());
+                mLogger.debug("Cache file do not exists:" + in.getAbsolutePath());
                 return null;
             }
 
@@ -161,14 +166,14 @@ public class DiskCache implements Cache<String, Bitmap> {
             try {
                 FileInputStream fis = atomicFile.openRead();
                 Bitmap out = BitmapFactory.decodeStream(fis);
-                Log.d("DiskCache", "Success read file cache:" + in.getAbsolutePath());
+                mLogger.info("Success read file cache:" + in.getAbsolutePath());
                 fis.close();
                 return out;
             } catch (FileNotFoundException e) {
-                LoggerManager.getLogger(getClass()).debug("Cache file do not exists:" + Log.getStackTraceString(e));
+                mLogger.debug("Cache file do not exists:" + Log.getStackTraceString(e));
                 return null;
             } catch (IOException e) {
-                LoggerManager.getLogger(getClass()).debug("Failed to close fis:" + Log.getStackTraceString(e));
+                mLogger.debug("Failed to close fis:" + Log.getStackTraceString(e));
                 return null;
             }
         }
@@ -208,7 +213,7 @@ public class DiskCache implements Cache<String, Bitmap> {
         public boolean write() {
 
             if (hasOp(this)) {
-                Log.d("", "Ignore dup task for:" + fileName);
+                mLogger.info("Ignore dup task for:" + fileName);
                 return true;
             }
 
@@ -217,28 +222,28 @@ public class DiskCache implements Cache<String, Bitmap> {
             File out = new File(dir + File.separator + fileName);
 
             if (out.exists()) {
-                LoggerManager.getLogger(getClass()).debug("Skip cache exists file:" + out.getAbsolutePath());
+                mLogger.debug("Skip cache exists file:" + out.getAbsolutePath());
                 removeOp(this);
                 return true;
             }
 
             if (!out.getParentFile().exists() && !out.getParentFile().mkdirs()) {
                 // Something went wrong, nothing to do.
-                LoggerManager.getLogger(getClass()).debug("Failed to create dirs:" + out.getParentFile().getAbsolutePath());
+                mLogger.debug("Failed to create dirs:" + out.getParentFile().getAbsolutePath());
                 removeOp(this);
                 return false;
             }
             try {
                 if (!out.createNewFile()) {
                     // Something went wrong, nothing to do.
-                    LoggerManager.getLogger(getClass()).debug("Failed to create file:" + out.getAbsolutePath());
+                    mLogger.debug("Failed to create file:" + out.getAbsolutePath());
                     removeOp(this);
                     return false;
                 }
                 AtomicFileCompat atomicFile = new AtomicFileCompat(out);
                 FileOutputStream fos = atomicFile.startWrite();
                 if (!in.compress(DiskCache.this.mFormat, DiskCache.this.mQuality, fos)) {
-                    LoggerManager.getLogger(getClass()).debug("Failed to compress bitmap to file:" + out.getAbsolutePath());
+                    mLogger.debug("Failed to compress bitmap to file:" + out.getAbsolutePath());
                     removeOp(this);
                     atomicFile.failWrite(fos);
                     return false;
@@ -246,11 +251,11 @@ public class DiskCache implements Cache<String, Bitmap> {
                 atomicFile.finishWrite(fos);
             } catch (IOException e) {
                 // Something went wrong, nothing to do.
-                LoggerManager.getLogger(getClass()).debug("IOException when create file:" + Log.getStackTraceString(e));
+                mLogger.debug("IOException when create file:" + Log.getStackTraceString(e));
                 removeOp(this);
                 return false;
             }
-            Log.d("DiskCache", "Success write bitmap to:" + out.getAbsolutePath());
+            mLogger.info("Success write bitmap to:" + out.getAbsolutePath());
             removeOp(this);
             return true;
         }

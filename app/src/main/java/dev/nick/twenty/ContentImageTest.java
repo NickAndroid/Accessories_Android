@@ -118,10 +118,4 @@ public class ContentImageTest extends BaseTest {
             Scalpel.getInstance().wire(convert, this);
         }
     }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        ImageLoader.getInstance().clearAllCache();
-    }
 }

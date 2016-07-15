@@ -42,7 +42,7 @@ public class FileImageFetcher extends BaseImageFetcher {
 
         super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);
 
-        String path = splitter.getRealPath(url);
+        String path = mSplitter.getRealPath(url);
         File file = new File(path);
         if (!file.exists()) {
             callOnError(errorListener, new Cause(new FileNotFoundException(String.format("File %s not found.", url))));

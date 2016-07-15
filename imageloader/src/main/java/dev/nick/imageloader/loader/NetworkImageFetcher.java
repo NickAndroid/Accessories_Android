@@ -26,6 +26,8 @@ import java.util.UUID;
 
 import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.cache.CachePolicy;
+import dev.nick.imageloader.cache.FileNameGenerator;
+import dev.nick.imageloader.cache.KeyGenerator;
 import dev.nick.imageloader.loader.network.HttpImageDownloader;
 import dev.nick.imageloader.loader.network.ImageDownloader;
 import dev.nick.imageloader.loader.network.NetworkUtils;
@@ -36,9 +38,21 @@ import dev.nick.logger.LoggerManager;
 
 public class NetworkImageFetcher extends BaseImageFetcher {
 
+    private static final String DOWNLOAD_DIR_NAME = "download";
+
     private ImageFetcher mFileImageFetcher;
 
-    private String mTmpDir;
+    private String mDownloadDir;
+
+    private FileNameGenerator mFileNameGenerator;
+    private KeyGenerator mKeyGenerator = new KeyGenerator() {
+        @NonNull
+        @Override
+        public String fromUrl(@NonNull String url, ViewSpec info) {
+            // Careless the spec info.
+            return String.valueOf(url.hashCode());
+        }
+    };
 
     public NetworkImageFetcher(PathSplitter<String> splitter, ImageFetcher fileImageFetcher) {
         super(splitter);
@@ -46,20 +60,28 @@ public class NetworkImageFetcher extends BaseImageFetcher {
     }
 
     private void ensurePolicy() {
-        CachePolicy policy = loaderConfig.getCachePolicy();
+        CachePolicy policy = mLoaderConfig.getCachePolicy();
         boolean preferredExternal = policy.getPreferredLocation() == CachePolicy.Location.EXTERNAL;
-        mTmpDir = context.getCacheDir().getPath();
+        mDownloadDir = mContext.getCacheDir().getParent() + File.separator + DOWNLOAD_DIR_NAME;
         if (preferredExternal && Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            File externalCache = context.getExternalCacheDir();
+            File externalCache = mContext.getExternalCacheDir();
             if (externalCache != null) {
-                mTmpDir = externalCache.getPath();
+                mDownloadDir = externalCache.getPath() + File.separator + DOWNLOAD_DIR_NAME;
             }
         }
-        LoggerManager.getLogger(getClass()).verbose("Using tmp fir:" + mTmpDir);
+        mFileNameGenerator = policy.getFileNameGenerator();
+        mLogger.verbose("Using download dir:" + mDownloadDir);
+        if (!new File(mDownloadDir).exists() && !new File(mDownloadDir).mkdirs()) {
+            throw new IllegalStateException("Can not create folder for download.");
+        }
     }
 
     private String buildTmpFilePath() {
-        return mTmpDir + File.separator + UUID.randomUUID();
+        return mDownloadDir + File.separator + UUID.randomUUID();
+    }
+
+    private String buildDownloadFilePath(String url) {
+        return mDownloadDir + File.separator + mFileNameGenerator.fromKey(mKeyGenerator.fromUrl(url, null));
     }
 
     @Override
@@ -78,8 +100,8 @@ public class NetworkImageFetcher extends BaseImageFetcher {
 
         super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);
 
-        boolean wifiOnly = loaderConfig.getNetworkPolicy().isOnlyOnWifi();
-        boolean isOnLine = NetworkUtils.isOnline(context, wifiOnly);
+        boolean wifiOnly = mLoaderConfig.getNetworkPolicy().isOnlyOnWifi();
+        boolean isOnLine = NetworkUtils.isOnline(mContext, wifiOnly);
 
         // No connection.
         if (!isOnLine) {
@@ -91,18 +113,40 @@ public class NetworkImageFetcher extends BaseImageFetcher {
 
         String tmpPath = buildTmpFilePath();
 
-        LoggerManager.getLogger(getClass()).verbose("Using tmp path for image download:" + tmpPath);
+        mLogger.verbose("Using tmp path for image download:" + tmpPath);
 
         ImageDownloader<Boolean> downloader = new HttpImageDownloader(tmpPath);
+
+        String downloadPath = buildDownloadFilePath(url);
+        File downloadFile = new File(downloadPath);
+
+        boolean exists = downloadFile.exists();
+
+        if (exists) {
+            try {
+                mLogger.info("Using exist file instead of download.");
+                mFileImageFetcher.fetchFromUrl(ImageSource.FILE.prefix + downloadPath,
+                        decodeSpec, progressListener, errorListener);
+                return;
+            } catch (Exception e) {
+                mLogger.warn("Error when fetch exists file:" + downloadPath);
+                //noinspection ResultOfMethodCallIgnored
+                downloadFile.delete();
+            }
+        }
 
         boolean ok = downloader.download(url, progressListener, errorListener);
 
         if (ok) {
             mFileImageFetcher.fetchFromUrl(ImageSource.FILE.prefix + tmpPath, decodeSpec, progressListener, errorListener);
         }
+        // Rename the file as download.
+        if (ok && !new File(tmpPath).renameTo(downloadFile)) {
+            mLogger.warn(String.format("Failed to move the tmp file from %s to %s", tmpPath, downloadPath));
+        }
         // Delete the tmp file.
-        if (ok && !new File(tmpPath).delete()) {
-            LoggerManager.getLogger(getClass()).warn("Failed to delete the tmp file:" + tmpPath);
+        if (!ok && !new File(tmpPath).delete()) {
+            mLogger.verbose("Failed to delete the tmp file:" + tmpPath);
         }
     }
 }

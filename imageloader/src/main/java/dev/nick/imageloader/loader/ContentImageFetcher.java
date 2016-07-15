@@ -49,7 +49,7 @@ public class ContentImageFetcher extends BaseImageFetcher {
 
         String[] pro = {MediaStore.Images.Media.DATA};
 
-        Cursor cursor = context.getContentResolver().query(uri, pro, null, null, null);
+        Cursor cursor = mContext.getContentResolver().query(uri, pro, null, null, null);
 
         if (cursor == null) {
             callOnError(errorListener, new Cause(new Exception(String.format("Cursor for %s is null.", url))));

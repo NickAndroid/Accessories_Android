@@ -96,7 +96,10 @@ public class NetworkImageTest extends BaseTest {
 
                 String uri = tracks.get(position).getUrl();
 
-               // ImageLoader.getInstance().cancel(holder.imageView);
+                holder.progressBar.setProgress(0);
+                holder.textView.setText("");
+
+                // ImageLoader.getInstance().cancel(holder.imageView);
                 ImageLoader.getInstance().displayImage(uri, holder.imageView,
                         new DisplayOption.Builder()
                                 .oneAfterOne()
@@ -113,6 +116,7 @@ public class NetworkImageTest extends BaseTest {
                             @Override
                             public void onComplete(@Nullable BitmapResult result) {
                                 if (result != null) {
+                                    holder.progressBar.setProgress((int) (1 * 100));
                                     LoggerManager.getLogger(getClass()).debug("onComplete:" + result.result);
                                     holder.textView.setText("Completed");
                                 }
@@ -134,6 +138,7 @@ public class NetworkImageTest extends BaseTest {
                             @Override
                             public void onStartLoading() {
                                 holder.textView.setText("Start");
+                                holder.progressBar.setProgress(0);
                             }
                         });
 
@@ -198,11 +203,5 @@ public class NetworkImageTest extends BaseTest {
         public ViewHolder(View convert) {
             Scalpel.getInstance().wire(convert, this);
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        ImageLoader.getInstance().clearAllCache();
     }
 }

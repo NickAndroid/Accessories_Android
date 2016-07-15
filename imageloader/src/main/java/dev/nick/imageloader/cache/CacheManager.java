@@ -60,8 +60,8 @@ public class CacheManager {
     }
 
     public void cache(@NonNull String url, ViewSpec info, Bitmap value) {
-        LoggerManager.getLogger(getClass()).verbose(String.format("Caching %s for %s", value, url));
         String key = mKeyGenerator.fromUrl(url, info);
+        LoggerManager.getLogger(getClass()).verbose(String.format("Caching %s by key %s", url, key));
         cacheByKey(key, value);
     }
 

@@ -179,10 +179,4 @@ public class FileImageTest extends BaseTest implements LoadingListener {
 
         return tracks;
     }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        ImageLoader.getInstance().clearAllCache();
-    }
 }

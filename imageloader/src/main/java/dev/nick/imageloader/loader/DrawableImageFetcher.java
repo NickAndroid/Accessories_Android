@@ -41,11 +41,11 @@ public class DrawableImageFetcher extends BaseImageFetcher {
 
         super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);
 
-        Resources resources = this.context.getResources();
+        Resources resources = this.mContext.getResources();
 
-        int resId = resources.getIdentifier(splitter.getRealPath(url),
+        int resId = resources.getIdentifier(mSplitter.getRealPath(url),
                 "drawable",
-                this.context.getPackageName());
+                this.mContext.getPackageName());
 
         if (resId <= 0) {
             callOnError(errorListener, new Cause(new Resources.NotFoundException(String.format("Res of id-%s not found.", resId))));

@@ -46,9 +46,9 @@ public class AssetsImageFetcher extends BaseImageFetcher {
 
         super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);
 
-        String path = splitter.getRealPath(url);
+        String path = mSplitter.getRealPath(url);
 
-        if (mAssets == null) mAssets = context.getAssets();
+        if (mAssets == null) mAssets = mContext.getAssets();
 
         InputStream in;
         try {

@@ -22,10 +22,13 @@ import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
+import dev.nick.logger.Logger;
 import dev.nick.logger.LoggerManager;
 
 class BaseImageFetcher implements ImageFetcher {
@@ -35,14 +38,19 @@ class BaseImageFetcher implements ImageFetcher {
     /* Maximum pixels size for created bitmap. */
     static final int MAX_NUM_PIXELS_THUMBNAIL = 512 * 512;
 
-    protected PathSplitter<String> splitter;
+    protected PathSplitter<String> mSplitter;
 
-    protected Context context;
+    protected Context mContext;
 
-    protected LoaderConfig loaderConfig;
+    protected LoaderConfig mLoaderConfig;
+
+    protected Logger mLogger;
+
+    private AtomicBoolean mPrepared;
 
     public BaseImageFetcher(PathSplitter<String> splitter) {
-        this.splitter = splitter;
+        this.mSplitter = splitter;
+        this.mPrepared = new AtomicBoolean(Boolean.FALSE);
     }
 
     @Override
@@ -51,13 +59,17 @@ class BaseImageFetcher implements ImageFetcher {
                              @Nullable ProgressListener<BitmapResult> progressListener,
                              @Nullable ErrorListener errorListener)
             throws Exception {
-        LoggerManager.getLogger(getClass()).funcEnter();
+        if (!mPrepared.get()) throw new IllegalStateException("Fetcher not prepared.");
+        mLogger.funcEnter();
     }
 
     @Override
     public ImageFetcher prepare(Context context, LoaderConfig config) {
-        this.context = context;
-        this.loaderConfig = config;
+        if (mPrepared.compareAndSet(false, true)) {
+            this.mContext = context;
+            this.mLoaderConfig = config;
+            this.mLogger = LoggerManager.getLogger(getClass());
+        }
         return this;
     }
 

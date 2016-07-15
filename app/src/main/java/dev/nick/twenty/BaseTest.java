@@ -31,11 +31,16 @@ public class BaseTest extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (ImageLoader.getInstance().isPaused()) {
-            ImageLoader.getInstance().resume();
-        } else {
-            ImageLoader.getInstance().pause();
-            ImageLoader.getInstance().clearTasks();
+        switch (item.getItemId()) {
+            case R.id.clear:
+                ImageLoader.getInstance().clearAllCache();
+                break;
+            case R.id.clear_disc:
+                ImageLoader.getInstance().clearDiskCache();
+                break;
+            case R.id.clear_mem:
+                ImageLoader.getInstance().clearMemCache();
+                break;
         }
         return true;
     }

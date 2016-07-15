@@ -19,6 +19,7 @@ package dev.nick.imageloader.loader.task;
 import android.content.Context;
 import android.os.Process;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.io.InterruptedIOException;
 
@@ -112,5 +113,10 @@ public class ImageTaskImpl implements ImageTask {
     @Override
     public ProgressListener<BitmapResult> getProgressListener() {
         return mProgressListener;
+    }
+
+    @Override
+    public void setProgressListener(@Nullable ProgressListener<BitmapResult> listener) {
+        mProgressListener = listener;
     }
 }
