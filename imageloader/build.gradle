@@ -6,7 +6,7 @@ def siteUrl = 'http://nickandroid.github.io/ImageLoader/'
 def gitUrl = 'https://github.com/NickAndroid/ImageLoader.git'
 
 group = "dev.nick"
-version = "0.8"
+version = "0.9"
 
 android {
     compileSdkVersion 24
