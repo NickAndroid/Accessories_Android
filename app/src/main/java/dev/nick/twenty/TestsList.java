@@ -24,7 +24,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -73,6 +72,19 @@ public class TestsList extends AppCompatActivity {
         mRecyclerView.setAdapter(new Adapter(onStartTest()));
     }
 
+    static class TwoLinesViewHolder extends RecyclerView.ViewHolder {
+
+        @FindView(id = android.R.id.title)
+        TextView title;
+        @FindView(id = android.R.id.text1)
+        TextView description;
+
+        public TwoLinesViewHolder(final View itemView) {
+            super(itemView);
+            Scalpel.getInstance().wire(itemView, this);
+        }
+    }
+
     private class Adapter extends RecyclerView.Adapter<TwoLinesViewHolder> {
 
         private final List<Test> data;
@@ -105,19 +117,6 @@ public class TestsList extends AppCompatActivity {
         @Override
         public int getItemCount() {
             return data.size();
-        }
-    }
-
-    static class TwoLinesViewHolder extends RecyclerView.ViewHolder {
-
-        @FindView(id = android.R.id.title)
-        TextView title;
-        @FindView(id = android.R.id.text1)
-        TextView description;
-
-        public TwoLinesViewHolder(final View itemView) {
-            super(itemView);
-            Scalpel.getInstance().wire(itemView, this);
         }
     }
 }
