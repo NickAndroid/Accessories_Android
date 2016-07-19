@@ -22,5 +22,6 @@ public class Test {
     public Test(Class clz) {
         this.clz = clz;
         this.title = clz.getSimpleName();
+        this.description = "No description found for this test";
     }
 }

@@ -16,6 +16,7 @@
 
 package dev.nick.twenty;
 
+import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -30,12 +31,13 @@ import android.widget.TextView;
 
 import com.nick.scalpel.Scalpel;
 import com.nick.scalpel.annotation.binding.FindView;
-import com.nick.scalpel.annotation.binding.OnClick;
+import com.nick.scalpel.annotation.request.RequirePermission;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("ConstantConditions")
+@RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
 public class TestsList extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
@@ -117,11 +119,5 @@ public class TestsList extends AppCompatActivity {
             super(itemView);
             Scalpel.getInstance().wire(itemView, this);
         }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) finish();
-        return super.onOptionsItemSelected(item);
     }
 }

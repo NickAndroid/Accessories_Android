@@ -17,7 +17,9 @@
 package dev.nick.twenty;
 
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,6 +29,12 @@ import dev.nick.imageloader.ImageLoader;
 public class BaseTest extends AppCompatActivity {
 
     boolean mPermRequired;
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        getSupportActionBar().setDefaultDisplayHomeAsUpEnabled(true);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -72,6 +80,9 @@ public class BaseTest extends AppCompatActivity {
                 break;
             case R.id.clear_mem:
                 ImageLoader.getInstance().clearMemCache();
+                break;
+            case android.R.id.home:
+                finish();
                 break;
         }
         return true;
