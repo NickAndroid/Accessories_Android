@@ -26,7 +26,6 @@ import com.nick.scalpel.annotation.binding.FindView;
 import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.display.ImageQuality;
-import dev.nick.imageloader.display.animator.FadeInImageAnimator;
 import dev.nick.imageloader.display.animator.SlideInBottomAnimator;
 import dev.nick.imageloader.display.processor.BlurBitmapProcessor;
 
@@ -40,7 +39,7 @@ public class DrawableImageTest extends BaseTest {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.drawable_list);
+        setContentView(R.layout.drawable_list_layout);
         setTitle(getClass().getSimpleName());
         Scalpel.getInstance().wire(this);
     }

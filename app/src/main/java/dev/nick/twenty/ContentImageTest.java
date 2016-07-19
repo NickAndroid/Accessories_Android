@@ -37,7 +37,6 @@ import java.util.List;
 import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.display.ImageQuality;
-import dev.nick.imageloader.display.animator.FadeInImageAnimator;
 import dev.nick.imageloader.display.animator.ZoomInAnimator;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
@@ -50,7 +49,7 @@ public class ContentImageTest extends BaseTest {
 
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.file_image);
+        setContentView(R.layout.file_image_layout);
         setTitle(getClass().getSimpleName());
         Scalpel.getInstance().wire(this);
     }

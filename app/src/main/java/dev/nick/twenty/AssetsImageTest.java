@@ -39,7 +39,7 @@ public class AssetsImageTest extends BaseTest {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.drawable_list);
+        setContentView(R.layout.drawable_list_layout);
         setTitle(getClass().getSimpleName());
         Scalpel.getInstance().wire(this);
     }

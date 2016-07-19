@@ -54,7 +54,7 @@ public class FileImageTest extends BaseTest implements DisplayListener {
 
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.file_image);
+        setContentView(R.layout.file_image_layout);
         setTitle(getClass().getSimpleName());
         Scalpel.getInstance().wire(this);
     }

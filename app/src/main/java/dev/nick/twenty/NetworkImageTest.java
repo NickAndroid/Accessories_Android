@@ -54,7 +54,7 @@ public class NetworkImageTest extends BaseTest {
 
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.file_image);
+        setContentView(R.layout.file_image_layout);
         setTitle(getClass().getSimpleName());
         Scalpel.getInstance().wire(this);
     }
@@ -87,7 +87,7 @@ public class NetworkImageTest extends BaseTest {
                 final ViewHolder holder;
 
                 if (convertView == null) {
-                    convertView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.net_image, parent, false);
+                    convertView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.net_image_layout, parent, false);
                     holder = new ViewHolder(convertView);
                     convertView.setTag(holder);
                 } else {
