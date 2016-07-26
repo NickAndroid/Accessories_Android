@@ -26,7 +26,6 @@ import com.nick.scalpel.annotation.binding.FindView;
 import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.display.ImageQuality;
-import dev.nick.imageloader.display.animator.SlideInBottomAnimator;
 import dev.nick.imageloader.display.processor.BlurBitmapProcessor;
 
 public class DrawableImageTest extends BaseTest {
@@ -51,7 +50,6 @@ public class DrawableImageTest extends BaseTest {
                 .defaultImgRes(R.drawable.ic_launcher)
                 .bitmapProcessor(new BlurBitmapProcessor(24))
                 .imageQuality(ImageQuality.RAW)
-                .imageAnimator(new SlideInBottomAnimator(getApplicationContext()))
                 .build());
     }
 }

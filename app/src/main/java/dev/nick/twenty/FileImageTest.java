@@ -41,7 +41,7 @@ import dev.nick.imageloader.DisplayListener;
 import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.display.ImageQuality;
-import dev.nick.imageloader.display.animator.GrowFadeInBottom;
+import dev.nick.imageloader.display.animator.FadeInImageAnimator;
 import dev.nick.imageloader.loader.ImageSource;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
@@ -128,7 +128,7 @@ public class FileImageTest extends BaseTest implements DisplayListener {
                                 .viewMaybeReused()
                                 .animateOnlyNewLoaded()
                                 .oneAfterOne()
-                                .imageAnimator(new GrowFadeInBottom(getApplicationContext()))
+                                .imageAnimator(new FadeInImageAnimator())
                                 .build(), FileImageTest.this);
 
                 return convertView;
