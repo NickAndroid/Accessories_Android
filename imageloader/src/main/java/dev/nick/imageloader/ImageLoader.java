@@ -147,7 +147,6 @@ public class ImageLoader implements TaskMonitor,
         if (sLoader == null) {
             int debugLevel = config.getDebugLevel();
             LoggerManager.setDebugLevel(debugLevel);
-            LoggerManager.setTagPrefix("ImageLoader");
             LoggerManager.getLogger(ImageLoader.class).warn("Configure ImageLoader:" + config.toString());
             sLoader = new ImageLoader(context, config);
             return;

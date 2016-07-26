@@ -17,6 +17,8 @@
 package dev.nick.twenty;
 
 import android.graphics.Bitmap;
+import android.os.Build;
+import android.os.Trace;
 import android.util.Log;
 
 import com.nick.scalpel.ScalpelApplication;
@@ -29,6 +31,9 @@ public class MyApp extends ScalpelApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            Trace.beginSection("ImageLoader_init");
+        }
         ImageLoader.init(getApplicationContext(), new LoaderConfig.Builder()
                 .cachePolicy(new CachePolicy.Builder()
                         .enableMemCache()
@@ -41,5 +46,8 @@ public class MyApp extends ScalpelApplication {
                 .debugLevel(Log.VERBOSE)
                 .loadingThreads(Runtime.getRuntime().availableProcessors() * 2)
                 .build());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            Trace.endSection();
+        }
     }
 }
