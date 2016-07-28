@@ -25,13 +25,13 @@ import dev.nick.logger.LoggerManager;
 public class FutureImageTask extends FutureTask<Void> {
 
     private DoneListener mListener;
-    private DisplayTask mImageTask;
+    private DisplayTask mTask;
 
     private boolean mCancelOthersBeforeRun;
 
     public FutureImageTask(DisplayTask task, @Nullable DoneListener listener, boolean cancelOthersBeforeRun) {
         super(task);
-        this.mImageTask = task;
+        this.mTask = task;
         this.mListener = listener;
         this.mCancelOthersBeforeRun = cancelOthersBeforeRun;
     }
@@ -47,11 +47,11 @@ public class FutureImageTask extends FutureTask<Void> {
         void onDone(FutureImageTask futureImageTask);
     }
 
-    public boolean shouldCancelOthersBeroreRun() {
+    public boolean shouldCancelOthersBeforeRun() {
         return mCancelOthersBeforeRun;
     }
 
-    public DisplayTask getImageTask() {
-        return mImageTask;
+    public DisplayTask getListenableTask() {
+        return mTask;
     }
 }

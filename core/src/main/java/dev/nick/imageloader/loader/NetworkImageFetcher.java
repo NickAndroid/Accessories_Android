@@ -34,7 +34,6 @@ import dev.nick.imageloader.loader.network.NetworkUtils;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
-import dev.nick.logger.LoggerManager;
 
 public class NetworkImageFetcher extends BaseImageFetcher {
 

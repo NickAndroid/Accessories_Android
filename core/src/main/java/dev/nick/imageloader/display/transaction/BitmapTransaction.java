@@ -57,7 +57,7 @@ public class BitmapTransaction {
      * @return the transition drawable
      */
     public TransitionDrawable createImageTransitionDrawable(final Bitmap bitmap,
-                                                               final int fadeTime, final boolean dither, final boolean force) {
+                                                            final int fadeTime, final boolean dither, final boolean force) {
         return BitmapUtils.createImageTransitionDrawable(mResources, mFromDrawable, bitmap,
                 fadeTime, dither, force);
     }

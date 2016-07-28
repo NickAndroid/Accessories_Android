@@ -27,6 +27,7 @@ import java.io.FileNotFoundException;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
+import dev.nick.imageloader.utils.Preconditions;
 
 public class FileImageFetcher extends BaseImageFetcher {
 
@@ -56,6 +57,7 @@ public class FileImageFetcher extends BaseImageFetcher {
 
         switch (decodeSpec.quality) {
             case FIT_VIEW:
+                Preconditions.checkNotNull(viewSpec, "Spec can not be null when defined quality which not RAW");
                 decodeOptions = new BitmapFactory.Options();
                 // If we have to resize this image, first get the natural bounds.
                 decodeOptions.inJustDecodeBounds = true;

@@ -34,7 +34,7 @@ import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
 
-public class ImageDisplayTask implements DisplayTask {
+public class DisplayTaskImpl implements DisplayTask {
 
     private String mUrl;
 
@@ -46,24 +46,24 @@ public class ImageDisplayTask implements DisplayTask {
     private ProgressListener<BitmapResult> mProgressListener;
     private ErrorListener mErrorListener;
 
-    private TaskMonitor mTaskMonitor;
+    private DisplayTaskMonitor mDisplayTaskMonitor;
 
     private DisplayTaskRecord mTaskRecord;
 
     private Context mContext;
 
-    public ImageDisplayTask(Context context,
-                            LoaderConfig loaderConfig,
-                            TaskMonitor taskMonitor,
-                            String url,
-                            ViewSpec spec,
-                            ImageQuality quality,
-                            ProgressListener<BitmapResult> progressListener,
-                            ErrorListener errorListener,
-                            DisplayTaskRecord taskRecord) {
+    public DisplayTaskImpl(Context context,
+                           LoaderConfig loaderConfig,
+                           DisplayTaskMonitor displayTaskMonitor,
+                           String url,
+                           ViewSpec spec,
+                           ImageQuality quality,
+                           ProgressListener<BitmapResult> progressListener,
+                           ErrorListener errorListener,
+                           DisplayTaskRecord taskRecord) {
         this.mContext = context;
         this.mLoaderConfig = loaderConfig;
-        this.mTaskMonitor = taskMonitor;
+        this.mDisplayTaskMonitor = displayTaskMonitor;
         this.mUrl = url;
         this.mViewSpec = spec;
         this.mQuality = quality;
@@ -77,7 +77,7 @@ public class ImageDisplayTask implements DisplayTask {
 
         Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
 
-        if (!mTaskMonitor.shouldRun(this)) return;
+        if (!mDisplayTaskMonitor.shouldRun(this)) return;
 
         ImageSource source = ImageSource.of(mUrl);
 

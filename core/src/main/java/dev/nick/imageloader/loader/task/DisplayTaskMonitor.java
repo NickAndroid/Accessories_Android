@@ -14,27 +14,10 @@
  * limitations under the License.
  */
 
-package dev.nick.imageloader.loader;
+package dev.nick.imageloader.loader.task;
 
-import dev.nick.imageloader.display.ImageQuality;
+import android.support.annotation.NonNull;
 
-public class DecodeSpec {
-
-    public static DecodeSpec NONE_SPEC = new DecodeSpec(ImageQuality.RAW, null);
-
-    ImageQuality quality;
-    ViewSpec viewSpec;
-
-    public DecodeSpec(ImageQuality quality, ViewSpec viewSpec) {
-        this.quality = quality;
-        this.viewSpec = viewSpec;
-    }
-
-    public ImageQuality getQuality() {
-        return quality;
-    }
-
-    public ViewSpec getViewSpec() {
-        return viewSpec;
-    }
+public interface DisplayTaskMonitor {
+    boolean shouldRun(@NonNull DisplayTask task);
 }

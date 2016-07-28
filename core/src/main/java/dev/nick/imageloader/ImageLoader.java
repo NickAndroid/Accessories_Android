@@ -18,12 +18,14 @@ package dev.nick.imageloader;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
+import android.view.animation.Animation;
 import android.widget.ImageView;
 
 import java.io.InterruptedIOException;
@@ -31,6 +33,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -56,12 +59,13 @@ import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
 import dev.nick.imageloader.loader.task.DisplayTask;
+import dev.nick.imageloader.loader.task.DisplayTaskImpl;
+import dev.nick.imageloader.loader.task.DisplayTaskMonitor;
 import dev.nick.imageloader.loader.task.DisplayTaskRecord;
 import dev.nick.imageloader.loader.task.FutureImageTask;
-import dev.nick.imageloader.loader.task.ImageDisplayTask;
 import dev.nick.imageloader.loader.task.TaskManager;
 import dev.nick.imageloader.loader.task.TaskManagerImpl;
-import dev.nick.imageloader.loader.task.TaskMonitor;
+import dev.nick.imageloader.utils.Preconditions;
 import dev.nick.logger.Logger;
 import dev.nick.logger.LoggerManager;
 import dev.nick.stack.RequestHandler;
@@ -70,7 +74,7 @@ import dev.nick.stack.RequestStackService;
 /**
  * Main class of {@link ImageLoader} library.
  */
-public class ImageLoader implements TaskMonitor,
+public class ImageLoader implements DisplayTaskMonitor,
         Handler.Callback,
         RequestHandler<FutureImageTask>,
         FutureImageTask.DoneListener {
@@ -109,6 +113,15 @@ public class ImageLoader implements TaskMonitor,
     private ImageSettableIdCreator mSettableIdCreator;
 
     private static ImageLoader sLoader;
+
+    private final DisplayOption mDefDisplayOption = new DisplayOption.Builder()
+            .imageQuality(ImageQuality.FIT_VIEW)
+            .imageAnimator(null)
+            .bitmapProcessor(null)
+            .defaultImgRes(0)
+            .loadingImgRes(0)
+            .viewMaybeReused()
+            .build();
 
     private ImageLoader(Context context, LoaderConfig config) {
         this.mContext = context;
@@ -168,6 +181,20 @@ public class ImageLoader implements TaskMonitor,
         mClearTaskRequestedTimeMills = System.currentTimeMillis();
     }
 
+    private void loadImage(@NonNull String url, @NonNull LoadingListener loadingListener) {
+        Preconditions.checkNotNull(loadingListener);
+        displayImage(url, new FakeImageSettable(),
+                new DisplayOption.Builder()
+                        .imageQuality(ImageQuality.FIT_VIEW)
+                        .imageAnimator(null)
+                        .bitmapProcessor(null)
+                        .defaultImgRes(0)
+                        .loadingImgRes(0)
+                        .viewMaybeReused()
+                        .build(),
+                loadingListener);
+    }
+
     /**
      * Display image from the url to the view.
      *
@@ -176,7 +203,7 @@ public class ImageLoader implements TaskMonitor,
      */
     public void displayImage(@NonNull String url, @NonNull ImageView view) {
         ImageViewDelegate viewDelegate = new ImageViewDelegate(view);
-        displayImage(url, viewDelegate, null);
+        displayImage(url, viewDelegate, null, null);
     }
 
     /**
@@ -193,9 +220,20 @@ public class ImageLoader implements TaskMonitor,
     /**
      * Display image from the url to the view.
      *
-     * @param url    Image source url, one of {@link dev.nick.imageloader.loader.ImageSource}
-     * @param view   Target view to display the image.
-     * @param option {@link DisplayOption} is options using when display the image.
+     * @param url  Image source url, one of {@link dev.nick.imageloader.loader.ImageSource}
+     * @param view Target view to display the image.
+     */
+    public void displayImage(@NonNull String url, @NonNull ImageView view, @Nullable DisplayListener loadingListener) {
+        displayImage(url, view, null, loadingListener);
+    }
+
+    /**
+     * Display image from the url to the view.
+     *
+     * @param url             Image source url, one of {@link dev.nick.imageloader.loader.ImageSource}
+     * @param view            Target view to display the image.
+     * @param option          {@link DisplayOption} is options using when display the image.
+     * @param loadingListener The listener.
      */
     public void displayImage(@NonNull String url, @NonNull ImageView view,
                              @Nullable DisplayOption option, @Nullable DisplayListener loadingListener) {
@@ -210,7 +248,7 @@ public class ImageLoader implements TaskMonitor,
      * @param settable Target {@link ImageSettable} to display the image.
      */
     public void displayImage(@NonNull String url, @NonNull ImageSettable settable) {
-        displayImage(url, settable, null);
+        displayImage(url, settable, null, null);
     }
 
     /**
@@ -230,6 +268,16 @@ public class ImageLoader implements TaskMonitor,
      * Display image from the url to the view.
      *
      * @param url      Image source url, one of {@link dev.nick.imageloader.loader.ImageSource}
+     * @param settable Target settable to display the image.
+     */
+    public void displayImage(@NonNull String url, @NonNull ImageSettable settable, @Nullable DisplayListener loadingListener) {
+        displayImage(url, settable, null, loadingListener);
+    }
+
+    /**
+     * Display image from the url to the view.
+     *
+     * @param url      Image source url, one of {@link dev.nick.imageloader.loader.ImageSource}
      * @param settable Target {@link ImageSettable} to display the image.
      * @param option   {@link DisplayOption} is options using when display the image.
      * @param listener The progress listener using to watch the progress of the loading.
@@ -239,9 +287,11 @@ public class ImageLoader implements TaskMonitor,
                              @Nullable DisplayOption option,
                              @Nullable DisplayListener listener) {
 
+        Preconditions.checkNotNull(url, settable);
+
         DisplayTaskRecord record = createTaskRecord(settable);
 
-        option = createOptionIfNull(option);
+        option = assignOptionIfNull(option);
 
         beforeLoading(settable, option);
 
@@ -316,7 +366,7 @@ public class ImageLoader implements TaskMonitor,
             errorListenerDelegate = new ErrorListenerDelegate(listener);
         }
 
-        ImageDisplayTask imageTask = new ImageDisplayTask(
+        DisplayTaskImpl imageTask = new DisplayTaskImpl(
                 mContext,
                 mConfig,
                 this,
@@ -333,16 +383,9 @@ public class ImageLoader implements TaskMonitor,
         mStackService.push(future);
     }
 
-    private DisplayOption createOptionIfNull(DisplayOption option) {
+    private DisplayOption assignOptionIfNull(DisplayOption option) {
         if (option != null) return option;
-        return new DisplayOption.Builder()
-                .imageQuality(ImageQuality.FIT_VIEW)
-                .imageAnimator(null)
-                .bitmapProcessor(null)
-                .defaultImgRes(0)
-                .loadingImgRes(0)
-                .viewMaybeReused()
-                .build();
+        return mDefDisplayOption;
     }
 
     private void onTaskCreated(DisplayTaskRecord record) {
@@ -360,8 +403,8 @@ public class ImageLoader implements TaskMonitor,
     }
 
     private boolean onFutureSubmit(FutureImageTask futureImageTask) {
-        if (futureImageTask.shouldCancelOthersBeroreRun()) {
-            cancel(futureImageTask.getImageTask().getTaskRecord().getSettableId());
+        if (futureImageTask.shouldCancelOthersBeforeRun()) {
+            cancel(futureImageTask.getListenableTask().getTaskRecord().getSettableId());
         }
         synchronized (mFutures) {
             mFutures.add(futureImageTask);
@@ -511,10 +554,6 @@ public class ImageLoader implements TaskMonitor,
         return true;
     }
 
-    public void loadImage(@NonNull String url, @NonNull LoadingListener loadingListener) {
-
-    }
-
     public void pause() {
         if (mState == LoaderState.TERMINATED) {
             throw new IllegalStateException("Loader has been terminated.");
@@ -566,7 +605,7 @@ public class ImageLoader implements TaskMonitor,
         if (pendingCancels.size() > 0) {
             for (FutureImageTask toBeCanceled : pendingCancels) {
                 toBeCanceled.cancel(true);
-                callOnCancel(toBeCanceled.getImageTask().getProgressListener());
+                callOnCancel(toBeCanceled.getListenableTask().getProgressListener());
                 mLogger.info("Cancel task for url:" + url);
             }
             pendingCancels.clear();
@@ -587,7 +626,7 @@ public class ImageLoader implements TaskMonitor,
         if (pendingCancels.size() > 0) {
             for (FutureImageTask toBeCanceled : pendingCancels) {
                 toBeCanceled.cancel(true);
-                callOnCancel(toBeCanceled.getImageTask().getProgressListener());
+                callOnCancel(toBeCanceled.getListenableTask().getProgressListener());
                 mLogger.info("Cancel task for settable:" + settableId);
             }
             pendingCancels.clear();
@@ -602,7 +641,7 @@ public class ImageLoader implements TaskMonitor,
             for (FutureImageTask futureImageTask : mFutures) {
                 if (!futureImageTask.isCancelled()
                         && !futureImageTask.isDone()
-                        && url.equals(futureImageTask.getImageTask().getUrl())) {
+                        && url.equals(futureImageTask.getListenableTask().getUrl())) {
                     pendingCancels.add(futureImageTask);
                 }
             }
@@ -624,7 +663,7 @@ public class ImageLoader implements TaskMonitor,
             for (FutureImageTask futureImageTask : mFutures) {
                 if (!futureImageTask.isCancelled()
                         && !futureImageTask.isDone()
-                        && settableId == futureImageTask.getImageTask().getTaskRecord().getSettableId()) {
+                        && settableId == futureImageTask.getListenableTask().getTaskRecord().getSettableId()) {
                     pendingCancels.add(futureImageTask);
                 }
             }
@@ -680,6 +719,45 @@ public class ImageLoader implements TaskMonitor,
     public void onDone(FutureImageTask futureImageTask) {
         onFutureDone(futureImageTask);
     }
+
+    class FakeImageSettable implements ImageSettable {
+        @Override
+        public void setImageBitmap(@NonNull Bitmap bitmap) {
+            // Nothing.
+        }
+
+        @Override
+        public boolean setBackgroundDrawable(@Nullable Drawable drawable) {
+            return true;
+        }
+
+        @Override
+        public void setImageResource(int resId) {
+            // Nothing.
+        }
+
+        @Override
+        public int getWidth() {
+            return 0;
+        }
+
+        @Override
+        public int getHeight() {
+            return 0;
+        }
+
+        @Override
+        public void startAnimation(Animation animation) {
+            // Nothing.
+        }
+
+        @Override
+        public int hashCode() {
+            return UUID.randomUUID().hashCode();
+        }
+    }
+
+    ;
 
     class ImageSettingsLocker {
 
