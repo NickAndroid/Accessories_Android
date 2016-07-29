@@ -32,6 +32,8 @@ LOCAL_STATIC_JAVA_LIBRARIES += android-support-annotations
 
 LOCAL_PROGUARD_FLAG_FILES := proguard.flags
 
+LOCAL_JACK_ENABLED = disabled
+
 include $(BUILD_STATIC_JAVA_LIBRARY)
 
 
