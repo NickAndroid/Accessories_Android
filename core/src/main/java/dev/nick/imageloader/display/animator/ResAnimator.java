@@ -22,12 +22,24 @@ import android.view.animation.AnimationUtils;
 
 import dev.nick.imageloader.display.ImageSettable;
 
+/**
+ * Abs class for a animator that load animation from resource.
+ * use {@link #from(Context, int)} construct an animator quickly.
+ */
 public abstract class ResAnimator implements ImageAnimator {
 
     protected Context context;
 
     public ResAnimator(Context context) {
         this.context = context;
+    }
+
+    public static ResAnimator from(Context context, final int animResId) {
+        return new ResAnimator(context) {
+            int getAnimResId() {
+                return animResId;
+            }
+        };
     }
 
     @Override

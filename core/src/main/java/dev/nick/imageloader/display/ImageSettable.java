@@ -31,6 +31,7 @@ public interface ImageSettable {
     @UiThread
     void setImageBitmap(@NonNull Bitmap bitmap);
 
+    @UiThread
     boolean setBackgroundDrawable(@Nullable Drawable drawable);
 
     @UiThread
