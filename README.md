@@ -8,7 +8,7 @@ Android image loader library
 
 ## Usage
 
-### JCenter:
+### Latest version:
 
 [ ![Download](https://api.bintray.com/packages/nickandroid/maven/imageloader/images/download.svg) ](https://bintray.com/nickandroid/maven/imageloader/_latestVersion)
 
@@ -18,25 +18,27 @@ Android image loader library
 <dependency>
   <groupId>dev.nick</groupId>
   <artifactId>imageloader</artifactId>
-  <version>0.9</version>
+  <version>$latest</version>
   <type>pom</type>
 </dependency>
 ```
 
 ### gradle
 ```
-compile 'dev.nick:imageloader:0.9@aar'
+compile 'dev.nick:imageloader:$latest@aar'
 ```
 
 ## Samples
 
-### Config:
+### How to get a loader instance:
+*  Use the shared(single) instance
 ```java
-public class MyApp extends Application {
+public class C {
     @Override
     public void onCreate() {
         super.onCreate();
-        ImageLoader.init(getApplicationContext(), new LoaderConfig.Builder()
+        // Get the shared instance
+        ImageLoader loader = ImageLoader.shared(getApplicationContext(), new LoaderConfig.Builder()
                 .cachePolicy(new CachePolicy.Builder()
                         .enableMemCache()
                         .enableDiskCache()
@@ -48,13 +50,40 @@ public class MyApp extends Application {
                 .debugLevel(Log.VERBOSE)
                 .loadingThreads(Runtime.getRuntime().availableProcessors() * 2)
                 .build());
+        // Some works
+        loader....
+    }
+}
+```
+*  Create a new loader with new config
+```java
+public class Z {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        // Create a new instance
+        ImageLoader loader = ImageLoader.create(getApplicationContext(), new LoaderConfig.Builder()
+                .cachePolicy(new CachePolicy.Builder()
+                        .cachingThreads(Runtime.getRuntime().availableProcessors())
+                        .cacheDirName("tests2")
+                        .preferredLocation(CachePolicy.Location.EXTERNAL)
+                        .compressFormat(Bitmap.CompressFormat.JPEG)
+                        .build())
+                .debugLevel(Log.VERBOSE)
+                .loadingThreads(Runtime.getRuntime().availableProcessors())
+                .build());
+        // Some works
+        loader....
     }
 }
 ```
 
-### Loading:
+### Loading or Display:
 ```java
-ImageLoader.getInstance().displayImage(uri, holder.imageView,
+mLoader.loadImage(uri, new LoadingListener(){...});
+```
+```java
+mLoader.displayImage(uri, holder.imageView,
                         new DisplayOption.Builder()
                                 .imageQuality(DisplayOption.ImageQuality.FIT_VIEW)
                                 .loadingImgRes(R.drawable.ic_cloud_download_black_24dp)
@@ -65,12 +94,12 @@ ImageLoader.getInstance().displayImage(uri, holder.imageView,
 ```
 **Or**
 ```java
-ImageLoader.getInstance().displayImage(uri, holder.imageView);
+mLoader.displayImage(uri, holder.imageView);
 ```
 
 ### Listening:
 ```java
-ImageLoader.getInstance().displayImage(uri, holder.imageView, new LoaderListener(){...});
+mLoader.displayImage(uri, holder.imageView, new LoaderListener(){...});
 ```
 
 ### CustomView support:
@@ -78,12 +107,12 @@ ImageLoader.getInstance().displayImage(uri, holder.imageView, new LoaderListener
 class CustomView implements ImageSettable {}
 ```
 ```java
-ImageLoader.getInstance().displayImage(uri, customView);
+mLoader.displayImage(uri, customView);
 ```
 
 ### Cancel tasks:
 ```java
-ImageLoader.getInstance().cancel(ImageView/ImageSettable/Url);
+mLoader.cancel(ImageView/ImageSettable/Url);
 ```
 
 ### Clear cache:
@@ -91,14 +120,14 @@ ImageLoader.getInstance().cancel(ImageView/ImageSettable/Url);
  @Override
     public void onTrimMemory(int level) {
         super.onTrimMemory(level);
-        ImageLoader.getInstance().clearMemCache();
+        mLoader.clearMemCache();
     }
 ```
 ```java
 @Override
     protected void onDestroy() {
         super.onDestroy();
-        ImageLoader.getInstance().clearAllCache();
+        mLoader.clearAllCache();
     }
 ```
 
