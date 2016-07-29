@@ -163,6 +163,7 @@ public class ImageLoader implements DisplayTaskMonitor,
      *
      * @param context An application {@link Context} is preferred.
      * @return Single instance of {@link ImageLoader}
+     * @since 1.0.1
      */
     public static ImageLoader create(Context context) {
         return create(context, null);
@@ -174,6 +175,7 @@ public class ImageLoader implements DisplayTaskMonitor,
      * @param context An application {@link Context} is preferred.
      * @param config  Configuration of this loader.
      * @return Single instance of {@link ImageLoader}
+     * @since 1.0.1
      */
     public static ImageLoader create(Context context, LoaderConfig config) {
         return shared(context, config).fork();
@@ -184,6 +186,7 @@ public class ImageLoader implements DisplayTaskMonitor,
      *
      * @param context An application {@link Context} is preferred.
      * @return Single instance of {@link ImageLoader}
+     * @since 1.0.1
      */
     public static ImageLoader shared(Context context) {
         return shared(context, null);
@@ -195,6 +198,7 @@ public class ImageLoader implements DisplayTaskMonitor,
      * @param context An application {@link Context} is preferred.
      * @param config  Configuration of this loader.
      * @return Single instance of {@link ImageLoader}
+     * @since 1.0.1
      */
     public static ImageLoader shared(Context context, LoaderConfig config) {
         if (sLoader == null) {
@@ -604,6 +608,9 @@ public class ImageLoader implements DisplayTaskMonitor,
         return true;
     }
 
+    /**
+     * Call this to pause the {@link ImageLoader}
+     */
     public void pause() {
         if (mState == LoaderState.TERMINATED) {
             throw new IllegalStateException("Loader has been terminated.");
@@ -612,10 +619,20 @@ public class ImageLoader implements DisplayTaskMonitor,
         mLogger.funcExit();
     }
 
+    /**
+     * @return {@code true} if this loader is paused.
+     * @see {@link #pause()}
+     */
     public boolean isPaused() {
         return mState == LoaderState.PAUSED || mState == LoaderState.PAUSE_REQUESTED;
     }
 
+    /**
+     * Call this to resume the {@link ImageLoader} from pause state.
+     *
+     * @see {@link #pause()}
+     * @see {@link LoaderState}
+     */
     public void resume() {
         if (mState == LoaderState.TERMINATED) {
             throw new IllegalStateException("Loader has been terminated.");
@@ -627,6 +644,9 @@ public class ImageLoader implements DisplayTaskMonitor,
         }
     }
 
+    /**
+     * Terminate the loader.
+     */
     public void terminate() {
         if (mState == LoaderState.TERMINATED) {
             throw new IllegalStateException("Loader has already been terminated.");
@@ -641,6 +661,9 @@ public class ImageLoader implements DisplayTaskMonitor,
         mLogger.funcExit();
     }
 
+    /**
+     * Clear all the load&display tasks.
+     */
     public void cancelAllTasks() {
         synchronized (mFutures) {
             for (FutureImageTask futureImageTask : mFutures) {
@@ -650,7 +673,12 @@ public class ImageLoader implements DisplayTaskMonitor,
         }
     }
 
-    public void cancel(@NonNull String url) {
+    /**
+     * Cancel the load&display task who's url match given.
+     *
+     * @param url The url of the loader request.
+     */
+    public ImageLoader cancel(@NonNull String url) {
         List<FutureImageTask> pendingCancels = findTasks(url);
         if (pendingCancels.size() > 0) {
             for (FutureImageTask toBeCanceled : pendingCancels) {
@@ -661,16 +689,32 @@ public class ImageLoader implements DisplayTaskMonitor,
             pendingCancels.clear();
             pendingCancels = null;
         }
+        return this;
     }
 
+    /**
+     * Cancel the load&display task who's view match given.
+     *
+     * @param view The view of the loader request.
+     */
     public ImageLoader cancel(@NonNull ImageView view) {
         return cancel(new ImageViewDelegate(view));
     }
 
+    /**
+     * Cancel the load&display task who's settable match given.
+     *
+     * @param settable The settable of the loader request.
+     */
     public ImageLoader cancel(@NonNull ImageSettable settable) {
         return cancel(mSettableIdCreator.createSettableId(settable));
     }
 
+    /**
+     * Cancel the load&display task who's settableId match given.
+     *
+     * @param settableId The settableId of the loader request.
+     */
     public ImageLoader cancel(int settableId) {
         List<FutureImageTask> pendingCancels = findTasks(settableId);
         if (pendingCancels.size() > 0) {
