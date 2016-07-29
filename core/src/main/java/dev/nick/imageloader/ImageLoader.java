@@ -17,6 +17,7 @@
 package dev.nick.imageloader;
 
 import android.content.Context;
+import android.content.Loader;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
@@ -24,10 +25,12 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringDef;
 import android.support.annotation.WorkerThread;
 import android.view.animation.Animation;
 import android.widget.ImageView;
 
+import java.io.File;
 import java.io.InterruptedIOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,6 +41,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import dev.nick.imageloader.cache.CacheManager;
 import dev.nick.imageloader.control.Forkable;
@@ -79,7 +83,7 @@ public class ImageLoader implements DisplayTaskMonitor,
         Handler.Callback,
         RequestHandler<FutureImageTask>,
         FutureImageTask.DoneListener,
-        Forkable<ImageLoader> {
+        Forkable<ImageLoader, LoaderConfig> {
 
     private static final int MSG_APPLY_IMAGE_SETTINGS = 0x1;
     private static final int MSG_CALL_ON_START = 0x2;
@@ -125,21 +129,25 @@ public class ImageLoader implements DisplayTaskMonitor,
             .viewMaybeReused()
             .build();
 
-    private ImageLoader(ImageLoader copy) {
+    private ImageLoader(ImageLoader copy, LoaderConfig config) {
+        // Shared elements.
         this.mContext = copy.mContext;
-        this.mConfig = copy.mConfig;
+        this.mConfig = config;
         this.mTaskManager = copy.mTaskManager;
         this.mSettableIdCreator = copy.mSettableIdCreator;
         this.mUIThreadHandler = copy.mUIThreadHandler;
-        this.mCacheManager = copy.mCacheManager;
-        this.mLoadingService = copy.mLoadingService;
-        this.mImageSettingsScheduler = copy.mImageSettingsScheduler;
-        this.mStackService = copy.mStackService;
-        this.mLogger = copy.mLogger;
 
+        // Owned elements
+        this.mLoadingService = Executors.newFixedThreadPool(config.getLoadingThreads());
+        this.mImageSettingsScheduler = Executors.newSingleThreadExecutor();
+        this.mStackService = RequestStackService.createStarted(this);
+        this.mCacheManager = new CacheManager(config.getCachePolicy(), mContext);
         this.mTaskLockMap = new HashMap<>();
         this.mFutures = new ArrayList<>();
         this.mState = LoaderState.RUNNING;
+        this.mLogger = LoggerManager.getLogger(getClass().getSimpleName()
+                + "#"
+                + LoaderFactory.assignLoaderId());
     }
 
     private ImageLoader(Context context, LoaderConfig config) {
@@ -155,7 +163,9 @@ public class ImageLoader implements DisplayTaskMonitor,
         this.mTaskLockMap = new HashMap<>();
         this.mFutures = new ArrayList<>();
         this.mState = LoaderState.RUNNING;
-        this.mLogger = LoggerManager.getLogger(getClass());
+        this.mLogger = LoggerManager.getLogger(getClass().getSimpleName()
+                + "#"
+                + LoaderFactory.assignLoaderId());
     }
 
     /**
@@ -178,7 +188,7 @@ public class ImageLoader implements DisplayTaskMonitor,
      * @since 1.0.1
      */
     public static ImageLoader create(Context context, LoaderConfig config) {
-        return shared(context, config).fork();
+        return shared(context, config).fork(config);
     }
 
     /**
@@ -679,6 +689,7 @@ public class ImageLoader implements DisplayTaskMonitor,
      * @param url The url of the loader request.
      */
     public ImageLoader cancel(@NonNull String url) {
+        Preconditions.checkNotNull(url);
         List<FutureImageTask> pendingCancels = findTasks(url);
         if (pendingCancels.size() > 0) {
             for (FutureImageTask toBeCanceled : pendingCancels) {
@@ -716,6 +727,7 @@ public class ImageLoader implements DisplayTaskMonitor,
      * @param settableId The settableId of the loader request.
      */
     public ImageLoader cancel(int settableId) {
+        Preconditions.checkState(settableId > 0);
         List<FutureImageTask> pendingCancels = findTasks(settableId);
         if (pendingCancels.size() > 0) {
             for (FutureImageTask toBeCanceled : pendingCancels) {
@@ -815,8 +827,8 @@ public class ImageLoader implements DisplayTaskMonitor,
     }
 
     @Override
-    public ImageLoader fork() {
-        return new ImageLoader(this);
+    public ImageLoader fork(LoaderConfig config) {
+        return new ImageLoader(this, config);
     }
 
     class FakeImageSettable implements ImageSettable {
@@ -855,8 +867,6 @@ public class ImageLoader implements DisplayTaskMonitor,
             return UUID.randomUUID().hashCode();
         }
     }
-
-    ;
 
     class ImageSettingsLocker {
 
@@ -1016,5 +1026,13 @@ public class ImageLoader implements DisplayTaskMonitor,
     private static class ProgressParams {
         float progress;
         ProgressListener<BitmapResult> progressListener;
+    }
+
+    private static class LoaderFactory {
+        private static AtomicInteger sLoaderId = new AtomicInteger(0);
+
+        static int assignLoaderId() {
+            return sLoaderId.getAndIncrement();
+        }
     }
 }

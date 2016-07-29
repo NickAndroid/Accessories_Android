@@ -38,9 +38,10 @@ public class LoggerManager {
     }
 
     public static Logger getLogger(Class propertyClz) {
+        return getLogger(propertyClz.getSimpleName());
+    }
 
-        String propName = propertyClz.getSimpleName();
-
+    public static Logger getLogger(String propName) {
         synchronized (sLoggers) {
             if (sLoggers.containsKey(propName)) return sLoggers.get(propName);
             Logger logger = new LoggerImpl(new LogTagBuilder() {
