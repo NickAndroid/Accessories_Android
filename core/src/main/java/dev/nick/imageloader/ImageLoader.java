@@ -669,7 +669,7 @@ public class ImageLoader implements DisplayTaskMonitor,
     }
 
     /**
-     * Clear all the load&display tasks.
+     * Clear all the load and display tasks.
      */
     public void cancelAllTasks() {
         synchronized (mFutures) {
@@ -681,7 +681,7 @@ public class ImageLoader implements DisplayTaskMonitor,
     }
 
     /**
-     * Cancel the load&display task who's url match given.
+     * Cancel the load and display task who's url match given.
      *
      * @param url The url of the loader request.
      */
@@ -701,7 +701,7 @@ public class ImageLoader implements DisplayTaskMonitor,
     }
 
     /**
-     * Cancel the load&display task who's view match given.
+     * Cancel the load and display task who's view match given.
      *
      * @param view The view of the loader request.
      */
@@ -710,7 +710,7 @@ public class ImageLoader implements DisplayTaskMonitor,
     }
 
     /**
-     * Cancel the load&display task who's settable match given.
+     * Cancel the load and display task who's settable match given.
      *
      * @param settable The settable of the loader request.
      */
@@ -719,7 +719,7 @@ public class ImageLoader implements DisplayTaskMonitor,
     }
 
     /**
-     * Cancel the load&display task who's settableId match given.
+     * Cancel the load and display task who's settableId match given.
      *
      * @param settableId The settableId of the loader request.
      */
