@@ -1,1 +1,1 @@
-./gradlew bintrayUpload
+./gradlew bintrayUpload > build/upload.log

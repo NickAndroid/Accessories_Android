@@ -628,7 +628,7 @@ public class ImageLoader implements DisplayTaskMonitor,
 
     /**
      * @return {@code true} if this loader is paused.
-     * @see {@link #pause()}
+     * @see #pause()
      */
     public boolean isPaused() {
         return mState == LoaderState.PAUSED || mState == LoaderState.PAUSE_REQUESTED;
@@ -637,8 +637,8 @@ public class ImageLoader implements DisplayTaskMonitor,
     /**
      * Call this to resume the {@link ImageLoader} from pause state.
      *
-     * @see {@link #pause()}
-     * @see {@link LoaderState}
+     * @see #pause()
+     * @see LoaderState
      */
     public void resume() {
         if (mState == LoaderState.TERMINATED) {
