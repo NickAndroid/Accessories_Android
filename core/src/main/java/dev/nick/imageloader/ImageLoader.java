@@ -17,7 +17,6 @@
 package dev.nick.imageloader;
 
 import android.content.Context;
-import android.content.Loader;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
@@ -25,12 +24,11 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringDef;
+import android.support.annotation.VisibleForTesting;
 import android.support.annotation.WorkerThread;
 import android.view.animation.Animation;
 import android.widget.ImageView;
 
-import java.io.File;
 import java.io.InterruptedIOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -96,10 +94,13 @@ public class ImageLoader implements DisplayTaskMonitor,
 
     private Handler mUIThreadHandler;
 
+    @VisibleForTesting
     private CacheManager mCacheManager;
 
+    @VisibleForTesting
     private LoaderConfig mConfig;
 
+    @VisibleForTesting
     private RequestStackService<FutureImageTask> mStackService;
 
     private Logger mLogger;
@@ -109,7 +110,9 @@ public class ImageLoader implements DisplayTaskMonitor,
     private final Map<Integer, DisplayTaskRecord> mTaskLockMap;
     private final List<FutureImageTask> mFutures;
 
+    @VisibleForTesting
     private ExecutorService mLoadingService;
+    @VisibleForTesting
     private ExecutorService mImageSettingsScheduler;
 
     private Freezer mFreezer;
@@ -120,7 +123,7 @@ public class ImageLoader implements DisplayTaskMonitor,
 
     private static ImageLoader sLoader;
 
-    private final DisplayOption mDefDisplayOption = new DisplayOption.Builder()
+    private static final DisplayOption sDefDisplayOption = new DisplayOption.Builder()
             .imageQuality(ImageQuality.FIT_VIEW)
             .imageAnimator(null)
             .bitmapProcessor(null)
@@ -225,6 +228,7 @@ public class ImageLoader implements DisplayTaskMonitor,
      * @see LoaderConfig
      */
     private synchronized static ImageLoader init(Context context, LoaderConfig config) {
+        Preconditions.checkNotNull(context);
         if (config == null) {
             config = LoaderConfig.DEFAULT_CONFIG;
         }
@@ -449,7 +453,7 @@ public class ImageLoader implements DisplayTaskMonitor,
 
     private DisplayOption assignOptionIfNull(DisplayOption option) {
         if (option != null) return option;
-        return mDefDisplayOption;
+        return sDefDisplayOption;
     }
 
     private void onTaskCreated(DisplayTaskRecord record) {

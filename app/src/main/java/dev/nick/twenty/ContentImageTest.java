@@ -17,6 +17,7 @@
 package dev.nick.twenty;
 
 import android.Manifest;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -35,6 +36,8 @@ import java.io.File;
 import java.util.List;
 
 import dev.nick.imageloader.ImageLoader;
+import dev.nick.imageloader.LoaderConfig;
+import dev.nick.imageloader.cache.CachePolicy;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.display.ImageQuality;
 import dev.nick.imageloader.display.animator.FadeInImageAnimator;
@@ -93,7 +96,16 @@ public class ContentImageTest extends BaseTest {
 
                 String uri = mArtworkUri + File.separator + tracks.get(position).getAlbumId();
 
-                ImageLoader.shared(getApplicationContext()).displayImage(uri, holder.imageView,
+                ImageLoader.create(getApplicationContext(), new LoaderConfig.Builder()
+                        .cachePolicy(new CachePolicy.Builder()
+                                .enableMemCache()
+                                .enableDiskCache()
+                                .cachingThreads(Runtime.getRuntime().availableProcessors())
+                                .cacheDirName("dis.cache.tests.content")
+                                .preferredLocation(CachePolicy.Location.INTERNAL)
+                                .compressFormat(Bitmap.CompressFormat.JPEG)
+                                .build())
+                        .build()).displayImage(uri, holder.imageView,
                         new DisplayOption.Builder()
                                 .oneAfterOne()
                                 .imageQuality(ImageQuality.RAW)
