@@ -100,7 +100,7 @@ public class NetworkImageTest extends BaseTest {
                 holder.textView.setText("");
 
                 ImageLoader
-                        .shared()
+                        .shared(getApplicationContext())
                         .cancel(holder.imageView)
                         .displayImage(uri, holder.imageView,
                                 new DisplayOption.Builder()
@@ -153,7 +153,7 @@ public class NetworkImageTest extends BaseTest {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Track track = (Track) adapter.getItem(i);
-                ImageLoader.shared().cancel(track.getUrl());
+                ImageLoader.shared(getApplicationContext()).cancel(track.getUrl());
             }
         });
     }

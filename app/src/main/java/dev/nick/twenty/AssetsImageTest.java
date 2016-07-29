@@ -47,7 +47,7 @@ public class AssetsImageTest extends BaseTest {
     @Override
     protected void onStart() {
         super.onStart();
-        ImageLoader.shared().displayImage(urlAssets, imageView, new DisplayOption.Builder()
+        ImageLoader.shared(this).displayImage(urlAssets, imageView, new DisplayOption.Builder()
                 .defaultImgRes(R.drawable.ic_launcher)
                 .bitmapProcessor(new BlackWhiteBitmapProcessor())
                 .imageQuality(ImageQuality.RAW)
