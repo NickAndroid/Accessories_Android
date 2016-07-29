@@ -132,27 +132,6 @@ public class ImageLoader implements DisplayTaskMonitor,
             .viewMaybeReused()
             .build();
 
-    private ImageLoader(ImageLoader copy, LoaderConfig config) {
-        // Shared elements.
-        this.mContext = copy.mContext;
-        this.mConfig = config;
-        this.mTaskManager = copy.mTaskManager;
-        this.mSettableIdCreator = copy.mSettableIdCreator;
-        this.mUIThreadHandler = copy.mUIThreadHandler;
-
-        // Owned elements
-        this.mLoadingService = Executors.newFixedThreadPool(config.getLoadingThreads());
-        this.mImageSettingsScheduler = Executors.newSingleThreadExecutor();
-        this.mStackService = RequestStackService.createStarted(this);
-        this.mCacheManager = new CacheManager(config.getCachePolicy(), mContext);
-        this.mTaskLockMap = new HashMap<>();
-        this.mFutures = new ArrayList<>();
-        this.mState = LoaderState.RUNNING;
-        this.mLogger = LoggerManager.getLogger(getClass().getSimpleName()
-                + "#"
-                + LoaderFactory.assignLoaderId());
-    }
-
     private ImageLoader(Context context, LoaderConfig config) {
         this.mContext = context;
         this.mConfig = config;
@@ -169,6 +148,7 @@ public class ImageLoader implements DisplayTaskMonitor,
         this.mLogger = LoggerManager.getLogger(getClass().getSimpleName()
                 + "#"
                 + LoaderFactory.assignLoaderId());
+        this.mLogger.info("Create loader with config " + config);
     }
 
     /**
@@ -832,7 +812,8 @@ public class ImageLoader implements DisplayTaskMonitor,
 
     @Override
     public ImageLoader fork(LoaderConfig config) {
-        return new ImageLoader(this, config);
+        //FIXME Consider to use shared elements for better performance.
+        return new ImageLoader(this.mContext, config);
     }
 
     class FakeImageSettable implements ImageSettable {
