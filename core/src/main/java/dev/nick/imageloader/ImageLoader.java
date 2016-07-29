@@ -608,6 +608,9 @@ public class ImageLoader implements DisplayTaskMonitor,
         return true;
     }
 
+    /**
+     * @return {@link CacheManager} instance of this loader is using.
+     */
     public CacheManager getCacheManager() {
         return mCacheManager;
     }
