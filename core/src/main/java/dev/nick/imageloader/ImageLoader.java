@@ -181,7 +181,7 @@ public class ImageLoader implements DisplayTaskMonitor,
         mClearTaskRequestedTimeMills = System.currentTimeMillis();
     }
 
-    private void loadImage(@NonNull String url, @NonNull LoadingListener loadingListener) {
+    public void loadImage(@NonNull String url, @NonNull LoadingListener loadingListener) {
         Preconditions.checkNotNull(loadingListener);
         displayImage(url, new FakeImageSettable(),
                 new DisplayOption.Builder()

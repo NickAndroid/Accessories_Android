@@ -41,6 +41,10 @@
             android:name=".NetworkImageTest"
             android:label="NetworkImageTest" />
 
+        <activity
+            android:name=".LoadImageTest"
+            android:label="LoadImageTest" />
+
     </application>
 
 </manifest>
