@@ -1,2 +1,2 @@
-include ':app', ':android.opt.imageloader'
-project(':android.opt.imageloader').projectDir = new File('core')
+include ':app', ':imageloader'
+project(':imageloader').projectDir = new File('core')
