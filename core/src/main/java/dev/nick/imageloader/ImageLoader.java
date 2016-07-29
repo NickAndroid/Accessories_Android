@@ -132,13 +132,15 @@ public class ImageLoader implements DisplayTaskMonitor,
             .viewMaybeReused()
             .build();
 
-    private ImageLoader(Context context, LoaderConfig config) {
+    private ImageLoader(Context context, CacheManager cacheManager, LoaderConfig config) {
         this.mContext = context;
         this.mConfig = config;
         this.mTaskManager = new TaskManagerImpl();
         this.mSettableIdCreator = new ImageSettableIdCreatorImpl();
         this.mUIThreadHandler = new Handler(Looper.getMainLooper(), this);
-        this.mCacheManager = new CacheManager(config.getCachePolicy(), context);
+        this.mCacheManager = cacheManager == null
+                ? new CacheManager(config.getCachePolicy(), context)
+                : cacheManager;
         this.mLoadingService = Executors.newFixedThreadPool(config.getLoadingThreads());
         this.mImageSettingsScheduler = Executors.newSingleThreadExecutor();
         this.mStackService = RequestStackService.createStarted(this);
@@ -149,6 +151,10 @@ public class ImageLoader implements DisplayTaskMonitor,
                 + "#"
                 + LoaderFactory.assignLoaderId());
         this.mLogger.info("Create loader with config " + config);
+    }
+
+    private static ImageLoader clone(ImageLoader from, LoaderConfig config) {
+        return new ImageLoader(from.mContext, from.mCacheManager, config);
     }
 
     /**
@@ -216,7 +222,7 @@ public class ImageLoader implements DisplayTaskMonitor,
             int debugLevel = config.getDebugLevel();
             LoggerManager.setDebugLevel(debugLevel);
             LoggerManager.getLogger(ImageLoader.class).warn("Configure ImageLoader:" + config.toString());
-            sLoader = new ImageLoader(context, config);
+            sLoader = new ImageLoader(context, null, config);
             return sLoader;
         }
         throw new IllegalArgumentException("Already configured.");
@@ -602,6 +608,10 @@ public class ImageLoader implements DisplayTaskMonitor,
         return true;
     }
 
+    public CacheManager getCacheManager() {
+        return mCacheManager;
+    }
+
     /**
      * Call this to pause the {@link ImageLoader}
      */
@@ -813,7 +823,7 @@ public class ImageLoader implements DisplayTaskMonitor,
     @Override
     public ImageLoader fork(LoaderConfig config) {
         //FIXME Consider to use shared elements for better performance.
-        return new ImageLoader(this.mContext, config);
+        return clone(this, config);
     }
 
     class FakeImageSettable implements ImageSettable {

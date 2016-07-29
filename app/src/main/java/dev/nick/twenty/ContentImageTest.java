@@ -45,10 +45,10 @@ import dev.nick.imageloader.display.animator.FadeInImageAnimator;
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
 public class ContentImageTest extends BaseTest {
 
+    static String mArtworkUri = "content://media/external/audio/albumart";
     @FindView(id = R.id.list)
     ListView listView;
-
-    static String mArtworkUri = "content://media/external/audio/albumart";
+    ImageLoader mLoader;
 
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +62,17 @@ public class ContentImageTest extends BaseTest {
         super.onStart();
 
         final List<Track> tracks = MediaUtils.getTrackList(this);
+
+        mLoader = ImageLoader.create(getApplicationContext(), new LoaderConfig.Builder()
+                .cachePolicy(new CachePolicy.Builder()
+                        .enableMemCache()
+                        .enableDiskCache()
+                        .cachingThreads(Runtime.getRuntime().availableProcessors())
+                        .cacheDirName("dis.cache.tests.content")
+                        .preferredLocation(CachePolicy.Location.INTERNAL)
+                        .compressFormat(Bitmap.CompressFormat.JPEG)
+                        .build())
+                .build());
 
         BaseAdapter adapter = new BaseAdapter() {
             @Override
@@ -96,16 +107,7 @@ public class ContentImageTest extends BaseTest {
 
                 String uri = mArtworkUri + File.separator + tracks.get(position).getAlbumId();
 
-                ImageLoader.create(getApplicationContext(), new LoaderConfig.Builder()
-                        .cachePolicy(new CachePolicy.Builder()
-                                .enableMemCache()
-                                .enableDiskCache()
-                                .cachingThreads(Runtime.getRuntime().availableProcessors())
-                                .cacheDirName("dis.cache.tests.content")
-                                .preferredLocation(CachePolicy.Location.INTERNAL)
-                                .compressFormat(Bitmap.CompressFormat.JPEG)
-                                .build())
-                        .build()).displayImage(uri, holder.imageView,
+                mLoader.displayImage(uri, holder.imageView,
                         new DisplayOption.Builder()
                                 .oneAfterOne()
                                 .imageQuality(ImageQuality.RAW)
@@ -118,6 +120,13 @@ public class ContentImageTest extends BaseTest {
         };
 
         listView.setAdapter(adapter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mLoader.clearMemCache();
+        mLoader.terminate();
     }
 
     class ViewHolder {
