@@ -122,7 +122,7 @@ public class FileImageTest extends BaseTest implements DisplayListener {
                 // String uri = mArtworkUri + File.separator + tracks.get(position).getAlbumId();
                 String uri = ImageSource.FILE.getPrefix() + tracks.get(position).getUrl();
 
-                ImageLoader.getInstance().displayImage(uri, holder.imageView,
+                ImageLoader.shared().displayImage(uri, holder.imageView,
                         new DisplayOption.Builder()
                                 .imageQuality(ImageQuality.FIT_VIEW)
                                 .viewMaybeReused()

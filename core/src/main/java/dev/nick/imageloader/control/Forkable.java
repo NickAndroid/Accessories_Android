@@ -17,5 +17,5 @@
 package dev.nick.imageloader.control;
 
 public interface Forkable<T> {
-    T fork(T from);
+    T fork();
 }

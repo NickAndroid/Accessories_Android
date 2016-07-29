@@ -37,12 +37,8 @@ import com.nick.scalpel.annotation.request.RequirePermission;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.nick.imageloader.DisplayListener;
 import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.LoadingListener;
-import dev.nick.imageloader.display.DisplayOption;
-import dev.nick.imageloader.display.ImageQuality;
-import dev.nick.imageloader.display.animator.FadeInImageAnimator;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.logger.LoggerManager;
@@ -101,7 +97,7 @@ public class LoadImageTest extends BaseTest {
                 holder.textView.setText("");
 
                 ImageLoader
-                        .getInstance()
+                        .shared()
                         .loadImage(uri, new LoadingListener() {
                                     @Override
                                     public void onError(@NonNull Cause cause) {
@@ -148,7 +144,7 @@ public class LoadImageTest extends BaseTest {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Track track = (Track) adapter.getItem(i);
-                ImageLoader.getInstance().cancel(track.getUrl());
+                ImageLoader.shared().cancel(track.getUrl());
             }
         });
     }

@@ -40,6 +40,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import dev.nick.imageloader.cache.CacheManager;
+import dev.nick.imageloader.control.Forkable;
 import dev.nick.imageloader.control.Freezer;
 import dev.nick.imageloader.control.LoaderState;
 import dev.nick.imageloader.display.BitmapImageSettings;
@@ -65,11 +66,11 @@ import dev.nick.imageloader.loader.task.DisplayTaskRecord;
 import dev.nick.imageloader.loader.task.FutureImageTask;
 import dev.nick.imageloader.loader.task.TaskManager;
 import dev.nick.imageloader.loader.task.TaskManagerImpl;
+import dev.nick.imageloader.stack.RequestHandler;
+import dev.nick.imageloader.stack.RequestStackService;
 import dev.nick.imageloader.utils.Preconditions;
 import dev.nick.logger.Logger;
 import dev.nick.logger.LoggerManager;
-import dev.nick.imageloader.stack.RequestHandler;
-import dev.nick.imageloader.stack.RequestStackService;
 
 /**
  * Main class of {@link ImageLoader} library.
@@ -77,7 +78,8 @@ import dev.nick.imageloader.stack.RequestStackService;
 public class ImageLoader implements DisplayTaskMonitor,
         Handler.Callback,
         RequestHandler<FutureImageTask>,
-        FutureImageTask.DoneListener {
+        FutureImageTask.DoneListener,
+        Forkable<ImageLoader> {
 
     private static final int MSG_APPLY_IMAGE_SETTINGS = 0x1;
     private static final int MSG_CALL_ON_START = 0x2;
@@ -123,6 +125,23 @@ public class ImageLoader implements DisplayTaskMonitor,
             .viewMaybeReused()
             .build();
 
+    private ImageLoader(ImageLoader copy) {
+        this.mContext = copy.mContext;
+        this.mConfig = copy.mConfig;
+        this.mTaskManager = copy.mTaskManager;
+        this.mSettableIdCreator = copy.mSettableIdCreator;
+        this.mUIThreadHandler = copy.mUIThreadHandler;
+        this.mCacheManager = copy.mCacheManager;
+        this.mLoadingService = copy.mLoadingService;
+        this.mImageSettingsScheduler = copy.mImageSettingsScheduler;
+        this.mStackService = copy.mStackService;
+        this.mLogger = copy.mLogger;
+
+        this.mTaskLockMap = new HashMap<>();
+        this.mFutures = new ArrayList<>();
+        this.mState = LoaderState.RUNNING;
+    }
+
     private ImageLoader(Context context, LoaderConfig config) {
         this.mContext = context;
         this.mConfig = config;
@@ -140,12 +159,48 @@ public class ImageLoader implements DisplayTaskMonitor,
     }
 
     /**
-     * Init the image loader with default {@link LoaderConfig}.
+     * Create a new instance of ImageLoader.
      *
      * @param context An application {@link Context} is preferred.
+     * @return Single instance of {@link ImageLoader}
      */
-    public synchronized static void init(Context context) {
-        init(context, LoaderConfig.DEFAULT_CONFIG);
+    public static ImageLoader create(Context context) {
+        return create(context, null);
+    }
+
+    /**
+     * Create a new instance of ImageLoader.
+     *
+     * @param context An application {@link Context} is preferred.
+     * @param config  Configuration of this loader.
+     * @return Single instance of {@link ImageLoader}
+     */
+    public static ImageLoader create(Context context, LoaderConfig config) {
+        return shared(context, config).fork();
+    }
+
+    /**
+     * Get the shared instance of ImageLoader
+     *
+     * @param context An application {@link Context} is preferred.
+     * @return Single instance of {@link ImageLoader}
+     */
+    public static ImageLoader shared(Context context) {
+        return shared(context, null);
+    }
+
+    /**
+     * Get the shared instance of ImageLoader
+     *
+     * @param context An application {@link Context} is preferred.
+     * @param config  Configuration of this loader.
+     * @return Single instance of {@link ImageLoader}
+     */
+    public static ImageLoader shared(Context context, LoaderConfig config) {
+        if (sLoader == null) {
+            sLoader = init(context, config);
+        }
+        return sLoader;
     }
 
     /**
@@ -155,23 +210,18 @@ public class ImageLoader implements DisplayTaskMonitor,
      * @param config  Configuration of this loader.
      * @see LoaderConfig
      */
-    public synchronized static void init(Context context, LoaderConfig config) {
-        if (config == null) throw new NullPointerException("config is null.");
+    private synchronized static ImageLoader init(Context context, LoaderConfig config) {
+        if (config == null) {
+            config = LoaderConfig.DEFAULT_CONFIG;
+        }
         if (sLoader == null) {
             int debugLevel = config.getDebugLevel();
             LoggerManager.setDebugLevel(debugLevel);
             LoggerManager.getLogger(ImageLoader.class).warn("Configure ImageLoader:" + config.toString());
             sLoader = new ImageLoader(context, config);
-            return;
+            return sLoader;
         }
         throw new IllegalArgumentException("Already configured.");
-    }
-
-    /**
-     * @return Single instance of {@link ImageLoader}
-     */
-    public static ImageLoader getInstance() {
-        return sLoader;
     }
 
     /**
@@ -718,6 +768,11 @@ public class ImageLoader implements DisplayTaskMonitor,
     @Override
     public void onDone(FutureImageTask futureImageTask) {
         onFutureDone(futureImageTask);
+    }
+
+    @Override
+    public ImageLoader fork() {
+        return new ImageLoader(this);
     }
 
     class FakeImageSettable implements ImageSettable {

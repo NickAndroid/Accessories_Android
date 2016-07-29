@@ -34,7 +34,7 @@ public class MyApp extends ScalpelApplication {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             Trace.beginSection("ImageLoader_init");
         }
-        ImageLoader.init(getApplicationContext(), new LoaderConfig.Builder()
+        ImageLoader.shared(getApplicationContext(), new LoaderConfig.Builder()
                 .cachePolicy(new CachePolicy.Builder()
                         .enableMemCache()
                         .enableDiskCache()
