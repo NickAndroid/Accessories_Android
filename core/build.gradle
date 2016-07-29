@@ -2,21 +2,25 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
-def siteUrl = 'http://nickandroid.github.io/ImageLoader/'
-def gitUrl = 'https://github.com/NickAndroid/ImageLoader.git'
+def siteUrl = 'http://nickandroid.github.io/ImageLoader_Android/'
+def gitUrl = 'https://github.com/NickAndroid/ImageLoader_Android.git'
 
 group = "dev.nick"
 version = "1.0.0"
 
 android {
     compileSdkVersion 24
-    buildToolsVersion "23.0.3"
+    buildToolsVersion "24.0.1"
 
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
+    }
+    compileOptions {
+        targetCompatibility = JavaVersion.VERSION_1_7
+        sourceCompatibility = JavaVersion.VERSION_1_7
     }
     buildTypes {
         release {
@@ -29,7 +33,7 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:24.0.0'
+    compile 'com.android.support:appcompat-v7:24.1.0'
 }
 
 install {
