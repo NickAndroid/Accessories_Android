@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package dev.nick.stack;
+package dev.nick.imageloader.stack;
 
 class Looper<T> implements Runnable {
 

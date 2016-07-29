@@ -68,8 +68,8 @@ import dev.nick.imageloader.loader.task.TaskManagerImpl;
 import dev.nick.imageloader.utils.Preconditions;
 import dev.nick.logger.Logger;
 import dev.nick.logger.LoggerManager;
-import dev.nick.stack.RequestHandler;
-import dev.nick.stack.RequestStackService;
+import dev.nick.imageloader.stack.RequestHandler;
+import dev.nick.imageloader.stack.RequestStackService;
 
 /**
  * Main class of {@link ImageLoader} library.

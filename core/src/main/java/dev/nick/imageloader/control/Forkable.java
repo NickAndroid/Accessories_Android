@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-package dev.nick.stack;
+package dev.nick.imageloader.control;
 
-public interface RequestHandler<T> {
-    boolean handle(T request);
+public interface Forkable<T> {
+    T fork(T from);
 }

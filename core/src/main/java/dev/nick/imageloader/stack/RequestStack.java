@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package dev.nick.stack;
+package dev.nick.imageloader.stack;
 
 import java.util.Stack;
 import java.util.concurrent.CountDownLatch;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package dev.nick.stack;
+package dev.nick.imageloader.stack;
 
 public final class RequestStackService<T> implements RequestHandler<T> {
 
