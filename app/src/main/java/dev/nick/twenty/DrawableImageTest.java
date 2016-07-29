@@ -46,7 +46,7 @@ public class DrawableImageTest extends BaseTest {
     @Override
     protected void onStart() {
         super.onStart();
-        ImageLoader.shared().displayImage(urlDrawable, imageView, new DisplayOption.Builder()
+        ImageLoader.shared(this).displayImage(urlDrawable, imageView, new DisplayOption.Builder()
                 .defaultImgRes(R.drawable.ic_launcher)
                 .bitmapProcessor(new BlurBitmapProcessor(24))
                 .imageQuality(ImageQuality.RAW)
