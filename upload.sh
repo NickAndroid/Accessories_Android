@@ -1,1 +1,1 @@
-./gradlew bintrayUpload > build/upload.log
+./gradlew bintrayUpload > build/upload.log; cat upload.log
