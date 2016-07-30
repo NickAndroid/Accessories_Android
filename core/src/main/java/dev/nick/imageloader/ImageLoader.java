@@ -89,40 +89,6 @@ public class ImageLoader implements DisplayTaskMonitor,
     private static final int MSG_CALL_ON_COMPLETE = 0x4;
     private static final int MSG_CALL_ON_FAILURE = 0x5;
     private static final int MSG_CALL_ON_CANCEL = 0x6;
-
-    private Context mContext;
-
-    private Handler mUIThreadHandler;
-
-    @VisibleForTesting
-    private CacheManager mCacheManager;
-
-    @VisibleForTesting
-    private LoaderConfig mConfig;
-
-    @VisibleForTesting
-    private RequestStackService<FutureImageTask> mStackService;
-
-    private Logger mLogger;
-
-    private long mClearTaskRequestedTimeMills;
-
-    private final Map<Integer, DisplayTaskRecord> mTaskLockMap;
-    private final List<FutureImageTask> mFutures;
-
-    @VisibleForTesting
-    private ExecutorService mLoadingService;
-    @VisibleForTesting
-    private ExecutorService mImageSettingsScheduler;
-
-    private Freezer mFreezer;
-    private LoaderState mState;
-
-    private TaskManager mTaskManager;
-    private ImageSettableIdCreator mSettableIdCreator;
-
-    private static ImageLoader sLoader;
-
     private static final DisplayOption sDefDisplayOption = new DisplayOption.Builder()
             .imageQuality(ImageQuality.FIT_VIEW)
             .imageAnimator(null)
@@ -131,8 +97,32 @@ public class ImageLoader implements DisplayTaskMonitor,
             .loadingImgRes(0)
             .viewMaybeReused()
             .build();
+    private static ImageLoader sLoader;
+    private final Map<Integer, DisplayTaskRecord> mTaskLockMap;
+    private final List<FutureImageTask> mFutures;
+    private Context mContext;
+    private Handler mUIThreadHandler;
+    @VisibleForTesting
+    private CacheManager mCacheManager;
+    @VisibleForTesting
+    private LoaderConfig mConfig;
+    @VisibleForTesting
+    private RequestStackService<FutureImageTask> mStackService;
+    private Logger mLogger;
+    private long mClearTaskRequestedTimeMills;
+    @VisibleForTesting
+    private ExecutorService mLoadingService;
+    @VisibleForTesting
+    private ExecutorService mImageSettingsScheduler;
+    private Freezer mFreezer;
+    private LoaderState mState;
+    private TaskManager mTaskManager;
+    private ImageSettableIdCreator mSettableIdCreator;
 
     private ImageLoader(Context context, CacheManager cacheManager, LoaderConfig config) {
+        Preconditions.checkNotNull(context);
+        if (config == null) config = LoaderConfig.DEFAULT_CONFIG;
+        LoggerManager.setDebugLevel(config.getDebugLevel());
         this.mContext = context;
         this.mConfig = config;
         this.mTaskManager = new TaskManagerImpl();
@@ -201,31 +191,9 @@ public class ImageLoader implements DisplayTaskMonitor,
      */
     public static ImageLoader shared(Context context, LoaderConfig config) {
         if (sLoader == null) {
-            sLoader = init(context, config);
+            sLoader = new ImageLoader(context, null, config);
         }
         return sLoader;
-    }
-
-    /**
-     * Init the image loader with custom {@link LoaderConfig}.
-     *
-     * @param context An application {@link Context} is preferred.
-     * @param config  Configuration of this loader.
-     * @see LoaderConfig
-     */
-    private synchronized static ImageLoader init(Context context, LoaderConfig config) {
-        Preconditions.checkNotNull(context);
-        if (config == null) {
-            config = LoaderConfig.DEFAULT_CONFIG;
-        }
-        if (sLoader == null) {
-            int debugLevel = config.getDebugLevel();
-            LoggerManager.setDebugLevel(debugLevel);
-            LoggerManager.getLogger(ImageLoader.class).warn("Configure ImageLoader:" + config.toString());
-            sLoader = new ImageLoader(context, null, config);
-            return sLoader;
-        }
-        throw new IllegalArgumentException("Already configured.");
     }
 
     /**
@@ -829,15 +797,33 @@ public class ImageLoader implements DisplayTaskMonitor,
         return clone(this, config);
     }
 
+    private static class FailureParams {
+        Cause cause;
+        ErrorListener listener;
+    }
+
+    private static class CompleteParams {
+        BitmapResult result;
+        ProgressListener<BitmapResult> progressListener;
+    }
+
+    private static class ProgressParams {
+        float progress;
+        ProgressListener<BitmapResult> progressListener;
+    }
+
+    private static class LoaderFactory {
+        private static AtomicInteger sLoaderId = new AtomicInteger(0);
+
+        static int assignLoaderId() {
+            return sLoaderId.getAndIncrement();
+        }
+    }
+
     class FakeImageSettable implements ImageSettable {
         @Override
         public void setImageBitmap(@NonNull Bitmap bitmap) {
             // Nothing.
-        }
-
-        @Override
-        public boolean setBackgroundDrawable(@Nullable Drawable drawable) {
-            return true;
         }
 
         @Override
@@ -1008,29 +994,6 @@ public class ImageLoader implements DisplayTaskMonitor,
             } else {
                 callOnFailure(listener, cause);
             }
-        }
-    }
-
-    private static class FailureParams {
-        Cause cause;
-        ErrorListener listener;
-    }
-
-    private static class CompleteParams {
-        BitmapResult result;
-        ProgressListener<BitmapResult> progressListener;
-    }
-
-    private static class ProgressParams {
-        float progress;
-        ProgressListener<BitmapResult> progressListener;
-    }
-
-    private static class LoaderFactory {
-        private static AtomicInteger sLoaderId = new AtomicInteger(0);
-
-        static int assignLoaderId() {
-            return sLoaderId.getAndIncrement();
         }
     }
 }

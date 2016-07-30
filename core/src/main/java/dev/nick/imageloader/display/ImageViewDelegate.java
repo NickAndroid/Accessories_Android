@@ -40,11 +40,6 @@ public class ImageViewDelegate implements ImageSettable {
     }
 
     @Override
-    public boolean setBackgroundDrawable(@Nullable Drawable drawable) {
-        return false;
-    }
-
-    @Override
     public void setImageResource(int resId) {
         mImageView.setImageResource(resId);
     }
