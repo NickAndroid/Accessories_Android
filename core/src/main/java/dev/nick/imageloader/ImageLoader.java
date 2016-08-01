@@ -89,6 +89,7 @@ public class ImageLoader implements DisplayTaskMonitor,
     private static final int MSG_CALL_ON_COMPLETE = 0x4;
     private static final int MSG_CALL_ON_FAILURE = 0x5;
     private static final int MSG_CALL_ON_CANCEL = 0x6;
+
     private static final DisplayOption sDefDisplayOption = new DisplayOption.Builder()
             .imageQuality(ImageQuality.FIT_VIEW)
             .imageAnimator(null)
@@ -97,25 +98,34 @@ public class ImageLoader implements DisplayTaskMonitor,
             .loadingImgRes(0)
             .viewMaybeReused()
             .build();
+
     private static ImageLoader sLoader;
+
     private final Map<Integer, DisplayTaskRecord> mTaskLockMap;
     private final List<FutureImageTask> mFutures;
+
     private Context mContext;
     private Handler mUIThreadHandler;
+
     @VisibleForTesting
     private CacheManager mCacheManager;
     @VisibleForTesting
     private LoaderConfig mConfig;
     @VisibleForTesting
     private RequestStackService<FutureImageTask> mStackService;
+
     private Logger mLogger;
+
     private long mClearTaskRequestedTimeMills;
+
     @VisibleForTesting
     private ExecutorService mLoadingService;
     @VisibleForTesting
     private ExecutorService mImageSettingsScheduler;
+
     private Freezer mFreezer;
     private LoaderState mState;
+
     private TaskManager mTaskManager;
     private ImageSettableIdCreator mSettableIdCreator;
 
