@@ -20,11 +20,12 @@ import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
 import dev.nick.imageloader.display.BitmapUtils;
+import dev.nick.imageloader.display.ImageSettable;
 
 public class RoundCornerBitmapProcessor implements BitmapProcessor {
     @NonNull
     @Override
-    public Bitmap process(@NonNull Bitmap in) {
+    public Bitmap process(@NonNull Bitmap in, @NonNull ImageSettable settable) {
         return BitmapUtils.roundCorner(in, 24);
     }
 }
