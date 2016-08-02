@@ -480,7 +480,7 @@ public class ImageLoader implements DisplayTaskMonitor,
                                     ImageAnimator animator) {
         if (settable != null) {
             BitmapImageSettings settings = new BitmapImageSettings(mContext.getResources(), animator,
-                    (processor == null ? bitmap : processor.process(bitmap)), settable);
+                    (processor == null ? bitmap : processor.process(bitmap, settable)), settable);
             mUIThreadHandler.obtainMessage(MSG_APPLY_IMAGE_SETTINGS, settings).sendToTarget();
         }
     }
@@ -600,7 +600,9 @@ public class ImageLoader implements DisplayTaskMonitor,
         if (mState == LoaderState.TERMINATED) {
             throw new IllegalStateException("Loader has been terminated.");
         }
-        mState = LoaderState.PAUSE_REQUESTED;
+        if (!isPaused()) {
+            mState = LoaderState.PAUSE_REQUESTED;
+        }
         mLogger.funcExit();
     }
 
@@ -622,8 +624,10 @@ public class ImageLoader implements DisplayTaskMonitor,
         if (mState == LoaderState.TERMINATED) {
             throw new IllegalStateException("Loader has been terminated.");
         }
-        if (mState == LoaderState.PAUSED) {
-            mFreezer.resume();
+        if (isPaused()) {
+            if (mFreezer != null) {
+                mFreezer.resume();
+            }
             mState = LoaderState.RUNNING;
             mLogger.funcExit();
         }

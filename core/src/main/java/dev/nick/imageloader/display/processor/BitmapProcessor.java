@@ -19,7 +19,9 @@ package dev.nick.imageloader.display.processor;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
+import dev.nick.imageloader.display.ImageSettable;
+
 public interface BitmapProcessor {
     @NonNull
-    Bitmap process(@NonNull Bitmap in);
+    Bitmap process(@NonNull Bitmap in, @NonNull ImageSettable settable);
 }

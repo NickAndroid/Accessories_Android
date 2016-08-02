@@ -20,8 +20,6 @@ import dev.nick.imageloader.display.ImageQuality;
 
 public class DecodeSpec {
 
-    public static DecodeSpec NONE_SPEC = new DecodeSpec(ImageQuality.RAW, null);
-
     ImageQuality quality;
     ViewSpec viewSpec;
 
