@@ -56,7 +56,7 @@ public class FileImageFetcher extends BaseImageFetcher {
         callOnStart(progressListener);
 
         switch (decodeSpec.quality) {
-            case FIT_VIEW:
+            case OPT:
                 Preconditions.checkNotNull(viewSpec, "Spec can not be null when defined quality which not RAW");
                 decodeOptions = new BitmapFactory.Options();
                 // If we have to resize this image, first get the natural bounds.

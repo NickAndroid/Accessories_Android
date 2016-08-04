@@ -14,18 +14,14 @@
  * limitations under the License.
  */
 
-package dev.nick.imageloader.display.processor;
+package dev.nick.imageloader.display.handler;
 
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
-import dev.nick.imageloader.display.BitmapUtils;
 import dev.nick.imageloader.display.ImageSettable;
 
-public class BlackWhiteBitmapProcessor implements BitmapProcessor {
+public interface BitmapHandler {
     @NonNull
-    @Override
-    public Bitmap process(@NonNull Bitmap in, @NonNull ImageSettable settable) {
-        return BitmapUtils.blackAndWhited(in);
-    }
+    Bitmap process(@NonNull Bitmap in, @NonNull ImageSettable settable);
 }

@@ -27,7 +27,7 @@ import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.display.ImageQuality;
 import dev.nick.imageloader.display.animator.FadeInImageAnimator;
-import dev.nick.imageloader.display.processor.BlackWhiteBitmapProcessor;
+import dev.nick.imageloader.display.handler.BlackWhiteBitmapHandler;
 
 public class AssetsImageTest extends BaseTest {
 
@@ -47,9 +47,9 @@ public class AssetsImageTest extends BaseTest {
     @Override
     protected void onStart() {
         super.onStart();
-        ImageLoader.shared(this).displayImage(urlAssets, imageView, new DisplayOption.Builder()
-                .defaultImgRes(R.drawable.ic_launcher)
-                .bitmapProcessor(new BlackWhiteBitmapProcessor())
+        ImageLoader.shared(this).loadInto(urlAssets, imageView, new DisplayOption.Builder()
+                .showWithDefault(R.drawable.ic_launcher)
+                .bitmapHandler(new BlackWhiteBitmapHandler())
                 .imageQuality(ImageQuality.RAW)
                 .imageAnimator(new FadeInImageAnimator())
                 .build());

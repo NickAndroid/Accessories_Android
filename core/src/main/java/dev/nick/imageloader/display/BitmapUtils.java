@@ -28,7 +28,7 @@ import android.graphics.RectF;
 public final class BitmapUtils {
 
     /* Initial blur radius. */
-    private static final int DEFAULT_RADIUS = 8;
+    private static final int DEFAULT_RADIUS = 24;
 
     /**
      * This class is never instantiated

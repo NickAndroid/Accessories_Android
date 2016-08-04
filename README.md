@@ -80,10 +80,10 @@ public class Z {
 
 ### Loading or Display:
 ```java
-mLoader.loadImage(uri, new LoadingListener(){...});
+mLoader.load(uri, new LoadingListener(){...});
 ```
 ```java
-mLoader.displayImage(uri, holder.imageView,
+mLoader.loadInto(uri, holder.imageView,
                         new DisplayOption.Builder()
                                 .imageQuality(DisplayOption.ImageQuality.FIT_VIEW)
                                 .loadingImgRes(R.drawable.ic_cloud_download_black_24dp)
@@ -94,12 +94,12 @@ mLoader.displayImage(uri, holder.imageView,
 ```
 **Or**
 ```java
-mLoader.displayImage(uri, holder.imageView);
+mLoader.loadInto(uri, holder.imageView);
 ```
 
 ### Listening:
 ```java
-mLoader.displayImage(uri, holder.imageView, new LoaderListener(){...});
+mLoader.loadInto(uri, holder.imageView, new LoaderListener(){...});
 ```
 
 ### CustomView support:
@@ -107,7 +107,7 @@ mLoader.displayImage(uri, holder.imageView, new LoaderListener(){...});
 class CustomView implements ImageSettable {}
 ```
 ```java
-mLoader.displayImage(uri, customView);
+mLoader.loadInto(uri, customView);
 ```
 
 ### Cancel tasks:

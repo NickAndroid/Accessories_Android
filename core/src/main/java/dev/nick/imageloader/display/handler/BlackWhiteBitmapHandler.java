@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package dev.nick.imageloader.display.processor;
+package dev.nick.imageloader.display.handler;
 
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
@@ -22,24 +22,10 @@ import android.support.annotation.NonNull;
 import dev.nick.imageloader.display.BitmapUtils;
 import dev.nick.imageloader.display.ImageSettable;
 
-public class BlurBitmapProcessor implements BitmapProcessor {
-
-    int radius = 0;
-
-    public BlurBitmapProcessor() {
-    }
-
-    public BlurBitmapProcessor(int radius) {
-        this.radius = radius;
-    }
-
+public class BlackWhiteBitmapHandler implements BitmapHandler {
     @NonNull
     @Override
     public Bitmap process(@NonNull Bitmap in, @NonNull ImageSettable settable) {
-        if (radius > 0) {
-            return BitmapUtils.createBlurredBitmap(in, radius);
-        } else {
-            return BitmapUtils.createBlurredBitmap(in);
-        }
+        return BitmapUtils.blackAndWhited(in);
     }
 }

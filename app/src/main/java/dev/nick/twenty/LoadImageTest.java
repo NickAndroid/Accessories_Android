@@ -46,109 +46,6 @@ import dev.nick.logger.LoggerManager;
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
 public class LoadImageTest extends BaseTest {
 
-    @FindView(id = R.id.list)
-    ListView listView;
-
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.file_image_layout);
-        setTitle(getClass().getSimpleName());
-        Scalpel.getInstance().wire(this);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        final List<Track> tracks = getTrackList();
-
-        final BaseAdapter adapter = new BaseAdapter() {
-            @Override
-            public int getCount() {
-                return tracks.size();
-            }
-
-            @Override
-            public Object getItem(int position) {
-                return tracks.get(position);
-            }
-
-            @Override
-            public long getItemId(int position) {
-                return position;
-            }
-
-            @Override
-            public View getView(int position, View convertView, final ViewGroup parent) {
-
-                final ViewHolder holder;
-
-                if (convertView == null) {
-                    convertView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.net_image_layout, parent, false);
-                    holder = new ViewHolder(convertView);
-                    convertView.setTag(holder);
-                } else {
-                    holder = (ViewHolder) convertView.getTag();
-                }
-
-                String uri = tracks.get(position).getUrl();
-
-                holder.progressBar.setProgress(0);
-                holder.textView.setText("");
-
-                ImageLoader
-                        .shared(getApplicationContext())
-                        .loadImage(uri, new LoadingListener() {
-                                    @Override
-                                    public void onError(@NonNull Cause cause) {
-                                        LoggerManager.getLogger(getClass()).error(cause);
-                                        holder.textView.setText("Error");
-                                    }
-
-                                    @Override
-                                    public void onComplete(@Nullable BitmapResult result) {
-                                        if (result != null) {
-                                            holder.progressBar.setProgress((int) (1 * 100));
-                                            LoggerManager.getLogger(getClass()).debug("onComplete:" + result.result);
-                                            holder.textView.setText("Completed");
-                                        }
-                                        holder.imageView.setImageBitmap(result != null ? result.result : null);
-                                    }
-
-                                    @Override
-                                    public void onProgressUpdate(float progress) {
-                                        holder.progressBar.setProgress((int) (progress * 100));
-                                        holder.textView.setText("" + (int) (progress * 100));
-                                    }
-
-                                    @Override
-                                    public void onCancel() {
-                                        LoggerManager.getLogger(getClass()).debug("onCancel");
-                                        holder.progressBar.setProgress(0);
-                                        holder.textView.setText("Canceled");
-                                    }
-
-                                    @Override
-                                    public void onStartLoading() {
-                                        holder.textView.setText("Start");
-                                        holder.progressBar.setProgress(0);
-                                    }
-                                });
-
-                return convertView;
-            }
-        };
-
-        listView.setAdapter(adapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Track track = (Track) adapter.getItem(i);
-                ImageLoader.shared(getApplicationContext()).cancel(track.getUrl());
-            }
-        });
-    }
-
     final String[] urls = new String[]{
             "http://i.imgur.com/ZXVlev9.jpg",
             "http://i.imgur.com/LT6RmQU.png",
@@ -261,6 +158,108 @@ public class LoadImageTest extends BaseTest {
             "http://i.imgur.com/moer0PI.jpg",
             "http://i.imgur.com/vRUz3TD.jpg"
     };
+    @FindView(id = R.id.list)
+    ListView listView;
+
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.file_image_layout);
+        setTitle(getClass().getSimpleName());
+        Scalpel.getInstance().wire(this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        final List<Track> tracks = getTrackList();
+
+        final BaseAdapter adapter = new BaseAdapter() {
+            @Override
+            public int getCount() {
+                return tracks.size();
+            }
+
+            @Override
+            public Object getItem(int position) {
+                return tracks.get(position);
+            }
+
+            @Override
+            public long getItemId(int position) {
+                return position;
+            }
+
+            @Override
+            public View getView(int position, View convertView, final ViewGroup parent) {
+
+                final ViewHolder holder;
+
+                if (convertView == null) {
+                    convertView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.net_image_layout, parent, false);
+                    holder = new ViewHolder(convertView);
+                    convertView.setTag(holder);
+                } else {
+                    holder = (ViewHolder) convertView.getTag();
+                }
+
+                String uri = tracks.get(position).getUrl();
+
+                holder.progressBar.setProgress(0);
+                holder.textView.setText("");
+
+                ImageLoader
+                        .shared(getApplicationContext())
+                        .load(uri, new LoadingListener.Stub() {
+                            @Override
+                            public void onError(@NonNull Cause cause) {
+                                LoggerManager.getLogger(getClass()).error(cause);
+                                holder.textView.setText("Error");
+                            }
+
+                            @Override
+                            public void onComplete(@Nullable BitmapResult result) {
+                                if (result != null) {
+                                    holder.progressBar.setProgress((int) (1 * 100));
+                                    LoggerManager.getLogger(getClass()).debug("onComplete:" + result.result);
+                                    holder.textView.setText("Completed");
+                                }
+                                holder.imageView.setImageBitmap(result != null ? result.result : null);
+                            }
+
+                            @Override
+                            public void onProgressUpdate(float progress) {
+                                holder.progressBar.setProgress((int) (progress * 100));
+                                holder.textView.setText("" + (int) (progress * 100));
+                            }
+
+                            @Override
+                            public void onCancel() {
+                                LoggerManager.getLogger(getClass()).debug("onCancel");
+                                holder.progressBar.setProgress(0);
+                                holder.textView.setText("Canceled");
+                            }
+
+                            @Override
+                            public void onStartLoading() {
+                                holder.textView.setText("Start");
+                                holder.progressBar.setProgress(0);
+                            }
+                        });
+
+                return convertView;
+            }
+        };
+
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Track track = (Track) adapter.getItem(i);
+                ImageLoader.shared(getApplicationContext()).cancel(track.getUrl());
+            }
+        });
+    }
 
     List<Track> getTrackList() {
         List<Track> out = new ArrayList<>(urls.length);

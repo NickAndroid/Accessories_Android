@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package dev.nick.imageloader.display.processor;
+package dev.nick.imageloader.display.handler;
 
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
+import dev.nick.imageloader.display.BitmapUtils;
 import dev.nick.imageloader.display.ImageSettable;
 
-public interface BitmapProcessor {
+public class RoundCornerBitmapHandler implements BitmapHandler {
     @NonNull
-    Bitmap process(@NonNull Bitmap in, @NonNull ImageSettable settable);
+    @Override
+    public Bitmap process(@NonNull Bitmap in, @NonNull ImageSettable settable) {
+        return BitmapUtils.roundCorner(in, 24);
+    }
 }

@@ -19,7 +19,7 @@ package dev.nick.imageloader.display;
 import android.support.annotation.DrawableRes;
 
 import dev.nick.imageloader.display.animator.ImageAnimator;
-import dev.nick.imageloader.display.processor.BitmapProcessor;
+import dev.nick.imageloader.display.handler.BitmapHandler;
 
 public class DisplayOption {
 
@@ -28,7 +28,7 @@ public class DisplayOption {
 
     private ImageQuality quality;
 
-    private BitmapProcessor processor;
+    private BitmapHandler processor;
     private ImageAnimator animator;
 
     private boolean applyImageOneByOne;
@@ -39,7 +39,7 @@ public class DisplayOption {
     private DisplayOption(int defaultImgRes,
                           int loadingImgRes,
                           ImageQuality quality,
-                          BitmapProcessor processor,
+                          BitmapHandler processor,
                           ImageAnimator animator,
                           boolean applyImageOneByOne,
                           boolean viewMaybeReused,
@@ -66,7 +66,7 @@ public class DisplayOption {
         return quality;
     }
 
-    public BitmapProcessor getProcessor() {
+    public BitmapHandler getProcessor() {
         return processor;
     }
 
@@ -91,9 +91,9 @@ public class DisplayOption {
         private int defaultImgRes;
         private int loadingImgRes;
 
-        private ImageQuality quality = ImageQuality.FIT_VIEW;
+        private ImageQuality quality = ImageQuality.OPT;
 
-        private BitmapProcessor processor;
+        private BitmapHandler handler;
         private ImageAnimator animator;
 
         private boolean oneAfterOne;
@@ -105,7 +105,7 @@ public class DisplayOption {
          * @param defaultImgRes Image res showing when load failure.
          * @return Instance of this builder.
          */
-        public Builder defaultImgRes(@DrawableRes int defaultImgRes) {
+        public Builder showWithDefault(@DrawableRes int defaultImgRes) {
             this.defaultImgRes = defaultImgRes;
             return this;
         }
@@ -114,17 +114,17 @@ public class DisplayOption {
          * @param loadingImgRes Image res showing when loading.
          * @return Instance of this builder.
          */
-        public Builder loadingImgRes(@DrawableRes int loadingImgRes) {
+        public Builder showOnLoading(@DrawableRes int loadingImgRes) {
             this.loadingImgRes = loadingImgRes;
             return this;
         }
 
         /**
-         * @param processor {@link BitmapProcessor} instance using to process the bitmap before display.
+         * @param handler {@link BitmapHandler} instance using to process the bitmap before display.
          * @return Instance of this builder.
          */
-        public Builder bitmapProcessor(BitmapProcessor processor) {
-            this.processor = processor;
+        public Builder bitmapHandler(BitmapHandler handler) {
+            this.handler = handler;
             return this;
         }
 
@@ -152,7 +152,8 @@ public class DisplayOption {
         }
 
         /**
-         * Display the image one by one.
+         * Display the image one by one, by default will display
+         * loaded images at the same time.
          *
          * @return Instance of this builder.
          */
@@ -186,7 +187,7 @@ public class DisplayOption {
                     defaultImgRes,
                     loadingImgRes,
                     quality,
-                    processor,
+                    handler,
                     animator,
                     oneAfterOne,
                     viewMaybeReused,

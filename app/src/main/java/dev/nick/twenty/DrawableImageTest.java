@@ -26,7 +26,7 @@ import com.nick.scalpel.annotation.binding.FindView;
 import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.display.ImageQuality;
-import dev.nick.imageloader.display.processor.BlurBitmapProcessor;
+import dev.nick.imageloader.display.handler.BlurBitmapHandler;
 
 public class DrawableImageTest extends BaseTest {
 
@@ -46,9 +46,9 @@ public class DrawableImageTest extends BaseTest {
     @Override
     protected void onStart() {
         super.onStart();
-        ImageLoader.shared(this).displayImage(urlDrawable, imageView, new DisplayOption.Builder()
-                .defaultImgRes(R.drawable.ic_launcher)
-                .bitmapProcessor(new BlurBitmapProcessor(24))
+        ImageLoader.shared(this).loadInto(urlDrawable, imageView, new DisplayOption.Builder()
+                .showWithDefault(R.drawable.ic_launcher)
+                .bitmapHandler(new BlurBitmapHandler(24))
                 .imageQuality(ImageQuality.RAW)
                 .build());
     }

@@ -9,5 +9,5 @@ public enum ImageQuality {
     /**
      * Decrease the size of the image to fit the view dimen.
      */
-    FIT_VIEW
+    OPT
 }

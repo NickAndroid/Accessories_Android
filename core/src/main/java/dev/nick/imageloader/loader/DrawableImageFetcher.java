@@ -58,7 +58,7 @@ public class DrawableImageFetcher extends BaseImageFetcher {
         ViewSpec viewSpec = decodeSpec.viewSpec;
 
         switch (decodeSpec.quality) {
-            case FIT_VIEW:
+            case OPT:
                 decodeOptions = new BitmapFactory.Options();
 
                 // If we have to resize this image, first get the natural bounds.

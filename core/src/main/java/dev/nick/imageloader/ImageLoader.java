@@ -18,7 +18,6 @@ package dev.nick.imageloader;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -54,7 +53,7 @@ import dev.nick.imageloader.display.ImageSettableIdCreatorImpl;
 import dev.nick.imageloader.display.ImageViewDelegate;
 import dev.nick.imageloader.display.ResImageSettings;
 import dev.nick.imageloader.display.animator.ImageAnimator;
-import dev.nick.imageloader.display.processor.BitmapProcessor;
+import dev.nick.imageloader.display.handler.BitmapHandler;
 import dev.nick.imageloader.loader.ImageSource;
 import dev.nick.imageloader.loader.ProgressListener;
 import dev.nick.imageloader.loader.ViewSpec;
@@ -91,11 +90,11 @@ public class ImageLoader implements DisplayTaskMonitor,
     private static final int MSG_CALL_ON_CANCEL = 0x6;
 
     private static final DisplayOption sDefDisplayOption = new DisplayOption.Builder()
-            .imageQuality(ImageQuality.FIT_VIEW)
+            .imageQuality(ImageQuality.OPT)
             .imageAnimator(null)
-            .bitmapProcessor(null)
-            .defaultImgRes(0)
-            .loadingImgRes(0)
+            .bitmapHandler(null)
+            .showWithDefault(0)
+            .showOnLoading(0)
             .viewMaybeReused()
             .build();
 
@@ -213,18 +212,17 @@ public class ImageLoader implements DisplayTaskMonitor,
         mClearTaskRequestedTimeMills = System.currentTimeMillis();
     }
 
-    public void loadImage(@NonNull String url, @NonNull LoadingListener loadingListener) {
-        Preconditions.checkNotNull(loadingListener);
-        displayImage(url, new FakeImageSettable(),
+    public void load(@NonNull String url, @NonNull LoadingListener loadingListener) {
+        loadInto(url, new FakeImageSettable(),
                 new DisplayOption.Builder()
-                        .imageQuality(ImageQuality.FIT_VIEW)
+                        .imageQuality(ImageQuality.OPT)
                         .imageAnimator(null)
-                        .bitmapProcessor(null)
-                        .defaultImgRes(0)
-                        .loadingImgRes(0)
+                        .bitmapHandler(null)
+                        .showWithDefault(0)
+                        .showOnLoading(0)
                         .viewMaybeReused()
                         .build(),
-                loadingListener);
+                Preconditions.checkNotNull(loadingListener));
     }
 
     /**
@@ -233,9 +231,9 @@ public class ImageLoader implements DisplayTaskMonitor,
      * @param url  Image source url, one of {@link dev.nick.imageloader.loader.ImageSource}
      * @param view Target view to display the image.
      */
-    public void displayImage(@NonNull String url, @NonNull ImageView view) {
+    public void loadInto(@NonNull String url, @NonNull ImageView view) {
         ImageViewDelegate viewDelegate = new ImageViewDelegate(view);
-        displayImage(url, viewDelegate, null, null);
+        loadInto(url, viewDelegate, null, null);
     }
 
     /**
@@ -245,8 +243,8 @@ public class ImageLoader implements DisplayTaskMonitor,
      * @param view   Target view to display the image.
      * @param option {@link DisplayOption} is options using when display the image.
      */
-    public void displayImage(@NonNull String url, @NonNull ImageView view, @Nullable DisplayOption option) {
-        displayImage(url, view, option, null);
+    public void loadInto(@NonNull String url, @NonNull ImageView view, @Nullable DisplayOption option) {
+        loadInto(url, view, option, null);
     }
 
     /**
@@ -255,8 +253,8 @@ public class ImageLoader implements DisplayTaskMonitor,
      * @param url  Image source url, one of {@link dev.nick.imageloader.loader.ImageSource}
      * @param view Target view to display the image.
      */
-    public void displayImage(@NonNull String url, @NonNull ImageView view, @Nullable DisplayListener loadingListener) {
-        displayImage(url, view, null, loadingListener);
+    public void loadInto(@NonNull String url, @NonNull ImageView view, @Nullable DisplayListener loadingListener) {
+        loadInto(url, view, null, loadingListener);
     }
 
     /**
@@ -267,10 +265,10 @@ public class ImageLoader implements DisplayTaskMonitor,
      * @param option          {@link DisplayOption} is options using when display the image.
      * @param loadingListener The listener.
      */
-    public void displayImage(@NonNull String url, @NonNull ImageView view,
-                             @Nullable DisplayOption option, @Nullable DisplayListener loadingListener) {
+    public void loadInto(@NonNull String url, @NonNull ImageView view,
+                         @Nullable DisplayOption option, @Nullable DisplayListener loadingListener) {
         ImageViewDelegate viewDelegate = new ImageViewDelegate(view);
-        displayImage(url, viewDelegate, option, loadingListener);
+        loadInto(url, viewDelegate, option, loadingListener);
     }
 
     /**
@@ -279,8 +277,8 @@ public class ImageLoader implements DisplayTaskMonitor,
      * @param url      Image source url, one of {@link dev.nick.imageloader.loader.ImageSource}
      * @param settable Target {@link ImageSettable} to display the image.
      */
-    public void displayImage(@NonNull String url, @NonNull ImageSettable settable) {
-        displayImage(url, settable, null, null);
+    public void loadInto(@NonNull String url, @NonNull ImageSettable settable) {
+        loadInto(url, settable, null, null);
     }
 
     /**
@@ -290,10 +288,10 @@ public class ImageLoader implements DisplayTaskMonitor,
      * @param settable Target {@link ImageSettable} to display the image.
      * @param option   {@link DisplayOption} is options using when display the image.
      */
-    public void displayImage(@NonNull String url,
-                             @NonNull ImageSettable settable,
-                             @Nullable DisplayOption option) {
-        displayImage(url, settable, option, null);
+    public void loadInto(@NonNull String url,
+                         @NonNull ImageSettable settable,
+                         @Nullable DisplayOption option) {
+        loadInto(url, settable, option, null);
     }
 
     /**
@@ -302,8 +300,8 @@ public class ImageLoader implements DisplayTaskMonitor,
      * @param url      Image source url, one of {@link dev.nick.imageloader.loader.ImageSource}
      * @param settable Target settable to display the image.
      */
-    public void displayImage(@NonNull String url, @NonNull ImageSettable settable, @Nullable DisplayListener loadingListener) {
-        displayImage(url, settable, null, loadingListener);
+    public void loadInto(@NonNull String url, @NonNull ImageSettable settable, @Nullable DisplayListener loadingListener) {
+        loadInto(url, settable, null, loadingListener);
     }
 
     /**
@@ -314,10 +312,10 @@ public class ImageLoader implements DisplayTaskMonitor,
      * @param option   {@link DisplayOption} is options using when display the image.
      * @param listener The progress listener using to watch the progress of the loading.
      */
-    public void displayImage(@NonNull String url,
-                             @NonNull ImageSettable settable,
-                             @Nullable DisplayOption option,
-                             @Nullable DisplayListener listener) {
+    public void loadInto(@NonNull String url,
+                         @NonNull ImageSettable settable,
+                         @Nullable DisplayOption option,
+                         @Nullable DisplayListener listener) {
 
         Preconditions.checkNotNull(url, settable);
 
@@ -337,11 +335,18 @@ public class ImageLoader implements DisplayTaskMonitor,
             Bitmap cached;
             if ((cached = mCacheManager.getMemCache(url, info)) != null) {
                 mLogger.verbose("MemCache, Load cached mem bitmap:" + cached);
+
                 applyImageSettings(
                         cached,
                         option.getProcessor(),
                         settable,
                         option.isAnimateOnlyNewLoaded() ? null : option.getAnimator());
+                // Call complete.
+                if (listener != null) {
+                    BitmapResult result = new BitmapResult();
+                    result.result = cached;
+                    listener.onComplete(result);
+                }
                 return;
             }
         }
@@ -476,7 +481,7 @@ public class ImageLoader implements DisplayTaskMonitor,
     }
 
     @WorkerThread
-    private void applyImageSettings(Bitmap bitmap, BitmapProcessor processor, ImageSettable settable,
+    private void applyImageSettings(Bitmap bitmap, BitmapHandler processor, ImageSettable settable,
                                     ImageAnimator animator) {
         if (settable != null) {
             BitmapImageSettings settings = new BitmapImageSettings(mContext.getResources(), animator,
@@ -961,7 +966,7 @@ public class ImageLoader implements DisplayTaskMonitor,
             if (!isViewMaybeReused || !isTaskDirty(taskRecord)) {
                 if (!option.isApplyImageOneByOne()) {
                     ImageAnimator animator = (option == null ? null : option.getAnimator());
-                    BitmapProcessor processor = (option == null ? null : option.getProcessor());
+                    BitmapHandler processor = (option == null ? null : option.getProcessor());
                     applyImageSettings(result.result, processor, settable, animator);
                 } else {
                     mImageSettingsScheduler.execute(new Runnable() {
@@ -969,7 +974,7 @@ public class ImageLoader implements DisplayTaskMonitor,
                         public void run() {
                             if (isViewMaybeReused && isTaskDirty(taskRecord)) return;
                             ImageAnimator animator = (option == null ? null : option.getAnimator());
-                            BitmapProcessor processor = (option == null ? null : option.getProcessor());
+                            BitmapHandler processor = (option == null ? null : option.getProcessor());
                             applyImageSettings(result.result, processor, settable, animator);
                             if (animator != null) {
                                 long delay = animator.getDuration();

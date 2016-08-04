@@ -107,7 +107,7 @@ public class ContentImageTest extends BaseTest {
 
                 String uri = mArtworkUri + File.separator + tracks.get(position).getAlbumId();
 
-                mLoader.displayImage(uri, holder.imageView,
+                mLoader.loadInto(uri, holder.imageView,
                         new DisplayOption.Builder()
                                 .oneAfterOne()
                                 .imageQuality(ImageQuality.RAW)

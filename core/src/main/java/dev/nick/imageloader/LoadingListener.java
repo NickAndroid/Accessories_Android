@@ -16,5 +16,37 @@
 
 package dev.nick.imageloader;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import dev.nick.imageloader.loader.result.BitmapResult;
+import dev.nick.imageloader.loader.result.Cause;
+
 public interface LoadingListener extends DisplayListener {
+    class Stub implements LoadingListener {
+        @Override
+        public void onError(@NonNull Cause cause) {
+            // Nothing.
+        }
+
+        @Override
+        public void onComplete(@Nullable BitmapResult result) {
+            // Nothing.
+        }
+
+        @Override
+        public void onProgressUpdate(float progress) {
+            // Nothing.
+        }
+
+        @Override
+        public void onCancel() {
+            // Nothing.
+        }
+
+        @Override
+        public void onStartLoading() {
+            // Nothing.
+        }
+    }
 }
