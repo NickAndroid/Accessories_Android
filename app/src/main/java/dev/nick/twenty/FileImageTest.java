@@ -20,7 +20,6 @@ import android.Manifest;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,10 +43,9 @@ import dev.nick.imageloader.display.ImageQuality;
 import dev.nick.imageloader.display.animator.FadeInImageAnimator;
 import dev.nick.imageloader.loader.ImageSource;
 import dev.nick.imageloader.loader.result.BitmapResult;
-import dev.nick.imageloader.loader.result.Cause;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
-public class FileImageTest extends BaseTest implements DisplayListener {
+public class FileImageTest extends BaseTest {
 
     @FindView(id = R.id.list)
     ListView listView;
@@ -57,26 +55,6 @@ public class FileImageTest extends BaseTest implements DisplayListener {
         setContentView(R.layout.file_image_layout);
         setTitle(getClass().getSimpleName());
         Scalpel.getInstance().wire(this);
-    }
-
-    @Override
-    public void onError(@NonNull Cause cause) {
-    }
-
-    @Override
-    public void onComplete(BitmapResult result) {
-    }
-
-    @Override
-    public void onProgressUpdate(float progress) {
-    }
-
-    @Override
-    public void onCancel() {
-    }
-
-    @Override
-    public void onStartLoading() {
     }
 
     @Override
@@ -122,14 +100,19 @@ public class FileImageTest extends BaseTest implements DisplayListener {
                 // String uri = mArtworkUri + File.separator + tracks.get(position).getAlbumId();
                 String uri = ImageSource.FILE.getPrefix() + tracks.get(position).getUrl();
 
-                ImageLoader.shared(getApplicationContext()).loadInto(uri, holder.imageView,
+                ImageLoader.shared(getApplicationContext()).display(uri, holder.imageView,
                         new DisplayOption.Builder()
                                 .imageQuality(ImageQuality.OPT)
                                 .viewMaybeReused()
                                 .animateOnlyNewLoaded()
                                 .oneAfterOne()
                                 .imageAnimator(new FadeInImageAnimator())
-                                .build(), FileImageTest.this);
+                                .build(), new DisplayListener.Stub() {
+                            @Override
+                            public void onComplete(@Nullable BitmapResult result) {
+                                super.onComplete(result);
+                            }
+                        });
 
                 return convertView;
             }
@@ -137,17 +120,6 @@ public class FileImageTest extends BaseTest implements DisplayListener {
         };
 
         listView.setAdapter(adapter);
-    }
-
-    class ViewHolder {
-        @FindView(id = R.id.image)
-        ImageView imageView;
-        @FindView(id = R.id.textView)
-        TextView textView;
-
-        public ViewHolder(View convert) {
-            Scalpel.getInstance().wire(convert, this);
-        }
     }
 
     List<Track> gallery() {
@@ -174,5 +146,16 @@ public class FileImageTest extends BaseTest implements DisplayListener {
         cursor.close();
 
         return tracks;
+    }
+
+    class ViewHolder {
+        @FindView(id = R.id.image)
+        ImageView imageView;
+        @FindView(id = R.id.textView)
+        TextView textView;
+
+        public ViewHolder(View convert) {
+            Scalpel.getInstance().wire(convert, this);
+        }
     }
 }

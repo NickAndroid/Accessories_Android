@@ -83,7 +83,7 @@ public class Z {
 mLoader.load(uri, new LoadingListener(){...});
 ```
 ```java
-mLoader.loadInto(uri, holder.imageView,
+mLoader.display(uri, holder.imageView,
                         new DisplayOption.Builder()
                                 .imageQuality(DisplayOption.ImageQuality.FIT_VIEW)
                                 .loadingImgRes(R.drawable.ic_cloud_download_black_24dp)
@@ -94,12 +94,12 @@ mLoader.loadInto(uri, holder.imageView,
 ```
 **Or**
 ```java
-mLoader.loadInto(uri, holder.imageView);
+mLoader.display(uri, holder.imageView);
 ```
 
 ### Listening:
 ```java
-mLoader.loadInto(uri, holder.imageView, new LoaderListener(){...});
+mLoader.display(uri, holder.imageView, new LoaderListener(){...});
 ```
 
 ### CustomView support:
@@ -107,7 +107,7 @@ mLoader.loadInto(uri, holder.imageView, new LoaderListener(){...});
 class CustomView implements ImageSettable {}
 ```
 ```java
-mLoader.loadInto(uri, customView);
+mLoader.display(uri, customView);
 ```
 
 ### Cancel tasks:

@@ -213,7 +213,7 @@ public class ImageLoader implements DisplayTaskMonitor,
     }
 
     public void load(@NonNull String url, @NonNull LoadingListener loadingListener) {
-        loadInto(url, new FakeImageSettable(),
+        display(url, new FakeImageSettable(),
                 new DisplayOption.Builder()
                         .imageQuality(ImageQuality.OPT)
                         .imageAnimator(null)
@@ -231,9 +231,9 @@ public class ImageLoader implements DisplayTaskMonitor,
      * @param url  Image source url, one of {@link dev.nick.imageloader.loader.ImageSource}
      * @param view Target view to display the image.
      */
-    public void loadInto(@NonNull String url, @NonNull ImageView view) {
+    public void display(@NonNull String url, @NonNull ImageView view) {
         ImageViewDelegate viewDelegate = new ImageViewDelegate(view);
-        loadInto(url, viewDelegate, null, null);
+        display(url, viewDelegate, null, null);
     }
 
     /**
@@ -243,8 +243,8 @@ public class ImageLoader implements DisplayTaskMonitor,
      * @param view   Target view to display the image.
      * @param option {@link DisplayOption} is options using when display the image.
      */
-    public void loadInto(@NonNull String url, @NonNull ImageView view, @Nullable DisplayOption option) {
-        loadInto(url, view, option, null);
+    public void display(@NonNull String url, @NonNull ImageView view, @Nullable DisplayOption option) {
+        display(url, view, option, null);
     }
 
     /**
@@ -253,8 +253,8 @@ public class ImageLoader implements DisplayTaskMonitor,
      * @param url  Image source url, one of {@link dev.nick.imageloader.loader.ImageSource}
      * @param view Target view to display the image.
      */
-    public void loadInto(@NonNull String url, @NonNull ImageView view, @Nullable DisplayListener loadingListener) {
-        loadInto(url, view, null, loadingListener);
+    public void display(@NonNull String url, @NonNull ImageView view, @Nullable DisplayListener loadingListener) {
+        display(url, view, null, loadingListener);
     }
 
     /**
@@ -265,10 +265,10 @@ public class ImageLoader implements DisplayTaskMonitor,
      * @param option          {@link DisplayOption} is options using when display the image.
      * @param loadingListener The listener.
      */
-    public void loadInto(@NonNull String url, @NonNull ImageView view,
-                         @Nullable DisplayOption option, @Nullable DisplayListener loadingListener) {
+    public void display(@NonNull String url, @NonNull ImageView view,
+                        @Nullable DisplayOption option, @Nullable DisplayListener loadingListener) {
         ImageViewDelegate viewDelegate = new ImageViewDelegate(view);
-        loadInto(url, viewDelegate, option, loadingListener);
+        display(url, viewDelegate, option, loadingListener);
     }
 
     /**
@@ -277,8 +277,8 @@ public class ImageLoader implements DisplayTaskMonitor,
      * @param url      Image source url, one of {@link dev.nick.imageloader.loader.ImageSource}
      * @param settable Target {@link ImageSettable} to display the image.
      */
-    public void loadInto(@NonNull String url, @NonNull ImageSettable settable) {
-        loadInto(url, settable, null, null);
+    public void display(@NonNull String url, @NonNull ImageSettable settable) {
+        display(url, settable, null, null);
     }
 
     /**
@@ -288,10 +288,10 @@ public class ImageLoader implements DisplayTaskMonitor,
      * @param settable Target {@link ImageSettable} to display the image.
      * @param option   {@link DisplayOption} is options using when display the image.
      */
-    public void loadInto(@NonNull String url,
-                         @NonNull ImageSettable settable,
-                         @Nullable DisplayOption option) {
-        loadInto(url, settable, option, null);
+    public void display(@NonNull String url,
+                        @NonNull ImageSettable settable,
+                        @Nullable DisplayOption option) {
+        display(url, settable, option, null);
     }
 
     /**
@@ -300,8 +300,8 @@ public class ImageLoader implements DisplayTaskMonitor,
      * @param url      Image source url, one of {@link dev.nick.imageloader.loader.ImageSource}
      * @param settable Target settable to display the image.
      */
-    public void loadInto(@NonNull String url, @NonNull ImageSettable settable, @Nullable DisplayListener loadingListener) {
-        loadInto(url, settable, null, loadingListener);
+    public void display(@NonNull String url, @NonNull ImageSettable settable, @Nullable DisplayListener loadingListener) {
+        display(url, settable, null, loadingListener);
     }
 
     /**
@@ -312,10 +312,10 @@ public class ImageLoader implements DisplayTaskMonitor,
      * @param option   {@link DisplayOption} is options using when display the image.
      * @param listener The progress listener using to watch the progress of the loading.
      */
-    public void loadInto(@NonNull String url,
-                         @NonNull ImageSettable settable,
-                         @Nullable DisplayOption option,
-                         @Nullable DisplayListener listener) {
+    public void display(@NonNull String url,
+                        @NonNull ImageSettable settable,
+                        @Nullable DisplayOption option,
+                        @Nullable DisplayListener listener) {
 
         Preconditions.checkNotNull(url, settable);
 

@@ -102,7 +102,7 @@ public class NetworkImageTest extends BaseTest {
                 ImageLoader
                         .shared(getApplicationContext())
                         .cancel(holder.imageView)
-                        .loadInto(uri, holder.imageView,
+                        .display(uri, holder.imageView,
                                 new DisplayOption.Builder()
                                         .oneAfterOne()
                                         .imageQuality(ImageQuality.OPT)

@@ -42,4 +42,32 @@ public interface DisplayListener extends ProgressListener<BitmapResult>, ErrorLi
     @Override
     @CallingOnUIThread
     void onStartLoading();
+
+    class Stub implements DisplayListener {
+
+        @Override
+        public void onError(@NonNull Cause cause) {
+            // Nothing.
+        }
+
+        @Override
+        public void onComplete(@Nullable BitmapResult result) {
+            // Nothing.
+        }
+
+        @Override
+        public void onProgressUpdate(float progress) {
+            // Nothing.
+        }
+
+        @Override
+        public void onCancel() {
+            // Nothing.
+        }
+
+        @Override
+        public void onStartLoading() {
+
+        }
+    }
 }
