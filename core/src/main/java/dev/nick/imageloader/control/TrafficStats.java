@@ -27,23 +27,28 @@ public class TrafficStats extends UsageStats {
         super(context);
     }
 
-    public void onWifiUsage(long size) {
+    public void onWifiTrafficUsage(long size) {
         onUsage(TAG_WIFI, size);
     }
 
-    public void onMobileUsage(long size) {
+    public void onMobileTrafficUsage(long size) {
         onUsage(TAG_MOBILE, size);
     }
 
-    public long getWifiUsage() {
+    public long getWifiTrafficUsage() {
         return getUsage(TAG_WIFI);
     }
 
-    public long getMobileUsage() {
+    public long getMobileTrafficUsage() {
         return getUsage(TAG_MOBILE);
     }
 
-    public long getTotalUsage() {
-        return getMobileUsage() + getWifiUsage();
+    public long getTotalTrafficUsage() {
+        return getMobileTrafficUsage() + getWifiTrafficUsage();
+    }
+
+    public void reset() {
+        onReset(TAG_MOBILE);
+        onReset(TAG_WIFI);
     }
 }

@@ -54,4 +54,8 @@ public class UsageStats {
         long lastLong = Long.parseLong(last);
         writeString(tag, String.valueOf((lastLong + size)));
     }
+
+    protected void onReset(String tag) {
+        writeString(tag, String.valueOf((0)));
+    }
 }

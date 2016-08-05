@@ -17,6 +17,7 @@
 package dev.nick.imageloader.loader;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -37,8 +38,7 @@ import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
 
-public class NetworkImageFetcher extends BaseImageFetcher
-        implements HttpImageDownloader.ByteReadingListener {
+public class NetworkImageFetcher extends BaseImageFetcher {
 
     private static final String DOWNLOAD_DIR_NAME = "download";
 
@@ -107,20 +107,37 @@ public class NetworkImageFetcher extends BaseImageFetcher
 
     @Override
     public void fetchFromUrl(@NonNull String url,
-                             @NonNull DecodeSpec decodeSpec,
+                             @NonNull final DecodeSpec decodeSpec,
                              @Nullable ProgressListener<BitmapResult> progressListener,
                              @Nullable ErrorListener errorListener)
             throws Exception {
 
         super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);
 
-        boolean isOnLine = NetworkUtils.isOnline(mContext, mOnlyOnWifi);
+        int usingNetworkType = ConnectivityManager.TYPE_WIFI;
+
+        boolean isWifiOnLine = NetworkUtils.isWifiOnline(mContext);
+        boolean isMobileOnLine = NetworkUtils.isMobileOnline(mContext);
+
+        boolean readyToLoad = false;
+
+        if (isWifiOnLine) {
+            readyToLoad = true;
+            usingNetworkType = ConnectivityManager.TYPE_WIFI;
+        }
+
+        if (!isWifiOnLine && !mOnlyOnWifi && isMobileOnLine) {
+            readyToLoad = true;
+            usingNetworkType = ConnectivityManager.TYPE_MOBILE;
+        }
 
         // No connection.
-        if (!isOnLine) {
+        if (!readyToLoad) {
             callOnError(errorListener, new Cause(new IllegalStateException("No network is available.")));
             return;
         }
+
+        mLogger.verbose("Using network tye to download:" + decodeNetworkType(usingNetworkType));
 
         callOnStart(progressListener);
 
@@ -128,7 +145,25 @@ public class NetworkImageFetcher extends BaseImageFetcher
 
         mLogger.verbose("Using tmp path for image download:" + tmpPath);
 
-        ImageDownloader<Boolean> downloader = new HttpImageDownloader(tmpPath, this);
+        HttpImageDownloader.ByteReadingListener byteReadingListener = null;
+        if (mTrafficStatsEnabled) {
+            final int finalUsingNetworkType = usingNetworkType;
+            byteReadingListener = new HttpImageDownloader.ByteReadingListener() {
+                @Override
+                public void onBytesRead(byte[] bytes) {
+                    switch (finalUsingNetworkType) {
+                        case ConnectivityManager.TYPE_MOBILE:
+                            mTrafficStats.onMobileTrafficUsage(bytes.length);
+                            break;
+                        case ConnectivityManager.TYPE_WIFI: //fall
+                        default:
+                            mTrafficStats.onWifiTrafficUsage(bytes.length);
+                            break;
+                    }
+                }
+            };
+        }
+        ImageDownloader<Boolean> downloader = new HttpImageDownloader(tmpPath, byteReadingListener);
 
         String downloadPath = buildDownloadFilePath(url);
         File downloadFile = new File(downloadPath);
@@ -163,10 +198,12 @@ public class NetworkImageFetcher extends BaseImageFetcher
         }
     }
 
-    @Override
-    public void onBytesRead(byte[] bytes) { //// FIXME: 2016/8/5 No mobile usage update.
-        if (mTrafficStatsEnabled && mOnlyOnWifi) {
-            mTrafficStats.onWifiUsage(bytes.length);
+    String decodeNetworkType(int type) {
+        switch (type) {
+            case ConnectivityManager.TYPE_MOBILE:
+                return "TYPE_MOBILE";
+            default:
+                return "WIFI-ETC";
         }
     }
 }

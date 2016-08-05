@@ -44,6 +44,8 @@ import dev.nick.imageloader.cache.CacheManager;
 import dev.nick.imageloader.control.Forkable;
 import dev.nick.imageloader.control.Freezer;
 import dev.nick.imageloader.control.LoaderState;
+import dev.nick.imageloader.control.StorageStats;
+import dev.nick.imageloader.control.TrafficStats;
 import dev.nick.imageloader.display.BitmapImageSettings;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.display.ImageQuality;
@@ -127,6 +129,9 @@ public class ImageLoader implements DisplayTaskMonitor,
 
     private TaskManager mTaskManager;
     private ImageSettableIdCreator mSettableIdCreator;
+
+    private StorageStats mStorageStats;
+    private TrafficStats mTrafficStats;
 
     private ImageLoader(Context context, CacheManager cacheManager, LoaderConfig config) {
         Preconditions.checkNotNull(context);
@@ -771,6 +776,8 @@ public class ImageLoader implements DisplayTaskMonitor,
     @WorkerThread
     public void clearDiskCache() {
         mCacheManager.evictDisk();
+        ensureStorageStats();
+        mStorageStats.reset();
         mLogger.funcExit();
     }
 
@@ -814,6 +821,48 @@ public class ImageLoader implements DisplayTaskMonitor,
     public ImageLoader fork(LoaderConfig config) {
         //FIXME Consider to use shared elements for better performance.
         return clone(this, config);
+    }
+
+    public long getInternalStorageUsage() {
+        ensureStorageStats();
+        return mStorageStats.getInternalStorageUsage();
+    }
+
+    public long getExternalStorageUsage() {
+        ensureStorageStats();
+        return mStorageStats.getExternalStorageUsage();
+    }
+
+    public long getTotalStorageUsage() {
+        ensureStorageStats();
+        return mStorageStats.getTotalStorageUsage();
+    }
+
+    public long getTotalTrafficUsage() {
+        ensureTrafficStats();
+        return mTrafficStats.getTotalTrafficUsage();
+    }
+
+    public long getMobileTrafficUsage() {
+        ensureTrafficStats();
+        return mTrafficStats.getMobileTrafficUsage();
+    }
+
+    public long getWifiTrafficUsage() {
+        ensureTrafficStats();
+        return mTrafficStats.getWifiTrafficUsage();
+    }
+
+    private synchronized void ensureStorageStats() {
+        if (mStorageStats == null) {
+            mStorageStats = new StorageStats(mContext);
+        }
+    }
+
+    private synchronized void ensureTrafficStats() {
+        if (mTrafficStats == null) {
+            mTrafficStats = new TrafficStats(mContext);
+        }
     }
 
     private static class FailureParams {

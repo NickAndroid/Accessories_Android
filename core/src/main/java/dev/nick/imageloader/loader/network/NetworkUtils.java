@@ -25,7 +25,7 @@ public abstract class NetworkUtils {
     /**
      * Check if we have a network connection.
      */
-    public static boolean isOnline(final Context context, boolean onlyOnWifi) {
+    public static boolean isWifiOnline(final Context context) {
 
         boolean state = false;
 
@@ -38,8 +38,6 @@ public abstract class NetworkUtils {
                 NetworkInfo info = connectivityManager.getNetworkInfo(network);
                 if (info.getType() == ConnectivityManager.TYPE_WIFI) {
                     state = info.isConnectedOrConnecting();
-                } else {
-                    state = !onlyOnWifi && info.isConnectedOrConnecting();
                 }
             }
         } else {
@@ -49,22 +47,36 @@ public abstract class NetworkUtils {
             if (wifiNetwork != null) {
                 state = wifiNetwork.isConnectedOrConnecting();
             }
+        /* Other networks */
+            NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+            if (activeNetwork != null) {
+                state = activeNetwork.isConnectedOrConnecting();
+            }
+        }
+        return state;
+    }
 
+    public static boolean isMobileOnline(final Context context) {
+
+        boolean state = false;
+
+        ConnectivityManager connectivityManager = (ConnectivityManager) context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            Network[] networks = connectivityManager.getAllNetworks();
+            for (Network network : networks) {
+                NetworkInfo info = connectivityManager.getNetworkInfo(network);
+                if (info.getType() == ConnectivityManager.TYPE_MOBILE) {
+                    state = info.isConnectedOrConnecting();
+                }
+            }
+        } else {
         /* Mobile data connection */
             NetworkInfo mobileNetwork = connectivityManager
                     .getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
             if (mobileNetwork != null) {
-                if (!onlyOnWifi) {
-                    state = mobileNetwork.isConnectedOrConnecting();
-                }
-            }
-
-        /* Other networks */
-            NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-            if (activeNetwork != null) {
-                if (!onlyOnWifi) {
-                    state = activeNetwork.isConnectedOrConnecting();
-                }
+                state = mobileNetwork.isConnectedOrConnecting();
             }
         }
         return state;

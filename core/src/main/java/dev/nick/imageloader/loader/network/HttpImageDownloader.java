@@ -58,7 +58,9 @@ public class HttpImageDownloader implements ImageDownloader<Boolean> {
                 float downloadSize = 0f;
                 while ((len = is.read(bytes)) != -1) {
                     fos.write(bytes, 0, len);
-                    mByteReadingListener.onBytesRead(bytes);
+                    if (mByteReadingListener != null) {
+                        mByteReadingListener.onBytesRead(bytes);
+                    }
                     downloadSize += len;
                     float progress = downloadSize / fileSize;
                     if (progressListener != null) {

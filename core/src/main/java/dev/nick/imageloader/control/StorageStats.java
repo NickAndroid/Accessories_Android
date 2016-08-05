@@ -18,32 +18,37 @@ package dev.nick.imageloader.control;
 
 import android.content.Context;
 
-public class StorageStas extends UsageStats {
+public class StorageStats extends UsageStats {
 
     static final String TAG_INTERNAL_STORAGE = "internal";
     static final String TAG_EXTERNAL_STORAGE = "external";
 
-    public StorageStas(Context context) {
+    public StorageStats(Context context) {
         super(context);
     }
 
-    public void onInternalUsage(long size) {
+    public void onInternalStorageUsage(long size) {
         onUsage(TAG_INTERNAL_STORAGE, size);
     }
 
-    public void onExternalUsage(long size) {
+    public void onExternalStorageUsage(long size) {
         onUsage(TAG_EXTERNAL_STORAGE, size);
     }
 
-    public long getInternalUsage() {
+    public long getInternalStorageUsage() {
         return getUsage(TAG_INTERNAL_STORAGE);
     }
 
-    public long getExternalUsage() {
+    public long getExternalStorageUsage() {
         return getUsage(TAG_EXTERNAL_STORAGE);
     }
 
-    public long getTotalUsage() {
-        return getExternalUsage() + getInternalUsage();
+    public long getTotalStorageUsage() {
+        return getExternalStorageUsage() + getInternalStorageUsage();
+    }
+
+    public void reset() {
+        onReset(TAG_EXTERNAL_STORAGE);
+        onReset(TAG_INTERNAL_STORAGE);
     }
 }

@@ -36,7 +36,7 @@ import java.util.List;
 import dev.nick.imageloader.cache.Cache;
 import dev.nick.imageloader.cache.CachePolicy;
 import dev.nick.imageloader.cache.FileNameGenerator;
-import dev.nick.imageloader.control.StorageStas;
+import dev.nick.imageloader.control.StorageStats;
 import dev.nick.imageloader.utils.FileUtils;
 import dev.nick.logger.Logger;
 import dev.nick.logger.LoggerManager;
@@ -49,7 +49,7 @@ public class DiskCache implements Cache<String, Bitmap> {
     private boolean mPreferToExternal;
     private boolean mStorageStatsEnabled;
 
-    private StorageStas mStorageStats;
+    private StorageStats mStorageStats;
 
     private Bitmap.CompressFormat mFormat;
     private int mQuality;
@@ -70,7 +70,7 @@ public class DiskCache implements Cache<String, Bitmap> {
         }
         mStorageStatsEnabled = cachePolicy.isStorageStatsEnabled();
         if (mStorageStatsEnabled) {
-            mStorageStats = new StorageStas(context);
+            mStorageStats = new StorageStats(context);
         }
         mRunningOps = new ArrayList<>();
         mFileNameGenerator = cachePolicy.getFileNameGenerator();
@@ -274,7 +274,7 @@ public class DiskCache implements Cache<String, Bitmap> {
     }
 
     void updateUsage(long fileSize) {
-        mStorageStats.onExternalUsage(fileSize);
+        mStorageStats.onExternalStorageUsage(fileSize);
     }
 
     void addOp(FileOperator op) {
