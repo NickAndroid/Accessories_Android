@@ -23,13 +23,23 @@ public class NetworkPolicy {
             .build();
 
     boolean onlyOnWifi;
+    boolean trafficStatsEnabled;
 
-    private NetworkPolicy(boolean onlyOnWifi) {
+    private NetworkPolicy(boolean onlyOnWifi, boolean trafficStatsEnabled) {
         this.onlyOnWifi = onlyOnWifi;
+        this.trafficStatsEnabled = trafficStatsEnabled;
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     public boolean isOnlyOnWifi() {
         return onlyOnWifi;
+    }
+
+    public boolean isTrafficStatsEnabled() {
+        return trafficStatsEnabled;
     }
 
     @Override
@@ -40,10 +50,15 @@ public class NetworkPolicy {
     }
 
     public static class Builder {
+
         boolean onlyOnWifi;
+        boolean trafficStatsEnbaled;
+
+        private Builder() {
+        }
 
         /**
-         * To load image only under WIFI connection.}
+         * To load image only under WIFI connection.
          *
          * @return Builder instance.
          */
@@ -52,8 +67,18 @@ public class NetworkPolicy {
             return Builder.this;
         }
 
+        /**
+         * To enable the traffic stats.
+         *
+         * @return Builder instance.
+         */
+        public Builder enableTrafficStats() {
+            this.trafficStatsEnbaled = true;
+            return Builder.this;
+        }
+
         public NetworkPolicy build() {
-            return new NetworkPolicy(onlyOnWifi);
+            return new NetworkPolicy(onlyOnWifi, trafficStatsEnbaled);
         }
     }
 }

@@ -42,6 +42,20 @@ public class LoaderConfig {
 
     private int debugLevel;
 
+    private LoaderConfig(CachePolicy cachePolicy,
+                         NetworkPolicy networkPolicy,
+                         int nLoadingThreads,
+                         int debugLevel) {
+        this.cachePolicy = cachePolicy;
+        this.networkPolicy = networkPolicy;
+        this.nLoadingThreads = nLoadingThreads;
+        this.debugLevel = debugLevel;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
     @Override
     public String toString() {
         return "LoaderConfig{" +
@@ -69,16 +83,6 @@ public class LoaderConfig {
         return debugLevel;
     }
 
-    private LoaderConfig(CachePolicy cachePolicy,
-                         NetworkPolicy networkPolicy,
-                         int nLoadingThreads,
-                         int debugLevel) {
-        this.cachePolicy = cachePolicy;
-        this.networkPolicy = networkPolicy;
-        this.nLoadingThreads = nLoadingThreads;
-        this.debugLevel = debugLevel;
-    }
-
     public static class Builder {
 
         private int nLoadingThreads;
@@ -86,7 +90,7 @@ public class LoaderConfig {
         private NetworkPolicy networkPolicy;
         private int debugLevel;
 
-        public Builder() {
+        private Builder() {
         }
 
         /**

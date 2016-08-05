@@ -41,6 +41,7 @@ import dev.nick.imageloader.cache.CachePolicy;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.display.ImageQuality;
 import dev.nick.imageloader.display.animator.FadeInImageAnimator;
+import dev.nick.imageloader.loader.network.NetworkPolicy;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
 public class ContentImageTest extends BaseTest {
@@ -63,8 +64,8 @@ public class ContentImageTest extends BaseTest {
 
         final List<Track> tracks = MediaUtils.getTrackList(this);
 
-        mLoader = ImageLoader.create(getApplicationContext(), new LoaderConfig.Builder()
-                .cachePolicy(new CachePolicy.Builder()
+        mLoader = ImageLoader.create(getApplicationContext(), LoaderConfig.builder()
+                .cachePolicy(CachePolicy.builder()
                         .enableMemCache()
                         .enableDiskCache()
                         .cachingThreads(Runtime.getRuntime().availableProcessors())
@@ -72,6 +73,7 @@ public class ContentImageTest extends BaseTest {
                         .preferredLocation(CachePolicy.Location.INTERNAL)
                         .compressFormat(Bitmap.CompressFormat.JPEG)
                         .build())
+                .networkPolicy(NetworkPolicy.builder().enableTrafficStats().build())
                 .build());
 
         BaseAdapter adapter = new BaseAdapter() {

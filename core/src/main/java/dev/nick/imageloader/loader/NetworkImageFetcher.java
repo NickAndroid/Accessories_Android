@@ -28,14 +28,17 @@ import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.cache.CachePolicy;
 import dev.nick.imageloader.cache.FileNameGenerator;
 import dev.nick.imageloader.cache.KeyGenerator;
+import dev.nick.imageloader.control.TrafficStats;
 import dev.nick.imageloader.loader.network.HttpImageDownloader;
 import dev.nick.imageloader.loader.network.ImageDownloader;
+import dev.nick.imageloader.loader.network.NetworkPolicy;
 import dev.nick.imageloader.loader.network.NetworkUtils;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
 
-public class NetworkImageFetcher extends BaseImageFetcher {
+public class NetworkImageFetcher extends BaseImageFetcher
+        implements HttpImageDownloader.ByteReadingListener {
 
     private static final String DOWNLOAD_DIR_NAME = "download";
 
@@ -53,14 +56,19 @@ public class NetworkImageFetcher extends BaseImageFetcher {
         }
     };
 
+    private boolean mOnlyOnWifi;
+    private boolean mTrafficStatsEnabled;
+
+    private TrafficStats mTrafficStats;
+
     public NetworkImageFetcher(PathSplitter<String> splitter, ImageFetcher fileImageFetcher) {
         super(splitter);
         mFileImageFetcher = fileImageFetcher;
     }
 
     private void ensurePolicy() {
-        CachePolicy policy = mLoaderConfig.getCachePolicy();
-        boolean preferredExternal = policy.getPreferredLocation() == CachePolicy.Location.EXTERNAL;
+        CachePolicy cachePolicy = mLoaderConfig.getCachePolicy();
+        boolean preferredExternal = cachePolicy.getPreferredLocation() == CachePolicy.Location.EXTERNAL;
         mDownloadDir = mContext.getCacheDir().getParent() + File.separator + DOWNLOAD_DIR_NAME;
         if (preferredExternal && Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             File externalCache = mContext.getExternalCacheDir();
@@ -68,10 +76,16 @@ public class NetworkImageFetcher extends BaseImageFetcher {
                 mDownloadDir = externalCache.getPath() + File.separator + DOWNLOAD_DIR_NAME;
             }
         }
-        mFileNameGenerator = policy.getFileNameGenerator();
+        mFileNameGenerator = cachePolicy.getFileNameGenerator();
         mLogger.verbose("Using download dir:" + mDownloadDir);
         if (!new File(mDownloadDir).exists() && !new File(mDownloadDir).mkdirs()) {
             throw new IllegalStateException("Can not create folder for download.");
+        }
+        NetworkPolicy networkPolicy = mLoaderConfig.getNetworkPolicy();
+        mOnlyOnWifi = networkPolicy.isOnlyOnWifi();
+        mTrafficStatsEnabled = networkPolicy.isTrafficStatsEnabled();
+        if (mTrafficStatsEnabled) {
+            mTrafficStats = new TrafficStats(mContext);
         }
     }
 
@@ -100,8 +114,7 @@ public class NetworkImageFetcher extends BaseImageFetcher {
 
         super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);
 
-        boolean wifiOnly = mLoaderConfig.getNetworkPolicy().isOnlyOnWifi();
-        boolean isOnLine = NetworkUtils.isOnline(mContext, wifiOnly);
+        boolean isOnLine = NetworkUtils.isOnline(mContext, mOnlyOnWifi);
 
         // No connection.
         if (!isOnLine) {
@@ -115,7 +128,7 @@ public class NetworkImageFetcher extends BaseImageFetcher {
 
         mLogger.verbose("Using tmp path for image download:" + tmpPath);
 
-        ImageDownloader<Boolean> downloader = new HttpImageDownloader(tmpPath);
+        ImageDownloader<Boolean> downloader = new HttpImageDownloader(tmpPath, this);
 
         String downloadPath = buildDownloadFilePath(url);
         File downloadFile = new File(downloadPath);
@@ -147,6 +160,13 @@ public class NetworkImageFetcher extends BaseImageFetcher {
         // Delete the tmp file.
         if (!ok && !new File(tmpPath).delete()) {
             mLogger.verbose("Failed to delete the tmp file:" + tmpPath);
+        }
+    }
+
+    @Override
+    public void onBytesRead(byte[] bytes) { //// FIXME: 2016/8/5 No mobile usage update.
+        if (mTrafficStatsEnabled && mOnlyOnWifi) {
+            mTrafficStats.onWifiUsage(bytes.length);
         }
     }
 }

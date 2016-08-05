@@ -36,6 +36,8 @@ import java.util.List;
 import dev.nick.imageloader.cache.Cache;
 import dev.nick.imageloader.cache.CachePolicy;
 import dev.nick.imageloader.cache.FileNameGenerator;
+import dev.nick.imageloader.control.StorageStas;
+import dev.nick.imageloader.utils.FileUtils;
 import dev.nick.logger.Logger;
 import dev.nick.logger.LoggerManager;
 
@@ -45,6 +47,9 @@ public class DiskCache implements Cache<String, Bitmap> {
     private String mInternalCacheDir;
 
     private boolean mPreferToExternal;
+    private boolean mStorageStatsEnabled;
+
+    private StorageStas mStorageStats;
 
     private Bitmap.CompressFormat mFormat;
     private int mQuality;
@@ -62,6 +67,10 @@ public class DiskCache implements Cache<String, Bitmap> {
             File externalCache = context.getExternalCacheDir();
             if (externalCache != null)
                 mExternalCacheDir = externalCache.getPath() + File.separator + cachePolicy.getCacheDirName();
+        }
+        mStorageStatsEnabled = cachePolicy.isStorageStatsEnabled();
+        if (mStorageStatsEnabled) {
+            mStorageStats = new StorageStas(context);
         }
         mRunningOps = new ArrayList<>();
         mFileNameGenerator = cachePolicy.getFileNameGenerator();
@@ -249,6 +258,9 @@ public class DiskCache implements Cache<String, Bitmap> {
                     return false;
                 }
                 atomicFile.finishWrite(fos);
+                if (mStorageStatsEnabled) {
+                    updateUsage(FileUtils.getFileSize(atomicFile.getBaseFile()));
+                }
             } catch (IOException e) {
                 // Something went wrong, nothing to do.
                 mLogger.debug("IOException when create file:" + Log.getStackTraceString(e));
@@ -259,6 +271,10 @@ public class DiskCache implements Cache<String, Bitmap> {
             removeOp(this);
             return true;
         }
+    }
+
+    void updateUsage(long fileSize) {
+        mStorageStats.onExternalUsage(fileSize);
     }
 
     void addOp(FileOperator op) {

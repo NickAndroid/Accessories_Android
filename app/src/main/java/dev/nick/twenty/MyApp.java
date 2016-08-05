@@ -26,6 +26,7 @@ import com.nick.scalpel.ScalpelApplication;
 import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.cache.CachePolicy;
+import dev.nick.imageloader.loader.network.NetworkPolicy;
 
 public class MyApp extends ScalpelApplication {
     @Override
@@ -34,15 +35,19 @@ public class MyApp extends ScalpelApplication {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             Trace.beginSection("ImageLoader_init");
         }
-        ImageLoader.shared(getApplicationContext(), new LoaderConfig.Builder()
-                .cachePolicy(new CachePolicy.Builder()
+        ImageLoader.shared(getApplicationContext(), LoaderConfig.builder()
+                .cachePolicy(CachePolicy.builder()
                         .enableMemCache()
                         .enableDiskCache()
+                        .enableStorgeStats()
                         .cachingThreads(Runtime.getRuntime().availableProcessors())
                         .cacheDirName("dis.cache.tests")
                         .preferredLocation(CachePolicy.Location.EXTERNAL)
                         .compressFormat(Bitmap.CompressFormat.PNG)
                         .build())
+                .networkPolicy(NetworkPolicy.builder()
+                        .onlyOnWifi()
+                        .enableTrafficStats().build())
                 .debugLevel(Log.VERBOSE)
                 .loadingThreads(Runtime.getRuntime().availableProcessors() * 2)
                 .build());

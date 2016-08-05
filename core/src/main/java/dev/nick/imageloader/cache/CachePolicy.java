@@ -45,9 +45,21 @@ public class CachePolicy {
             .keyGenerator(CachePolicy.DEFAULT_KEY_GENERATOR)
             .preferredLocation(CachePolicy.Location.EXTERNAL)
             .build();
+    private boolean memCacheEnabled;
+    private boolean diskCacheEnabled;
+    private boolean storageStatsEnabled;
+    private int nCachingThreads;
+    private int memCachePoolSize;
+    private int preferredLocation;
+    private String cacheDirName;
+    private KeyGenerator keyGenerator;
+    private FileNameGenerator fileNameGenerator;
+    private Bitmap.CompressFormat compressFormat;
+    private int quality;
 
     private CachePolicy(boolean memCacheEnabled,
                         boolean diskCacheEnabled,
+                        boolean storageStatsEnabled,
                         int nCachingThreads,
                         int memCachePoolSize,
                         String cacheDirName,
@@ -58,6 +70,7 @@ public class CachePolicy {
                         int preferredLocation) {
         this.memCacheEnabled = memCacheEnabled;
         this.diskCacheEnabled = diskCacheEnabled;
+        this.storageStatsEnabled = storageStatsEnabled;
         this.nCachingThreads = nCachingThreads;
         this.memCachePoolSize = memCachePoolSize;
         this.cacheDirName = cacheDirName;
@@ -68,16 +81,9 @@ public class CachePolicy {
         this.quality = quality;
     }
 
-    private boolean memCacheEnabled;
-    private boolean diskCacheEnabled;
-    private int nCachingThreads;
-    private int memCachePoolSize;
-    private int preferredLocation;
-    private String cacheDirName;
-    private KeyGenerator keyGenerator;
-    private FileNameGenerator fileNameGenerator;
-    private Bitmap.CompressFormat compressFormat;
-    private int quality;
+    public static Builder builder() {
+        return new Builder();
+    }
 
     public boolean isDiskCacheEnabled() {
         return diskCacheEnabled;
@@ -85,6 +91,10 @@ public class CachePolicy {
 
     public boolean isMemCacheEnabled() {
         return memCacheEnabled;
+    }
+
+    public boolean isStorageStatsEnabled() {
+        return storageStatsEnabled;
     }
 
     public int getMemCachePoolSize() {
@@ -128,6 +138,7 @@ public class CachePolicy {
                 "cacheDirName='" + cacheDirName + '\'' +
                 ", memCacheEnabled=" + memCacheEnabled +
                 ", diskCacheEnabled=" + diskCacheEnabled +
+                ", storageStatsEnabled=" + storageStatsEnabled +
                 ", nCachingThreads=" + nCachingThreads +
                 ", memCachePoolSize=" + memCachePoolSize +
                 ", preferredLocation=" + preferredLocation +
@@ -138,10 +149,22 @@ public class CachePolicy {
                 '}';
     }
 
+    public interface Location {
+        int INTERNAL = 0x100;
+        int EXTERNAL = 0x101;
+    }
+
+    public interface Quality {
+        int BEST = 100;
+        int HIGH = 60;
+        int LOW = 30;
+    }
+
     public static class Builder {
 
         private boolean memCacheEnabled;
         private boolean diskCacheEnabled;
+        private boolean storageStats;
         private int nCachingThreads;
         private int memCachePoolSize;
         private int preferredLocation;
@@ -150,6 +173,9 @@ public class CachePolicy {
         private FileNameGenerator fileNameGenerator;
         private Bitmap.CompressFormat compressFormat;
         private int imageQuality;
+
+        private Builder() {
+        }
 
         /**
          * To enable disk cache.
@@ -168,6 +194,16 @@ public class CachePolicy {
          */
         public Builder enableMemCache() {
             this.memCacheEnabled = true;
+            return Builder.this;
+        }
+
+        /**
+         * To enabled storage usage stats.
+         *
+         * @return Builder instance.
+         */
+        public Builder enableStorgeStats() {
+            this.storageStats = true;
             return Builder.this;
         }
 
@@ -237,6 +273,7 @@ public class CachePolicy {
             return new CachePolicy(
                     memCacheEnabled,
                     diskCacheEnabled,
+                    storageStats,
                     nCachingThreads,
                     memCachePoolSize,
                     cacheDirName,
@@ -270,16 +307,5 @@ public class CachePolicy {
                         "using default: Location.EXTERNAL");
             }
         }
-    }
-
-    public interface Location {
-        int INTERNAL = 0x100;
-        int EXTERNAL = 0x101;
-    }
-
-    public interface Quality {
-        int BEST = 100;
-        int HIGH = 60;
-        int LOW = 30;
     }
 }

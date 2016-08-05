@@ -30,9 +30,11 @@ import dev.nick.logger.LoggerManager;
 public class HttpImageDownloader implements ImageDownloader<Boolean> {
 
     String mTmpFilePath;
+    ByteReadingListener mByteReadingListener;
 
-    public HttpImageDownloader(String tmpFilePath) {
+    public HttpImageDownloader(String tmpFilePath, ByteReadingListener listener) {
         this.mTmpFilePath = tmpFilePath;
+        this.mByteReadingListener = listener;
     }
 
     @Override
@@ -56,6 +58,7 @@ public class HttpImageDownloader implements ImageDownloader<Boolean> {
                 float downloadSize = 0f;
                 while ((len = is.read(bytes)) != -1) {
                     fos.write(bytes, 0, len);
+                    mByteReadingListener.onBytesRead(bytes);
                     downloadSize += len;
                     float progress = downloadSize / fileSize;
                     if (progressListener != null) {
@@ -73,5 +76,9 @@ public class HttpImageDownloader implements ImageDownloader<Boolean> {
             }
         }
         return Boolean.FALSE;
+    }
+
+    public interface ByteReadingListener {
+        void onBytesRead(byte[] bytes);
     }
 }
