@@ -18,7 +18,6 @@ package dev.nick.imageloader.control;
 
 import android.content.Context;
 
-import dev.nick.imageloader.utils.XmlUtils;
 import dev.nick.logger.Logger;
 import dev.nick.logger.LoggerManager;
 
