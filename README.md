@@ -37,8 +37,8 @@ public class C {
     @Override
     public void onCreate() {
         super.onCreate();
-        // Get the shared instance
-        ImageLoader loader = ImageLoader.shared(getApplicationContext(), new LoaderConfig.Builder()
+        // Create the shared instance
+        ImageLoader loader = ImageLoader.createShared(getApplicationContext(), new LoaderConfig.Builder()
                 .cachePolicy(new CachePolicy.Builder()
                         .enableMemCache()
                         .enableDiskCache()
@@ -51,7 +51,7 @@ public class C {
                 .loadingThreads(Runtime.getRuntime().availableProcessors() * 2)
                 .build());
         // Some works
-        loader....
+        ImageLoader.shared().works...
     }
 }
 ```
@@ -73,7 +73,7 @@ public class Z {
                 .loadingThreads(Runtime.getRuntime().availableProcessors())
                 .build());
         // Some works
-        loader....
+        loader.works...
     }
 }
 ```
