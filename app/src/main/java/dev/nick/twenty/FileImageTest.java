@@ -100,8 +100,8 @@ public class FileImageTest extends BaseTest {
                 // String uri = mArtworkUri + File.separator + tracks.get(position).getAlbumId();
                 String uri = ImageSource.FILE.getPrefix() + tracks.get(position).getUrl();
 
-                ImageLoader.shared(getApplicationContext()).display(uri, holder.imageView,
-                        new DisplayOption.Builder()
+                ImageLoader.shared().display(uri, holder.imageView,
+                        DisplayOption.builder()
                                 .imageQuality(ImageQuality.OPT)
                                 .viewMaybeReused()
                                 .animateOnlyNewLoaded()

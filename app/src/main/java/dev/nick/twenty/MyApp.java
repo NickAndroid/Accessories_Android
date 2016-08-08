@@ -27,6 +27,7 @@ import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.cache.CachePolicy;
 import dev.nick.imageloader.loader.network.NetworkPolicy;
+import dev.nick.imageloader.queue.QueuePolicy;
 
 public class MyApp extends ScalpelApplication {
     @Override
@@ -35,7 +36,8 @@ public class MyApp extends ScalpelApplication {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             Trace.beginSection("ImageLoader_init");
         }
-        ImageLoader.shared(getApplicationContext(), LoaderConfig.builder()
+        ImageLoader.createShared(getApplicationContext(), LoaderConfig.builder()
+                .queuePolicy(QueuePolicy.LIFO)
                 .cachePolicy(CachePolicy.builder()
                         .enableMemCache()
                         .enableDiskCache()

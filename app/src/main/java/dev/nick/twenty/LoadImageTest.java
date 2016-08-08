@@ -209,7 +209,7 @@ public class LoadImageTest extends BaseTest {
                 holder.textView.setText("");
 
                 ImageLoader
-                        .shared(getApplicationContext())
+                        .shared()
                         .load(uri, new LoadingListener.Stub() {
                             @Override
                             public void onError(@NonNull Cause cause) {
@@ -256,7 +256,7 @@ public class LoadImageTest extends BaseTest {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Track track = (Track) adapter.getItem(i);
-                ImageLoader.shared(getApplicationContext()).cancel(track.getUrl());
+                ImageLoader.shared().cancel(track.getUrl());
             }
         });
     }

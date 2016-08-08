@@ -1,1 +1,1 @@
-./gradlew bintrayUpload > build/upload.log; cat upload.log
+./gradlew bintrayUpload | tee build/upload.log

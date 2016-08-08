@@ -85,7 +85,7 @@ public class NetworkImageFetcher extends BaseImageFetcher {
         mOnlyOnWifi = networkPolicy.isOnlyOnWifi();
         mTrafficStatsEnabled = networkPolicy.isTrafficStatsEnabled();
         if (mTrafficStatsEnabled) {
-            mTrafficStats = new TrafficStats(mContext);
+            mTrafficStats = TrafficStats.from(mContext);
         }
     }
 

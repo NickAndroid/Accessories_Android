@@ -70,7 +70,7 @@ public class DiskCache implements Cache<String, Bitmap> {
         }
         mStorageStatsEnabled = cachePolicy.isStorageStatsEnabled();
         if (mStorageStatsEnabled) {
-            mStorageStats = new StorageStats(context);
+            mStorageStats = StorageStats.from(context);
         }
         mRunningOps = new ArrayList<>();
         mFileNameGenerator = cachePolicy.getFileNameGenerator();
@@ -259,7 +259,7 @@ public class DiskCache implements Cache<String, Bitmap> {
                 }
                 atomicFile.finishWrite(fos);
                 if (mStorageStatsEnabled) {
-                    updateUsage(FileUtils.getFileSize(atomicFile.getBaseFile()));
+                    updateUsage(FileUtils.getFileSize(atomicFile.getBaseFile()), dir.equals(mExternalCacheDir));
                 }
             } catch (IOException e) {
                 // Something went wrong, nothing to do.
@@ -273,8 +273,12 @@ public class DiskCache implements Cache<String, Bitmap> {
         }
     }
 
-    void updateUsage(long fileSize) {
-        mStorageStats.onExternalStorageUsage(fileSize);
+    void updateUsage(long fileSize, boolean external) {
+        if (external) {
+            mStorageStats.onExternalStorageUsage(fileSize);
+        } else {
+            mStorageStats.onInternalStorageUsage(fileSize);
+        }
     }
 
     void addOp(FileOperator op) {

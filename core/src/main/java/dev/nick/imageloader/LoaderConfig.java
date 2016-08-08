@@ -21,6 +21,7 @@ import android.util.Log;
 
 import dev.nick.imageloader.cache.CachePolicy;
 import dev.nick.imageloader.loader.network.NetworkPolicy;
+import dev.nick.imageloader.queue.QueuePolicy;
 import dev.nick.logger.LoggerManager;
 
 /**
@@ -29,25 +30,30 @@ import dev.nick.logger.LoggerManager;
  */
 public class LoaderConfig {
 
-    public static final LoaderConfig DEFAULT_CONFIG = new Builder()
+    public static final LoaderConfig DEFAULT_CONFIG = LoaderConfig.builder()
             .cachePolicy(CachePolicy.DEFAULT_CACHE_POLICY)
+            .queuePolicy(QueuePolicy.FIFO)
             .networkPolicy(NetworkPolicy.DEFAULT_NETWORK_POLICY)
             .loadingThreads(Runtime.getRuntime().availableProcessors())
+            .debugLevel(Log.WARN)
             .build();
 
     private int nLoadingThreads;
 
     private CachePolicy cachePolicy;
     private NetworkPolicy networkPolicy;
+    private QueuePolicy queuePolicy;
 
     private int debugLevel;
 
     private LoaderConfig(CachePolicy cachePolicy,
                          NetworkPolicy networkPolicy,
+                         QueuePolicy queuePolicy,
                          int nLoadingThreads,
                          int debugLevel) {
         this.cachePolicy = cachePolicy;
         this.networkPolicy = networkPolicy;
+        this.queuePolicy = queuePolicy;
         this.nLoadingThreads = nLoadingThreads;
         this.debugLevel = debugLevel;
     }
@@ -59,9 +65,10 @@ public class LoaderConfig {
     @Override
     public String toString() {
         return "LoaderConfig{" +
-                "cachePolicy=" + cachePolicy +
-                ", nLoadingThreads=" + nLoadingThreads +
+                "nLoadingThreads=" + nLoadingThreads +
+                ", cachePolicy=" + cachePolicy +
                 ", networkPolicy=" + networkPolicy +
+                ", queuePolicy=" + queuePolicy +
                 ", debugLevel=" + debugLevel +
                 '}';
     }
@@ -73,6 +80,10 @@ public class LoaderConfig {
 
     public NetworkPolicy getNetworkPolicy() {
         return networkPolicy;
+    }
+
+    public QueuePolicy getQueuePolicy() {
+        return queuePolicy;
     }
 
     public int getLoadingThreads() {
@@ -88,6 +99,7 @@ public class LoaderConfig {
         private int nLoadingThreads;
         private CachePolicy cachePolicy;
         private NetworkPolicy networkPolicy;
+        private QueuePolicy queuePolicy;
         private int debugLevel;
 
         private Builder() {
@@ -114,6 +126,16 @@ public class LoaderConfig {
         }
 
         /**
+         * @param queuePolicy The {@link QueuePolicy} using for queue.
+         * @return Builder instance.
+         * @see QueuePolicy
+         */
+        public Builder queuePolicy(QueuePolicy queuePolicy) {
+            this.queuePolicy = queuePolicy;
+            return Builder.this;
+        }
+
+        /**
          * @param nLoadingThreads Number of threads when loading.
          * @return Builder instance.
          */
@@ -136,6 +158,7 @@ public class LoaderConfig {
             return new LoaderConfig(
                     cachePolicy,
                     networkPolicy,
+                    queuePolicy,
                     nLoadingThreads,
                     debugLevel);
         }
@@ -152,6 +175,10 @@ public class LoaderConfig {
             if (nLoadingThreads <= 0) {
                 LoggerManager.getLogger(ImageLoader.class).warn("Using [Runtime.availableProcessors] as nLoadingThreads");
                 nLoadingThreads = Runtime.getRuntime().availableProcessors();
+            }
+            if (queuePolicy == null) {
+                LoggerManager.getLogger(ImageLoader.class).warn("Using FIFO as queuePolicy");
+                queuePolicy = QueuePolicy.FIFO;
             }
             if (debugLevel < Log.VERBOSE) {
                 debugLevel = Log.VERBOSE;

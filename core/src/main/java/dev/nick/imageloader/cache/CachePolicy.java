@@ -33,7 +33,7 @@ public class CachePolicy {
     public static final FileNameGenerator DEFAULT_FILENAME_GENERATOR = new HeadlessFileNameGenerator();
     public static final KeyGenerator DEFAULT_KEY_GENERATOR = new HashcodeKeyGenerator();
 
-    public static final CachePolicy DEFAULT_CACHE_POLICY = new CachePolicy.Builder()
+    public static final CachePolicy DEFAULT_CACHE_POLICY = CachePolicy.builder()
             .enableDiskCache()
             .enableMemCache()
             .cachingThreads(Runtime.getRuntime().availableProcessors())

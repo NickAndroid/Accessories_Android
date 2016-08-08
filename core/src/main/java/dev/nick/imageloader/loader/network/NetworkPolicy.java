@@ -18,9 +18,7 @@ package dev.nick.imageloader.loader.network;
 
 public class NetworkPolicy {
 
-    public static final NetworkPolicy DEFAULT_NETWORK_POLICY = new NetworkPolicy.Builder()
-            .onlyOnWifi()
-            .build();
+    public static final NetworkPolicy DEFAULT_NETWORK_POLICY = NetworkPolicy.builder().build();
 
     boolean onlyOnWifi;
     boolean trafficStatsEnabled;

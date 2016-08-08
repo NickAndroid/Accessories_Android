@@ -86,6 +86,10 @@ public class DisplayOption {
         return animateOnlyNewLoaded;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static class Builder {
 
         private int defaultImgRes;
@@ -100,6 +104,9 @@ public class DisplayOption {
         private boolean viewMaybeReused;
 
         private boolean animateOnlyNewLoaded;
+
+        private Builder() {
+        }
 
         /**
          * @param defaultImgRes Image res showing when load failure.

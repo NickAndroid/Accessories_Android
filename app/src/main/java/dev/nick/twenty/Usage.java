@@ -37,13 +37,13 @@ public class Usage extends ScalpelAutoActivity {
 
         String string =
                 "getExternalStorageUsage" +
-                        MiscUtils.formatedFileSize(ImageLoader.shared(this).getExternalStorageUsage())
+                        MiscUtils.formatedFileSize(ImageLoader.shared().getExternalStorageUsage())
                         + "\n getInternalStorageUsage"
-                        + MiscUtils.formatedFileSize(ImageLoader.shared(this).getInternalStorageUsage())
+                        + MiscUtils.formatedFileSize(ImageLoader.shared().getInternalStorageUsage())
                         + "\n getMobileTrafficUsage"
-                        + MiscUtils.formatedFileSize(ImageLoader.shared(this).getMobileTrafficUsage())
+                        + MiscUtils.formatedFileSize(ImageLoader.shared().getMobileTrafficUsage())
                         + "\n getWifiTrafficUsage"
-                        + MiscUtils.formatedFileSize(ImageLoader.shared(this).getWifiTrafficUsage());
+                        + MiscUtils.formatedFileSize(ImageLoader.shared().getWifiTrafficUsage());
 
         textView.setText(string);
     }

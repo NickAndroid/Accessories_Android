@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package dev.nick.imageloader.stack;
+package dev.nick.imageloader.queue;
+
+import dev.nick.logger.LoggerManager;
 
 class Looper<T> implements Runnable {
 
-    RequestStack<T> stack;
+    RequestQueue<T> stack;
     RequestHandler<T> requestHandler;
 
-    public Looper(RequestHandler<T> requestHandler, RequestStack<T> stack) {
+    public Looper(RequestHandler<T> requestHandler, RequestQueue<T> stack) {
         this.requestHandler = requestHandler;
         this.stack = stack;
     }
@@ -32,10 +34,11 @@ class Looper<T> implements Runnable {
 
     void loop() {
         for (; ; ) {
-            final T t = stack.take();
+            final T t = stack.next();
             if (t == null) break;
-            requestHandler.handle(t);
+            requestHandler.handleRequest(t);
         }
+        LoggerManager.getLogger(getClass()).debug("Looper has quit");
     }
 
     @Override

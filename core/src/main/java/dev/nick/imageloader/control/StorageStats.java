@@ -18,28 +18,45 @@ package dev.nick.imageloader.control;
 
 import android.content.Context;
 
+import java.util.concurrent.atomic.AtomicLong;
+
+import dev.nick.logger.LoggerManager;
+
 public class StorageStats extends UsageStats {
 
     static final String TAG_INTERNAL_STORAGE = "internal";
     static final String TAG_EXTERNAL_STORAGE = "external";
 
-    public StorageStats(Context context) {
+    static StorageStats sInstance;
+
+    private AtomicLong mExternalUsage, mInternalUsage;
+
+    private StorageStats(Context context) {
         super(context);
+        mExternalUsage = new AtomicLong(0);
+        mInternalUsage = new AtomicLong(0);
+    }
+
+    public synchronized static StorageStats from(Context context) {
+        if (sInstance == null) sInstance = new StorageStats(context);
+        return sInstance;
     }
 
     public void onInternalStorageUsage(long size) {
-        onUsage(TAG_INTERNAL_STORAGE, size);
+        mInternalUsage.addAndGet(size);
     }
 
     public void onExternalStorageUsage(long size) {
-        onUsage(TAG_EXTERNAL_STORAGE, size);
+        mExternalUsage.addAndGet(size);
     }
 
     public long getInternalStorageUsage() {
+        flush(TAG_INTERNAL_STORAGE, mInternalUsage.getAndSet(0));
         return getUsage(TAG_INTERNAL_STORAGE);
     }
 
     public long getExternalStorageUsage() {
+        flush(TAG_EXTERNAL_STORAGE, mExternalUsage.getAndSet(0));
         return getUsage(TAG_EXTERNAL_STORAGE);
     }
 
@@ -47,8 +64,14 @@ public class StorageStats extends UsageStats {
         return getExternalStorageUsage() + getInternalStorageUsage();
     }
 
+    public void flush() {
+        LoggerManager.getLogger(getClass()).funcEnter();
+        flush(TAG_INTERNAL_STORAGE, mInternalUsage.getAndSet(0));
+        flush(TAG_EXTERNAL_STORAGE, mExternalUsage.getAndSet(0));
+    }
+
     public void reset() {
-        onReset(TAG_EXTERNAL_STORAGE);
-        onReset(TAG_INTERNAL_STORAGE);
+        reset(TAG_EXTERNAL_STORAGE);
+        reset(TAG_INTERNAL_STORAGE);
     }
 }

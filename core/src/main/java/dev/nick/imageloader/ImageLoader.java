@@ -69,8 +69,9 @@ import dev.nick.imageloader.loader.task.DisplayTaskRecord;
 import dev.nick.imageloader.loader.task.FutureImageTask;
 import dev.nick.imageloader.loader.task.TaskManager;
 import dev.nick.imageloader.loader.task.TaskManagerImpl;
-import dev.nick.imageloader.stack.RequestHandler;
-import dev.nick.imageloader.stack.RequestStackService;
+import dev.nick.imageloader.queue.IdleStateMonitor;
+import dev.nick.imageloader.queue.RequestHandler;
+import dev.nick.imageloader.queue.RequestQueueManager;
 import dev.nick.imageloader.utils.Preconditions;
 import dev.nick.logger.Logger;
 import dev.nick.logger.LoggerManager;
@@ -91,7 +92,7 @@ public class ImageLoader implements DisplayTaskMonitor,
     private static final int MSG_CALL_ON_FAILURE = 0x5;
     private static final int MSG_CALL_ON_CANCEL = 0x6;
 
-    private static final DisplayOption sDefDisplayOption = new DisplayOption.Builder()
+    private static final DisplayOption sDefDisplayOption = DisplayOption.builder()
             .imageQuality(ImageQuality.OPT)
             .imageAnimator(null)
             .bitmapHandler(null)
@@ -113,7 +114,7 @@ public class ImageLoader implements DisplayTaskMonitor,
     @VisibleForTesting
     private LoaderConfig mConfig;
     @VisibleForTesting
-    private RequestStackService<FutureImageTask> mStackService;
+    private RequestQueueManager<FutureImageTask> mStackService;
 
     private Logger mLogger;
 
@@ -130,9 +131,6 @@ public class ImageLoader implements DisplayTaskMonitor,
     private TaskManager mTaskManager;
     private ImageSettableIdCreator mSettableIdCreator;
 
-    private StorageStats mStorageStats;
-    private TrafficStats mTrafficStats;
-
     private ImageLoader(Context context, CacheManager cacheManager, LoaderConfig config) {
         Preconditions.checkNotNull(context);
         if (config == null) config = LoaderConfig.DEFAULT_CONFIG;
@@ -147,7 +145,14 @@ public class ImageLoader implements DisplayTaskMonitor,
                 : cacheManager;
         this.mLoadingService = Executors.newFixedThreadPool(config.getLoadingThreads());
         this.mImageSettingsScheduler = Executors.newSingleThreadExecutor();
-        this.mStackService = RequestStackService.createStarted(this);
+        this.mStackService = RequestQueueManager.createStarted(this, new IdleStateMonitor() {
+            @Override
+            public void onIdle() {
+                LoggerManager.getLogger(IdleStateMonitor.class).funcEnter();
+                TrafficStats.from(mContext).flush();
+                StorageStats.from(mContext).flush();
+            }
+        }, config.getQueuePolicy());
         this.mTaskLockMap = new HashMap<>();
         this.mFutures = new ArrayList<>();
         this.mState = LoaderState.RUNNING;
@@ -162,64 +167,49 @@ public class ImageLoader implements DisplayTaskMonitor,
     }
 
     /**
-     * Create a new instance of ImageLoader.
+     * Create the shared instance of ImageLoader
      *
      * @param context An application {@link Context} is preferred.
-     * @return Single instance of {@link ImageLoader}
      * @since 1.0.1
      */
-    public static ImageLoader create(Context context) {
-        return create(context, null);
+    public static void createShared(Context context) {
+        createShared(context, null);
     }
 
     /**
-     * Create a new instance of ImageLoader.
+     * Create the shared instance of ImageLoader
      *
      * @param context An application {@link Context} is preferred.
      * @param config  Configuration of this loader.
-     * @return Single instance of {@link ImageLoader}
      * @since 1.0.1
      */
-    public static ImageLoader create(Context context, LoaderConfig config) {
-        return shared(context, config).fork(config);
-    }
-
-    /**
-     * Get the shared instance of ImageLoader
-     *
-     * @param context An application {@link Context} is preferred.
-     * @return Single instance of {@link ImageLoader}
-     * @since 1.0.1
-     */
-    public static ImageLoader shared(Context context) {
-        return shared(context, null);
-    }
-
-    /**
-     * Get the shared instance of ImageLoader
-     *
-     * @param context An application {@link Context} is preferred.
-     * @param config  Configuration of this loader.
-     * @return Single instance of {@link ImageLoader}
-     * @since 1.0.1
-     */
-    public static ImageLoader shared(Context context, LoaderConfig config) {
-        if (sLoader == null) {
+    public static void createShared(Context context, LoaderConfig config) {
+        if (sLoader == null || sLoader.isTerminated()) {
             sLoader = new ImageLoader(context, null, config);
         }
-        return sLoader;
+    }
+
+    /**
+     * Get the createShared instance of ImageLoader
+     *
+     * @return Single instance of {@link ImageLoader}
+     * @since 1.0.1
+     */
+    public static ImageLoader shared() {
+        return Preconditions.checkNotNull(sLoader, "Call createShared first");
     }
 
     /**
      * Clear all pending tasks.
      */
     public void clearTasks() {
+        ensureNotTerminated();
         mClearTaskRequestedTimeMills = System.currentTimeMillis();
     }
 
     public void load(@NonNull String url, @NonNull LoadingListener loadingListener) {
         display(url, new FakeImageSettable(),
-                new DisplayOption.Builder()
+                DisplayOption.builder()
                         .imageQuality(ImageQuality.OPT)
                         .imageAnimator(null)
                         .bitmapHandler(null)
@@ -321,6 +311,8 @@ public class ImageLoader implements DisplayTaskMonitor,
                         @NonNull ImageSettable settable,
                         @Nullable DisplayOption option,
                         @Nullable DisplayListener listener) {
+
+        ensureNotTerminated();
 
         Preconditions.checkNotNull(url, settable);
 
@@ -589,7 +581,7 @@ public class ImageLoader implements DisplayTaskMonitor,
     }
 
     @Override
-    public boolean handle(FutureImageTask future) {
+    public boolean handleRequest(FutureImageTask future) {
         freezeIfRequested();
         if (!onFutureSubmit(future)) return false;
         mLoadingService.submit(future);
@@ -607,9 +599,7 @@ public class ImageLoader implements DisplayTaskMonitor,
      * Call this to pause the {@link ImageLoader}
      */
     public void pause() {
-        if (mState == LoaderState.TERMINATED) {
-            throw new IllegalStateException("Loader has been terminated.");
-        }
+        ensureNotTerminated();
         if (!isPaused()) {
             mState = LoaderState.PAUSE_REQUESTED;
         }
@@ -625,15 +615,21 @@ public class ImageLoader implements DisplayTaskMonitor,
     }
 
     /**
+     * @return {@code true} if this loader is terminated.
+     * @see #terminate() ()
+     */
+    public boolean isTerminated() {
+        return mState == LoaderState.TERMINATED;
+    }
+
+    /**
      * Call this to resume the {@link ImageLoader} from pause state.
      *
      * @see #pause()
      * @see LoaderState
      */
     public void resume() {
-        if (mState == LoaderState.TERMINATED) {
-            throw new IllegalStateException("Loader has been terminated.");
-        }
+        ensureNotTerminated();
         if (isPaused()) {
             if (mFreezer != null) {
                 mFreezer.resume();
@@ -647,9 +643,7 @@ public class ImageLoader implements DisplayTaskMonitor,
      * Terminate the loader.
      */
     public void terminate() {
-        if (mState == LoaderState.TERMINATED) {
-            throw new IllegalStateException("Loader has already been terminated.");
-        }
+        ensureNotTerminated();
         mState = LoaderState.TERMINATED;
         mStackService.terminate();
         mLoadingService.shutdown();
@@ -658,6 +652,10 @@ public class ImageLoader implements DisplayTaskMonitor,
         }
         cancelAllTasks();
         mLogger.funcExit();
+    }
+
+    private void ensureNotTerminated() {
+        Preconditions.checkState(!isTerminated(), "Loader has already been terminated");
     }
 
     /**
@@ -776,8 +774,7 @@ public class ImageLoader implements DisplayTaskMonitor,
     @WorkerThread
     public void clearDiskCache() {
         mCacheManager.evictDisk();
-        ensureStorageStats();
-        mStorageStats.reset();
+        StorageStats.from(mContext).reset();
         mLogger.funcExit();
     }
 
@@ -819,50 +816,31 @@ public class ImageLoader implements DisplayTaskMonitor,
 
     @Override
     public ImageLoader fork(LoaderConfig config) {
-        //FIXME Consider to use shared elements for better performance.
         return clone(this, config);
     }
 
     public long getInternalStorageUsage() {
-        ensureStorageStats();
-        return mStorageStats.getInternalStorageUsage();
+        return StorageStats.from(mContext).getInternalStorageUsage();
     }
 
     public long getExternalStorageUsage() {
-        ensureStorageStats();
-        return mStorageStats.getExternalStorageUsage();
+        return StorageStats.from(mContext).getExternalStorageUsage();
     }
 
     public long getTotalStorageUsage() {
-        ensureStorageStats();
-        return mStorageStats.getTotalStorageUsage();
+        return StorageStats.from(mContext).getTotalStorageUsage();
     }
 
     public long getTotalTrafficUsage() {
-        ensureTrafficStats();
-        return mTrafficStats.getTotalTrafficUsage();
+        return TrafficStats.from(mContext).getTotalTrafficUsage();
     }
 
     public long getMobileTrafficUsage() {
-        ensureTrafficStats();
-        return mTrafficStats.getMobileTrafficUsage();
+        return TrafficStats.from(mContext).getMobileTrafficUsage();
     }
 
     public long getWifiTrafficUsage() {
-        ensureTrafficStats();
-        return mTrafficStats.getWifiTrafficUsage();
-    }
-
-    private synchronized void ensureStorageStats() {
-        if (mStorageStats == null) {
-            mStorageStats = new StorageStats(mContext);
-        }
-    }
-
-    private synchronized void ensureTrafficStats() {
-        if (mTrafficStats == null) {
-            mTrafficStats = new TrafficStats(mContext);
-        }
+        return TrafficStats.from(mContext).getWifiTrafficUsage();
     }
 
     private static class FailureParams {

@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-package dev.nick.imageloader.stack;
+package dev.nick.imageloader.queue;
 
 public interface RequestHandler<T> {
-    boolean handle(T request);
+    boolean handleRequest(T request);
 }

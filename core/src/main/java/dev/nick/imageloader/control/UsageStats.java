@@ -18,6 +18,7 @@ package dev.nick.imageloader.control;
 
 import android.content.Context;
 
+import dev.nick.imageloader.utils.XmlUtils;
 import dev.nick.logger.Logger;
 import dev.nick.logger.LoggerManager;
 
@@ -32,14 +33,14 @@ public class UsageStats {
     }
 
     protected void writeString(String tag, String value) {
-        mContext.getSharedPreferences(buildTag(), Context.MODE_PRIVATE).edit().putString(tag, value).apply();
+        mContext.getSharedPreferences(buildXmlFileName(), Context.MODE_PRIVATE).edit().putString(tag, value).apply();
     }
 
     protected String readString(String tag, String defValue) {
-        return mContext.getSharedPreferences(buildTag(), Context.MODE_PRIVATE).getString(tag, defValue);
+        return mContext.getSharedPreferences(buildXmlFileName(), Context.MODE_PRIVATE).getString(tag, defValue);
     }
 
-    protected String buildTag() {
+    protected String buildXmlFileName() {
         return mContext.getPackageName() + "." + getClass().getSimpleName().toLowerCase();
     }
 
@@ -48,14 +49,13 @@ public class UsageStats {
         return Long.parseLong(last);
     }
 
-    protected void onUsage(String tag, long size) {
-        mLogger.verbose(tag + "-" + size);
+    protected void flush(String tag, long size) {
         String last = readString(tag, String.valueOf(0));
         long lastLong = Long.parseLong(last);
         writeString(tag, String.valueOf((lastLong + size)));
     }
 
-    protected void onReset(String tag) {
+    protected void reset(String tag) {
         writeString(tag, String.valueOf((0)));
     }
 }

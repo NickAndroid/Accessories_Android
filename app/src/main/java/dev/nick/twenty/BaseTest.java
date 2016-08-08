@@ -61,25 +61,25 @@ public class BaseTest extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.pause:
-                ImageLoader.shared(this).pause();
+                ImageLoader.shared().pause();
                 break;
             case R.id.resume:
-                ImageLoader.shared(this).resume();
+                ImageLoader.shared().resume();
                 break;
             case R.id.terminate:
-                ImageLoader.shared(this).terminate();
+                ImageLoader.shared().terminate();
                 break;
             case R.id.cancel:
-                ImageLoader.shared(this).cancelAllTasks();
+                ImageLoader.shared().cancelAllTasks();
                 break;
             case R.id.clear:
-                ImageLoader.shared(this).clearAllCache();
+                ImageLoader.shared().clearAllCache();
                 break;
             case R.id.clear_disc:
-                ImageLoader.shared(this).clearDiskCache();
+                ImageLoader.shared().clearDiskCache();
                 break;
             case R.id.clear_mem:
-                ImageLoader.shared(this).clearMemCache();
+                ImageLoader.shared().clearMemCache();
                 break;
             case android.R.id.home:
                 finish();

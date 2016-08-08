@@ -64,7 +64,7 @@ public class ContentImageTest extends BaseTest {
 
         final List<Track> tracks = MediaUtils.getTrackList(this);
 
-        mLoader = ImageLoader.create(getApplicationContext(), LoaderConfig.builder()
+        mLoader = ImageLoader.shared().fork(LoaderConfig.builder()
                 .cachePolicy(CachePolicy.builder()
                         .enableMemCache()
                         .enableDiskCache()
@@ -110,7 +110,7 @@ public class ContentImageTest extends BaseTest {
                 String uri = mArtworkUri + File.separator + tracks.get(position).getAlbumId();
 
                 mLoader.display(uri, holder.imageView,
-                        new DisplayOption.Builder()
+                        DisplayOption.builder()
                                 .oneAfterOne()
                                 .imageQuality(ImageQuality.RAW)
                                 .viewMaybeReused()

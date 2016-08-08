@@ -18,28 +18,45 @@ package dev.nick.imageloader.control;
 
 import android.content.Context;
 
+import java.util.concurrent.atomic.AtomicLong;
+
+import dev.nick.logger.LoggerManager;
+
 public class TrafficStats extends UsageStats {
 
     private static final String TAG_WIFI = "wifi";
     private static final String TAG_MOBILE = "mobile";
 
-    public TrafficStats(Context context) {
+    static TrafficStats sInstance;
+
+    private AtomicLong mWifiUsage, mMobileUsage;
+
+    private TrafficStats(Context context) {
         super(context);
+        mWifiUsage = new AtomicLong(0);
+        mMobileUsage = new AtomicLong(0);
+    }
+
+    public synchronized static TrafficStats from(Context context) {
+        if (sInstance == null) sInstance = new TrafficStats(context);
+        return sInstance;
     }
 
     public void onWifiTrafficUsage(long size) {
-        onUsage(TAG_WIFI, size);
+        mWifiUsage.addAndGet(size);
     }
 
     public void onMobileTrafficUsage(long size) {
-        onUsage(TAG_MOBILE, size);
+        mMobileUsage.addAndGet(size);
     }
 
     public long getWifiTrafficUsage() {
+        flush(TAG_WIFI, mWifiUsage.getAndSet(0));
         return getUsage(TAG_WIFI);
     }
 
     public long getMobileTrafficUsage() {
+        flush(TAG_MOBILE, mMobileUsage.getAndSet(0));
         return getUsage(TAG_MOBILE);
     }
 
@@ -47,8 +64,14 @@ public class TrafficStats extends UsageStats {
         return getMobileTrafficUsage() + getWifiTrafficUsage();
     }
 
+    public void flush() {
+        LoggerManager.getLogger(getClass()).funcEnter();
+        flush(TAG_WIFI, mWifiUsage.getAndSet(0));
+        flush(TAG_MOBILE, mMobileUsage.getAndSet(0));
+    }
+
     public void reset() {
-        onReset(TAG_MOBILE);
-        onReset(TAG_WIFI);
+        reset(TAG_MOBILE);
+        reset(TAG_WIFI);
     }
 }
