@@ -45,6 +45,7 @@ class RequestQueue<T> {
     }
 
     public T add(T item) {
+        if (!mActive) return null;
         if (mHolder.add(item)) {
             signal();
         }
@@ -69,10 +70,15 @@ class RequestQueue<T> {
 
     public void deactivate() {
         mActive = false;
+        unSignal();
     }
 
     private void signal() {
         mIdleSignal = true;
+    }
+
+    private void unSignal() {
+        mIdleSignal = false;
     }
 
     protected void onIdle() {
