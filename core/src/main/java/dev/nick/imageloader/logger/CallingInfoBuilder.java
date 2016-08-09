@@ -14,19 +14,8 @@
  *  limitations under the License.
  */
 
-package dev.nick.logger;
+package dev.nick.imageloader.logger;
 
-class CallingInfoBuilderImpl implements CallingInfoBuilder {
-
-    @Override
-    public String getCallingInfo() {
-        StackTraceElement[] traceElements = Thread.currentThread().getStackTrace();
-        if (traceElements.length <= 4) return null;
-        StackTraceElement element = traceElements[4];
-        return element.getMethodName()
-                + "()@" +
-                element.getFileName() +
-                "#" +
-                element.getLineNumber();
-    }
+public interface CallingInfoBuilder {
+    String getCallingInfo();
 }

@@ -20,7 +20,7 @@ import android.support.annotation.Nullable;
 
 import java.util.concurrent.FutureTask;
 
-import dev.nick.logger.LoggerManager;
+import dev.nick.imageloader.logger.LoggerManager;
 
 public class FutureImageTask extends FutureTask<Void> {
 

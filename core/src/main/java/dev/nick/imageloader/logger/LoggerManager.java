@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package dev.nick.logger;
+package dev.nick.imageloader.logger;
 
 import android.util.Log;
 

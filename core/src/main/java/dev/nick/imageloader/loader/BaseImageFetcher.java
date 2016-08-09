@@ -28,8 +28,8 @@ import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
-import dev.nick.logger.Logger;
-import dev.nick.logger.LoggerManager;
+import dev.nick.imageloader.logger.Logger;
+import dev.nick.imageloader.logger.LoggerManager;
 
 class BaseImageFetcher implements ImageFetcher {
 

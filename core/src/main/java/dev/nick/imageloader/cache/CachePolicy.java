@@ -21,7 +21,7 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import dev.nick.imageloader.ImageLoader;
-import dev.nick.logger.LoggerManager;
+import dev.nick.imageloader.logger.LoggerManager;
 
 /**
  * Policy reading when caching images.

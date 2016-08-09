@@ -73,8 +73,8 @@ import dev.nick.imageloader.queue.IdleStateMonitor;
 import dev.nick.imageloader.queue.RequestHandler;
 import dev.nick.imageloader.queue.RequestQueueManager;
 import dev.nick.imageloader.utils.Preconditions;
-import dev.nick.logger.Logger;
-import dev.nick.logger.LoggerManager;
+import dev.nick.imageloader.logger.Logger;
+import dev.nick.imageloader.logger.LoggerManager;
 
 /**
  * Main class of {@link ImageLoader} library.
@@ -114,7 +114,7 @@ public class ImageLoader implements DisplayTaskMonitor,
     @VisibleForTesting
     private LoaderConfig mConfig;
     @VisibleForTesting
-    private RequestQueueManager<FutureImageTask> mStackService;
+    private RequestQueueManager<FutureImageTask> mQueueService;
 
     private Logger mLogger;
 
@@ -145,7 +145,7 @@ public class ImageLoader implements DisplayTaskMonitor,
                 : cacheManager;
         this.mLoadingService = Executors.newFixedThreadPool(config.getLoadingThreads());
         this.mImageSettingsScheduler = Executors.newSingleThreadExecutor();
-        this.mStackService = RequestQueueManager.createStarted(this, new IdleStateMonitor() {
+        this.mQueueService = RequestQueueManager.createStarted(this, new IdleStateMonitor() {
             @Override
             public void onIdle() {
                 LoggerManager.getLogger(IdleStateMonitor.class).funcEnter();
@@ -413,8 +413,8 @@ public class ImageLoader implements DisplayTaskMonitor,
 
         FutureImageTask future = new FutureImageTask(imageTask, this, option.isViewMaybeReused());
 
-        // Push it to the request stack.
-        mStackService.push(future);
+        // Push it to the request queue.
+        mQueueService.push(future);
     }
 
     private DisplayOption assignOptionIfNull(DisplayOption option) {
@@ -645,7 +645,7 @@ public class ImageLoader implements DisplayTaskMonitor,
     public void terminate() {
         ensureNotTerminated();
         mState = LoaderState.TERMINATED;
-        mStackService.terminate();
+        mQueueService.terminate();
         mLoadingService.shutdown();
         synchronized (mTaskLockMap) {
             mTaskLockMap.clear();

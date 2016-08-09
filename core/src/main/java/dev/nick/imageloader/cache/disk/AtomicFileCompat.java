@@ -71,7 +71,7 @@ public class AtomicFileCompat {
      * access to AtomicFileCompat.
      */
     public FileOutputStream startWrite() throws IOException {
-        // Rename the current file so it may be used as a backup during the next read
+        // Rename the current file so it may be used as a backup during the lower read
         if (mBaseName.exists()) {
             if (!mBackupName.exists()) {
                 if (!mBaseName.renameTo(mBackupName)) {
@@ -106,7 +106,7 @@ public class AtomicFileCompat {
     /**
      * Call when you have successfully finished writing to the stream
      * returned by {@link #startWrite()}.  This will close, sync, and
-     * commit the new data.  The next attempt to read the atomic file
+     * commit the new data.  The lower attempt to read the atomic file
      * will return the new file stream.
      */
     public void finishWrite(FileOutputStream str) {

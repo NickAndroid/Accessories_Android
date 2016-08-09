@@ -41,7 +41,7 @@ import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.LoadingListener;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
-import dev.nick.logger.LoggerManager;
+import dev.nick.imageloader.logger.LoggerManager;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
 public class LoadImageTest extends BaseTest {

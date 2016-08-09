@@ -28,7 +28,7 @@ import java.util.concurrent.Executors;
 import dev.nick.imageloader.cache.disk.DiskCache;
 import dev.nick.imageloader.cache.mem.MemCache;
 import dev.nick.imageloader.loader.ViewSpec;
-import dev.nick.logger.LoggerManager;
+import dev.nick.imageloader.logger.LoggerManager;
 
 public class CacheManager {
 

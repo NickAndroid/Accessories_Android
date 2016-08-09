@@ -14,27 +14,8 @@
  *  limitations under the License.
  */
 
-package dev.nick.logger;
+package dev.nick.imageloader.logger;
 
-public interface Logger {
-
-    boolean isDebuggable(int level);
-
-    void setDebugLevel(int level);
-
-    void funcEnter();
-
-    void funcExit();
-
-    void info(Object o);
-
-    void debug(Object o);
-
-    void verbose(Object o);
-
-    void warn(Object o);
-
-    void error(Object o);
-
-    void trace(String trackMsg, Throwable throwable);
+public interface LogTagBuilder {
+    String buildLogTag(String prop);
 }

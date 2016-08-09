@@ -22,7 +22,7 @@ import android.util.Log;
 import dev.nick.imageloader.cache.CachePolicy;
 import dev.nick.imageloader.loader.network.NetworkPolicy;
 import dev.nick.imageloader.queue.QueuePolicy;
-import dev.nick.logger.LoggerManager;
+import dev.nick.imageloader.logger.LoggerManager;
 
 /**
  * Configuration for {@link ImageLoader}, use a {@link Builder}
@@ -145,7 +145,7 @@ public class LoaderConfig {
         }
 
         /**
-         * @param debugLevel Debug level of {@link dev.nick.logger.Logger}
+         * @param debugLevel Debug level of {@link dev.nick.imageloader.logger.Logger}
          * @return Builder instance.
          */
         public Builder debugLevel(int debugLevel) {

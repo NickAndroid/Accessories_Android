@@ -25,7 +25,7 @@ import java.net.URLConnection;
 import dev.nick.imageloader.loader.ProgressListener;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
-import dev.nick.logger.LoggerManager;
+import dev.nick.imageloader.logger.LoggerManager;
 
 public class HttpImageDownloader implements ImageDownloader<Boolean> {
 
