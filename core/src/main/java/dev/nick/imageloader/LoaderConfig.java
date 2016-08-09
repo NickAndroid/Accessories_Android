@@ -21,8 +21,8 @@ import android.util.Log;
 
 import dev.nick.imageloader.cache.CachePolicy;
 import dev.nick.imageloader.loader.network.NetworkPolicy;
-import dev.nick.imageloader.queue.QueuePolicy;
 import dev.nick.imageloader.logger.LoggerManager;
+import dev.nick.imageloader.queue.QueuePolicy;
 
 /**
  * Configuration for {@link ImageLoader}, use a {@link Builder}
@@ -32,7 +32,6 @@ public class LoaderConfig {
 
     public static final LoaderConfig DEFAULT_CONFIG = LoaderConfig.builder()
             .cachePolicy(CachePolicy.DEFAULT_CACHE_POLICY)
-            .queuePolicy(QueuePolicy.FIFO)
             .networkPolicy(NetworkPolicy.DEFAULT_NETWORK_POLICY)
             .loadingThreads(Runtime.getRuntime().availableProcessors())
             .debugLevel(Log.WARN)
@@ -129,9 +128,10 @@ public class LoaderConfig {
          * @param queuePolicy The {@link QueuePolicy} using for queue.
          * @return Builder instance.
          * @see QueuePolicy
+         * @deprecated Do not call anymore, FIFO is preferred by force.
          */
         public Builder queuePolicy(QueuePolicy queuePolicy) {
-            this.queuePolicy = queuePolicy;
+            this.queuePolicy = QueuePolicy.FIFO;
             return Builder.this;
         }
 

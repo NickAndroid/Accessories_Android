@@ -17,9 +17,5 @@
 package dev.nick.imageloader.queue;
 
 public class FIFOPriorityBlockingQueue<E> extends PriorityBlockingQueue<E> {
-
-    @Override
-    public E take() throws InterruptedException {
-        return takeFirst();
-    }
+    // Default.
 }

@@ -86,7 +86,7 @@ import dev.nick.imageloader.utils.Preconditions;
 public class ImageLoader implements DisplayTaskMonitor,
         Handler.Callback,
         RequestHandler<FutureImageTask>,
-        FutureImageTask.DoneListener,
+        FutureImageTask.TaskActionListener,
         Forkable<ImageLoader, LoaderConfig> {
 
     private static final int MSG_APPLY_IMAGE_SETTINGS = 0x1;
@@ -163,7 +163,7 @@ public class ImageLoader implements DisplayTaskMonitor,
                 TrafficStats.from(mContext).flush();
                 StorageStats.from(mContext).flush();
             }
-        }, config.getQueuePolicy());
+        }, QueuePolicy.FIFO);
         this.mTaskLockMap = new HashMap<>();
         this.mFutures = new ArrayList<>();
         this.mState = LoaderState.RUNNING;
@@ -455,6 +455,12 @@ public class ImageLoader implements DisplayTaskMonitor,
     }
 
     private void onFutureDone(FutureImageTask futureImageTask) {
+        synchronized (mFutures) {
+            mFutures.remove(futureImageTask);
+        }
+    }
+
+    private void onFutureCancel(FutureImageTask futureImageTask) {
         synchronized (mFutures) {
             mFutures.remove(futureImageTask);
         }
@@ -819,7 +825,14 @@ public class ImageLoader implements DisplayTaskMonitor,
 
     @Override
     public void onDone(FutureImageTask futureImageTask) {
+        mLogger.warn(futureImageTask);
         onFutureDone(futureImageTask);
+    }
+
+    @Override
+    public void onCancel(FutureImageTask futureImageTask) {
+        mLogger.warn(futureImageTask);
+        onFutureCancel(futureImageTask);
     }
 
     @Override

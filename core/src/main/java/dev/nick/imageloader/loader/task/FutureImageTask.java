@@ -24,12 +24,12 @@ import dev.nick.imageloader.logger.LoggerManager;
 
 public class FutureImageTask extends FutureTask<Void> {
 
-    private DoneListener mListener;
+    private TaskActionListener mListener;
     private DisplayTask mTask;
 
     private boolean mCancelOthersBeforeRun;
 
-    public FutureImageTask(DisplayTask task, @Nullable DoneListener listener, boolean cancelOthersBeforeRun) {
+    public FutureImageTask(DisplayTask task, @Nullable TaskActionListener listener, boolean cancelOthersBeforeRun) {
         super(task);
         this.mTask = task;
         this.mListener = listener;
@@ -43,8 +43,20 @@ public class FutureImageTask extends FutureTask<Void> {
         if (mListener != null) mListener.onDone(this);
     }
 
-    public interface DoneListener {
-        void onDone(FutureImageTask futureImageTask);
+    @Override
+    public boolean cancel(boolean mayInterruptIfRunning) {
+        boolean result = super.cancel(mayInterruptIfRunning);
+        if (mListener != null) mListener.onCancel(this);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "FutureImageTask{" +
+                "mListener=" + mListener +
+                ", mTask=" + mTask +
+                ", mCancelOthersBeforeRun=" + mCancelOthersBeforeRun +
+                '}';
     }
 
     public boolean shouldCancelOthersBeforeRun() {
@@ -53,5 +65,11 @@ public class FutureImageTask extends FutureTask<Void> {
 
     public DisplayTask getListenableTask() {
         return mTask;
+    }
+
+    public interface TaskActionListener {
+        void onDone(FutureImageTask futureImageTask);
+
+        void onCancel(FutureImageTask futureImageTask);
     }
 }
