@@ -33,6 +33,7 @@ public class LoaderConfig {
     public static final LoaderConfig DEFAULT_CONFIG = LoaderConfig.builder()
             .cachePolicy(CachePolicy.DEFAULT_CACHE_POLICY)
             .networkPolicy(NetworkPolicy.DEFAULT_NETWORK_POLICY)
+            .queuePolicy(QueuePolicy.FIFO)
             .loadingThreads(Runtime.getRuntime().availableProcessors())
             .debugLevel(Log.WARN)
             .build();
@@ -128,10 +129,10 @@ public class LoaderConfig {
          * @param queuePolicy The {@link QueuePolicy} using for queue.
          * @return Builder instance.
          * @see QueuePolicy
-         * @deprecated Do not call anymore, FIFO is preferred by force.
+         * @deprecated Do not call anymore, FIFO is preferred by default.
          */
         public Builder queuePolicy(QueuePolicy queuePolicy) {
-            this.queuePolicy = QueuePolicy.FIFO;
+            this.queuePolicy = queuePolicy;
             return Builder.this;
         }
 
