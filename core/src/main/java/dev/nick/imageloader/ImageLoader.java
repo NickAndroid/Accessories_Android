@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -107,7 +106,7 @@ public class ImageLoader implements DisplayTaskMonitor,
 
     private static ImageLoader sLoader;
 
-    private final Map<Integer, DisplayTaskRecord> mTaskLockMap;
+    private final Map<Long, DisplayTaskRecord> mTaskLockMap;
     private final List<FutureImageTask> mFutures;
 
     private Context mContext;
@@ -125,7 +124,7 @@ public class ImageLoader implements DisplayTaskMonitor,
     private long mClearTaskRequestedTimeMills;
 
     @VisibleForTesting
-    private ExecutorService mLoadingService;
+    private ThreadPoolExecutor mLoadingService, mFallbackService;
     @VisibleForTesting
     private ExecutorService mImageSettingsScheduler;
 
@@ -219,11 +218,12 @@ public class ImageLoader implements DisplayTaskMonitor,
     }
 
     public void load(@NonNull String url, @NonNull LoadingListener loadingListener) {
-        display(url, new FakeImageSettable(),
+        display(url, new FakeImageSettable(url),
                 DisplayOption.builder()
                         .imageQuality(ImageQuality.OPT)
                         .imageAnimator(null)
                         .bitmapHandler(null)
+                        .viewMaybeReused()
                         .showWithDefault(0)
                         .showOnLoading(0)
                         .build(),
@@ -372,7 +372,7 @@ public class ImageLoader implements DisplayTaskMonitor,
     }
 
     private DisplayTaskRecord createTaskRecord(ImageSettable settable) {
-        int settableId = mSettableIdCreator.createSettableId(settable);
+        long settableId = mSettableIdCreator.createSettableId(settable);
         int taskId = mTaskManager.nextTaskId();
         DisplayTaskRecord displayTaskRecord = new DisplayTaskRecord(settableId, taskId);
         onTaskCreated(displayTaskRecord);
@@ -433,7 +433,7 @@ public class ImageLoader implements DisplayTaskMonitor,
     private void onTaskCreated(DisplayTaskRecord record) {
         mLogger.verbose("Created task:" + record);
         int taskId = record.getTaskId();
-        int settableId = record.getSettableId();
+        long settableId = record.getSettableId();
         synchronized (mTaskLockMap) {
             DisplayTaskRecord exists = mTaskLockMap.get(settableId);
             if (exists != null) {
@@ -598,8 +598,43 @@ public class ImageLoader implements DisplayTaskMonitor,
     public boolean handleRequest(FutureImageTask future) {
         freezeIfRequested();
         if (!onFutureSubmit(future)) return false;
-        mLoadingService.submit(future);
+        getExecutor(ImageSource.of(future.getListenableTask().getUrl())).submit(future);
         return true;
+    }
+
+    private ExecutorService getExecutor(ImageSource source) {
+
+        switch (source) {
+            case NETWORK_HTTP: // fall.
+            case NETWORK_HTTPS:
+                return mLoadingService;
+            default:
+                int activeThreads = mLoadingService.getActiveCount();
+                int max = mLoadingService.getMaximumPoolSize();
+                if (activeThreads == max) {
+                    mLogger.verbose("The loading service hits, using fallback one.");
+                    ensureFallbackService();
+                    return mFallbackService;
+                }
+                break;
+        }
+        return mLoadingService;
+    }
+
+    private synchronized void ensureFallbackService() {
+        if (mFallbackService == null) {
+            int poolSize = mConfig.getLoadingThreads();
+            poolSize = poolSize / 2 + 1;
+            this.mFallbackService = new ThreadPoolExecutor(
+                    poolSize,
+                    poolSize,
+                    0L,
+                    TimeUnit.MILLISECONDS,
+                    mConfig.getQueuePolicy() == QueuePolicy.FIFO
+                            ? new FIFOPriorityBlockingQueue<Runnable>()
+                            : new LIFOPriorityBlockingQueue<Runnable>());
+            mLogger.verbose("Created fallback service with pool size:" + poolSize);
+        }
     }
 
     /**
@@ -727,14 +762,14 @@ public class ImageLoader implements DisplayTaskMonitor,
      *
      * @param settableId The settableId of the loader request.
      */
-    public ImageLoader cancel(int settableId) {
-        Preconditions.checkState(settableId > 0, "Invalid settable with id:0");
+    public ImageLoader cancel(long settableId) {
+        Preconditions.checkState(settableId != 0, "Invalid settable with id:0");
         List<FutureImageTask> pendingCancels = findTasks(settableId);
         if (pendingCancels.size() > 0) {
             for (FutureImageTask toBeCanceled : pendingCancels) {
                 toBeCanceled.cancel(true);
                 callOnCancel(toBeCanceled.getListenableTask().getProgressListener());
-                mLogger.trace("Cancel task for settable:" + settableId, new Throwable());
+                mLogger.verbose("Cancel task for settable:" + settableId);
             }
             pendingCancels.clear();
             pendingCancels = null;
@@ -764,7 +799,7 @@ public class ImageLoader implements DisplayTaskMonitor,
         return findTasks(mSettableIdCreator.createSettableId(settable));
     }
 
-    private List<FutureImageTask> findTasks(int settableId) {
+    private List<FutureImageTask> findTasks(long settableId) {
         List<FutureImageTask> pendingCancels = new ArrayList<>();
         synchronized (mFutures) {
             for (FutureImageTask futureImageTask : mFutures) {
@@ -825,13 +860,13 @@ public class ImageLoader implements DisplayTaskMonitor,
 
     @Override
     public void onDone(FutureImageTask futureImageTask) {
-        mLogger.warn(futureImageTask);
+        mLogger.verbose(futureImageTask.getListenableTask().getTaskRecord());
         onFutureDone(futureImageTask);
     }
 
     @Override
     public void onCancel(FutureImageTask futureImageTask) {
-        mLogger.warn(futureImageTask);
+        mLogger.verbose(futureImageTask.getListenableTask().getTaskRecord());
         onFutureCancel(futureImageTask);
     }
 
@@ -888,6 +923,13 @@ public class ImageLoader implements DisplayTaskMonitor,
     }
 
     class FakeImageSettable implements ImageSettable {
+
+        String url;
+
+        public FakeImageSettable(String url) {
+            this.url = url;
+        }
+
         @Override
         public void setImageBitmap(@NonNull Bitmap bitmap) {
             // Nothing.
@@ -915,7 +957,7 @@ public class ImageLoader implements DisplayTaskMonitor,
 
         @Override
         public int hashCode() {
-            return UUID.randomUUID().hashCode();
+            return url.hashCode();
         }
     }
 

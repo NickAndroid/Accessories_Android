@@ -22,7 +22,7 @@ import dev.nick.imageloader.utils.Preconditions;
 
 public class ImageSettableIdCreatorImpl implements ImageSettableIdCreator {
     @Override
-    public int createSettableId(@NonNull ImageSettable settable) {
+    public long createSettableId(@NonNull ImageSettable settable) {
         Preconditions.checkNotNull(settable);
         return settable.hashCode();
     }

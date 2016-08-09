@@ -18,14 +18,14 @@ package dev.nick.imageloader.loader.task;
 
 public class DisplayTaskRecord extends TaskRecord {
 
-    private int settableId;
+    private long settableId;
 
-    public DisplayTaskRecord(int settableId, int taskId) {
+    public DisplayTaskRecord(long settableId, int taskId) {
         super(taskId);
         this.settableId = settableId;
     }
 
-    public int getSettableId() {
+    public long getSettableId() {
         return settableId;
     }
 

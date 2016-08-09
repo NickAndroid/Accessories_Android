@@ -20,5 +20,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
 public class PriorityBlockingQueue<E> extends LinkedBlockingDeque<E> implements BlockingQueue<E> {
-    // Empty.
+    @Override
+    public E take() throws InterruptedException {
+        return super.take();
+    }
 }
