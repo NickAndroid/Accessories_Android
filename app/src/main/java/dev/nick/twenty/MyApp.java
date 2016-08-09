@@ -37,7 +37,7 @@ public class MyApp extends ScalpelApplication {
             Trace.beginSection("ImageLoader_init");
         }
         ImageLoader.createShared(getApplicationContext(), LoaderConfig.builder()
-                .queuePolicy(QueuePolicy.LIFO)
+                .queuePolicy(QueuePolicy.FIFO)
                 .cachePolicy(CachePolicy.builder()
                         .enableMemCache()
                         .enableDiskCache()

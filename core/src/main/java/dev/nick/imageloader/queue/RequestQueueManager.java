@@ -17,7 +17,6 @@
 package dev.nick.imageloader.queue;
 
 import dev.nick.imageloader.logger.LoggerManager;
-import dev.nick.imageloader.utils.Preconditions;
 
 public final class RequestQueueManager<T> implements RequestHandler<T> {
 
@@ -47,11 +46,7 @@ public final class RequestQueueManager<T> implements RequestHandler<T> {
     }
 
     public void push(T request) {
-        push(request, Priority.NORMAL);
-    }
-
-    public void push(T request, Priority priority) {
-        mQueue.add(request, Preconditions.checkNotNull(priority));
+        mQueue.add(request);
     }
 
     @Override

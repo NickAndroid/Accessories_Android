@@ -16,13 +16,10 @@
 
 package dev.nick.imageloader.queue;
 
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingDeque;
-
-public class PriorityBlockingQueue<E> extends LinkedBlockingDeque<E> implements BlockingQueue<E> {
+public class FIFOPriorityBlockingQueue<E> extends PriorityBlockingQueue<E> {
 
     @Override
     public E take() throws InterruptedException {
-        return takeLast();
+        return takeFirst();
     }
 }

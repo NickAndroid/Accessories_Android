@@ -37,6 +37,7 @@ import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -69,12 +70,15 @@ import dev.nick.imageloader.loader.task.DisplayTaskRecord;
 import dev.nick.imageloader.loader.task.FutureImageTask;
 import dev.nick.imageloader.loader.task.TaskManager;
 import dev.nick.imageloader.loader.task.TaskManagerImpl;
+import dev.nick.imageloader.logger.Logger;
+import dev.nick.imageloader.logger.LoggerManager;
+import dev.nick.imageloader.queue.FIFOPriorityBlockingQueue;
 import dev.nick.imageloader.queue.IdleStateMonitor;
+import dev.nick.imageloader.queue.LIFOPriorityBlockingQueue;
+import dev.nick.imageloader.queue.QueuePolicy;
 import dev.nick.imageloader.queue.RequestHandler;
 import dev.nick.imageloader.queue.RequestQueueManager;
 import dev.nick.imageloader.utils.Preconditions;
-import dev.nick.imageloader.logger.Logger;
-import dev.nick.imageloader.logger.LoggerManager;
 
 /**
  * Main class of {@link ImageLoader} library.
@@ -143,7 +147,14 @@ public class ImageLoader implements DisplayTaskMonitor,
         this.mCacheManager = cacheManager == null
                 ? new CacheManager(config.getCachePolicy(), context)
                 : cacheManager;
-        this.mLoadingService = Executors.newFixedThreadPool(config.getLoadingThreads());
+        this.mLoadingService = new ThreadPoolExecutor(
+                config.getLoadingThreads(),
+                config.getLoadingThreads(),
+                0L,
+                TimeUnit.MILLISECONDS,
+                config.getQueuePolicy() == QueuePolicy.FIFO
+                        ? new FIFOPriorityBlockingQueue<Runnable>()
+                        : new LIFOPriorityBlockingQueue<Runnable>());
         this.mImageSettingsScheduler = Executors.newSingleThreadExecutor();
         this.mQueueService = RequestQueueManager.createStarted(this, new IdleStateMonitor() {
             @Override
@@ -215,7 +226,6 @@ public class ImageLoader implements DisplayTaskMonitor,
                         .bitmapHandler(null)
                         .showWithDefault(0)
                         .showOnLoading(0)
-                        .viewMaybeReused()
                         .build(),
                 Preconditions.checkNotNull(loadingListener));
     }
@@ -379,8 +389,6 @@ public class ImageLoader implements DisplayTaskMonitor,
                                 DisplayOption option,
                                 DisplayListener listener,
                                 DisplayTaskRecord record) {
-
-        mLogger.funcEnter();
 
         ImageQuality imageQuality = option.getQuality();
 
@@ -714,13 +722,13 @@ public class ImageLoader implements DisplayTaskMonitor,
      * @param settableId The settableId of the loader request.
      */
     public ImageLoader cancel(int settableId) {
-        Preconditions.checkState(settableId > 0);
+        Preconditions.checkState(settableId > 0, "Invalid settable with id:0");
         List<FutureImageTask> pendingCancels = findTasks(settableId);
         if (pendingCancels.size() > 0) {
             for (FutureImageTask toBeCanceled : pendingCancels) {
                 toBeCanceled.cancel(true);
                 callOnCancel(toBeCanceled.getListenableTask().getProgressListener());
-                mLogger.info("Cancel task for settable:" + settableId);
+                mLogger.trace("Cancel task for settable:" + settableId, new Throwable());
             }
             pendingCancels.clear();
             pendingCancels = null;
