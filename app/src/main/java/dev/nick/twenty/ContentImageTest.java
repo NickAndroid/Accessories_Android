@@ -109,15 +109,16 @@ public class ContentImageTest extends BaseTest {
 
                 String uri = mArtworkUri + File.separator + tracks.get(position).getAlbumId();
 
-                mLoader.display()
-                        .url(uri)
+                mLoader.load()
+                        .from(uri)
                         .option(DisplayOption.builder()
                                 .oneAfterOne()
                                 .imageQuality(ImageQuality.RAW)
                                 .viewMaybeReused()
                                 .imageAnimator(new FadeInImageAnimator())
                                 .build())
-                        .into(holder.imageView);
+                        .into(holder.imageView)
+                .start();
 
                 return convertView;
             }

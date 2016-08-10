@@ -211,65 +211,47 @@ public class ImageLoader implements DisplayTaskMonitor,
     }
 
     /**
-     * @return An optional params wrapper.
-     * @see DisplayOptional
-     */
-    public DisplayOptional display() {
-        return new DisplayOptional(this);
-    }
-
-    /**
-     * @return An optional params wrapper.
-     * @see LoadOptional
-     */
-    public LoadOptional load() {
-        return new LoadOptional(this);
-    }
-
-    /**
-     * Load image from url.
+     * Start a quick optional param builder,
+     * do not forget to call {@link LoadingOptional#start()} to start this task.
      *
-     * @param url             The url to load.
-     * @param loadingListener Listener to listen the progress of the loading process.
-     * @param priority        Priority for this loading session.
-     * @see Priority
-     * @see LoadingListener
+     * @return An optional params wrapper.
+     * @see LoadingOptional
      */
-    public void load(@NonNull String url, @NonNull LoadingListener loadingListener, Priority priority) {
-        display(url, new FakeImageSettable(url),
-                DisplayOption.builder()
-                        .imageQuality(ImageQuality.OPT)
-                        .imageAnimator(null)
-                        .bitmapHandler(null)
-                        .viewMaybeReused()
-                        .showWithDefault(0)
-                        .showOnLoading(0)
-                        .build(),
-                Preconditions.checkNotNull(loadingListener),
-                priority);
+    public LoadingOptional load() {
+        return new LoadingOptional(this);
     }
 
-    public void display(@NonNull String url,
-                        @NonNull ImageView view,
-                        @Nullable DisplayOption option,
-                        @Nullable DisplayListener listener,
-                        @Nullable Priority priority) {
+    /**
+     * Display image from the from to the view.
+     *
+     * @param url      Image source from, one of {@link dev.nick.imageloader.loader.ImageSource}
+     * @param view     Target {@link ImageView} to display the image.
+     * @param option   {@link DisplayOption} is options using when display the image.
+     * @param listener The progress listener using to watch the progress of the loading.
+     * @deprecated Use {@link #load()} instead.
+     */
+    void display(@NonNull String url,
+                 @NonNull ImageView view,
+                 @Nullable DisplayOption option,
+                 @Nullable LoadingListener listener,
+                 @Nullable Priority priority) {
         display(url, new ImageViewDelegate(view), option, listener, priority);
     }
 
     /**
-     * Display image from the url to the view.
+     * Display image from the from to the view.
      *
-     * @param url      Image source url, one of {@link dev.nick.imageloader.loader.ImageSource}
+     * @param url      Image source from, one of {@link dev.nick.imageloader.loader.ImageSource}
      * @param settable Target {@link ImageSettable} to display the image.
      * @param option   {@link DisplayOption} is options using when display the image.
      * @param listener The progress listener using to watch the progress of the loading.
+     * @deprecated Use {@link #load()} instead.
      */
-    public void display(@NonNull String url,
-                        @NonNull ImageSettable settable,
-                        @Nullable DisplayOption option,
-                        @Nullable DisplayListener listener,
-                        @Nullable Priority priority) {
+    void display(@NonNull String url,
+                 @NonNull ImageSettable settable,
+                 @Nullable DisplayOption option,
+                 @Nullable LoadingListener listener,
+                 @Nullable Priority priority) {
 
         ensureNotTerminated();
 
@@ -336,7 +318,7 @@ public class ImageLoader implements DisplayTaskMonitor,
     private void loadAndDisplay(String url,
                                 ImageSettable settable,
                                 DisplayOption option,
-                                DisplayListener listener,
+                                LoadingListener listener,
                                 DisplayTaskRecord record,
                                 Priority priority) {
 
@@ -679,9 +661,9 @@ public class ImageLoader implements DisplayTaskMonitor,
     }
 
     /**
-     * Cancel the load and loading task who's url match given.
+     * Cancel the load and loading task who's from match given.
      *
-     * @param url The url of the loader request.
+     * @param url The from of the loader request.
      */
     public ImageLoader cancel(@NonNull String url) {
         Preconditions.checkNotNull(url);
@@ -690,7 +672,7 @@ public class ImageLoader implements DisplayTaskMonitor,
             for (FutureImageTask toBeCanceled : pendingCancels) {
                 toBeCanceled.cancel(true);
                 callOnCancel(toBeCanceled.getListenableTask().getProgressListener());
-                mLogger.info("Cancel task for url:" + url);
+                mLogger.info("Cancel task for from:" + url);
             }
             pendingCancels.clear();
             pendingCancels = null;
@@ -881,83 +863,60 @@ public class ImageLoader implements DisplayTaskMonitor,
         }
     }
 
-    public static class DisplayOptional {
+    public static class LoadingOptional {
 
         private String url;
         private DisplayOption option;
-        private DisplayListener listener;
-        private Priority priority;
-
-        private ImageLoader loader;
-
-        private DisplayOptional(@NonNull ImageLoader loader) {
-            this.loader = loader;
-        }
-
-        public DisplayOptional url(@NonNull String url) {
-            this.url = Preconditions.checkNotNull(url);
-            return DisplayOptional.this;
-        }
-
-        public DisplayOptional option(@NonNull DisplayOption option) {
-            this.option = Preconditions.checkNotNull(option);
-            return DisplayOptional.this;
-        }
-
-        public DisplayOptional listener(@NonNull DisplayListener listener) {
-            this.listener = Preconditions.checkNotNull(listener);
-            return DisplayOptional.this;
-        }
-
-        public DisplayOptional priority(@NonNull Priority priority) {
-            this.priority = Preconditions.checkNotNull(priority);
-            return DisplayOptional.this;
-        }
-
-        public void into(@NonNull ImageSettable settable) {
-            loader.display(url, Preconditions.checkNotNull(settable), option, listener, priority);
-        }
-
-        public void into(@NonNull ImageView view) {
-            ImageViewDelegate viewDelegate = new ImageViewDelegate(view);
-            loader.display(url, viewDelegate, option, listener, priority);
-        }
-    }
-
-    public static class LoadOptional {
-
-        private String url;
-
-        private Priority priority;
         private LoadingListener listener;
+        private Priority priority;
+        private ImageSettable settable;
 
         private ImageLoader loader;
 
-        private LoadOptional(@NonNull ImageLoader loader) {
+        private LoadingOptional(@NonNull ImageLoader loader) {
             this.loader = loader;
         }
 
-        public LoadOptional url(@NonNull String url) {
+        public LoadingOptional from(@NonNull String url) {
             this.url = Preconditions.checkNotNull(url);
-            return LoadOptional.this;
+            return LoadingOptional.this;
         }
 
-        public LoadOptional listener(@NonNull LoadingListener listener) {
+        public LoadingOptional option(@NonNull DisplayOption option) {
+            this.option = Preconditions.checkNotNull(option);
+            return LoadingOptional.this;
+        }
+
+        public LoadingOptional listener(@NonNull LoadingListener listener) {
             this.listener = Preconditions.checkNotNull(listener);
-            return LoadOptional.this;
+            return LoadingOptional.this;
         }
 
-        public LoadOptional priority(@NonNull Priority priority) {
+        public LoadingOptional priority(@NonNull Priority priority) {
             this.priority = Preconditions.checkNotNull(priority);
-            return LoadOptional.this;
+            return LoadingOptional.this;
+        }
+
+        public LoadingOptional into(@NonNull ImageSettable settable) {
+            this.settable = Preconditions.checkNotNull(settable);
+            return LoadingOptional.this;
+        }
+
+        public LoadingOptional into(@NonNull ImageView view) {
+            this.settable = new ImageViewDelegate(view);
+            return LoadingOptional.this;
         }
 
         public void start() {
-            loader.load(url, listener, priority);
+            loader.display(url, noneNullSettable(), option, listener, priority);
+        }
+
+        private ImageSettable noneNullSettable() {
+            return settable == null ? new FakeImageSettable(url) : settable;
         }
     }
 
-    class FakeImageSettable implements ImageSettable {
+    static class FakeImageSettable implements ImageSettable {
 
         String url;
 

@@ -49,7 +49,7 @@ public class HttpImageDownloader implements ImageDownloader<Boolean> {
             float fileSize = (float) conn.getContentLength();
             if (fileSize < 1 || is == null) {
                 if (errorListener != null) {
-                    errorListener.onError(new Cause(new Error(String.format("Content for url %s length is 0.", url))));
+                    errorListener.onError(new Cause(new Error(String.format("Content for from %s length is 0.", url))));
                 }
             } else {
                 FileOutputStream fos = new FileOutputStream(mTmpFilePath);

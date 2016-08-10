@@ -18,7 +18,6 @@ package dev.nick.twenty;
 
 import android.Manifest;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,14 +36,10 @@ import com.nick.scalpel.annotation.request.RequirePermission;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.nick.imageloader.DisplayListener;
 import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.display.ImageQuality;
 import dev.nick.imageloader.display.animator.FadeInImageAnimator;
-import dev.nick.imageloader.loader.result.BitmapResult;
-import dev.nick.imageloader.loader.result.Cause;
-import dev.nick.imageloader.logger.LoggerManager;
 import dev.nick.imageloader.queue.Priority;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
@@ -212,50 +207,19 @@ public class NetworkImageTest extends BaseTest {
                 holder.progressBar.setProgress(0);
                 holder.textView.setText("");
 
-                ImageLoader
-                        .shared()
+                ImageLoader.shared()
                         .cancel(holder.imageView)
-                        .display(uri, holder.imageView,
-                                DisplayOption.builder()
-                                        .oneAfterOne()
-                                        .imageQuality(ImageQuality.OPT)
-                                        .viewMaybeReused()
-                                        .imageAnimator(new FadeInImageAnimator())
-                                        .build(), new DisplayListener() {
-                                    @Override
-                                    public void onError(@NonNull Cause cause) {
-                                        LoggerManager.getLogger(getClass()).error(cause);
-                                        holder.textView.setText("Error");
-                                    }
-
-                                    @Override
-                                    public void onComplete(@Nullable BitmapResult result) {
-                                        if (result != null) {
-                                            holder.progressBar.setProgress((int) (1 * 100));
-                                            LoggerManager.getLogger(getClass()).debug("onComplete:" + result.result);
-                                            holder.textView.setText("Completed");
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onProgressUpdate(float progress) {
-                                        holder.progressBar.setProgress((int) (progress * 100));
-                                        holder.textView.setText("" + (int) (progress * 100));
-                                    }
-
-                                    @Override
-                                    public void onCancel() {
-                                        LoggerManager.getLogger(getClass()).debug("onCancel");
-                                        holder.progressBar.setProgress(0);
-                                        holder.textView.setText("Canceled");
-                                    }
-
-                                    @Override
-                                    public void onStartLoading() {
-                                        holder.textView.setText("Start");
-                                        holder.progressBar.setProgress(0);
-                                    }
-                                }, Priority.HIGH);
+                        .load()
+                        .from(uri)
+                        .option(DisplayOption.builder()
+                                .oneAfterOne()
+                                .imageQuality(ImageQuality.OPT)
+                                .viewMaybeReused()
+                                .imageAnimator(new FadeInImageAnimator())
+                                .build())
+                        .into(holder.imageView)
+                        .priority(Priority.HIGH)
+                        .start();
 
                 return convertView;
             }

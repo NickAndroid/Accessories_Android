@@ -23,8 +23,8 @@ import android.widget.ImageView;
 import com.nick.scalpel.Scalpel;
 import com.nick.scalpel.annotation.binding.FindView;
 
-import dev.nick.imageloader.DisplayListener;
 import dev.nick.imageloader.ImageLoader;
+import dev.nick.imageloader.LoadingListener;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.display.ImageQuality;
 import dev.nick.imageloader.display.animator.FadeInImageAnimator;
@@ -50,9 +50,9 @@ public class AssetsImageTest extends BaseTest {
     protected void onStart() {
         super.onStart();
         ImageLoader.shared()
-                .display()
-                .url(urlAssets)
-                .listener(new DisplayListener.Stub())
+                .load()
+                .from(urlAssets)
+                .listener(new LoadingListener.Stub())
                 .option(DisplayOption.builder()
                         .showWithDefault(R.drawable.ic_launcher)
                         .bitmapHandler(new BlackWhiteBitmapHandler())
@@ -60,6 +60,7 @@ public class AssetsImageTest extends BaseTest {
                         .imageAnimator(new FadeInImageAnimator())
                         .build())
                 .priority(Priority.HIGH)
-                .into(imageView);
+                .into(imageView)
+                .start();
     }
 }

@@ -11,6 +11,6 @@ dev.nick.imageloader.loader
 dev.nick.imageloader.loader.network
 dev.nick.imageloader.loader.result
 dev.nick.imageloader.loader.task
+dev.nick.imageloader.logger
 dev.nick.imageloader.queue
 dev.nick.imageloader.utils
-dev.nick.imageloader.logger

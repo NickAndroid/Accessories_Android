@@ -48,14 +48,14 @@ public class Track implements Serializable {
     }
 
     /**
-     * @return the url
+     * @return the from
      */
     public String getUrl() {
         return url;
     }
 
     /**
-     * @param url the url to set
+     * @param url the from to set
      */
     public void setUrl(String url) {
         this.url = url;

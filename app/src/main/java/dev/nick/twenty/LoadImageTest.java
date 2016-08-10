@@ -209,44 +209,48 @@ public class LoadImageTest extends BaseTest {
                 holder.progressBar.setProgress(0);
                 holder.textView.setText("");
 
-                ImageLoader
-                        .shared()
-                        .load(uri, new LoadingListener.Stub() {
-                            @Override
-                            public void onError(@NonNull Cause cause) {
-                                LoggerManager.getLogger(getClass()).error(cause);
-                                holder.textView.setText("Error");
-                            }
+                LoadingListener loadingListener = new LoadingListener.Stub() {
+                    @Override
+                    public void onError(@NonNull Cause cause) {
+                        LoggerManager.getLogger(getClass()).error(cause);
+                        holder.textView.setText("Error");
+                    }
 
-                            @Override
-                            public void onComplete(@Nullable BitmapResult result) {
-                                if (result != null) {
-                                    holder.progressBar.setProgress((int) (1 * 100));
-                                    LoggerManager.getLogger(getClass()).debug("onComplete:" + result.result);
-                                    holder.textView.setText("Completed");
-                                }
-                                holder.imageView.setImageBitmap(result != null ? result.result : null);
-                            }
+                    @Override
+                    public void onComplete(@Nullable BitmapResult result) {
+                        if (result != null) {
+                            holder.progressBar.setProgress((int) (1 * 100));
+                            LoggerManager.getLogger(getClass()).debug("onComplete:" + result.result);
+                            holder.textView.setText("Completed");
+                        }
+                        holder.imageView.setImageBitmap(result != null ? result.result : null);
+                    }
 
-                            @Override
-                            public void onProgressUpdate(float progress) {
-                                holder.progressBar.setProgress((int) (progress * 100));
-                                holder.textView.setText("" + (int) (progress * 100));
-                            }
+                    @Override
+                    public void onProgressUpdate(float progress) {
+                        holder.progressBar.setProgress((int) (progress * 100));
+                        holder.textView.setText("" + (int) (progress * 100));
+                    }
 
-                            @Override
-                            public void onCancel() {
-                                LoggerManager.getLogger(getClass()).debug("onCancel");
-                                holder.progressBar.setProgress(0);
-                                holder.textView.setText("Canceled");
-                            }
+                    @Override
+                    public void onCancel() {
+                        LoggerManager.getLogger(getClass()).debug("onCancel");
+                        holder.progressBar.setProgress(0);
+                        holder.textView.setText("Canceled");
+                    }
 
-                            @Override
-                            public void onStartLoading() {
-                                holder.textView.setText("Start");
-                                holder.progressBar.setProgress(0);
-                            }
-                        }, Priority.NORMAL);
+                    @Override
+                    public void onStartLoading() {
+                        holder.textView.setText("Start");
+                        holder.progressBar.setProgress(0);
+                    }
+                };
+
+                ImageLoader.shared().load()
+                        .from(uri)
+                        .priority(Priority.HIGH)
+                        .listener(loadingListener)
+                        .start();
 
                 return convertView;
             }

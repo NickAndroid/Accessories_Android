@@ -36,8 +36,8 @@ import com.nick.scalpel.annotation.request.RequirePermission;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.nick.imageloader.DisplayListener;
 import dev.nick.imageloader.ImageLoader;
+import dev.nick.imageloader.LoadingListener;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.display.ImageQuality;
 import dev.nick.imageloader.display.animator.FadeInImageAnimator;
@@ -99,8 +99,8 @@ public class FileImageTest extends BaseTest {
                 // String uri = mArtworkUri + File.separator + tracks.get(position).getAlbumId();
                 String uri = ImageSource.FILE.getPrefix() + tracks.get(position).getUrl();
 
-                ImageLoader.shared().display()
-                        .url(uri)
+                ImageLoader.shared().load()
+                        .from(uri)
                         .option(DisplayOption.builder()
                                 .imageQuality(ImageQuality.OPT)
                                 .viewMaybeReused()
@@ -108,8 +108,9 @@ public class FileImageTest extends BaseTest {
                                 .oneAfterOne()
                                 .imageAnimator(new FadeInImageAnimator())
                                 .build())
-                        .listener(new DisplayListener.Stub())
-                        .into(holder.imageView);
+                        .listener(new LoadingListener.Stub())
+                        .into(holder.imageView)
+                        .start();
 
                 return convertView;
             }

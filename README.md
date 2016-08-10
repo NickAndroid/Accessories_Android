@@ -30,15 +30,15 @@ compile 'dev.nick:imageloader:$latest@aar'
 
 ## Samples
 
-### How to get a loader instance:
+### How to init/get the loader:
 *  Use the shared(single) instance
 ```java
-public class C {
+public class MyApp {
     @Override
     public void onCreate() {
         super.onCreate();
         // Create the shared instance
-        ImageLoader loader = ImageLoader.createShared(getApplicationContext(), new LoaderConfig.Builder()
+        ImageLoader.createShared(getApplicationContext(), new LoaderConfig.Builder()
                 .cachePolicy(new CachePolicy.Builder()
                         .enableMemCache()
                         .enableDiskCache()
@@ -61,17 +61,18 @@ public class Z {
     @Override
     public void onCreate() {
         super.onCreate();
-        // Create a new instance
-        ImageLoader loader = ImageLoader.create(getApplicationContext(), new LoaderConfig.Builder()
-                .cachePolicy(new CachePolicy.Builder()
-                        .cachingThreads(Runtime.getRuntime().availableProcessors())
-                        .cacheDirName("tests2")
-                        .preferredLocation(CachePolicy.Location.EXTERNAL)
-                        .compressFormat(Bitmap.CompressFormat.JPEG)
-                        .build())
-                .debugLevel(Log.VERBOSE)
-                .loadingThreads(Runtime.getRuntime().availableProcessors())
-                .build());
+        // Fork a new instance
+        ImageLoader newLoader = ImageLoader.shared().fork(LoaderConfig.builder()
+                        .cachePolicy(CachePolicy.builder()
+                                .enableMemCache()
+                                .enableDiskCache()
+                                .cachingThreads(Runtime.getRuntime().availableProcessors())
+                                .cacheDirName("dis.cache.tests.content")
+                                .preferredLocation(CachePolicy.Location.INTERNAL)
+                                .compressFormat(Bitmap.CompressFormat.JPEG)
+                                .build())
+                        .networkPolicy(NetworkPolicy.builder().enableTrafficStats().build())
+                        .build());
         // Some works
         loader.works...
     }
@@ -80,26 +81,13 @@ public class Z {
 
 ### Loading or Display:
 ```java
-mLoader.load(uri, new LoadingListener(){...});
-```
-```java
-mLoader.display(uri, holder.imageView,
-                        new DisplayOption.Builder()
-                                .imageQuality(DisplayOption.ImageQuality.FIT_VIEW)
-                                .loadingImgRes(R.drawable.ic_cloud_download_black_24dp)
-                                .defaultImgRes(R.drawable.ic_broken_image_black_24dp)
-                                .bitmapProcessor(new BlackWhiteBitmapProcessor())
-                                .imageAnimator(new FadeInImageAnimator())
-                                .build());
-```
-**Or**
-```java
-mLoader.display(uri, holder.imageView);
-```
-
-### Listening:
-```java
-mLoader.display(uri, holder.imageView, new LoaderListener(){...});
+ ImageLoader.shared()
+                .load()
+                .from(urlDrawable)
+                .listener(listener)
+                .option(DisplayOption.builder()...) // Ignore this param if your just want to load a bitmap.
+                .into(imageView) // Ignore this param if your just want to load a bitmap.
+                .start();
 ```
 
 ### CustomView support:
@@ -107,7 +95,13 @@ mLoader.display(uri, holder.imageView, new LoaderListener(){...});
 class CustomView implements ImageSettable {}
 ```
 ```java
-mLoader.display(uri, customView);
+ImageLoader.shared()
+                .load()
+                .from(urlDrawable)
+                .listener(listener)
+                .option(DisplayOption.builder()...)
+                .into(new CustomView())
+                .start();
 ```
 
 ### Cancel tasks:

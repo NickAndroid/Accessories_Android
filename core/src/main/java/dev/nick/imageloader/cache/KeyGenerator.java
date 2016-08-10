@@ -22,7 +22,7 @@ import dev.nick.imageloader.loader.ViewSpec;
 
 public interface KeyGenerator {
     /**
-     * @param url  Give url of the image request.
+     * @param url  Give from of the image request.
      * @param info Image settable info {@link ViewSpec}
      * @return A key.
      */
