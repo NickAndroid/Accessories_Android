@@ -159,8 +159,7 @@ public class DisplayOption {
         }
 
         /**
-         * Display the image one by one, by default will display
-         * loaded images at the same time.
+         * Display the image one by one, by default will display loaded images at the same time.
          *
          * @return Instance of this builder.
          */

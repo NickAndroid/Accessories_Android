@@ -74,6 +74,7 @@ import dev.nick.imageloader.logger.LoggerManager;
 import dev.nick.imageloader.queue.FIFOPriorityBlockingQueue;
 import dev.nick.imageloader.queue.IdleStateMonitor;
 import dev.nick.imageloader.queue.LIFOPriorityBlockingQueue;
+import dev.nick.imageloader.queue.Priority;
 import dev.nick.imageloader.queue.QueuePolicy;
 import dev.nick.imageloader.queue.RequestHandler;
 import dev.nick.imageloader.queue.RequestQueueManager;
@@ -209,12 +210,8 @@ public class ImageLoader implements DisplayTaskMonitor,
         return Preconditions.checkNotNull(sLoader, "Call createShared first");
     }
 
-    /**
-     * Clear all pending tasks.
-     */
-    public void clearTasks() {
-        ensureNotTerminated();
-        mClearTaskRequestedTimeMills = System.currentTimeMillis();
+    public Optional optional() {
+        return new Optional(this);
     }
 
     public void load(@NonNull String url, @NonNull LoadingListener loadingListener) {
@@ -227,86 +224,16 @@ public class ImageLoader implements DisplayTaskMonitor,
                         .showWithDefault(0)
                         .showOnLoading(0)
                         .build(),
-                Preconditions.checkNotNull(loadingListener));
+                Preconditions.checkNotNull(loadingListener),
+                null);
     }
 
-    /**
-     * Display image from the url to the view.
-     *
-     * @param url  Image source url, one of {@link dev.nick.imageloader.loader.ImageSource}
-     * @param view Target view to display the image.
-     */
-    public void display(@NonNull String url, @NonNull ImageView view) {
-        ImageViewDelegate viewDelegate = new ImageViewDelegate(view);
-        display(url, viewDelegate, null, null);
-    }
-
-    /**
-     * Display image from the url to the view.
-     *
-     * @param url    Image source url, one of {@link dev.nick.imageloader.loader.ImageSource}
-     * @param view   Target view to display the image.
-     * @param option {@link DisplayOption} is options using when display the image.
-     */
-    public void display(@NonNull String url, @NonNull ImageView view, @Nullable DisplayOption option) {
-        display(url, view, option, null);
-    }
-
-    /**
-     * Display image from the url to the view.
-     *
-     * @param url  Image source url, one of {@link dev.nick.imageloader.loader.ImageSource}
-     * @param view Target view to display the image.
-     */
-    public void display(@NonNull String url, @NonNull ImageView view, @Nullable DisplayListener loadingListener) {
-        display(url, view, null, loadingListener);
-    }
-
-    /**
-     * Display image from the url to the view.
-     *
-     * @param url             Image source url, one of {@link dev.nick.imageloader.loader.ImageSource}
-     * @param view            Target view to display the image.
-     * @param option          {@link DisplayOption} is options using when display the image.
-     * @param loadingListener The listener.
-     */
-    public void display(@NonNull String url, @NonNull ImageView view,
-                        @Nullable DisplayOption option, @Nullable DisplayListener loadingListener) {
-        ImageViewDelegate viewDelegate = new ImageViewDelegate(view);
-        display(url, viewDelegate, option, loadingListener);
-    }
-
-    /**
-     * Display image from the url to the view.
-     *
-     * @param url      Image source url, one of {@link dev.nick.imageloader.loader.ImageSource}
-     * @param settable Target {@link ImageSettable} to display the image.
-     */
-    public void display(@NonNull String url, @NonNull ImageSettable settable) {
-        display(url, settable, null, null);
-    }
-
-    /**
-     * Display image from the url to the view.
-     *
-     * @param url      Image source url, one of {@link dev.nick.imageloader.loader.ImageSource}
-     * @param settable Target {@link ImageSettable} to display the image.
-     * @param option   {@link DisplayOption} is options using when display the image.
-     */
     public void display(@NonNull String url,
-                        @NonNull ImageSettable settable,
-                        @Nullable DisplayOption option) {
-        display(url, settable, option, null);
-    }
-
-    /**
-     * Display image from the url to the view.
-     *
-     * @param url      Image source url, one of {@link dev.nick.imageloader.loader.ImageSource}
-     * @param settable Target settable to display the image.
-     */
-    public void display(@NonNull String url, @NonNull ImageSettable settable, @Nullable DisplayListener loadingListener) {
-        display(url, settable, null, loadingListener);
+                        @NonNull ImageView view,
+                        @Nullable DisplayOption option,
+                        @Nullable DisplayListener listener,
+                        @Nullable Priority priority) {
+        display(url, new ImageViewDelegate(view), option, listener, priority);
     }
 
     /**
@@ -320,7 +247,8 @@ public class ImageLoader implements DisplayTaskMonitor,
     public void display(@NonNull String url,
                         @NonNull ImageSettable settable,
                         @Nullable DisplayOption option,
-                        @Nullable DisplayListener listener) {
+                        @Nullable DisplayListener listener,
+                        @Nullable Priority priority) {
 
         ensureNotTerminated();
 
@@ -368,7 +296,7 @@ public class ImageLoader implements DisplayTaskMonitor,
             }
         }
 
-        loadAndDisplay(loadingUrl, settable, option, listener, record);
+        loadAndDisplay(loadingUrl, settable, option, listener, record, priority);
     }
 
     private DisplayTaskRecord createTaskRecord(ImageSettable settable) {
@@ -388,7 +316,8 @@ public class ImageLoader implements DisplayTaskMonitor,
                                 ImageSettable settable,
                                 DisplayOption option,
                                 DisplayListener listener,
-                                DisplayTaskRecord record) {
+                                DisplayTaskRecord record,
+                                Priority priority) {
 
         ImageQuality imageQuality = option.getQuality();
 
@@ -420,6 +349,7 @@ public class ImageLoader implements DisplayTaskMonitor,
                 record);
 
         FutureImageTask future = new FutureImageTask(imageTask, this, option.isViewMaybeReused());
+        future.setPriority(priority == null ? Priority.NORMAL : priority);
 
         // Push it to the request queue.
         mQueueService.push(future);
@@ -689,6 +619,14 @@ public class ImageLoader implements DisplayTaskMonitor,
     }
 
     /**
+     * Clear all pending tasks.
+     */
+    public void clearTasks() {
+        ensureNotTerminated();
+        mClearTaskRequestedTimeMills = System.currentTimeMillis();
+    }
+
+    /**
      * Terminate the loader.
      */
     public void terminate() {
@@ -708,7 +646,7 @@ public class ImageLoader implements DisplayTaskMonitor,
     }
 
     /**
-     * Clear all the load and display tasks.
+     * Clear all the load and loading tasks.
      */
     public void cancelAllTasks() {
         synchronized (mFutures) {
@@ -720,7 +658,7 @@ public class ImageLoader implements DisplayTaskMonitor,
     }
 
     /**
-     * Cancel the load and display task who's url match given.
+     * Cancel the load and loading task who's url match given.
      *
      * @param url The url of the loader request.
      */
@@ -740,7 +678,7 @@ public class ImageLoader implements DisplayTaskMonitor,
     }
 
     /**
-     * Cancel the load and display task who's view match given.
+     * Cancel the load and loading task who's view match given.
      *
      * @param view The view of the loader request.
      */
@@ -749,7 +687,7 @@ public class ImageLoader implements DisplayTaskMonitor,
     }
 
     /**
-     * Cancel the load and display task who's settable match given.
+     * Cancel the load and loading task who's settable match given.
      *
      * @param settable The settable of the loader request.
      */
@@ -758,7 +696,7 @@ public class ImageLoader implements DisplayTaskMonitor,
     }
 
     /**
-     * Cancel the load and display task who's settableId match given.
+     * Cancel the load and loading task who's settableId match given.
      *
      * @param settableId The settableId of the loader request.
      */
@@ -919,6 +857,49 @@ public class ImageLoader implements DisplayTaskMonitor,
 
         static int assignLoaderId() {
             return sLoaderId.getAndIncrement();
+        }
+    }
+
+    public static class Optional {
+
+        private String url;
+        private DisplayOption option;
+        private DisplayListener listener;
+        private Priority priority;
+
+        private ImageLoader loader;
+
+        private Optional(@NonNull ImageLoader loader) {
+            this.loader = loader;
+        }
+
+        public Optional url(@NonNull String url) {
+            this.url = Preconditions.checkNotNull(url);
+            return Optional.this;
+        }
+
+        public Optional option(@NonNull DisplayOption option) {
+            this.option = Preconditions.checkNotNull(option);
+            return Optional.this;
+        }
+
+        public Optional listener(@NonNull DisplayListener listener) {
+            this.listener = Preconditions.checkNotNull(listener);
+            return Optional.this;
+        }
+
+        public Optional priority(@NonNull Priority priority) {
+            this.priority = Preconditions.checkNotNull(priority);
+            return Optional.this;
+        }
+
+        public void into(@NonNull ImageSettable settable) {
+            loader.display(url, Preconditions.checkNotNull(settable), option, listener, priority);
+        }
+
+        public void into(@NonNull ImageView view) {
+            ImageViewDelegate viewDelegate = new ImageViewDelegate(view);
+            loader.display(url, viewDelegate, option, listener, priority);
         }
     }
 

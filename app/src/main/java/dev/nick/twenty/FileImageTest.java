@@ -42,7 +42,6 @@ import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.display.ImageQuality;
 import dev.nick.imageloader.display.animator.FadeInImageAnimator;
 import dev.nick.imageloader.loader.ImageSource;
-import dev.nick.imageloader.loader.result.BitmapResult;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
 public class FileImageTest extends BaseTest {
@@ -100,19 +99,17 @@ public class FileImageTest extends BaseTest {
                 // String uri = mArtworkUri + File.separator + tracks.get(position).getAlbumId();
                 String uri = ImageSource.FILE.getPrefix() + tracks.get(position).getUrl();
 
-                ImageLoader.shared().display(uri, holder.imageView,
-                        DisplayOption.builder()
+                ImageLoader.shared().optional()
+                        .url(uri)
+                        .option(DisplayOption.builder()
                                 .imageQuality(ImageQuality.OPT)
                                 .viewMaybeReused()
                                 .animateOnlyNewLoaded()
                                 .oneAfterOne()
                                 .imageAnimator(new FadeInImageAnimator())
-                                .build(), new DisplayListener.Stub() {
-                            @Override
-                            public void onComplete(@Nullable BitmapResult result) {
-                                super.onComplete(result);
-                            }
-                        });
+                                .build())
+                        .listener(new DisplayListener.Stub())
+                        .into(holder.imageView);
 
                 return convertView;
             }

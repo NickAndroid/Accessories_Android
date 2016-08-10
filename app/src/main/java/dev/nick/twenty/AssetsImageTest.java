@@ -23,11 +23,13 @@ import android.widget.ImageView;
 import com.nick.scalpel.Scalpel;
 import com.nick.scalpel.annotation.binding.FindView;
 
+import dev.nick.imageloader.DisplayListener;
 import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.display.ImageQuality;
 import dev.nick.imageloader.display.animator.FadeInImageAnimator;
 import dev.nick.imageloader.display.handler.BlackWhiteBitmapHandler;
+import dev.nick.imageloader.queue.Priority;
 
 public class AssetsImageTest extends BaseTest {
 
@@ -47,11 +49,17 @@ public class AssetsImageTest extends BaseTest {
     @Override
     protected void onStart() {
         super.onStart();
-        ImageLoader.shared().display(urlAssets, imageView, DisplayOption.builder()
-                .showWithDefault(R.drawable.ic_launcher)
-                .bitmapHandler(new BlackWhiteBitmapHandler())
-                .imageQuality(ImageQuality.RAW)
-                .imageAnimator(new FadeInImageAnimator())
-                .build());
+        ImageLoader.shared()
+                .optional()
+                .url(urlAssets)
+                .listener(new DisplayListener.Stub())
+                .option(DisplayOption.builder()
+                        .showWithDefault(R.drawable.ic_launcher)
+                        .bitmapHandler(new BlackWhiteBitmapHandler())
+                        .imageQuality(ImageQuality.RAW)
+                        .imageAnimator(new FadeInImageAnimator())
+                        .build())
+                .priority(Priority.HIGH)
+                .into(imageView);
     }
 }

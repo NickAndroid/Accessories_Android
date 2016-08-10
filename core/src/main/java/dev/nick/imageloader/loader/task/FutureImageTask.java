@@ -21,11 +21,15 @@ import android.support.annotation.Nullable;
 import java.util.concurrent.FutureTask;
 
 import dev.nick.imageloader.logger.LoggerManager;
+import dev.nick.imageloader.queue.Priority;
+import dev.nick.imageloader.queue.PriorityRemarkable;
 
-public class FutureImageTask extends FutureTask<Void> {
+public class FutureImageTask extends FutureTask<Void> implements PriorityRemarkable {
 
     private TaskActionListener mListener;
     private DisplayTask mTask;
+
+    private Priority mPriority;
 
     private boolean mCancelOthersBeforeRun;
 
@@ -33,6 +37,7 @@ public class FutureImageTask extends FutureTask<Void> {
         super(task);
         this.mTask = task;
         this.mListener = listener;
+        this.mPriority = Priority.NORMAL;
         this.mCancelOthersBeforeRun = cancelOthersBeforeRun;
     }
 
@@ -50,6 +55,10 @@ public class FutureImageTask extends FutureTask<Void> {
         return result;
     }
 
+    public void setPriority(Priority priority) {
+        this.mPriority = priority;
+    }
+
     @Override
     public String toString() {
         return "FutureImageTask{" +
@@ -65,6 +74,11 @@ public class FutureImageTask extends FutureTask<Void> {
 
     public DisplayTask getListenableTask() {
         return mTask;
+    }
+
+    @Override
+    public Priority getRemark() {
+        return mPriority;
     }
 
     public interface TaskActionListener {

@@ -45,6 +45,7 @@ import dev.nick.imageloader.display.animator.FadeInImageAnimator;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.logger.LoggerManager;
+import dev.nick.imageloader.queue.Priority;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
 public class NetworkImageTest extends BaseTest {
@@ -254,7 +255,7 @@ public class NetworkImageTest extends BaseTest {
                                         holder.textView.setText("Start");
                                         holder.progressBar.setProgress(0);
                                     }
-                                });
+                                }, Priority.HIGH);
 
                 return convertView;
             }

@@ -129,10 +129,9 @@ public class LoaderConfig {
          * @param queuePolicy The {@link QueuePolicy} using for queue.
          * @return Builder instance.
          * @see QueuePolicy
-         * @deprecated Do not call anymore, FIFO is preferred by default.
+         * @deprecated Do not call anymore, FIFO is preferred by force.
          */
         public Builder queuePolicy(QueuePolicy queuePolicy) {
-            this.queuePolicy = queuePolicy;
             return Builder.this;
         }
 

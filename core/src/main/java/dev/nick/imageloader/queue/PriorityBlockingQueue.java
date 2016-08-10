@@ -16,12 +16,73 @@
 
 package dev.nick.imageloader.queue;
 
+import android.support.annotation.NonNull;
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.TimeUnit;
+
+import dev.nick.imageloader.logger.LoggerManager;
 
 public class PriorityBlockingQueue<E> extends LinkedBlockingDeque<E> implements BlockingQueue<E> {
+
     @Override
-    public E take() throws InterruptedException {
-        return super.take();
+    public boolean add(E e) {
+        if (e instanceof PriorityRemarkable) {
+            PriorityRemarkable remarkable = (PriorityRemarkable) e;
+            Priority priority = remarkable.getRemark();
+            switch (priority) {
+                case HIGH:
+                    super.addFirst(e);
+                    LoggerManager.getLogger(getClass()).warn("add for High");
+                    return true;
+                case LOW:
+                    super.addLast(e);
+                    LoggerManager.getLogger(getClass()).warn("add for low");
+                    return true;
+                default:
+                    break;
+            }
+        }
+
+        return super.add(e);
+    }
+
+    @Override
+    public boolean offer(@NonNull E e) {
+        if (e instanceof PriorityRemarkable) {
+            PriorityRemarkable remarkable = (PriorityRemarkable) e;
+            Priority priority = remarkable.getRemark();
+            switch (priority) {
+                case HIGH:
+                    LoggerManager.getLogger(getClass()).warn("offer for High");
+                    return super.offerFirst(e);
+                case LOW:
+                    LoggerManager.getLogger(getClass()).warn("offer for Low");
+                    return super.offerLast(e);
+                default:
+                    break;
+            }
+        }
+        return super.offer(e);
+    }
+
+    @Override
+    public boolean offer(E e, long timeout, @NonNull TimeUnit unit) throws InterruptedException {
+        if (e instanceof PriorityRemarkable) {
+            PriorityRemarkable remarkable = (PriorityRemarkable) e;
+            Priority priority = remarkable.getRemark();
+            switch (priority) {
+                case HIGH:
+                    LoggerManager.getLogger(getClass()).warn("offer for High");
+                    return super.offerFirst(e, timeout, unit);
+                case LOW:
+                    LoggerManager.getLogger(getClass()).warn("offer for Low");
+                    return super.offerLast(e, timeout, unit);
+                default:
+                    break;
+            }
+        }
+        return super.offer(e, timeout, unit);
     }
 }

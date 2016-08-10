@@ -23,6 +23,8 @@ import android.support.annotation.Nullable;
 import android.view.animation.Animation;
 import android.widget.ImageView;
 
+import dev.nick.imageloader.utils.Preconditions;
+
 /**
  * Wrapper class for a {@link ImageView}
  */
@@ -31,7 +33,7 @@ public class ImageViewDelegate implements ImageSettable {
     private ImageView mImageView;
 
     public ImageViewDelegate(ImageView imageView) {
-        this.mImageView = imageView;
+        this.mImageView = Preconditions.checkNotNull(imageView);
     }
 
     @Override

@@ -46,10 +46,14 @@ public class DrawableImageTest extends BaseTest {
     @Override
     protected void onStart() {
         super.onStart();
-        ImageLoader.shared().display(urlDrawable, imageView, DisplayOption.builder()
-                .showWithDefault(R.drawable.ic_launcher)
-                .bitmapHandler(new BlurBitmapHandler(24))
-                .imageQuality(ImageQuality.RAW)
-                .build());
+        ImageLoader.shared()
+                .optional()
+                .url(urlDrawable)
+                .option(DisplayOption.builder()
+                        .showWithDefault(R.drawable.ic_launcher)
+                        .bitmapHandler(new BlurBitmapHandler(24))
+                        .imageQuality(ImageQuality.RAW)
+                        .build())
+                .into(imageView);
     }
 }
