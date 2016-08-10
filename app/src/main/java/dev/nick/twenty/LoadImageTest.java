@@ -42,6 +42,7 @@ import dev.nick.imageloader.LoadingListener;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.logger.LoggerManager;
+import dev.nick.imageloader.queue.Priority;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
 public class LoadImageTest extends BaseTest {
@@ -245,7 +246,7 @@ public class LoadImageTest extends BaseTest {
                                 holder.textView.setText("Start");
                                 holder.progressBar.setProgress(0);
                             }
-                        });
+                        }, Priority.NORMAL);
 
                 return convertView;
             }

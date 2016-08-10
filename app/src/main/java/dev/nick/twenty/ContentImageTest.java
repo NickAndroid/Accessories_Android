@@ -109,7 +109,7 @@ public class ContentImageTest extends BaseTest {
 
                 String uri = mArtworkUri + File.separator + tracks.get(position).getAlbumId();
 
-                mLoader.optional()
+                mLoader.display()
                         .url(uri)
                         .option(DisplayOption.builder()
                                 .oneAfterOne()

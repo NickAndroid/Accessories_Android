@@ -50,7 +50,7 @@ public class AssetsImageTest extends BaseTest {
     protected void onStart() {
         super.onStart();
         ImageLoader.shared()
-                .optional()
+                .display()
                 .url(urlAssets)
                 .listener(new DisplayListener.Stub())
                 .option(DisplayOption.builder()

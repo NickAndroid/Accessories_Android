@@ -210,11 +210,32 @@ public class ImageLoader implements DisplayTaskMonitor,
         return Preconditions.checkNotNull(sLoader, "Call createShared first");
     }
 
-    public Optional optional() {
-        return new Optional(this);
+    /**
+     * @return An optional params wrapper.
+     * @see DisplayOptional
+     */
+    public DisplayOptional display() {
+        return new DisplayOptional(this);
     }
 
-    public void load(@NonNull String url, @NonNull LoadingListener loadingListener) {
+    /**
+     * @return An optional params wrapper.
+     * @see LoadOptional
+     */
+    public LoadOptional load() {
+        return new LoadOptional(this);
+    }
+
+    /**
+     * Load image from url.
+     *
+     * @param url             The url to load.
+     * @param loadingListener Listener to listen the progress of the loading process.
+     * @param priority        Priority for this loading session.
+     * @see Priority
+     * @see LoadingListener
+     */
+    public void load(@NonNull String url, @NonNull LoadingListener loadingListener, Priority priority) {
         display(url, new FakeImageSettable(url),
                 DisplayOption.builder()
                         .imageQuality(ImageQuality.OPT)
@@ -225,7 +246,7 @@ public class ImageLoader implements DisplayTaskMonitor,
                         .showOnLoading(0)
                         .build(),
                 Preconditions.checkNotNull(loadingListener),
-                null);
+                priority);
     }
 
     public void display(@NonNull String url,
@@ -860,7 +881,7 @@ public class ImageLoader implements DisplayTaskMonitor,
         }
     }
 
-    public static class Optional {
+    public static class DisplayOptional {
 
         private String url;
         private DisplayOption option;
@@ -869,28 +890,28 @@ public class ImageLoader implements DisplayTaskMonitor,
 
         private ImageLoader loader;
 
-        private Optional(@NonNull ImageLoader loader) {
+        private DisplayOptional(@NonNull ImageLoader loader) {
             this.loader = loader;
         }
 
-        public Optional url(@NonNull String url) {
+        public DisplayOptional url(@NonNull String url) {
             this.url = Preconditions.checkNotNull(url);
-            return Optional.this;
+            return DisplayOptional.this;
         }
 
-        public Optional option(@NonNull DisplayOption option) {
+        public DisplayOptional option(@NonNull DisplayOption option) {
             this.option = Preconditions.checkNotNull(option);
-            return Optional.this;
+            return DisplayOptional.this;
         }
 
-        public Optional listener(@NonNull DisplayListener listener) {
+        public DisplayOptional listener(@NonNull DisplayListener listener) {
             this.listener = Preconditions.checkNotNull(listener);
-            return Optional.this;
+            return DisplayOptional.this;
         }
 
-        public Optional priority(@NonNull Priority priority) {
+        public DisplayOptional priority(@NonNull Priority priority) {
             this.priority = Preconditions.checkNotNull(priority);
-            return Optional.this;
+            return DisplayOptional.this;
         }
 
         public void into(@NonNull ImageSettable settable) {
@@ -900,6 +921,39 @@ public class ImageLoader implements DisplayTaskMonitor,
         public void into(@NonNull ImageView view) {
             ImageViewDelegate viewDelegate = new ImageViewDelegate(view);
             loader.display(url, viewDelegate, option, listener, priority);
+        }
+    }
+
+    public static class LoadOptional {
+
+        private String url;
+
+        private Priority priority;
+        private LoadingListener listener;
+
+        private ImageLoader loader;
+
+        private LoadOptional(@NonNull ImageLoader loader) {
+            this.loader = loader;
+        }
+
+        public LoadOptional url(@NonNull String url) {
+            this.url = Preconditions.checkNotNull(url);
+            return LoadOptional.this;
+        }
+
+        public LoadOptional listener(@NonNull LoadingListener listener) {
+            this.listener = Preconditions.checkNotNull(listener);
+            return LoadOptional.this;
+        }
+
+        public LoadOptional priority(@NonNull Priority priority) {
+            this.priority = Preconditions.checkNotNull(priority);
+            return LoadOptional.this;
+        }
+
+        public void start() {
+            loader.load(url, listener, priority);
         }
     }
 

@@ -99,7 +99,7 @@ public class FileImageTest extends BaseTest {
                 // String uri = mArtworkUri + File.separator + tracks.get(position).getAlbumId();
                 String uri = ImageSource.FILE.getPrefix() + tracks.get(position).getUrl();
 
-                ImageLoader.shared().optional()
+                ImageLoader.shared().display()
                         .url(uri)
                         .option(DisplayOption.builder()
                                 .imageQuality(ImageQuality.OPT)
