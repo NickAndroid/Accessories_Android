@@ -42,7 +42,6 @@ public class MyApp extends ScalpelApplication {
                         .enableMemCache()
                         .enableDiskCache()
                         .enableStorgeStats()
-                        .cachingThreads(Runtime.getRuntime().availableProcessors())
                         .cacheDirName("dis.cache.tests")
                         .preferredLocation(CachePolicy.Location.EXTERNAL)
                         .compressFormat(Bitmap.CompressFormat.PNG)
@@ -51,7 +50,6 @@ public class MyApp extends ScalpelApplication {
                         .onlyOnWifi()
                         .enableTrafficStats().build())
                 .debugLevel(Log.VERBOSE)
-                .loadingThreads(Runtime.getRuntime().availableProcessors() * 2)
                 .build());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             Trace.endSection();

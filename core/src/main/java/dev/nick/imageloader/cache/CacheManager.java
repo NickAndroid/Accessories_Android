@@ -28,7 +28,6 @@ import java.util.concurrent.Executors;
 import dev.nick.imageloader.cache.disk.DiskCache;
 import dev.nick.imageloader.cache.mem.MemCache;
 import dev.nick.imageloader.loader.ViewSpec;
-import dev.nick.imageloader.logger.LoggerManager;
 
 public class CacheManager {
 
@@ -61,7 +60,6 @@ public class CacheManager {
 
     public void cache(@NonNull String url, ViewSpec info, Bitmap value) {
         String key = mKeyGenerator.fromUrl(url, info);
-        LoggerManager.getLogger(getClass()).verbose(String.format("Caching %s by key %s", url, key));
         cacheByKey(key, value);
     }
 

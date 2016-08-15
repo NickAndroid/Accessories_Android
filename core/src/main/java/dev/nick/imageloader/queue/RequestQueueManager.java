@@ -22,20 +22,30 @@ public final class RequestQueueManager<T> implements RequestHandler<T> {
 
     RequestQueue<T> mQueue;
     RequestHandler<T> mRequestHandler;
+    String mName;
 
-    private RequestQueueManager(RequestHandler<T> requestHandler, IdleStateMonitor idleStateMonitor, QueuePolicy policy) {
+    private RequestQueueManager(RequestHandler<T> requestHandler, IdleStateMonitor idleStateMonitor, QueuePolicy policy, String name) {
         mQueue = new RequestQueue<>();
         mQueue.setStateMonitor(idleStateMonitor);
         mQueue.setPolicy(policy);
         mRequestHandler = requestHandler;
+        mName = name;
     }
 
-    public static <T> RequestQueueManager<T> createStarted(RequestHandler<T> requestHandler, IdleStateMonitor idleStateMonitor, QueuePolicy policy) {
-        return new RequestQueueManager<T>(requestHandler, idleStateMonitor, policy).loop();
+    public static <T> RequestQueueManager<T> createStarted(RequestHandler<T> requestHandler) {
+        return createStarted(requestHandler, null);
+    }
+
+    public static <T> RequestQueueManager<T> createStarted(RequestHandler<T> requestHandler, IdleStateMonitor idleStateMonitor) {
+        return createStarted(requestHandler, idleStateMonitor, QueuePolicy.FIFO, null);
+    }
+
+    public static <T> RequestQueueManager<T> createStarted(RequestHandler<T> requestHandler, IdleStateMonitor idleStateMonitor, QueuePolicy policy, String name) {
+        return new RequestQueueManager<T>(requestHandler, idleStateMonitor, policy, name).loop();
     }
 
     RequestQueueManager<T> loop() {
-        Looper<T> looper = new Looper<>(this, mQueue);
+        Looper<T> looper = new Looper<>(this, mQueue, mName);
         looper.startLoop();
         return this;
     }

@@ -16,6 +16,7 @@
 
 package dev.nick.imageloader;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Handler;
@@ -85,7 +86,6 @@ import dev.nick.imageloader.utils.Preconditions;
  */
 public class ImageLoader implements DisplayTaskMonitor,
         Handler.Callback,
-        RequestHandler<FutureImageTask>,
         FutureImageTask.TaskActionListener,
         Forkable<ImageLoader, LoaderConfig> {
 
@@ -118,7 +118,9 @@ public class ImageLoader implements DisplayTaskMonitor,
     @VisibleForTesting
     private LoaderConfig mConfig;
     @VisibleForTesting
-    private RequestQueueManager<FutureImageTask> mQueueService;
+    private RequestQueueManager<FutureImageTask> mTaskHandleService;
+    @VisibleForTesting
+    private RequestQueueManager<Transaction> mTransactionService;
 
     private Logger mLogger;
 
@@ -135,6 +137,7 @@ public class ImageLoader implements DisplayTaskMonitor,
     private TaskManager mTaskManager;
     private ImageSettableIdCreator mSettableIdCreator;
 
+    @SuppressLint("DefaultLocale")
     private ImageLoader(Context context, CacheManager cacheManager, LoaderConfig config) {
         Preconditions.checkNotNull(context);
         if (config == null) config = LoaderConfig.DEFAULT_CONFIG;
@@ -156,21 +159,21 @@ public class ImageLoader implements DisplayTaskMonitor,
                         ? new FIFOPriorityBlockingQueue<Runnable>()
                         : new LIFOPriorityBlockingQueue<Runnable>());
         this.mImageSettingsScheduler = Executors.newSingleThreadExecutor();
-        this.mQueueService = RequestQueueManager.createStarted(this, new IdleStateMonitor() {
+        int loaderId = LoaderFactory.assignLoaderId();
+        this.mTaskHandleService = RequestQueueManager.createStarted(new TaskHandler(), null, null, "TaskHandleService#" + loaderId);
+        this.mTransactionService = RequestQueueManager.createStarted(new TransactionHandler(), new IdleStateMonitor() {
             @Override
             public void onIdle() {
                 LoggerManager.getLogger(IdleStateMonitor.class).funcEnter();
                 TrafficStats.from(mContext).flush();
                 StorageStats.from(mContext).flush();
             }
-        }, QueuePolicy.FIFO);
+        }, QueuePolicy.FIFO, "TransactionService#" + loaderId);
         this.mTaskLockMap = new HashMap<>();
         this.mFutures = new ArrayList<>();
         this.mState = LoaderState.RUNNING;
-        this.mLogger = LoggerManager.getLogger(getClass().getSimpleName()
-                + "#"
-                + LoaderFactory.assignLoaderId());
-        this.mLogger.info("Create loader with config " + config);
+        this.mLogger = LoggerManager.getLogger(getClass().getSimpleName() + "#" + loaderId);
+        this.mLogger.verbose(String.format("Create loader-%d with config %s", loaderId, config));
     }
 
     private static ImageLoader clone(ImageLoader from, LoaderConfig config) {
@@ -212,13 +215,13 @@ public class ImageLoader implements DisplayTaskMonitor,
 
     /**
      * Start a quick optional param builder,
-     * do not forget to call {@link LoadingOptional#start()} to start this task.
+     * do not forget to call {@link Transaction#start()} to start this task.
      *
      * @return An optional params wrapper.
-     * @see LoadingOptional
+     * @see Transaction
      */
-    public LoadingOptional load() {
-        return new LoadingOptional(this);
+    public Transaction load() {
+        return new Transaction(this);
     }
 
     /**
@@ -228,7 +231,6 @@ public class ImageLoader implements DisplayTaskMonitor,
      * @param view     Target {@link ImageView} to display the image.
      * @param option   {@link DisplayOption} is options using when display the image.
      * @param listener The progress listener using to watch the progress of the loading.
-     * @deprecated Use {@link #load()} instead.
      */
     void display(@NonNull String url,
                  @NonNull ImageView view,
@@ -245,7 +247,6 @@ public class ImageLoader implements DisplayTaskMonitor,
      * @param settable Target {@link ImageSettable} to display the image.
      * @param option   {@link DisplayOption} is options using when display the image.
      * @param listener The progress listener using to watch the progress of the loading.
-     * @deprecated Use {@link #load()} instead.
      */
     void display(@NonNull String url,
                  @NonNull ImageSettable settable,
@@ -255,13 +256,11 @@ public class ImageLoader implements DisplayTaskMonitor,
 
         ensureNotTerminated();
 
-        Preconditions.checkNotNull(url, settable);
+        Preconditions.checkNotNull(url, "url is null");
 
-        DisplayTaskRecord record = createTaskRecord(settable);
+        DisplayTaskRecord record = createTaskRecord(Preconditions.checkNotNull(settable));
 
         option = assignOptionIfNull(option);
-
-        beforeLoading(settable, option);
 
         // 1. Get from cache.
         // 2. If no mem cache, start a loading task from disk cache file or perform first loading.
@@ -272,8 +271,6 @@ public class ImageLoader implements DisplayTaskMonitor,
         if (mCacheManager.isMemCacheEnabled()) {
             Bitmap cached;
             if ((cached = mCacheManager.getMemCache(url, info)) != null) {
-                mLogger.verbose("MemCache, Load cached mem bitmap:" + cached);
-
                 applyImageSettings(
                         cached,
                         option.getProcessor(),
@@ -289,13 +286,32 @@ public class ImageLoader implements DisplayTaskMonitor,
             }
         }
 
+        beforeLoading(settable, option);
+
         String loadingUrl = url;
 
         if (mCacheManager.isDiskCacheEnabled()) {
             String cachePath;
             if ((cachePath = mCacheManager.getDiskCachePath(url, info)) != null) {
-                mLogger.verbose("DiskCache, Load cached disk cache:" + cachePath);
                 loadingUrl = ImageSource.FILE.getPrefix() + cachePath;
+                // Check mem cache again.
+                if (mCacheManager.isMemCacheEnabled()) {
+                    Bitmap cached;
+                    if ((cached = mCacheManager.getMemCache(loadingUrl, info)) != null) {
+                        applyImageSettings(
+                                cached,
+                                option.getProcessor(),
+                                settable,
+                                option.isAnimateOnlyNewLoaded() ? null : option.getAnimator());
+                        // Call complete.
+                        if (listener != null) {
+                            BitmapResult result = new BitmapResult();
+                            result.result = cached;
+                            listener.onComplete(result);
+                        }
+                        return;
+                    }
+                }
             }
         }
 
@@ -355,7 +371,7 @@ public class ImageLoader implements DisplayTaskMonitor,
         future.setPriority(priority == null ? Priority.NORMAL : priority);
 
         // Push it to the request queue.
-        mQueueService.push(future);
+        mTaskHandleService.push(future);
     }
 
     private DisplayOption assignOptionIfNull(DisplayOption option) {
@@ -364,7 +380,6 @@ public class ImageLoader implements DisplayTaskMonitor,
     }
 
     private void onTaskCreated(DisplayTaskRecord record) {
-        mLogger.verbose("Created task:" + record);
         int taskId = record.getTaskId();
         long settableId = record.getSettableId();
         synchronized (mTaskLockMap) {
@@ -527,14 +542,6 @@ public class ImageLoader implements DisplayTaskMonitor,
         params.listener.onError(params.cause);
     }
 
-    @Override
-    public boolean handleRequest(FutureImageTask future) {
-        freezeIfRequested();
-        if (!onFutureSubmit(future)) return false;
-        getExecutor(ImageSource.of(future.getListenableTask().getUrl())).submit(future);
-        return true;
-    }
-
     private ExecutorService getExecutor(ImageSource source) {
 
         switch (source) {
@@ -635,7 +642,7 @@ public class ImageLoader implements DisplayTaskMonitor,
     public void terminate() {
         ensureNotTerminated();
         mState = LoaderState.TERMINATED;
-        mQueueService.terminate();
+        mTaskHandleService.terminate();
         mLoadingService.shutdown();
         synchronized (mTaskLockMap) {
             mTaskLockMap.clear();
@@ -863,7 +870,7 @@ public class ImageLoader implements DisplayTaskMonitor,
         }
     }
 
-    public static class LoadingOptional {
+    public static class Transaction {
 
         private String url;
         private DisplayOption option;
@@ -873,41 +880,45 @@ public class ImageLoader implements DisplayTaskMonitor,
 
         private ImageLoader loader;
 
-        private LoadingOptional(@NonNull ImageLoader loader) {
+        private Transaction(@NonNull ImageLoader loader) {
             this.loader = loader;
         }
 
-        public LoadingOptional from(@NonNull String url) {
+        public Transaction from(@NonNull String url) {
             this.url = Preconditions.checkNotNull(url);
-            return LoadingOptional.this;
+            return Transaction.this;
         }
 
-        public LoadingOptional option(@NonNull DisplayOption option) {
+        public Transaction option(@NonNull DisplayOption option) {
             this.option = Preconditions.checkNotNull(option);
-            return LoadingOptional.this;
+            return Transaction.this;
         }
 
-        public LoadingOptional listener(@NonNull LoadingListener listener) {
+        public Transaction listener(@NonNull LoadingListener listener) {
             this.listener = Preconditions.checkNotNull(listener);
-            return LoadingOptional.this;
+            return Transaction.this;
         }
 
-        public LoadingOptional priority(@NonNull Priority priority) {
+        public Transaction priority(@NonNull Priority priority) {
             this.priority = Preconditions.checkNotNull(priority);
-            return LoadingOptional.this;
+            return Transaction.this;
         }
 
-        public LoadingOptional into(@NonNull ImageSettable settable) {
+        public Transaction into(@NonNull ImageSettable settable) {
             this.settable = Preconditions.checkNotNull(settable);
-            return LoadingOptional.this;
+            return Transaction.this;
         }
 
-        public LoadingOptional into(@NonNull ImageView view) {
+        public Transaction into(@NonNull ImageView view) {
             this.settable = new ImageViewDelegate(view);
-            return LoadingOptional.this;
+            return Transaction.this;
         }
 
         public void start() {
+            this.loader.mTransactionService.push(this);
+        }
+
+        private void startInternal() {
             loader.display(url, noneNullSettable(), option, listener, priority);
         }
 
@@ -1097,6 +1108,25 @@ public class ImageLoader implements DisplayTaskMonitor,
             } else {
                 callOnFailure(listener, cause);
             }
+        }
+    }
+
+    private class TaskHandler implements RequestHandler<FutureImageTask> {
+        @Override
+        public boolean handleRequest(FutureImageTask request) {
+            freezeIfRequested();
+            if (!onFutureSubmit(request)) return false;
+            getExecutor(ImageSource.of(request.getListenableTask().getUrl())).submit(request);
+            return true;
+        }
+    }
+
+    private class TransactionHandler implements RequestHandler<Transaction> {
+
+        @Override
+        public boolean handleRequest(Transaction transaction) {
+            transaction.startInternal();
+            return true;
         }
     }
 }

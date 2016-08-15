@@ -22,14 +22,16 @@ class Looper<T> implements Runnable {
 
     RequestQueue<T> stack;
     RequestHandler<T> requestHandler;
+    String name;
 
-    public Looper(RequestHandler<T> requestHandler, RequestQueue<T> stack) {
+    public Looper(RequestHandler<T> requestHandler, RequestQueue<T> stack, String name) {
         this.requestHandler = requestHandler;
         this.stack = stack;
+        this.name = name;
     }
 
     void startLoop() {
-        new Thread(this).start();
+        new Thread(this, name).start();
     }
 
     void loop() {

@@ -20,7 +20,6 @@ import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.logger.LoggerManager;
 
 /**
@@ -36,7 +35,7 @@ public class CachePolicy {
     public static final CachePolicy DEFAULT_CACHE_POLICY = CachePolicy.builder()
             .enableDiskCache()
             .enableMemCache()
-            .cachingThreads(Runtime.getRuntime().availableProcessors())
+            .cachingThreads((Runtime.getRuntime().availableProcessors() + 1) / 2)
             .memCachePoolSize(DEFAULT_MEM_CACHE_POOL_SIZE)
             .compressFormat(Bitmap.CompressFormat.PNG)
             .imageQuality(Quality.BEST)
@@ -286,8 +285,7 @@ public class CachePolicy {
 
         void invalidate() {
             if (nCachingThreads <= 0) {
-                LoggerManager.getLogger(ImageLoader.class).warn("Using [Runtime.availableProcessors] as nCachingThreads");
-                nCachingThreads = Runtime.getRuntime().availableProcessors();
+                nCachingThreads = DEFAULT_CACHE_POLICY.nCachingThreads;
             }
             if (memCachePoolSize == 0) {
                 memCachePoolSize(DEFAULT_MEM_CACHE_POOL_SIZE);

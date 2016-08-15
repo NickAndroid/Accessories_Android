@@ -20,7 +20,6 @@ import android.support.annotation.Nullable;
 
 import java.util.concurrent.FutureTask;
 
-import dev.nick.imageloader.logger.LoggerManager;
 import dev.nick.imageloader.queue.Priority;
 import dev.nick.imageloader.queue.PriorityRemarkable;
 
@@ -44,7 +43,6 @@ public class FutureImageTask extends FutureTask<Void> implements PriorityRemarka
     @Override
     protected void done() {
         super.done();
-        LoggerManager.getLogger(getClass()).funcEnter();
         if (mListener != null) mListener.onDone(this);
     }
 
