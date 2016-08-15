@@ -34,7 +34,7 @@ public class LoaderConfig {
             .cachePolicy(CachePolicy.DEFAULT_CACHE_POLICY)
             .networkPolicy(NetworkPolicy.DEFAULT_NETWORK_POLICY)
             .queuePolicy(QueuePolicy.FIFO)
-            .loadingThreads(Runtime.getRuntime().availableProcessors())
+            .loadingThreads((Runtime.getRuntime().availableProcessors() + 1) / 2)
             .debugLevel(Log.WARN)
             .build();
 
