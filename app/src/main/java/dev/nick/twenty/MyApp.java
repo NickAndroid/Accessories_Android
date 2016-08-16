@@ -49,7 +49,7 @@ public class MyApp extends ScalpelApplication {
                 .networkPolicy(NetworkPolicy.builder()
                         .onlyOnWifi()
                         .enableTrafficStats().build())
-                .debugLevel(Log.VERBOSE)
+                .debugLevel(Log.WARN)
                 .build());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             Trace.endSection();

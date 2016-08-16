@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class LoggerManager {
 
     final static HashMap<String, Logger> sLoggers = new HashMap<>();
-    final static AtomicInteger sDebugLevel = new AtomicInteger(Log.VERBOSE);
+    final static AtomicInteger sDebugLevel = new AtomicInteger(Log.WARN);
 
     static String TAG_PREFIX = "LoggerManager";
 
