@@ -16,188 +16,43 @@
 
 package dev.nick.imageloader.display;
 
-import android.support.annotation.DrawableRes;
-
 import dev.nick.imageloader.display.animator.ImageAnimator;
 import dev.nick.imageloader.display.handler.BitmapHandler;
+import lombok.Builder;
+import lombok.Getter;
 
+@Builder
+@Getter
 public class DisplayOption {
 
-    private int defaultImgRes;
-    private int loadingImgRes;
+    private int showWithDefault;
+    private int showOnLoading;
 
-    private ImageQuality quality;
+    private ImageQuality imageQuality;
 
-    private BitmapHandler processor;
-    private ImageAnimator animator;
+    private BitmapHandler bitmapHandler;
+    private ImageAnimator imageAnimator;
 
     private boolean applyImageOneByOne;
     private boolean viewMaybeReused;
 
     private boolean animateOnlyNewLoaded;
 
-    private DisplayOption(int defaultImgRes,
-                          int loadingImgRes,
-                          ImageQuality quality,
-                          BitmapHandler processor,
-                          ImageAnimator animator,
+    private DisplayOption(int showWithDefault,
+                          int showOnLoading,
+                          ImageQuality imageQuality,
+                          BitmapHandler bitmapHandler,
+                          ImageAnimator imageAnimator,
                           boolean applyImageOneByOne,
                           boolean viewMaybeReused,
                           boolean animateOnlyNewLoaded) {
-        this.defaultImgRes = defaultImgRes;
-        this.loadingImgRes = loadingImgRes;
-        this.quality = quality;
-        this.processor = processor;
-        this.animator = animator;
+        this.showWithDefault = showWithDefault;
+        this.showOnLoading = showOnLoading;
+        this.imageQuality = imageQuality;
+        this.bitmapHandler = bitmapHandler;
+        this.imageAnimator = imageAnimator;
         this.applyImageOneByOne = applyImageOneByOne;
         this.viewMaybeReused = viewMaybeReused;
         this.animateOnlyNewLoaded = animateOnlyNewLoaded;
-    }
-
-    public int getDefaultImgRes() {
-        return defaultImgRes;
-    }
-
-    public int getLoadingImgRes() {
-        return loadingImgRes;
-    }
-
-    public ImageQuality getQuality() {
-        return quality;
-    }
-
-    public BitmapHandler getProcessor() {
-        return processor;
-    }
-
-    public ImageAnimator getAnimator() {
-        return animator;
-    }
-
-    public boolean isApplyImageOneByOne() {
-        return applyImageOneByOne;
-    }
-
-    public boolean isViewMaybeReused() {
-        return viewMaybeReused;
-    }
-
-    public boolean isAnimateOnlyNewLoaded() {
-        return animateOnlyNewLoaded;
-    }
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public static class Builder {
-
-        private int defaultImgRes;
-        private int loadingImgRes;
-
-        private ImageQuality quality = ImageQuality.OPT;
-
-        private BitmapHandler handler;
-        private ImageAnimator animator;
-
-        private boolean oneAfterOne;
-        private boolean viewMaybeReused;
-
-        private boolean animateOnlyNewLoaded;
-
-        private Builder() {
-        }
-
-        /**
-         * @param defaultImgRes Image res showing when load failure.
-         * @return Instance of this builder.
-         */
-        public Builder showWithDefault(@DrawableRes int defaultImgRes) {
-            this.defaultImgRes = defaultImgRes;
-            return this;
-        }
-
-        /**
-         * @param loadingImgRes Image res showing when loading.
-         * @return Instance of this builder.
-         */
-        public Builder showOnLoading(@DrawableRes int loadingImgRes) {
-            this.loadingImgRes = loadingImgRes;
-            return this;
-        }
-
-        /**
-         * @param handler {@link BitmapHandler} instance using to process the bitmap before display.
-         * @return Instance of this builder.
-         */
-        public Builder bitmapHandler(BitmapHandler handler) {
-            this.handler = handler;
-            return this;
-        }
-
-        /**
-         * Set a image animator to perform an animation when displaying image.
-         *
-         * @param animator The animator you want to set.
-         * @return @return Instance of this builder.
-         */
-        public Builder imageAnimator(ImageAnimator animator) {
-            this.animator = animator;
-            return this;
-        }
-
-        /**
-         * Set the image quality displaying, lower image quality has
-         * a better performance.
-         *
-         * @param quality Image quality when displaying.
-         * @return Instance of this builder.
-         */
-        public Builder imageQuality(ImageQuality quality) {
-            this.quality = quality;
-            return this;
-        }
-
-        /**
-         * Display the image one by one, by default will display loaded images at the same time.
-         *
-         * @return Instance of this builder.
-         */
-        public Builder oneAfterOne() {
-            this.oneAfterOne = true;
-            return this;
-        }
-
-        /**
-         * Indicate that the view may be reused, the image won't be set if there is a new request for the same view.
-         *
-         * @return Instance of this builder.
-         */
-        public Builder viewMaybeReused() {
-            this.viewMaybeReused = true;
-            return this;
-        }
-
-        /**
-         * Indicate that only start an animation for new loaded images.
-         *
-         * @return Instance of this builder.
-         */
-        public Builder animateOnlyNewLoaded() {
-            this.animateOnlyNewLoaded = true;
-            return this;
-        }
-
-        public DisplayOption build() {
-            return new DisplayOption(
-                    defaultImgRes,
-                    loadingImgRes,
-                    quality,
-                    handler,
-                    animator,
-                    oneAfterOne,
-                    viewMaybeReused,
-                    animateOnlyNewLoaded);
-        }
     }
 }

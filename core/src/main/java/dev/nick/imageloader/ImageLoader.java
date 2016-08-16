@@ -28,36 +28,10 @@ import android.support.annotation.VisibleForTesting;
 import android.support.annotation.WorkerThread;
 import android.view.animation.Animation;
 import android.widget.ImageView;
-
-import java.io.InterruptedIOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-
+import dev.nick.imageloader.annotation.LoaderApi;
 import dev.nick.imageloader.cache.CacheManager;
-import dev.nick.imageloader.control.Forkable;
-import dev.nick.imageloader.control.Freezer;
-import dev.nick.imageloader.control.LoaderState;
-import dev.nick.imageloader.control.StorageStats;
-import dev.nick.imageloader.control.TrafficStats;
-import dev.nick.imageloader.display.BitmapImageSettings;
-import dev.nick.imageloader.display.DisplayOption;
-import dev.nick.imageloader.display.ImageQuality;
-import dev.nick.imageloader.display.ImageSettable;
-import dev.nick.imageloader.display.ImageSettableIdCreator;
-import dev.nick.imageloader.display.ImageSettableIdCreatorImpl;
-import dev.nick.imageloader.display.ImageViewDelegate;
-import dev.nick.imageloader.display.ResImageSettings;
+import dev.nick.imageloader.control.*;
+import dev.nick.imageloader.display.*;
 import dev.nick.imageloader.display.animator.ImageAnimator;
 import dev.nick.imageloader.display.handler.BitmapHandler;
 import dev.nick.imageloader.loader.ImageSource;
@@ -67,24 +41,19 @@ import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
 import dev.nick.imageloader.loader.result.Result;
-import dev.nick.imageloader.loader.task.DisplayTask;
-import dev.nick.imageloader.loader.task.DisplayTaskImpl;
-import dev.nick.imageloader.loader.task.DisplayTaskMonitor;
-import dev.nick.imageloader.loader.task.DisplayTaskRecord;
-import dev.nick.imageloader.loader.task.FutureImageTask;
-import dev.nick.imageloader.loader.task.MokeFutureImageTask;
-import dev.nick.imageloader.loader.task.TaskManager;
-import dev.nick.imageloader.loader.task.TaskManagerImpl;
+import dev.nick.imageloader.loader.task.*;
 import dev.nick.imageloader.logger.Logger;
 import dev.nick.imageloader.logger.LoggerManager;
-import dev.nick.imageloader.queue.FIFOPriorityBlockingQueue;
-import dev.nick.imageloader.queue.IdleStateMonitor;
-import dev.nick.imageloader.queue.LIFOPriorityBlockingQueue;
-import dev.nick.imageloader.queue.Priority;
-import dev.nick.imageloader.queue.QueuePolicy;
-import dev.nick.imageloader.queue.RequestHandler;
-import dev.nick.imageloader.queue.RequestQueueManager;
+import dev.nick.imageloader.queue.*;
 import dev.nick.imageloader.utils.Preconditions;
+
+import java.io.InterruptedIOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Main class of {@link ImageLoader} library.
@@ -107,7 +76,7 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
             .bitmapHandler(null)
             .showWithDefault(0)
             .showOnLoading(0)
-            .viewMaybeReused()
+            .viewMaybeReused(true)
             .build();
 
     private static ImageLoader sLoader;
@@ -202,6 +171,7 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
      * @param config  Configuration of this loader.
      * @since 1.0.1
      */
+    @LoaderApi
     public static void createShared(Context context, LoaderConfig config) {
         if (sLoader == null || sLoader.isTerminated()) {
             sLoader = new ImageLoader(context, null, config);
@@ -278,9 +248,9 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
             if ((cached = mCacheManager.getMemCache(url, info)) != null) {
                 applyImageSettings(
                         cached,
-                        option.getProcessor(),
+                        option.getBitmapHandler(),
                         settable,
-                        option.isAnimateOnlyNewLoaded() ? null : option.getAnimator());
+                        option.isAnimateOnlyNewLoaded() ? null : option.getImageAnimator());
                 // Call complete.
                 if (listener != null) {
                     BitmapResult result = new BitmapResult();
@@ -305,9 +275,9 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
                     if ((cached = mCacheManager.getMemCache(loadingUrl, info)) != null) {
                         applyImageSettings(
                                 cached,
-                                option.getProcessor(),
+                                option.getBitmapHandler(),
                                 settable,
-                                option.isAnimateOnlyNewLoaded() ? null : option.getAnimator());
+                                option.isAnimateOnlyNewLoaded() ? null : option.getImageAnimator());
                         // Call complete.
                         if (listener != null) {
                             BitmapResult result = new BitmapResult();
@@ -332,7 +302,7 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
     }
 
     private void beforeLoading(ImageSettable settable, DisplayOption option) {
-        int showWhenLoading = option.getLoadingImgRes();
+        int showWhenLoading = option.getShowOnLoading();
         applyImageSettings(showWhenLoading, settable, null);
     }
 
@@ -343,7 +313,7 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
                                       DisplayTaskRecord record,
                                       Priority priority) {
 
-        ImageQuality imageQuality = option.getQuality();
+        ImageQuality imageQuality = option.getImageQuality();
 
         ViewSpec viewSpec = new ViewSpec(settable.getWidth(), settable.getHeight());
 
@@ -799,11 +769,11 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
         return true;
     }
 
-    boolean checkInRunningState() {
+    private boolean checkInRunningState() {
         return mState != LoaderState.TERMINATED;
     }
 
-    void freezeIfRequested() {
+    private void freezeIfRequested() {
         if (mState == LoaderState.PAUSE_REQUESTED) {
             mState = LoaderState.PAUSED;
             if (mFreezer == null) mFreezer = new Freezer();
@@ -978,7 +948,7 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
         }
     }
 
-    static class FakeImageSettable implements ImageSettable {
+    private static class FakeImageSettable implements ImageSettable {
 
         String url;
 
@@ -1017,14 +987,14 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
         }
     }
 
-    public class BitmapTransaction extends Transaction<BitmapResult> {
+    private class BitmapTransaction extends Transaction<BitmapResult> {
 
         private BitmapTransaction(@NonNull ImageLoader loader) {
             super(loader);
         }
     }
 
-    class ImageSettingsLocker {
+    private class ImageSettingsLocker {
 
         private final static long MAX_DELAY = 2 * 1000;
 
@@ -1032,7 +1002,7 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
 
         private long unLockDelay;
 
-        public ImageSettingsLocker(long unLockDelay) {
+        ImageSettingsLocker(long unLockDelay) {
             this.unLockDelay = unLockDelay;
             this.latch = new CountDownLatch(1);
         }
@@ -1064,12 +1034,12 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
         private Boolean canceled = Boolean.FALSE;
         private Boolean isTaskDirty = null;
 
-        public ProgressListenerDelegate(ProgressListener<BitmapResult> listener,
-                                        ViewSpec viewSpec,
-                                        DisplayOption option,
-                                        @NonNull ImageSettable settable,
-                                        DisplayTaskRecord taskRecord,
-                                        String url) {
+        ProgressListenerDelegate(ProgressListener<BitmapResult> listener,
+                                 ViewSpec viewSpec,
+                                 DisplayOption option,
+                                 @NonNull ImageSettable settable,
+                                 DisplayTaskRecord taskRecord,
+                                 String url) {
             this.viewSpec = viewSpec;
             this.listener = listener;
             this.option = option;
@@ -1118,16 +1088,16 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
 
             if (!isViewMaybeReused || !isTaskDirty(taskRecord)) {
                 if (!option.isApplyImageOneByOne()) {
-                    ImageAnimator animator = (option == null ? null : option.getAnimator());
-                    BitmapHandler processor = (option == null ? null : option.getProcessor());
+                    ImageAnimator animator = (option == null ? null : option.getImageAnimator());
+                    BitmapHandler processor = (option == null ? null : option.getBitmapHandler());
                     applyImageSettings(result.result, processor, settable, animator);
                 } else {
                     mImageSettingsScheduler.execute(new Runnable() {
                         @Override
                         public void run() {
                             if (isViewMaybeReused && isTaskDirty(taskRecord)) return;
-                            ImageAnimator animator = (option == null ? null : option.getAnimator());
-                            BitmapHandler processor = (option == null ? null : option.getProcessor());
+                            ImageAnimator animator = (option == null ? null : option.getImageAnimator());
+                            BitmapHandler processor = (option == null ? null : option.getBitmapHandler());
                             applyImageSettings(result.result, processor, settable, animator);
                             if (animator != null) {
                                 long delay = animator.getDuration();
