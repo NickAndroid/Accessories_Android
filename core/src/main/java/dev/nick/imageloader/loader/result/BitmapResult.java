@@ -19,5 +19,9 @@ package dev.nick.imageloader.loader.result;
 import android.graphics.Bitmap;
 
 public class BitmapResult extends Result<Bitmap> {
-    // Nothing.
+    public static BitmapResult newResult(Bitmap b) {
+        BitmapResult result = new BitmapResult();
+        result.result = b;
+        return result;
+    }
 }

@@ -28,12 +28,12 @@ import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
 
-public class ContentImageFetcher extends BaseImageFetcher {
+public class ContentImageFetcher extends BaseImageFetcher<BitmapResult> {
 
     @NonNull
-    ImageFetcher mFileImageFetcher;
+    ImageFetcher<BitmapResult> mFileImageFetcher;
 
-    public ContentImageFetcher(PathSplitter<String> splitter, @NonNull final ImageFetcher fileImageFetcher) {
+    public ContentImageFetcher(PathSplitter<String> splitter, @NonNull final ImageFetcher<BitmapResult> fileImageFetcher) {
         super(splitter);
         this.mFileImageFetcher = fileImageFetcher;
     }
@@ -45,10 +45,10 @@ public class ContentImageFetcher extends BaseImageFetcher {
     }
 
     @Override
-    public void fetchFromUrl(@NonNull String url,
-                             @NonNull DecodeSpec decodeSpec,
-                             @Nullable ProgressListener<BitmapResult> progressListener,
-                             @Nullable ErrorListener errorListener)
+    public BitmapResult fetchFromUrl(@NonNull String url,
+                                     @NonNull DecodeSpec decodeSpec,
+                                     @Nullable ProgressListener<BitmapResult> progressListener,
+                                     @Nullable ErrorListener errorListener)
             throws Exception {
 
         super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);
@@ -61,20 +61,20 @@ public class ContentImageFetcher extends BaseImageFetcher {
 
         if (cursor == null) {
             callOnError(errorListener, new Cause(new Exception(String.format("Cursor for %s is null.", url))));
-            return;
+            return null;
         }
 
         try {
             if (cursor.getCount() == 0) {
                 callOnError(errorListener, new Cause(new Exception(String.format("Cursor count for %s is 0.", url))));
-                return;
+                return null;
             }
 
             int index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
 
             if (index < 0) {
                 callOnError(errorListener, new Cause(new Exception(String.format("Cursor index for %s is 0.", url))));
-                return;
+                return null;
             }
 
             callOnStart(progressListener);
@@ -83,7 +83,7 @@ public class ContentImageFetcher extends BaseImageFetcher {
 
             String filePath = cursor.getString(index);
 
-            mFileImageFetcher.fetchFromUrl(ImageSource.FILE.prefix + filePath,
+            return mFileImageFetcher.fetchFromUrl(ImageSource.FILE.prefix + filePath,
                     decodeSpec, progressListener, errorListener);
         } finally {
             cursor.close();

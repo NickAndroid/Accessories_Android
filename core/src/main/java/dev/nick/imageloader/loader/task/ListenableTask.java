@@ -21,8 +21,9 @@ import android.support.annotation.Nullable;
 
 import dev.nick.imageloader.loader.ProgressListener;
 import dev.nick.imageloader.loader.result.BitmapResult;
+import dev.nick.imageloader.loader.result.Result;
 
-public interface ListenableTask<X extends TaskRecord> extends Task<X, Void> {
+public interface ListenableTask<X extends TaskRecord, T> extends Task<X, Result<T>> {
     @NonNull
     String getUrl();
 

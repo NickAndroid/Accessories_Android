@@ -17,6 +17,7 @@
 package dev.nick.imageloader.loader.task;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Process;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -34,7 +35,7 @@ import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
 
-public class DisplayTaskImpl implements DisplayTask {
+public class DisplayTaskImpl implements DisplayTask<Bitmap> {
 
     private String mUrl;
 
@@ -46,15 +47,17 @@ public class DisplayTaskImpl implements DisplayTask {
     private ProgressListener<BitmapResult> mProgressListener;
     private ErrorListener mErrorListener;
 
-    private DisplayTaskMonitor mDisplayTaskMonitor;
+    private DisplayTaskMonitor<Bitmap> mDisplayTaskMonitor;
 
     private DisplayTaskRecord mTaskRecord;
 
     private Context mContext;
 
+    private BitmapResult mResult;
+
     public DisplayTaskImpl(Context context,
                            LoaderConfig loaderConfig,
-                           DisplayTaskMonitor displayTaskMonitor,
+                           DisplayTaskMonitor<Bitmap> displayTaskMonitor,
                            String url,
                            ViewSpec spec,
                            ImageQuality quality,
@@ -81,11 +84,11 @@ public class DisplayTaskImpl implements DisplayTask {
 
         ImageSource source = ImageSource.of(mUrl);
 
-        ImageFetcher fetcher = source.getFetcher(mContext, mLoaderConfig);
+        ImageFetcher<BitmapResult> fetcher = source.getFetcher(mContext, mLoaderConfig);
 
         DecodeSpec decodeSpec = new DecodeSpec(mQuality, mViewSpec);
         try {
-            fetcher.fetchFromUrl(mUrl, decodeSpec, mProgressListener, mErrorListener);
+            mResult = fetcher.fetchFromUrl(mUrl, decodeSpec, mProgressListener, mErrorListener);
         } catch (InterruptedIOException | InterruptedException ignored) {
 
         } catch (Exception e) {
@@ -99,9 +102,9 @@ public class DisplayTaskImpl implements DisplayTask {
     }
 
     @Override
-    public Void call() throws Exception {
+    public BitmapResult call() throws Exception {
         run();
-        return null;
+        return mResult;
     }
 
     @NonNull

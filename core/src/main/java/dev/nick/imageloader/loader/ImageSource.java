@@ -89,40 +89,31 @@ public enum ImageSource {
         }
     })), "https://"),
 
-    UNKNOWN(new ImageFetcher() {
+    UNKNOWN(new ImageFetcher<BitmapResult>() {
         @Override
-        public void fetchFromUrl(@NonNull String url,
-                                 @NonNull DecodeSpec decodeSpec,
-                                 @Nullable ProgressListener progressListener,
-                                 @Nullable ErrorListener errorListener)
+        public BitmapResult fetchFromUrl(@NonNull String url,
+                                         @NonNull DecodeSpec decodeSpec,
+                                         @Nullable ProgressListener progressListener,
+                                         @Nullable ErrorListener errorListener)
                 throws Exception {
             if (errorListener != null) {
-                errorListener.onError(new Cause(new IllegalArgumentException("Unknown image source.")));
+                errorListener.onError(new Cause(new IllegalArgumentException("Unknown image source called.")));
             }
+            return null;
         }
 
         @Override
-        public ImageFetcher prepare(Context context, LoaderConfig config) {
+        public ImageFetcher<BitmapResult> prepare(Context context, LoaderConfig config) {
             return this;
         }
     }, null);
 
-    ImageFetcher fetcher;
+    ImageFetcher<BitmapResult> fetcher;
     String prefix;
 
-    ImageSource(ImageFetcher fetcher, String prefix) {
+    ImageSource(ImageFetcher<BitmapResult> fetcher, String prefix) {
         this.fetcher = fetcher;
         this.prefix = prefix;
-    }
-
-    @NonNull
-    public ImageFetcher getFetcher(Context context, LoaderConfig config) {
-        return fetcher.prepare(context, config);
-
-    }
-
-    public String getPrefix() {
-        return prefix;
     }
 
     public static ImageSource of(@NonNull String url) {
@@ -130,6 +121,16 @@ public enum ImageSource {
             if (url.startsWith(source.prefix)) return source;
         }
         return ImageSource.UNKNOWN;
+    }
+
+    @NonNull
+    public ImageFetcher<BitmapResult> getFetcher(Context context, LoaderConfig config) {
+        return fetcher.prepare(context, config);
+
+    }
+
+    public String getPrefix() {
+        return prefix;
     }
 
     private static class HookedFileImageFetcher extends FileImageFetcher {

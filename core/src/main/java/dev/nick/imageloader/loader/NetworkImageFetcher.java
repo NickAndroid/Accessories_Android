@@ -38,11 +38,11 @@ import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
 
-public class NetworkImageFetcher extends BaseImageFetcher {
+public class NetworkImageFetcher extends BaseImageFetcher<BitmapResult> {
 
     private static final String DOWNLOAD_DIR_NAME = "download";
 
-    private ImageFetcher mFileImageFetcher;
+    private ImageFetcher<BitmapResult> mFileImageFetcher;
 
     private String mDownloadDir;
 
@@ -61,7 +61,7 @@ public class NetworkImageFetcher extends BaseImageFetcher {
 
     private TrafficStats mTrafficStats;
 
-    public NetworkImageFetcher(PathSplitter<String> splitter, ImageFetcher fileImageFetcher) {
+    public NetworkImageFetcher(PathSplitter<String> splitter, ImageFetcher<BitmapResult> fileImageFetcher) {
         super(splitter);
         mFileImageFetcher = fileImageFetcher;
     }
@@ -106,10 +106,10 @@ public class NetworkImageFetcher extends BaseImageFetcher {
     }
 
     @Override
-    public void fetchFromUrl(@NonNull String url,
-                             @NonNull final DecodeSpec decodeSpec,
-                             @Nullable ProgressListener<BitmapResult> progressListener,
-                             @Nullable ErrorListener errorListener)
+    public BitmapResult fetchFromUrl(@NonNull String url,
+                                     @NonNull final DecodeSpec decodeSpec,
+                                     @Nullable ProgressListener<BitmapResult> progressListener,
+                                     @Nullable ErrorListener errorListener)
             throws Exception {
 
         super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);
@@ -134,7 +134,7 @@ public class NetworkImageFetcher extends BaseImageFetcher {
         // No connection.
         if (!readyToLoad) {
             callOnError(errorListener, new Cause(new IllegalStateException("No network is available.")));
-            return;
+            return null;
         }
 
         mLogger.verbose("Using network tye to download:" + decodeNetworkType(usingNetworkType));
@@ -175,7 +175,7 @@ public class NetworkImageFetcher extends BaseImageFetcher {
                 mLogger.info("Using exist file instead of download.");
                 mFileImageFetcher.fetchFromUrl(ImageSource.FILE.prefix + downloadPath,
                         decodeSpec, progressListener, errorListener);
-                return;
+                return null;
             } catch (Exception e) {
                 mLogger.warn("Error when fetch exists file:" + downloadPath);
                 //noinspection ResultOfMethodCallIgnored
@@ -185,9 +185,6 @@ public class NetworkImageFetcher extends BaseImageFetcher {
 
         boolean ok = downloader.download(url, progressListener, errorListener);
 
-        if (ok) {
-            mFileImageFetcher.fetchFromUrl(ImageSource.FILE.prefix + tmpPath, decodeSpec, progressListener, errorListener);
-        }
         // Rename the file as download.
         if (ok && !new File(tmpPath).renameTo(downloadFile)) {
             mLogger.warn(String.format("Failed to move the tmp file from %s to %s", tmpPath, downloadPath));
@@ -196,6 +193,11 @@ public class NetworkImageFetcher extends BaseImageFetcher {
         if (!ok && !new File(tmpPath).delete()) {
             mLogger.verbose("Failed to delete the tmp file:" + tmpPath);
         }
+
+        if (ok) {
+            return mFileImageFetcher.fetchFromUrl(ImageSource.FILE.prefix + tmpPath, decodeSpec, progressListener, errorListener);
+        }
+        return null;
     }
 
     String decodeNetworkType(int type) {

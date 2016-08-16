@@ -24,11 +24,11 @@ import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.ErrorListener;
 
-public interface ImageFetcher {
-    void fetchFromUrl(@NonNull String url,
-                      @NonNull DecodeSpec decodeSpec,
-                      @Nullable ProgressListener<BitmapResult> progressListener,
-                      @Nullable ErrorListener errorListener) throws Exception;
+public interface ImageFetcher<T> {
+    T fetchFromUrl(@NonNull String url,
+                   @NonNull DecodeSpec decodeSpec,
+                   @Nullable ProgressListener<BitmapResult> progressListener,
+                   @Nullable ErrorListener errorListener) throws Exception;
 
-    ImageFetcher prepare(Context context, LoaderConfig config);
+    ImageFetcher<T> prepare(Context context, LoaderConfig config);
 }

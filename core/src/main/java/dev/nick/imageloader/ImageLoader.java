@@ -34,9 +34,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -63,11 +66,13 @@ import dev.nick.imageloader.loader.ViewSpec;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
+import dev.nick.imageloader.loader.result.Result;
 import dev.nick.imageloader.loader.task.DisplayTask;
 import dev.nick.imageloader.loader.task.DisplayTaskImpl;
 import dev.nick.imageloader.loader.task.DisplayTaskMonitor;
 import dev.nick.imageloader.loader.task.DisplayTaskRecord;
 import dev.nick.imageloader.loader.task.FutureImageTask;
+import dev.nick.imageloader.loader.task.MokeFutureImageTask;
 import dev.nick.imageloader.loader.task.TaskManager;
 import dev.nick.imageloader.loader.task.TaskManagerImpl;
 import dev.nick.imageloader.logger.Logger;
@@ -84,7 +89,7 @@ import dev.nick.imageloader.utils.Preconditions;
 /**
  * Main class of {@link ImageLoader} library.
  */
-public class ImageLoader implements DisplayTaskMonitor,
+public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
         Handler.Callback,
         FutureImageTask.TaskActionListener,
         Forkable<ImageLoader, LoaderConfig> {
@@ -214,14 +219,14 @@ public class ImageLoader implements DisplayTaskMonitor,
     }
 
     /**
-     * Start a quick optional param builder,
+     * Start a quick optional transaction builder,
      * do not forget to call {@link Transaction#start()} to start this task.
      *
      * @return An optional params wrapper.
      * @see Transaction
      */
     public Transaction load() {
-        return new Transaction(this);
+        return new BitmapTransaction(this);
     }
 
     /**
@@ -248,11 +253,11 @@ public class ImageLoader implements DisplayTaskMonitor,
      * @param option   {@link DisplayOption} is options using when display the image.
      * @param listener The progress listener using to watch the progress of the loading.
      */
-    void display(@NonNull String url,
-                 @NonNull ImageSettable settable,
-                 @Nullable DisplayOption option,
-                 @Nullable LoadingListener listener,
-                 @Nullable Priority priority) {
+    FutureTask display(@NonNull String url,
+                       @NonNull ImageSettable settable,
+                       @Nullable DisplayOption option,
+                       @Nullable LoadingListener listener,
+                       @Nullable Priority priority) {
 
         ensureNotTerminated();
 
@@ -282,7 +287,7 @@ public class ImageLoader implements DisplayTaskMonitor,
                     result.result = cached;
                     listener.onComplete(result);
                 }
-                return;
+                return new MokeFutureImageTask<>(BitmapResult.newResult(cached));
             }
         }
 
@@ -309,13 +314,13 @@ public class ImageLoader implements DisplayTaskMonitor,
                             result.result = cached;
                             listener.onComplete(result);
                         }
-                        return;
+                        return new MokeFutureImageTask<>(BitmapResult.newResult(cached));
                     }
                 }
             }
         }
 
-        loadAndDisplay(loadingUrl, settable, option, listener, record, priority);
+        return loadAndDisplay(loadingUrl, settable, option, listener, record, priority);
     }
 
     private DisplayTaskRecord createTaskRecord(ImageSettable settable) {
@@ -331,12 +336,12 @@ public class ImageLoader implements DisplayTaskMonitor,
         applyImageSettings(showWhenLoading, settable, null);
     }
 
-    private void loadAndDisplay(String url,
-                                ImageSettable settable,
-                                DisplayOption option,
-                                LoadingListener listener,
-                                DisplayTaskRecord record,
-                                Priority priority) {
+    private FutureTask loadAndDisplay(String url,
+                                      ImageSettable settable,
+                                      DisplayOption option,
+                                      LoadingListener listener,
+                                      DisplayTaskRecord record,
+                                      Priority priority) {
 
         ImageQuality imageQuality = option.getQuality();
 
@@ -372,6 +377,7 @@ public class ImageLoader implements DisplayTaskMonitor,
 
         // Push it to the request queue.
         mTaskHandleService.push(future);
+        return future;
     }
 
     private DisplayOption assignOptionIfNull(DisplayOption option) {
@@ -782,7 +788,7 @@ public class ImageLoader implements DisplayTaskMonitor,
     }
 
     @Override
-    public boolean shouldRun(@NonNull DisplayTask task) {
+    public boolean shouldRun(@NonNull DisplayTask<Bitmap> task) {
         if (!checkInRunningState()) return false;
         // Check if this task is dirty.
         boolean isTaskDirty = isTaskDirty(task.getTaskRecord());
@@ -870,7 +876,7 @@ public class ImageLoader implements DisplayTaskMonitor,
         }
     }
 
-    public static class Transaction {
+    public static class Transaction<T> {
 
         private String url;
         private DisplayOption option;
@@ -884,38 +890,83 @@ public class ImageLoader implements DisplayTaskMonitor,
             this.loader = loader;
         }
 
+        /**
+         * @param url Image source from, one of {@link dev.nick.imageloader.loader.ImageSource}
+         * @return Instance of Transaction.
+         */
         public Transaction from(@NonNull String url) {
             this.url = Preconditions.checkNotNull(url);
             return Transaction.this;
         }
 
+        /**
+         * @param option {@link DisplayOption} is options using when display the image.
+         *               * @param settable Target {@link ImageSettable} to display the image.
+         * @return Instance of Transaction.
+         */
         public Transaction option(@NonNull DisplayOption option) {
             this.option = Preconditions.checkNotNull(option);
             return Transaction.this;
         }
 
+        /**
+         * @param listener The progress listener using to watch the progress of the loading.
+         * @return Instance of Transaction.
+         */
         public Transaction listener(@NonNull LoadingListener listener) {
             this.listener = Preconditions.checkNotNull(listener);
             return Transaction.this;
         }
 
+        /**
+         * @param priority Priority for this task.
+         * @return Instance of Transaction.
+         */
         public Transaction priority(@NonNull Priority priority) {
             this.priority = Preconditions.checkNotNull(priority);
             return Transaction.this;
         }
 
+        /**
+         * @param settable The View to display the image.
+         * @return Instance of Transaction.
+         */
         public Transaction into(@NonNull ImageSettable settable) {
             this.settable = Preconditions.checkNotNull(settable);
             return Transaction.this;
         }
 
+        /**
+         * @param view The View to display the image.
+         * @return Instance of Transaction.
+         */
         public Transaction into(@NonNull ImageView view) {
             this.settable = new ImageViewDelegate(view);
             return Transaction.this;
         }
 
+        /**
+         * Call this to start this transaction.
+         */
         public void start() {
             this.loader.mTransactionService.push(this);
+        }
+
+        /**
+         * Call this to start this transaction synchronously.
+         *
+         * @return Result for this transaction.
+         */
+        public
+        @Nullable
+        Result<T> startSynchronously() {
+            try {
+                //noinspection unchecked
+                return (Result<T>) loader.display(url, noneNullSettable(), option, listener, priority).get();
+            } catch (InterruptedException | ExecutionException | CancellationException ignored) {
+
+            }
+            return null;
         }
 
         private void startInternal() {
@@ -963,6 +1014,13 @@ public class ImageLoader implements DisplayTaskMonitor,
         @Override
         public int hashCode() {
             return url.hashCode();
+        }
+    }
+
+    public class BitmapTransaction extends Transaction<BitmapResult> {
+
+        private BitmapTransaction(@NonNull ImageLoader loader) {
+            super(loader);
         }
     }
 

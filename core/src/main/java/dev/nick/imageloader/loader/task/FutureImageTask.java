@@ -16,23 +16,25 @@
 
 package dev.nick.imageloader.loader.task;
 
+import android.graphics.Bitmap;
 import android.support.annotation.Nullable;
 
 import java.util.concurrent.FutureTask;
 
+import dev.nick.imageloader.loader.result.Result;
 import dev.nick.imageloader.queue.Priority;
 import dev.nick.imageloader.queue.PriorityRemarkable;
 
-public class FutureImageTask extends FutureTask<Void> implements PriorityRemarkable {
+public class FutureImageTask extends FutureTask<Result<Bitmap>> implements PriorityRemarkable {
 
     private TaskActionListener mListener;
-    private DisplayTask mTask;
+    private DisplayTask<Bitmap> mTask;
 
     private Priority mPriority;
 
     private boolean mCancelOthersBeforeRun;
 
-    public FutureImageTask(DisplayTask task, @Nullable TaskActionListener listener, boolean cancelOthersBeforeRun) {
+    public FutureImageTask(DisplayTask<Bitmap> task, @Nullable TaskActionListener listener, boolean cancelOthersBeforeRun) {
         super(task);
         this.mTask = task;
         this.mListener = listener;
@@ -70,7 +72,7 @@ public class FutureImageTask extends FutureTask<Void> implements PriorityRemarka
         return mCancelOthersBeforeRun;
     }
 
-    public DisplayTask getListenableTask() {
+    public DisplayTask<Bitmap> getListenableTask() {
         return mTask;
     }
 

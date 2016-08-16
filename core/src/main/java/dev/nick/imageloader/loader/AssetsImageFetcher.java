@@ -30,7 +30,7 @@ import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
 
-public class AssetsImageFetcher extends BaseImageFetcher {
+public class AssetsImageFetcher extends BaseImageFetcher<BitmapResult> {
 
     private AssetManager mAssets;
 
@@ -39,10 +39,10 @@ public class AssetsImageFetcher extends BaseImageFetcher {
     }
 
     @Override
-    public void fetchFromUrl(@NonNull String url,
-                             @NonNull DecodeSpec decodeSpec,
-                             @Nullable ProgressListener<BitmapResult> progressListener,
-                             @Nullable ErrorListener errorListener) throws Exception {
+    public BitmapResult fetchFromUrl(@NonNull String url,
+                                     @NonNull DecodeSpec decodeSpec,
+                                     @Nullable ProgressListener<BitmapResult> progressListener,
+                                     @Nullable ErrorListener errorListener) throws Exception {
 
         super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);
 
@@ -55,7 +55,7 @@ public class AssetsImageFetcher extends BaseImageFetcher {
             in = mAssets.open(path);
         } catch (IOException e) {
             callOnError(errorListener, new Cause(e));
-            return;
+            return null;
         }
 
         callOnStart(progressListener);
@@ -85,12 +85,14 @@ public class AssetsImageFetcher extends BaseImageFetcher {
             tempBitmap = BitmapFactory.decodeStream(in, rect, decodeOptions);
         } catch (OutOfMemoryError error) {
             callOnError(errorListener, new Cause(error));
-            return;
+            return null;
         } finally {
             if (in != null) {
                 in.close();
             }
         }
-        callOnComplete(progressListener, newResult(tempBitmap));
+        BitmapResult result = newResult(tempBitmap);
+        callOnComplete(progressListener, result);
+        return result;
     }
 }

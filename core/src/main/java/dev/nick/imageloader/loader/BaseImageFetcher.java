@@ -31,7 +31,7 @@ import dev.nick.imageloader.loader.result.ErrorListener;
 import dev.nick.imageloader.logger.Logger;
 import dev.nick.imageloader.logger.LoggerManager;
 
-class BaseImageFetcher implements ImageFetcher {
+class BaseImageFetcher<T> implements ImageFetcher<T> {
 
     static final int UNCONSTRAINED = -1;
 
@@ -54,12 +54,13 @@ class BaseImageFetcher implements ImageFetcher {
     }
 
     @Override
-    public void fetchFromUrl(@NonNull String url,
-                             @NonNull DecodeSpec decodeSpec,
-                             @Nullable ProgressListener<BitmapResult> progressListener,
-                             @Nullable ErrorListener errorListener)
+    public T fetchFromUrl(@NonNull String url,
+                          @NonNull DecodeSpec decodeSpec,
+                          @Nullable ProgressListener<BitmapResult> progressListener,
+                          @Nullable ErrorListener errorListener)
             throws Exception {
         if (!mPrepared.get()) throw new IllegalStateException("Fetcher not prepared.");
+        return null;
     }
 
     @Override
@@ -73,9 +74,7 @@ class BaseImageFetcher implements ImageFetcher {
     }
 
     protected BitmapResult newResult(Bitmap bitmap) {
-        BitmapResult result = new BitmapResult();
-        result.result = bitmap;
-        return result;
+        return BitmapResult.newResult(bitmap);
     }
 
     protected void callOnStart(ProgressListener<BitmapResult> listener) {

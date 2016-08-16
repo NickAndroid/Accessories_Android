@@ -29,17 +29,17 @@ import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
 import dev.nick.imageloader.utils.Preconditions;
 
-public class FileImageFetcher extends BaseImageFetcher {
+public class FileImageFetcher extends BaseImageFetcher<BitmapResult> {
 
     public FileImageFetcher(PathSplitter<String> splitter) {
         super(splitter);
     }
 
     @Override
-    public void fetchFromUrl(@NonNull String url,
-                             @NonNull DecodeSpec decodeSpec,
-                             @Nullable ProgressListener<BitmapResult> progressListener,
-                             @Nullable ErrorListener errorListener) throws Exception {
+    public BitmapResult fetchFromUrl(@NonNull String url,
+                                     @NonNull DecodeSpec decodeSpec,
+                                     @Nullable ProgressListener<BitmapResult> progressListener,
+                                     @Nullable ErrorListener errorListener) throws Exception {
 
         super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);
 
@@ -47,7 +47,7 @@ public class FileImageFetcher extends BaseImageFetcher {
         File file = new File(path);
         if (!file.exists()) {
             callOnError(errorListener, new Cause(new FileNotFoundException(String.format("File %s not found.", url))));
-            return;
+            return null;
         }
 
         BitmapFactory.Options decodeOptions = null;
@@ -80,10 +80,12 @@ public class FileImageFetcher extends BaseImageFetcher {
             tempBitmap = BitmapFactory.decodeFile(path, decodeOptions);
         } catch (OutOfMemoryError error) {
             callOnError(errorListener, new Cause(error));
-            return;
+            return null;
         }
 
-        callOnComplete(progressListener, newResult(tempBitmap));
+        BitmapResult result = newResult(tempBitmap);
+        callOnComplete(progressListener, result);
+        return result;
     }
 
     @Override

@@ -18,6 +18,6 @@ package dev.nick.imageloader.loader.task;
 
 import android.support.annotation.NonNull;
 
-public interface DisplayTaskMonitor {
-    boolean shouldRun(@NonNull DisplayTask task);
+public interface DisplayTaskMonitor<T> {
+    boolean shouldRun(@NonNull DisplayTask<T> task);
 }

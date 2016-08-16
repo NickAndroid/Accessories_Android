@@ -16,5 +16,21 @@
 
 package dev.nick.imageloader.loader.task;
 
-public interface DisplayTask<T> extends ListenableTask<DisplayTaskRecord, T> {
+import java.util.concurrent.FutureTask;
+
+import dev.nick.imageloader.loader.result.Result;
+
+public class MokeFutureImageTask<T> extends FutureTask<Result<T>> {
+
+    static Runnable sEmptyWorker = new Runnable() {
+        @Override
+        public void run() {
+            // Empty.
+        }
+    };
+
+    public MokeFutureImageTask(final Result<T> base) {
+        super(sEmptyWorker, base);
+        run();
+    }
 }

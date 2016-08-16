@@ -46,6 +46,10 @@
             android:label="LoadImageTest" />
 
         <activity
+            android:name=".SyncLoadTest"
+            android:label="SyncLoadTest" />
+
+        <activity
             android:name=".Usage"
             android:label="Usage" />
 
