@@ -30,7 +30,7 @@ import dev.nick.imageloader.display.handler.BlurBitmapHandler;
 
 public class DrawableImageTest extends BaseTest {
 
-    final String urlDrawable = "drawable://girl";
+    final String urlDrawable = "drawable://tree";
 
     @FindView(id = R.id.image)
     ImageView imageView;

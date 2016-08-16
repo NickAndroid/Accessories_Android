@@ -33,7 +33,7 @@ import dev.nick.imageloader.queue.Priority;
 
 public class AssetsImageTest extends BaseTest {
 
-    final String urlAssets = "assets://girl.jpg";
+    final String urlAssets = "assets://tree.jpg";
 
     @FindView(id = R.id.image)
     ImageView imageView;
