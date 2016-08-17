@@ -29,22 +29,22 @@ import dev.nick.imageloader.display.ImageQuality;
 import dev.nick.imageloader.loader.DecodeSpec;
 import dev.nick.imageloader.loader.ImageFetcher;
 import dev.nick.imageloader.loader.ImageSource;
+import dev.nick.imageloader.loader.ImageSourceType;
 import dev.nick.imageloader.loader.ProgressListener;
 import dev.nick.imageloader.loader.ViewSpec;
-import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
 
 public class BitmapDisplayTaskImpl implements DisplayTask<Bitmap> {
 
-    private String mUrl;
+    private ImageSource<Bitmap> mImageSource;
 
     private ViewSpec mViewSpec;
     private ImageQuality mQuality;
 
     private LoaderConfig mLoaderConfig;
 
-    private ProgressListener<BitmapResult> mProgressListener;
+    private ProgressListener<Bitmap> mProgressListener;
     private ErrorListener mErrorListener;
 
     private DisplayTaskMonitor<Bitmap> mDisplayTaskMonitor;
@@ -53,21 +53,21 @@ public class BitmapDisplayTaskImpl implements DisplayTask<Bitmap> {
 
     private Context mContext;
 
-    private BitmapResult mResult;
+    private Bitmap mResult;
 
     public BitmapDisplayTaskImpl(Context context,
                                  LoaderConfig loaderConfig,
                                  DisplayTaskMonitor<Bitmap> displayTaskMonitor,
-                                 String url,
+                                 ImageSource<Bitmap> url,
                                  ViewSpec spec,
                                  ImageQuality quality,
-                                 ProgressListener<BitmapResult> progressListener,
+                                 ProgressListener<Bitmap> progressListener,
                                  ErrorListener errorListener,
                                  DisplayTaskRecord taskRecord) {
         this.mContext = context;
         this.mLoaderConfig = loaderConfig;
         this.mDisplayTaskMonitor = displayTaskMonitor;
-        this.mUrl = url;
+        this.mImageSource = url;
         this.mViewSpec = spec;
         this.mQuality = quality;
         this.mProgressListener = progressListener;
@@ -82,13 +82,13 @@ public class BitmapDisplayTaskImpl implements DisplayTask<Bitmap> {
 
         if (!mDisplayTaskMonitor.shouldRun(this)) return;
 
-        ImageSource<BitmapResult> source = ImageSource.of(mUrl);
+        ImageSourceType<Bitmap> source = mImageSource.getType();
 
-        ImageFetcher<BitmapResult> fetcher = source.getFetcher(mContext, mLoaderConfig);
+        ImageFetcher<Bitmap> fetcher = source.getFetcher(mContext, mLoaderConfig);
 
         DecodeSpec decodeSpec = new DecodeSpec(mQuality, mViewSpec);
         try {
-            mResult = fetcher.fetchFromUrl(mUrl, decodeSpec, mProgressListener, mErrorListener);
+            mResult = fetcher.fetchFromUrl(mImageSource.getUrl(), decodeSpec, mProgressListener, mErrorListener);
         } catch (InterruptedIOException | InterruptedException ignored) {
 
         } catch (Exception e) {
@@ -102,7 +102,7 @@ public class BitmapDisplayTaskImpl implements DisplayTask<Bitmap> {
     }
 
     @Override
-    public BitmapResult call() throws Exception {
+    public Bitmap call() throws Exception {
         run();
         return mResult;
     }
@@ -110,16 +110,16 @@ public class BitmapDisplayTaskImpl implements DisplayTask<Bitmap> {
     @NonNull
     @Override
     public String getUrl() {
-        return mUrl;
+        return mImageSource.getUrl();
     }
 
     @Override
-    public ProgressListener<BitmapResult> getProgressListener() {
+    public ProgressListener<Bitmap> getProgressListener() {
         return mProgressListener;
     }
 
     @Override
-    public void setProgressListener(@Nullable ProgressListener<BitmapResult> listener) {
+    public void setProgressListener(@Nullable ProgressListener<Bitmap> listener) {
         mProgressListener = listener;
     }
 }

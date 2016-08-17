@@ -18,36 +18,36 @@ package dev.nick.imageloader.loader;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import dev.nick.imageloader.LoaderConfig;
-import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
 
-public class ContentImageFetcher extends BaseImageFetcher<BitmapResult> {
+public class ContentImageFetcher extends BaseImageFetcher<Bitmap> {
 
     @NonNull
-    ImageFetcher<BitmapResult> mFileImageFetcher;
+    ImageFetcher<Bitmap> mFileImageFetcher;
 
-    public ContentImageFetcher(PathSplitter<String> splitter, @NonNull final ImageFetcher<BitmapResult> fileImageFetcher) {
+    public ContentImageFetcher(PathSplitter<String> splitter, @NonNull final ImageFetcher<Bitmap> fileImageFetcher) {
         super(splitter);
         this.mFileImageFetcher = fileImageFetcher;
     }
 
     @Override
-    public ImageFetcher prepare(Context context, LoaderConfig config) {
+    public ImageFetcher<Bitmap> prepare(Context context, LoaderConfig config) {
         mFileImageFetcher.prepare(context, config);
         return super.prepare(context, config);
     }
 
     @Override
-    public BitmapResult fetchFromUrl(@NonNull String url,
+    public Bitmap fetchFromUrl(@NonNull String url,
                                      @NonNull DecodeSpec decodeSpec,
-                                     @Nullable ProgressListener<BitmapResult> progressListener,
+                                     @Nullable ProgressListener<Bitmap> progressListener,
                                      @Nullable ErrorListener errorListener)
             throws Exception {
 
@@ -83,7 +83,7 @@ public class ContentImageFetcher extends BaseImageFetcher<BitmapResult> {
 
             String filePath = cursor.getString(index);
 
-            return mFileImageFetcher.fetchFromUrl(ImageSource.FILE.getPrefix() + filePath,
+            return mFileImageFetcher.fetchFromUrl(ImageSourceType.FILE.getPrefix() + filePath,
                     decodeSpec, progressListener, errorListener);
         } finally {
             cursor.close();
