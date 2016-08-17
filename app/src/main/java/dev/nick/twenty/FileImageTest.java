@@ -102,7 +102,6 @@ public class FileImageTest extends BaseTest {
                 ImageLoader.shared().load()
                         .from(uri)
                         .option(DisplayOption.builder()
-                                .showOnLoading(R.drawable.aio_image_default)
                                 .showWithDefault(R.drawable.aio_image_fail)
                                 .imageQuality(ImageQuality.OPT)
                                 .viewMaybeReused()
