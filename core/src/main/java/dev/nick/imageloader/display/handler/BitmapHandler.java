@@ -16,12 +16,11 @@
 
 package dev.nick.imageloader.display.handler;
 
-import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
 import dev.nick.imageloader.display.ImageSettable;
 
-public interface BitmapHandler {
+public interface BitmapHandler<T> {
     @NonNull
-    Bitmap process(@NonNull Bitmap in, @NonNull ImageSettable settable);
+    T process(@NonNull T in, @NonNull ImageSettable settable);
 }

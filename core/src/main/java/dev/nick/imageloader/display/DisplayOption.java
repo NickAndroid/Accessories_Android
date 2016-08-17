@@ -21,7 +21,7 @@ import android.support.annotation.DrawableRes;
 import dev.nick.imageloader.display.animator.ImageAnimator;
 import dev.nick.imageloader.display.handler.BitmapHandler;
 
-public class DisplayOption {
+public class DisplayOption<T> {
 
     private int defaultImgRes;
     private int loadingImgRes;

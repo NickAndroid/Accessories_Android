@@ -99,7 +99,7 @@ public class FileImageTest extends BaseTest {
                 // String uri = mArtworkUri + File.separator + tracks.get(position).getAlbumId();
                 String uri = ImageSourceType.FILE.getPrefix() + tracks.get(position).getUrl();
 
-                ImageLoader.shared().load()
+                ImageLoader.shared().loadBitmap()
                         .from(uri)
                         .option(DisplayOption.builder()
                                 .showWithDefault(R.drawable.aio_image_fail)

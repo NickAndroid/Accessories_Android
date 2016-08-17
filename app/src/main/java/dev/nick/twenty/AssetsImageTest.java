@@ -16,6 +16,7 @@
 
 package dev.nick.twenty;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.widget.ImageView;
@@ -50,9 +51,14 @@ public class AssetsImageTest extends BaseTest {
     protected void onStart() {
         super.onStart();
         ImageLoader.shared()
-                .load()
+                .loadBitmap()
                 .from(urlAssets)
-                .listener(new LoadingListener.Stub())
+                .listener(new LoadingListener.Stub() {
+                    @Override
+                    public void onComplete(@Nullable Bitmap result) {
+                        super.onComplete(result);
+                    }
+                })
                 .option(DisplayOption.builder()
                         .showWithDefault(R.drawable.ic_launcher)
                         .bitmapHandler(new BlackWhiteBitmapHandler())

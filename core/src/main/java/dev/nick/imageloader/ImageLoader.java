@@ -44,6 +44,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import dev.nick.imageloader.annotation.LoaderApi;
 import dev.nick.imageloader.cache.CacheManager;
 import dev.nick.imageloader.control.Forkable;
 import dev.nick.imageloader.control.Freezer;
@@ -118,22 +119,16 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
     private Context mContext;
     private Handler mUIThreadHandler;
 
-    @VisibleForTesting
     private CacheManager mCacheManager;
-    @VisibleForTesting
     private LoaderConfig mConfig;
-    @VisibleForTesting
     private RequestQueueManager<FutureImageTask> mTaskHandleService;
-    @VisibleForTesting
     private RequestQueueManager<Transaction> mTransactionService;
 
     private Logger mLogger;
 
     private long mClearTaskRequestedTimeMills;
 
-    @VisibleForTesting
     private ThreadPoolExecutor mLoadingService, mFallbackService;
-    @VisibleForTesting
     private ExecutorService mImageSettingsScheduler;
 
     private Freezer mFreezer;
@@ -181,6 +176,7 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
         this.mLogger.verbose(String.format("Create loader-%d with config %s", loaderId, config));
     }
 
+    @LoaderApi
     private static ImageLoader clone(ImageLoader from, LoaderConfig config) {
         return new ImageLoader(from.mContext, from.mCacheManager, config);
     }
@@ -191,6 +187,7 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
      * @param context An application {@link Context} is preferred.
      * @since 1.0.1
      */
+    @LoaderApi
     public static void createShared(Context context) {
         createShared(context, null);
     }
@@ -202,6 +199,7 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
      * @param config  Configuration of this loader.
      * @since 1.0.1
      */
+    @LoaderApi
     public static void createShared(Context context, LoaderConfig config) {
         if (sLoader == null || sLoader.isTerminated()) {
             sLoader = new ImageLoader(context, null, config);
@@ -214,8 +212,9 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
      * @return Single instance of {@link ImageLoader}
      * @since 1.0.1
      */
+    @LoaderApi
     public static ImageLoader shared() {
-        return Preconditions.checkNotNull(sLoader, "Call createShared first");
+        return Preconditions.checkNotNull(sLoader, "Call ImageLoader#createShared first");
     }
 
     /**
@@ -225,22 +224,24 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
      * @return An optional params wrapper.
      * @see Transaction
      */
-    public Transaction load() {
-        return new BitmapTransaction(this);
+    @LoaderApi
+    public Transaction<Bitmap> loadBitmap() {
+        return new Transaction<>(this);
     }
 
     /**
      * Display image from the from to the view.
      *
-     * @param source   Image source from, one of {@link ImageSource}
-     * @param settable Target {@link ImageSettable} to display the image.
-     * @param option   {@link DisplayOption} is options using when display the image.
-     * @param listener The progress listener using to watch the progress of the loading.
+     * @param source           Image source from, one of {@link ImageSource}
+     * @param settable         Target {@link ImageSettable} to display the image.
+     * @param option           {@link DisplayOption} is options using when display the image.
+     * @param progressListener The progress progressListener using to watch the progress of the loading.
      */
     <X> Future<X> display(@NonNull ImageSource<X> source,
                           @NonNull ImageSettable settable,
                           @Nullable DisplayOption option,
-                          @Nullable LoadingListener listener,
+                          @Nullable ProgressListener<X> progressListener,
+                          @Nullable ErrorListener errorListener,
                           @Nullable Priority priority) {
 
         ensureNotTerminated();
@@ -266,10 +267,11 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
                         settable,
                         option.isAnimateOnlyNewLoaded() ? null : option.getAnimator());
                 // Call complete.
-                if (listener != null) {
-                    listener.onComplete(cached);
+                if (progressListener != null) {
+                    progressListener.onComplete(cached);
                 }
-                return (Future<X>) new MokeFutureImageTask<>(cached);
+                Future future = new MokeFutureImageTask<>(cached);
+                return future;
             }
         }
 
@@ -291,17 +293,18 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
                                 settable,
                                 option.isAnimateOnlyNewLoaded() ? null : option.getAnimator());
                         // Call complete.
-                        if (listener != null) {
-                            listener.onComplete(cached);
+                        if (progressListener != null) {
+                            progressListener.onComplete(cached);
                         }
-                        return (Future<X>) new MokeFutureImageTask<>(cached);
+                        Future future = new MokeFutureImageTask<>(cached);
+                        return future;
                     }
                 }
                 source.setUrl(loadingUrl);
             }
         }
 
-        return loadAndDisplay(source, settable, option, listener, record, priority);
+        return loadAndDisplay(source, settable, option, progressListener, errorListener, record, priority);
     }
 
     private DisplayTaskRecord createTaskRecord(ImageSettable settable) {
@@ -320,7 +323,8 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
     private <X> Future<X> loadAndDisplay(ImageSource<X> source,
                                          ImageSettable settable,
                                          DisplayOption option,
-                                         LoadingListener listener,
+                                         ProgressListener<X> progressListener,
+                                         ErrorListener errorListener,
                                          DisplayTaskRecord record,
                                          Priority priority) {
 
@@ -329,7 +333,7 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
         ViewSpec viewSpec = new ViewSpec(settable.getWidth(), settable.getHeight());
 
         ProgressListenerDelegate progressListenerDelegate = new ProgressListenerDelegate(
-                listener,
+                progressListener,
                 viewSpec,
                 option,
                 settable,
@@ -338,8 +342,8 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
 
         ErrorListenerDelegate errorListenerDelegate = null;
 
-        if (listener != null) {
-            errorListenerDelegate = new ErrorListenerDelegate(listener);
+        if (progressListener != null) {
+            errorListenerDelegate = new ErrorListenerDelegate(errorListener);
         }
 
         BitmapDisplayTaskImpl imageTask = new BitmapDisplayTaskImpl(
@@ -474,19 +478,19 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
         return true;
     }
 
-    private void callOnStart(ProgressListener listener) {
+    private <T> void callOnStart(ProgressListener<T> listener) {
         if (listener != null) {
             mUIThreadHandler.obtainMessage(MSG_CALL_ON_START, listener).sendToTarget();
         }
     }
 
-    private void callOnCancel(ProgressListener listener) {
+    private <T> void callOnCancel(ProgressListener<T> listener) {
         if (listener != null) {
             mUIThreadHandler.obtainMessage(MSG_CALL_ON_CANCEL, listener).sendToTarget();
         }
     }
 
-    private void callOnProgressUpdate(ProgressListener<Bitmap> listener, float progress) {
+    private <T> void callOnProgressUpdate(ProgressListener<T> listener, float progress) {
         if (listener != null) {
             ProgressParams progressParams = new ProgressParams();
             progressParams.progress = progress;
@@ -495,7 +499,7 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
         }
     }
 
-    private void callOnComplete(ProgressListener<Bitmap> listener, Bitmap result) {
+    private <T> void callOnComplete(ProgressListener<T> listener, T result) {
         if (listener != null) {
             CompleteParams completeParams = new CompleteParams();
             completeParams.progressListener = listener;
@@ -525,7 +529,7 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
         progressParams.progressListener.onProgressUpdate(progressParams.progress);
     }
 
-    private void onCallOnComplete(CompleteParams params) {
+    private<T> void onCallOnComplete(CompleteParams<T> params) {
         params.progressListener.onComplete(params.result);
     }
 
@@ -839,14 +843,14 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
         ErrorListener listener;
     }
 
-    private static class CompleteParams {
-        Bitmap result;
-        ProgressListener<Bitmap> progressListener;
+    private static class CompleteParams<T> {
+        T result;
+        ProgressListener<T> progressListener;
     }
 
-    private static class ProgressParams {
+    private static class ProgressParams<T> {
         float progress;
-        ProgressListener<Bitmap> progressListener;
+        ProgressListener<T> progressListener;
     }
 
     private static class LoaderFactory {
@@ -861,7 +865,8 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
 
         private ImageSource<T> imageSource;
         private DisplayOption option;
-        private LoadingListener listener;
+        private ProgressListener<T> progressListener;
+        private ErrorListener errorListener;
         private Priority priority;
         private ImageSettable settable;
 
@@ -875,8 +880,10 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
          * @param url Image source from, one of {@link ImageSourceType}
          * @return Instance of Transaction.
          */
-        public Transaction from(@NonNull String url) {
-            this.imageSource = (ImageSource<T>) new ImageSource<>(ImageSourceType.of(Preconditions.checkNotNull(url)), url);
+        @LoaderApi
+        public Transaction<T> from(@NonNull String url) {
+            ImageSourceType<T> type = ImageSourceType.of(Preconditions.checkNotNull(url));
+            this.imageSource = new ImageSource<>(type, url);
             return Transaction.this;
         }
 
@@ -885,17 +892,19 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
          *               * @param settable Target {@link ImageSettable} to display the image.
          * @return Instance of Transaction.
          */
-        public Transaction option(@NonNull DisplayOption option) {
+        @LoaderApi
+        public Transaction<T> option(@NonNull DisplayOption option) {
             this.option = Preconditions.checkNotNull(option);
             return Transaction.this;
         }
 
         /**
-         * @param listener The progress listener using to watch the progress of the loading.
+         * @param listener The progress progressListener using to watch the progress of the loading.
          * @return Instance of Transaction.
          */
-        public Transaction listener(@NonNull LoadingListener listener) {
-            this.listener = Preconditions.checkNotNull(listener);
+        @LoaderApi
+        public Transaction<T> listener(@NonNull ProgressListener<T> listener) {
+            this.progressListener = Preconditions.checkNotNull(listener);
             return Transaction.this;
         }
 
@@ -903,7 +912,8 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
          * @param priority Priority for this task.
          * @return Instance of Transaction.
          */
-        public Transaction priority(@NonNull Priority priority) {
+        @LoaderApi
+        public Transaction<T> priority(@NonNull Priority priority) {
             this.priority = Preconditions.checkNotNull(priority);
             return Transaction.this;
         }
@@ -912,7 +922,8 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
          * @param settable The View to display the image.
          * @return Instance of Transaction.
          */
-        public Transaction into(@NonNull ImageSettable settable) {
+        @LoaderApi
+        public Transaction<T> into(@NonNull ImageSettable settable) {
             this.settable = Preconditions.checkNotNull(settable);
             return Transaction.this;
         }
@@ -921,7 +932,8 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
          * @param view The View to display the image.
          * @return Instance of Transaction.
          */
-        public Transaction into(@NonNull ImageView view) {
+        @LoaderApi
+        public Transaction<T> into(@NonNull ImageView view) {
             this.settable = new ImageViewDelegate(view);
             return Transaction.this;
         }
@@ -929,6 +941,7 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
         /**
          * Call this to start this transaction.
          */
+        @LoaderApi
         public void start() {
             this.loader.mTransactionService.push(this);
         }
@@ -940,9 +953,10 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
          */
         public
         @Nullable
+        @LoaderApi
         T startSynchronously() {
             try {
-                return loader.display(imageSource, noneNullSettable(), option, listener, priority).get();
+                return loader.display(imageSource, noneNullSettable(), option, progressListener, errorListener, priority).get();
             } catch (InterruptedException | ExecutionException | CancellationException ignored) {
 
             }
@@ -950,7 +964,7 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
         }
 
         private void startInternal() {
-            loader.display(imageSource, noneNullSettable(), option, listener, priority);
+            loader.display(imageSource, noneNullSettable(), option, progressListener, errorListener, priority);
         }
 
         private ImageSettable noneNullSettable() {
@@ -997,13 +1011,6 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
         }
     }
 
-    public class BitmapTransaction extends Transaction<Bitmap> {
-
-        private BitmapTransaction(@NonNull ImageLoader loader) {
-            super(loader);
-        }
-    }
-
     class ImageSettingsLocker {
 
         private final static long MAX_DELAY = 2 * 1000;
@@ -1029,9 +1036,9 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
         }
     }
 
-    private class ProgressListenerDelegate implements ProgressListener<Bitmap> {
+    private class ProgressListenerDelegate<T> implements ProgressListener<T> {
 
-        private ProgressListener<Bitmap> listener;
+        private ProgressListener<T> listener;
 
         @NonNull
         private ImageSettable settable;
@@ -1044,7 +1051,7 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
         private Boolean canceled = Boolean.FALSE;
         private Boolean isTaskDirty = null;
 
-        public ProgressListenerDelegate(ProgressListener<Bitmap> listener,
+        public ProgressListenerDelegate(ProgressListener<T> listener,
                                         ViewSpec viewSpec,
                                         DisplayOption option,
                                         @NonNull ImageSettable settable,
@@ -1081,7 +1088,7 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
         }
 
         @Override
-        public void onComplete(final Bitmap result) {
+        public void onComplete(final T result) {
 
             if (result == null) {
                 return;

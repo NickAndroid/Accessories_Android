@@ -209,7 +209,7 @@ public class NetworkImageTest extends BaseTest {
 
                 ImageLoader.shared()
                         .cancel(holder.imageView)
-                        .load()
+                        .loadBitmap()
                         .from(uri)
                         .option(DisplayOption.builder()
                                 .oneAfterOne()

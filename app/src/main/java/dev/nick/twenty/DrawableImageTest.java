@@ -47,7 +47,7 @@ public class DrawableImageTest extends BaseTest {
     protected void onStart() {
         super.onStart();
         ImageLoader.shared()
-                .load()
+                .loadBitmap()
                 .from(urlDrawable)
                 .option(DisplayOption.builder()
                         .showWithDefault(R.drawable.ic_launcher)

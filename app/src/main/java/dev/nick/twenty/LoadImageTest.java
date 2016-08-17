@@ -246,7 +246,7 @@ public class LoadImageTest extends BaseTest {
                     }
                 };
 
-                ImageLoader.shared().load()
+                ImageLoader.shared().loadBitmap()
                         .from(uri)
                         .priority(Priority.HIGH)
                         .listener(loadingListener)
