@@ -26,11 +26,10 @@ import android.support.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 
-import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
 
-public class AssetsImageFetcher extends BaseImageFetcher<BitmapResult> {
+public class AssetsImageFetcher extends BaseImageFetcher<Bitmap> {
 
     private AssetManager mAssets;
 
@@ -39,10 +38,10 @@ public class AssetsImageFetcher extends BaseImageFetcher<BitmapResult> {
     }
 
     @Override
-    public BitmapResult fetchFromUrl(@NonNull String url,
-                                     @NonNull DecodeSpec decodeSpec,
-                                     @Nullable ProgressListener<BitmapResult> progressListener,
-                                     @Nullable ErrorListener errorListener) throws Exception {
+    public Bitmap fetchFromUrl(@NonNull String url,
+                               @NonNull DecodeSpec decodeSpec,
+                               @Nullable ProgressListener<Bitmap> progressListener,
+                               @Nullable ErrorListener errorListener) throws Exception {
 
         super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);
 
@@ -91,8 +90,7 @@ public class AssetsImageFetcher extends BaseImageFetcher<BitmapResult> {
                 in.close();
             }
         }
-        BitmapResult result = newResult(tempBitmap);
-        callOnComplete(progressListener, result);
-        return result;
+        callOnComplete(progressListener, tempBitmap);
+        return tempBitmap;
     }
 }

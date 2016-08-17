@@ -25,7 +25,6 @@ import android.support.annotation.Nullable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import dev.nick.imageloader.LoaderConfig;
-import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
 import dev.nick.imageloader.logger.Logger;
@@ -56,7 +55,7 @@ class BaseImageFetcher<T> implements ImageFetcher<T> {
     @Override
     public T fetchFromUrl(@NonNull String url,
                           @NonNull DecodeSpec decodeSpec,
-                          @Nullable ProgressListener<BitmapResult> progressListener,
+                          @Nullable ProgressListener<T> progressListener,
                           @Nullable ErrorListener errorListener)
             throws Exception {
         if (!mPrepared.get()) throw new IllegalStateException("Fetcher not prepared.");
@@ -64,7 +63,7 @@ class BaseImageFetcher<T> implements ImageFetcher<T> {
     }
 
     @Override
-    public ImageFetcher prepare(Context context, LoaderConfig config) {
+    public ImageFetcher<T> prepare(Context context, LoaderConfig config) {
         if (mPrepared.compareAndSet(false, true)) {
             this.mContext = context;
             this.mLoaderConfig = config;
@@ -73,15 +72,11 @@ class BaseImageFetcher<T> implements ImageFetcher<T> {
         return this;
     }
 
-    protected BitmapResult newResult(Bitmap bitmap) {
-        return BitmapResult.newResult(bitmap);
-    }
-
-    protected void callOnStart(ProgressListener<BitmapResult> listener) {
+    protected void callOnStart(ProgressListener<T> listener) {
         if (listener != null) listener.onStartLoading();
     }
 
-    protected void callOnComplete(ProgressListener<BitmapResult> listener, BitmapResult result) {
+    protected void callOnComplete(ProgressListener<T> listener, T result) {
         if (listener != null) listener.onComplete(result);
     }
 
@@ -89,7 +84,7 @@ class BaseImageFetcher<T> implements ImageFetcher<T> {
         if (listener != null) listener.onError(cause);
     }
 
-    protected void callOnProgress(ProgressListener<BitmapResult> listener, int progress) {
+    protected void callOnProgress(ProgressListener<T> listener, int progress) {
         if (listener != null) listener.onProgressUpdate(progress);
     }
 

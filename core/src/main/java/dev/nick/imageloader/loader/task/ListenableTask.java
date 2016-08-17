@@ -20,15 +20,13 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import dev.nick.imageloader.loader.ProgressListener;
-import dev.nick.imageloader.loader.result.BitmapResult;
-import dev.nick.imageloader.loader.result.Result;
 
-public interface ListenableTask<X extends TaskRecord, T> extends Task<X, Result<T>> {
+public interface ListenableTask<X extends TaskRecord, T> extends Task<X, T> {
     @NonNull
     String getUrl();
 
     @Nullable
-    ProgressListener<BitmapResult> getProgressListener();
+    ProgressListener<T> getProgressListener();
 
-    void setProgressListener(@Nullable ProgressListener<BitmapResult> listener);
+    void setProgressListener(@Nullable ProgressListener<T> listener);
 }

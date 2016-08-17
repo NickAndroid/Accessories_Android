@@ -25,7 +25,6 @@ import com.nick.scalpel.Scalpel;
 import com.nick.scalpel.annotation.binding.FindView;
 
 import dev.nick.imageloader.ImageLoader;
-import dev.nick.imageloader.loader.result.Result;
 import dev.nick.imageloader.utils.Preconditions;
 
 public class SyncLoadTest extends BaseTest {
@@ -46,12 +45,11 @@ public class SyncLoadTest extends BaseTest {
     @Override
     protected void onStart() {
         super.onStart();
-        Result result = ImageLoader.shared()
+        Bitmap result = (Bitmap) ImageLoader.shared()
                 .load()
                 .from(urlDrawable)
                 .startSynchronously();
         Preconditions.checkNotNull(result);
-        Bitmap bm = (Bitmap) result.result;
-        imageView.setImageBitmap(bm);
+        imageView.setImageBitmap(result);
     }
 }

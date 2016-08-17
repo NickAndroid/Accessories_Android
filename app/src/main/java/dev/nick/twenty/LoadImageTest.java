@@ -17,6 +17,7 @@
 package dev.nick.twenty;
 
 import android.Manifest;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -39,7 +40,6 @@ import java.util.List;
 
 import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.LoadingListener;
-import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.logger.LoggerManager;
 import dev.nick.imageloader.queue.Priority;
@@ -217,13 +217,13 @@ public class LoadImageTest extends BaseTest {
                     }
 
                     @Override
-                    public void onComplete(@Nullable BitmapResult result) {
+                    public void onComplete(@Nullable Bitmap result) {
                         if (result != null) {
                             holder.progressBar.setProgress((int) (1 * 100));
-                            LoggerManager.getLogger(getClass()).debug("onComplete:" + result.result);
+                            LoggerManager.getLogger(getClass()).debug("onComplete:" + result);
                             holder.textView.setText("Completed");
                         }
-                        holder.imageView.setImageBitmap(result != null ? result.result : null);
+                        holder.imageView.setImageBitmap(result != null ? result : null);
                     }
 
                     @Override

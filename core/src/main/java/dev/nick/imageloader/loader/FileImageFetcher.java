@@ -24,22 +24,21 @@ import android.support.annotation.Nullable;
 import java.io.File;
 import java.io.FileNotFoundException;
 
-import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
 import dev.nick.imageloader.utils.Preconditions;
 
-public class FileImageFetcher extends BaseImageFetcher<BitmapResult> {
+public class FileImageFetcher extends BaseImageFetcher<Bitmap> {
 
     public FileImageFetcher(PathSplitter<String> splitter) {
         super(splitter);
     }
 
     @Override
-    public BitmapResult fetchFromUrl(@NonNull String url,
-                                     @NonNull DecodeSpec decodeSpec,
-                                     @Nullable ProgressListener<BitmapResult> progressListener,
-                                     @Nullable ErrorListener errorListener) throws Exception {
+    public Bitmap fetchFromUrl(@NonNull String url,
+                               @NonNull DecodeSpec decodeSpec,
+                               @Nullable ProgressListener<Bitmap> progressListener,
+                               @Nullable ErrorListener errorListener) throws Exception {
 
         super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);
 
@@ -83,13 +82,12 @@ public class FileImageFetcher extends BaseImageFetcher<BitmapResult> {
             return null;
         }
 
-        BitmapResult result = newResult(tempBitmap);
-        callOnComplete(progressListener, result);
-        return result;
+        callOnComplete(progressListener, tempBitmap);
+        return tempBitmap;
     }
 
     @Override
-    protected void callOnStart(ProgressListener<BitmapResult> listener) {
+    protected void callOnStart(ProgressListener<Bitmap> listener) {
         super.callOnStart(listener);
     }
 }
