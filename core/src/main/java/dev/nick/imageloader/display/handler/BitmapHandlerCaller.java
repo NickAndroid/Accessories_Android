@@ -14,25 +14,22 @@
  * limitations under the License.
  */
 
-package dev.nick.imageloader.display;
+package dev.nick.imageloader.display.handler;
 
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
+import android.support.annotation.WorkerThread;
 
-import dev.nick.imageloader.display.animator.ImageAnimator;
+import dev.nick.imageloader.display.ImageSettable;
 
-public class ResImageSettings extends ImageSettings {
+public abstract class BitmapHandlerCaller {
 
-    int mResId;
-
-    public ResImageSettings(ImageAnimator animator, @NonNull ImageSettable settable, int resId) {
-        super(animator, settable);
-        this.mResId = resId;
-    }
-
-    protected void apply() {
-        mSettable.setImageResource(mResId);
-        if (mAnimator != null) {
-            mAnimator.animate(mSettable);
+    @WorkerThread
+    public static Bitmap call(@NonNull BitmapHandler[] handlers, @NonNull Bitmap in,
+                              @NonNull ImageSettable settable) {
+        for (BitmapHandler handler : handlers) {
+            in = handler.process(in, settable);
         }
+        return in;
     }
 }

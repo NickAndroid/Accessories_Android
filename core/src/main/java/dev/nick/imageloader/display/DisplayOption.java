@@ -28,7 +28,7 @@ public class DisplayOption {
 
     private ImageQuality quality;
 
-    private BitmapHandler processor;
+    private BitmapHandler[] handlers;
     private ImageAnimator animator;
 
     private boolean applyImageOneByOne;
@@ -39,7 +39,7 @@ public class DisplayOption {
     private DisplayOption(int defaultImgRes,
                           int loadingImgRes,
                           ImageQuality quality,
-                          BitmapHandler processor,
+                          BitmapHandler[] handlers,
                           ImageAnimator animator,
                           boolean applyImageOneByOne,
                           boolean viewMaybeReused,
@@ -47,7 +47,7 @@ public class DisplayOption {
         this.defaultImgRes = defaultImgRes;
         this.loadingImgRes = loadingImgRes;
         this.quality = quality;
-        this.processor = processor;
+        this.handlers = handlers;
         this.animator = animator;
         this.applyImageOneByOne = applyImageOneByOne;
         this.viewMaybeReused = viewMaybeReused;
@@ -66,8 +66,8 @@ public class DisplayOption {
         return quality;
     }
 
-    public BitmapHandler getProcessor() {
-        return processor;
+    public BitmapHandler[] getHandlers() {
+        return handlers;
     }
 
     public ImageAnimator getAnimator() {
@@ -97,7 +97,7 @@ public class DisplayOption {
 
         private ImageQuality quality = ImageQuality.OPT;
 
-        private BitmapHandler handler;
+        private BitmapHandler[] handler;
         private ImageAnimator animator;
 
         private boolean oneAfterOne;
@@ -127,11 +127,11 @@ public class DisplayOption {
         }
 
         /**
-         * @param handler {@link BitmapHandler} instance using to process the bitmap before display.
+         * @param handlers {@link BitmapHandler} instances using to process the bitmap before display.
          * @return Instance of this builder.
          */
-        public Builder bitmapHandler(BitmapHandler handler) {
-            this.handler = handler;
+        public Builder bitmapHandler(BitmapHandler... handlers) {
+            this.handler = handlers;
             return this;
         }
 
