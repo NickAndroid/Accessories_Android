@@ -83,7 +83,7 @@ public class ContentImageFetcher extends BaseImageFetcher<BitmapResult> {
 
             String filePath = cursor.getString(index);
 
-            return mFileImageFetcher.fetchFromUrl(ImageSource.FILE.getPrefix() + filePath,
+            return mFileImageFetcher.fetchFromUrl(ImageSourceType.FILE.getPrefix() + filePath,
                     decodeSpec, progressListener, errorListener);
         } finally {
             cursor.close();

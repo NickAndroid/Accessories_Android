@@ -173,7 +173,7 @@ public class NetworkImageFetcher extends BaseImageFetcher<BitmapResult> {
         if (exists) {
             try {
                 mLogger.info("Using exist file instead of download.");
-                mFileImageFetcher.fetchFromUrl(ImageSource.FILE.getPrefix() + downloadPath,
+                mFileImageFetcher.fetchFromUrl(ImageSourceType.FILE.getPrefix() + downloadPath,
                         decodeSpec, progressListener, errorListener);
                 return null;
             } catch (Exception e) {
@@ -195,7 +195,7 @@ public class NetworkImageFetcher extends BaseImageFetcher<BitmapResult> {
         }
 
         if (ok) {
-            return mFileImageFetcher.fetchFromUrl(ImageSource.FILE.getPrefix() + tmpPath, decodeSpec, progressListener, errorListener);
+            return mFileImageFetcher.fetchFromUrl(ImageSourceType.FILE.getPrefix() + tmpPath, decodeSpec, progressListener, errorListener);
         }
         return null;
     }

@@ -41,7 +41,7 @@ import dev.nick.imageloader.LoadingListener;
 import dev.nick.imageloader.display.DisplayOption;
 import dev.nick.imageloader.display.ImageQuality;
 import dev.nick.imageloader.display.animator.FadeInImageAnimator;
-import dev.nick.imageloader.loader.ImageSource;
+import dev.nick.imageloader.loader.ImageSourceType;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
 public class FileImageTest extends BaseTest {
@@ -97,7 +97,7 @@ public class FileImageTest extends BaseTest {
                 holder.textView.setText(tracks.get(position).getTitle());
 
                 // String uri = mArtworkUri + File.separator + tracks.get(position).getAlbumId();
-                String uri = ImageSource.FILE.getPrefix() + tracks.get(position).getUrl();
+                String uri = ImageSourceType.FILE.getPrefix() + tracks.get(position).getUrl();
 
                 ImageLoader.shared().load()
                         .from(uri)
