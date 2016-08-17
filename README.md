@@ -9,7 +9,7 @@ Android image loader library
 ### Latest version:
 
 [ ![JCenter](https://api.bintray.com/packages/nickandroid/maven/imageloader/images/download.svg) ](https://bintray.com/nickandroid/maven/imageloader/_latestVersion)
-<a href="http://www.methodscount.com/?lib=dev.nick%3Aimageloader%3A1.3"><img src="https://img.shields.io/badge/Methods and size-core: 984 | deps: 31028 | 217 KB-e91e63.svg"/></a>
+<a href="http://www.methodscount.com/?lib=dev.nick%3Aimageloader%3A1.3"><img src="https://img.shields.io/badge/Methods count-core: 984 | deps: 31028-e91e63.svg"/></a>
 [![](https://jitpack.io/v/NickAndroid/ImageLoader_Android.svg)](https://jitpack.io/#NickAndroid/ImageLoader_Android)
 
 
