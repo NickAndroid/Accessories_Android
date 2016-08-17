@@ -20,19 +20,22 @@ import android.support.annotation.NonNull;
 
 import dev.nick.imageloader.display.animator.ImageAnimator;
 
-public class ResImageSettings extends ImageSettings {
+public abstract class ImageSettings implements Runnable {
 
-    int mResId;
+    protected ImageAnimator mAnimator;
+    @NonNull
+    protected ImageSettable mSettable;
 
-    public ResImageSettings(ImageAnimator animator, @NonNull ImageSettable settable, int resId) {
-        super(animator, settable);
-        this.mResId = resId;
+    public ImageSettings(ImageAnimator animator,
+                         @NonNull ImageSettable settable) {
+        this.mAnimator = animator;
+        this.mSettable = settable;
     }
 
-    protected void apply() {
-        mSettable.setImageResource(mResId);
-        if (mAnimator != null) {
-            mAnimator.animate(mSettable);
-        }
+    protected abstract void apply();
+
+    @Override
+    public final void run() {
+        apply();
     }
 }

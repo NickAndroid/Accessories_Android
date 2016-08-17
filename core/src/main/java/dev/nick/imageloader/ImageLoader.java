@@ -60,6 +60,7 @@ import dev.nick.imageloader.display.ImageViewDelegate;
 import dev.nick.imageloader.display.ResImageSettings;
 import dev.nick.imageloader.display.animator.ImageAnimator;
 import dev.nick.imageloader.display.handler.BitmapHandler;
+import dev.nick.imageloader.display.handler.BitmapHandlerCaller;
 import dev.nick.imageloader.loader.ImageSource;
 import dev.nick.imageloader.loader.ProgressListener;
 import dev.nick.imageloader.loader.ViewSpec;
@@ -278,7 +279,7 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
             if ((cached = mCacheManager.getMemCache(url, info)) != null) {
                 applyImageSettings(
                         cached,
-                        option.getProcessor(),
+                        option.getHandlers(),
                         settable,
                         option.isAnimateOnlyNewLoaded() ? null : option.getAnimator());
                 // Call complete.
@@ -305,7 +306,7 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
                     if ((cached = mCacheManager.getMemCache(loadingUrl, info)) != null) {
                         applyImageSettings(
                                 cached,
-                                option.getProcessor(),
+                                option.getHandlers(),
                                 settable,
                                 option.isAnimateOnlyNewLoaded() ? null : option.getAnimator());
                         // Call complete.
@@ -446,11 +447,15 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
     }
 
     @WorkerThread
-    private void applyImageSettings(Bitmap bitmap, BitmapHandler processor, ImageSettable settable,
+    private void applyImageSettings(Bitmap bitmap, BitmapHandler[] handlers, ImageSettable settable,
                                     ImageAnimator animator) {
         if (settable != null) {
-            BitmapImageSettings settings = new BitmapImageSettings(mContext.getResources(), animator,
-                    (processor == null ? bitmap : processor.process(bitmap, settable)), settable);
+            BitmapImageSettings settings = new BitmapImageSettings(
+                    animator,
+                    settable,
+                    (handlers == null || handlers.length == 0
+                            ? bitmap
+                            : BitmapHandlerCaller.call(handlers, bitmap, settable)));
             mUIThreadHandler.obtainMessage(MSG_APPLY_IMAGE_SETTINGS, settings).sendToTarget();
         }
     }
@@ -458,7 +463,7 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
     @WorkerThread
     private void applyImageSettings(int resId, ImageSettable settable, ImageAnimator animator) {
         if (settable != null) {
-            ResImageSettings settings = new ResImageSettings(animator, resId, settable);
+            ResImageSettings settings = new ResImageSettings(animator, settable, resId);
             mUIThreadHandler.obtainMessage(MSG_APPLY_IMAGE_SETTINGS, settings).sendToTarget();
         }
     }
@@ -1119,16 +1124,16 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
             if (!isViewMaybeReused || !isTaskDirty(taskRecord)) {
                 if (!option.isApplyImageOneByOne()) {
                     ImageAnimator animator = (option == null ? null : option.getAnimator());
-                    BitmapHandler processor = (option == null ? null : option.getProcessor());
-                    applyImageSettings(result.result, processor, settable, animator);
+                    BitmapHandler[] handlers = (option == null ? null : option.getHandlers());
+                    applyImageSettings(result.result, handlers, settable, animator);
                 } else {
                     mImageSettingsScheduler.execute(new Runnable() {
                         @Override
                         public void run() {
                             if (isViewMaybeReused && isTaskDirty(taskRecord)) return;
                             ImageAnimator animator = (option == null ? null : option.getAnimator());
-                            BitmapHandler processor = (option == null ? null : option.getProcessor());
-                            applyImageSettings(result.result, processor, settable, animator);
+                            BitmapHandler[] handlers = (option == null ? null : option.getHandlers());
+                            applyImageSettings(result.result, handlers, settable, animator);
                             if (animator != null) {
                                 long delay = animator.getDuration();
                                 ImageSettingsLocker locker = new ImageSettingsLocker(delay / 5);

@@ -16,44 +16,27 @@
 
 package dev.nick.imageloader.display;
 
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
 import dev.nick.imageloader.display.animator.ImageAnimator;
 
-public class BitmapImageSettings implements Runnable {
+public class BitmapImageSettings extends ImageSettings {
 
-    ImageAnimator animator;
-    @NonNull
-    ImageSettable settable;
-    Bitmap bitmap;
+    Bitmap mBitmap;
 
-    Resources resources;
-
-    public BitmapImageSettings(Resources resources, ImageAnimator animator, Bitmap bitmap,
-                               @NonNull ImageSettable settable) {
-        this.animator = animator;
-        this.bitmap = bitmap;
-        this.settable = settable;
-        this.resources = resources;
-    }
-
-    void apply() {
-        applyImageSetting(bitmap, settable, animator);
-    }
-
-    void applyImageSetting(Bitmap bitmap, ImageSettable settable, ImageAnimator animator) {
-        if (bitmap != null) {
-            settable.setImageBitmap(bitmap);
-            if (animator != null) {
-                animator.animate(settable);
-            }
-        }
+    public BitmapImageSettings(ImageAnimator animator, @NonNull ImageSettable settable, Bitmap bitmap) {
+        super(animator, settable);
+        this.mBitmap = bitmap;
     }
 
     @Override
-    public void run() {
-        apply();
+    protected void apply() {
+        if (mBitmap != null) {
+            mSettable.setImageBitmap(mBitmap);
+            if (mAnimator != null) {
+                mAnimator.animate(mSettable);
+            }
+        }
     }
 }
