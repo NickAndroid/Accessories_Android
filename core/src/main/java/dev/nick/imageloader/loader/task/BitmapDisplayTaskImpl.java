@@ -35,7 +35,7 @@ import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
 
-public class DisplayTaskImpl implements DisplayTask<Bitmap> {
+public class BitmapDisplayTaskImpl implements DisplayTask<Bitmap> {
 
     private String mUrl;
 
@@ -55,15 +55,15 @@ public class DisplayTaskImpl implements DisplayTask<Bitmap> {
 
     private BitmapResult mResult;
 
-    public DisplayTaskImpl(Context context,
-                           LoaderConfig loaderConfig,
-                           DisplayTaskMonitor<Bitmap> displayTaskMonitor,
-                           String url,
-                           ViewSpec spec,
-                           ImageQuality quality,
-                           ProgressListener<BitmapResult> progressListener,
-                           ErrorListener errorListener,
-                           DisplayTaskRecord taskRecord) {
+    public BitmapDisplayTaskImpl(Context context,
+                                 LoaderConfig loaderConfig,
+                                 DisplayTaskMonitor<Bitmap> displayTaskMonitor,
+                                 String url,
+                                 ViewSpec spec,
+                                 ImageQuality quality,
+                                 ProgressListener<BitmapResult> progressListener,
+                                 ErrorListener errorListener,
+                                 DisplayTaskRecord taskRecord) {
         this.mContext = context;
         this.mLoaderConfig = loaderConfig;
         this.mDisplayTaskMonitor = displayTaskMonitor;
@@ -82,7 +82,7 @@ public class DisplayTaskImpl implements DisplayTask<Bitmap> {
 
         if (!mDisplayTaskMonitor.shouldRun(this)) return;
 
-        ImageSource source = ImageSource.of(mUrl);
+        ImageSource<BitmapResult> source = ImageSource.of(mUrl);
 
         ImageFetcher<BitmapResult> fetcher = source.getFetcher(mContext, mLoaderConfig);
 

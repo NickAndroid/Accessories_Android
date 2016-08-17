@@ -24,113 +24,151 @@ import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
+import dev.nick.imageloader.loader.result.Result;
 
-public enum ImageSource {
+public class ImageSource<X> {
 
-    FILE(new FileImageFetcher(new PathSplitter<String>() {
-        @Override
-        public String getRealPath(@NonNull String fullPath) {
-            return fullPath.substring(FILE.prefix.length(), fullPath.length());
-        }
-    }), "file://"),
+    public static final ImageSource<BitmapResult> FILE = new ImageSource<>(
+            new FileImageFetcher(new PathSplitter<String>() {
+                @Override
+                public String getRealPath(@NonNull String fullPath) {
+                    return fullPath.substring(FILE.prefix.length(), fullPath.length());
+                }
+            }), "file://");
 
-    CONTENT(new ContentImageFetcher(new PathSplitter<String>() {
-        @Override
-        public String getRealPath(@NonNull String fullPath) {
-            return fullPath;
-        }
-    }, new FileImageFetcher(new PathSplitter<String>() {
-        @Override
-        public String getRealPath(@NonNull String fullPath) {
-            return fullPath.substring(FILE.prefix.length(), fullPath.length());
-        }
-    })) {
-        @Override
-        protected void callOnStart(ProgressListener<BitmapResult> listener) {
-            // Ignored.
-        }
-    }, "content://"),
+    public static final ImageSource<BitmapResult> CONTENT = new ImageSource<>
+            (new ContentImageFetcher(new PathSplitter<String>() {
+                @Override
+                public String getRealPath(@NonNull String fullPath) {
+                    return fullPath;
+                }
+            }, new FileImageFetcher(new PathSplitter<String>() {
+                @Override
+                public String getRealPath(@NonNull String fullPath) {
+                    return fullPath.substring(FILE.prefix.length(), fullPath.length());
+                }
+            })) {
+                @Override
+                protected void callOnStart(ProgressListener<BitmapResult> listener) {
+                    // Ignored.
+                }
+            }, "content://");
 
-    ASSETS(new AssetsImageFetcher(new PathSplitter<String>() {
-        @Override
-        public String getRealPath(@NonNull String fullPath) {
-            return fullPath.substring(ASSETS.prefix.length(), fullPath.length());
-        }
-    }), "assets://"),
+    public static final ImageSource<BitmapResult> ASSETS = new ImageSource<>(
+            new AssetsImageFetcher(new PathSplitter<String>() {
+                @Override
+                public String getRealPath(@NonNull String fullPath) {
+                    return fullPath.substring(ASSETS.prefix.length(), fullPath.length());
+                }
+            }), "assets://");
 
-    DRAWABLE(new DrawableImageFetcher(new PathSplitter<String>() {
-        @Override
-        public String getRealPath(@NonNull String fullPath) {
-            return fullPath.substring(DRAWABLE.prefix.length(), fullPath.length());
-        }
-    }), "drawable://"),
+    public static final ImageSource<BitmapResult> DRAWABLE = new ImageSource<>(
+            new DrawableImageFetcher(new PathSplitter<String>() {
+                @Override
+                public String getRealPath(@NonNull String fullPath) {
+                    return fullPath.substring(DRAWABLE.prefix.length(), fullPath.length());
+                }
+            }), "drawable://");
 
-    NETWORK_HTTP(new NetworkImageFetcher(new PathSplitter<String>() {
-        @Override
-        public String getRealPath(@NonNull String fullPath) {
-            return fullPath;
-        }
-    }, new HookedFileImageFetcher(new PathSplitter<String>() {
-        @Override
-        public String getRealPath(@NonNull String fullPath) {
-            return fullPath.substring(FILE.prefix.length(), fullPath.length());
-        }
-    })), "http://"),
+    public static final ImageSource<BitmapResult> NETWORK_HTTP = new ImageSource<>(
+            new NetworkImageFetcher(new PathSplitter<String>() {
+                @Override
+                public String getRealPath(@NonNull String fullPath) {
+                    return fullPath;
+                }
+            }, new HookedFileImageFetcher(new PathSplitter<String>() {
+                @Override
+                public String getRealPath(@NonNull String fullPath) {
+                    return fullPath.substring(FILE.prefix.length(), fullPath.length());
+                }
+            })), "http://");
 
-    NETWORK_HTTPS(new NetworkImageFetcher(new PathSplitter<String>() {
-        @Override
-        public String getRealPath(@NonNull String fullPath) {
-            return fullPath;
-        }
-    }, new HookedFileImageFetcher(new PathSplitter<String>() {
-        @Override
-        public String getRealPath(@NonNull String fullPath) {
-            return fullPath.substring(FILE.prefix.length(), fullPath.length());
-        }
-    })), "https://"),
+    public static final ImageSource<BitmapResult> NETWORK_HTTPS = new ImageSource<>(
+            new NetworkImageFetcher(new PathSplitter<String>() {
+                @Override
+                public String getRealPath(@NonNull String fullPath) {
+                    return fullPath;
+                }
+            }, new HookedFileImageFetcher(new PathSplitter<String>() {
+                @Override
+                public String getRealPath(@NonNull String fullPath) {
+                    return fullPath.substring(FILE.prefix.length(), fullPath.length());
+                }
+            })), "https://");
 
-    UNKNOWN(new ImageFetcher<BitmapResult>() {
-        @Override
-        public BitmapResult fetchFromUrl(@NonNull String url,
-                                         @NonNull DecodeSpec decodeSpec,
-                                         @Nullable ProgressListener progressListener,
-                                         @Nullable ErrorListener errorListener)
-                throws Exception {
-            if (errorListener != null) {
-                errorListener.onError(new Cause(new IllegalArgumentException("Unknown image source called.")));
-            }
-            return null;
-        }
+    public static final ImageSource<BitmapResult> UNKNOWN = new ImageSource<>(
+            new ImageFetcher<BitmapResult>() {
+                @Override
+                public BitmapResult fetchFromUrl(@NonNull String url,
+                                                 @NonNull DecodeSpec decodeSpec,
+                                                 @Nullable ProgressListener progressListener,
+                                                 @Nullable ErrorListener errorListener)
+                        throws Exception {
+                    if (errorListener != null) {
+                        errorListener.onError(new Cause(new IllegalArgumentException("Unknown image source called.")));
+                    }
+                    return null;
+                }
 
-        @Override
-        public ImageFetcher<BitmapResult> prepare(Context context, LoaderConfig config) {
-            return this;
-        }
-    }, null);
+                @Override
+                public ImageFetcher<BitmapResult> prepare(Context context, LoaderConfig config) {
+                    return this;
+                }
+            }, null);
 
-    ImageFetcher<BitmapResult> fetcher;
-    String prefix;
+    private static final ImageSource[] PREBUILT = new ImageSource[]{
+            FILE, CONTENT, DRAWABLE, ASSETS, NETWORK_HTTP, NETWORK_HTTPS
+    };
 
-    ImageSource(ImageFetcher<BitmapResult> fetcher, String prefix) {
+    private ImageFetcher<X> fetcher;
+    private String prefix;
+
+    public ImageSource(ImageFetcher<X> fetcher, String prefix) {
         this.fetcher = fetcher;
         this.prefix = prefix;
     }
 
-    public static ImageSource of(@NonNull String url) {
+    @NonNull
+    public ImageFetcher<X> getFetcher(Context context, LoaderConfig config) {
+        return fetcher.prepare(context, config);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T extends Result> ImageSource<T> of(@NonNull String url) {
         for (ImageSource source : ImageSource.values()) {
             if (url.startsWith(source.prefix)) return source;
         }
-        return ImageSource.UNKNOWN;
+        return (ImageSource<T>) ImageSource.UNKNOWN;
     }
 
-    @NonNull
-    public ImageFetcher<BitmapResult> getFetcher(Context context, LoaderConfig config) {
-        return fetcher.prepare(context, config);
+    public boolean isOneOf(@NonNull ImageSource... sources) {
+        for (ImageSource source : sources) {
+            if (source.equals(this)) return true;
+        }
+        return false;
+    }
 
+    public static ImageSource[] values() {
+        return PREBUILT;
     }
 
     public String getPrefix() {
         return prefix;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ImageSource<?> that = (ImageSource<?>) o;
+
+        return prefix != null ? prefix.equals(that.prefix) : that.prefix == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return prefix != null ? prefix.hashCode() : 0;
     }
 
     private static class HookedFileImageFetcher extends FileImageFetcher {

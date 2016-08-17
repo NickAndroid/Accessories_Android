@@ -127,7 +127,7 @@ public class DisplayOption {
         }
 
         /**
-         * @param handlers {@link BitmapHandler} instance using to process the bitmap before display.
+         * @param handlers {@link BitmapHandler} instances using to process the bitmap before display.
          * @return Instance of this builder.
          */
         public Builder bitmapHandler(BitmapHandler... handlers) {

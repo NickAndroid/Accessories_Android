@@ -39,6 +39,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -68,8 +69,8 @@ import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
 import dev.nick.imageloader.loader.result.Result;
+import dev.nick.imageloader.loader.task.BitmapDisplayTaskImpl;
 import dev.nick.imageloader.loader.task.DisplayTask;
-import dev.nick.imageloader.loader.task.DisplayTaskImpl;
 import dev.nick.imageloader.loader.task.DisplayTaskMonitor;
 import dev.nick.imageloader.loader.task.DisplayTaskRecord;
 import dev.nick.imageloader.loader.task.FutureImageTask;
@@ -105,7 +106,7 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
     private static final DisplayOption sDefDisplayOption = DisplayOption.builder()
             .imageQuality(ImageQuality.OPT)
             .imageAnimator(null)
-            .bitmapHandler(null)
+            .bitmapHandler()
             .showWithDefault(0)
             .showOnLoading(0)
             .viewMaybeReused()
@@ -254,11 +255,11 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
      * @param option   {@link DisplayOption} is options using when display the image.
      * @param listener The progress listener using to watch the progress of the loading.
      */
-    FutureTask display(@NonNull String url,
-                       @NonNull ImageSettable settable,
-                       @Nullable DisplayOption option,
-                       @Nullable LoadingListener listener,
-                       @Nullable Priority priority) {
+    Future display(@NonNull String url,
+                   @NonNull ImageSettable settable,
+                   @Nullable DisplayOption option,
+                   @Nullable LoadingListener listener,
+                   @Nullable Priority priority) {
 
         ensureNotTerminated();
 
@@ -362,7 +363,7 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
             errorListenerDelegate = new ErrorListenerDelegate(listener);
         }
 
-        DisplayTaskImpl imageTask = new DisplayTaskImpl(
+        BitmapDisplayTaskImpl imageTask = new BitmapDisplayTaskImpl(
                 mContext,
                 mConfig,
                 this,
@@ -554,20 +555,16 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
     }
 
     private ExecutorService getExecutor(ImageSource source) {
-
-        switch (source) {
-            case NETWORK_HTTP: // fall.
-            case NETWORK_HTTPS:
-                return mLoadingService;
-            default:
-                int activeThreads = mLoadingService.getActiveCount();
-                int max = mLoadingService.getMaximumPoolSize();
-                if (activeThreads == max) {
-                    mLogger.verbose("The loading service hits, using fallback one.");
-                    ensureFallbackService();
-                    return mFallbackService;
-                }
-                break;
+        if (source.isOneOf(ImageSource.NETWORK_HTTP, ImageSource.NETWORK_HTTPS)) {
+            return mLoadingService;
+        } else {
+            int activeThreads = mLoadingService.getActiveCount();
+            int max = mLoadingService.getMaximumPoolSize();
+            if (activeThreads == max) {
+                mLogger.warn("The loading service hits, using fallback one.");
+                ensureFallbackService();
+                return mFallbackService;
+            }
         }
         return mLoadingService;
     }
@@ -1143,7 +1140,7 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
                     });
                 }
             } else {
-                mLogger.info("Won't apply image settings for task:" + taskRecord);
+                mLogger.verbose("Won't apply image settings for task:" + taskRecord);
             }
             mCacheManager.cache(url, viewSpec, result.result);
         }
@@ -1167,7 +1164,7 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
         @Override
         public void onError(@NonNull Cause cause) {
             if (cause.exception instanceof InterruptedIOException) {
-                // We canceled this task.
+                // It's ok, We canceled this task.
             } else {
                 callOnFailure(listener, cause);
             }
