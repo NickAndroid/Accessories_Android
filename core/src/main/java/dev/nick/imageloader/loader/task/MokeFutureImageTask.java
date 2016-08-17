@@ -18,9 +18,7 @@ package dev.nick.imageloader.loader.task;
 
 import java.util.concurrent.FutureTask;
 
-import dev.nick.imageloader.loader.result.Result;
-
-public class MokeFutureImageTask<T> extends FutureTask<Result<T>> {
+public class MokeFutureImageTask<T> extends FutureTask<T> {
 
     static Runnable sEmptyWorker = new Runnable() {
         @Override
@@ -29,7 +27,7 @@ public class MokeFutureImageTask<T> extends FutureTask<Result<T>> {
         }
     };
 
-    public MokeFutureImageTask(final Result<T> base) {
+    public MokeFutureImageTask(final T base) {
         super(sEmptyWorker, base);
         run();
     }

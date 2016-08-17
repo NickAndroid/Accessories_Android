@@ -17,6 +17,7 @@
 package dev.nick.imageloader.loader;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -34,15 +35,14 @@ import dev.nick.imageloader.loader.network.HttpImageDownloader;
 import dev.nick.imageloader.loader.network.ImageDownloader;
 import dev.nick.imageloader.loader.network.NetworkPolicy;
 import dev.nick.imageloader.loader.network.NetworkUtils;
-import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
 
-public class NetworkImageFetcher extends BaseImageFetcher<BitmapResult> {
+public class NetworkImageFetcher extends BaseImageFetcher<Bitmap> {
 
     private static final String DOWNLOAD_DIR_NAME = "download";
 
-    private ImageFetcher<BitmapResult> mFileImageFetcher;
+    private ImageFetcher<Bitmap> mFileImageFetcher;
 
     private String mDownloadDir;
 
@@ -61,7 +61,7 @@ public class NetworkImageFetcher extends BaseImageFetcher<BitmapResult> {
 
     private TrafficStats mTrafficStats;
 
-    public NetworkImageFetcher(PathSplitter<String> splitter, ImageFetcher<BitmapResult> fileImageFetcher) {
+    public NetworkImageFetcher(PathSplitter<String> splitter, ImageFetcher<Bitmap> fileImageFetcher) {
         super(splitter);
         mFileImageFetcher = fileImageFetcher;
     }
@@ -98,7 +98,7 @@ public class NetworkImageFetcher extends BaseImageFetcher<BitmapResult> {
     }
 
     @Override
-    public ImageFetcher prepare(Context context, LoaderConfig config) {
+    public ImageFetcher<Bitmap> prepare(Context context, LoaderConfig config) {
         super.prepare(context, config);
         mFileImageFetcher.prepare(context, config);
         ensurePolicy();
@@ -106,10 +106,10 @@ public class NetworkImageFetcher extends BaseImageFetcher<BitmapResult> {
     }
 
     @Override
-    public BitmapResult fetchFromUrl(@NonNull String url,
-                                     @NonNull final DecodeSpec decodeSpec,
-                                     @Nullable ProgressListener<BitmapResult> progressListener,
-                                     @Nullable ErrorListener errorListener)
+    public Bitmap fetchFromUrl(@NonNull String url,
+                               @NonNull final DecodeSpec decodeSpec,
+                               @Nullable ProgressListener<Bitmap> progressListener,
+                               @Nullable ErrorListener errorListener)
             throws Exception {
 
         super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);

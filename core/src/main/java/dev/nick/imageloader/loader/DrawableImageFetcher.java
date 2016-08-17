@@ -22,21 +22,20 @@ import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
 
-public class DrawableImageFetcher extends BaseImageFetcher<BitmapResult> {
+public class DrawableImageFetcher extends BaseImageFetcher<Bitmap> {
 
     public DrawableImageFetcher(PathSplitter<String> splitter) {
         super(splitter);
     }
 
     @Override
-    public BitmapResult fetchFromUrl(@NonNull String url,
-                                     @NonNull DecodeSpec decodeSpec,
-                                     @Nullable ProgressListener<BitmapResult> progressListener,
-                                     @Nullable ErrorListener errorListener)
+    public Bitmap fetchFromUrl(@NonNull String url,
+                               @NonNull DecodeSpec decodeSpec,
+                               @Nullable ProgressListener<Bitmap> progressListener,
+                               @Nullable ErrorListener errorListener)
             throws Exception {
 
         super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);
@@ -85,8 +84,7 @@ public class DrawableImageFetcher extends BaseImageFetcher<BitmapResult> {
             return null;
         }
 
-        BitmapResult result = newResult(tempBitmap);
-        callOnComplete(progressListener, result);
-        return result;
+        callOnComplete(progressListener, tempBitmap);
+        return tempBitmap;
     }
 }

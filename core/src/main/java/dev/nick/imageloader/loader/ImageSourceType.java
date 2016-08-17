@@ -17,18 +17,17 @@
 package dev.nick.imageloader.loader;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import dev.nick.imageloader.LoaderConfig;
-import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
-import dev.nick.imageloader.loader.result.Result;
 
 public class ImageSourceType<X> {
 
-    public static final ImageSourceType<BitmapResult> FILE = new ImageSourceType<>(
+    public static final ImageSourceType<Bitmap> FILE = new ImageSourceType<>(
             new FileImageFetcher(new PathSplitter<String>() {
                 @Override
                 public String getRealPath(@NonNull String fullPath) {
@@ -36,7 +35,7 @@ public class ImageSourceType<X> {
                 }
             }), "file://");
 
-    public static final ImageSourceType<BitmapResult> CONTENT = new ImageSourceType<>
+    public static final ImageSourceType<Bitmap> CONTENT = new ImageSourceType<>
             (new ContentImageFetcher(new PathSplitter<String>() {
                 @Override
                 public String getRealPath(@NonNull String fullPath) {
@@ -49,12 +48,12 @@ public class ImageSourceType<X> {
                 }
             })) {
                 @Override
-                protected void callOnStart(ProgressListener<BitmapResult> listener) {
+                protected void callOnStart(ProgressListener<Bitmap> listener) {
                     // Ignored.
                 }
             }, "content://");
 
-    public static final ImageSourceType<BitmapResult> ASSETS = new ImageSourceType<>(
+    public static final ImageSourceType<Bitmap> ASSETS = new ImageSourceType<>(
             new AssetsImageFetcher(new PathSplitter<String>() {
                 @Override
                 public String getRealPath(@NonNull String fullPath) {
@@ -62,7 +61,7 @@ public class ImageSourceType<X> {
                 }
             }), "assets://");
 
-    public static final ImageSourceType<BitmapResult> DRAWABLE = new ImageSourceType<>(
+    public static final ImageSourceType<Bitmap> DRAWABLE = new ImageSourceType<>(
             new DrawableImageFetcher(new PathSplitter<String>() {
                 @Override
                 public String getRealPath(@NonNull String fullPath) {
@@ -70,7 +69,7 @@ public class ImageSourceType<X> {
                 }
             }), "drawable://");
 
-    public static final ImageSourceType<BitmapResult> NETWORK_HTTP = new ImageSourceType<>(
+    public static final ImageSourceType<Bitmap> NETWORK_HTTP = new ImageSourceType<>(
             new NetworkImageFetcher(new PathSplitter<String>() {
                 @Override
                 public String getRealPath(@NonNull String fullPath) {
@@ -83,7 +82,7 @@ public class ImageSourceType<X> {
                 }
             })), "http://");
 
-    public static final ImageSourceType<BitmapResult> NETWORK_HTTPS = new ImageSourceType<>(
+    public static final ImageSourceType<Bitmap> NETWORK_HTTPS = new ImageSourceType<>(
             new NetworkImageFetcher(new PathSplitter<String>() {
                 @Override
                 public String getRealPath(@NonNull String fullPath) {
@@ -96,13 +95,13 @@ public class ImageSourceType<X> {
                 }
             })), "https://");
 
-    public static final ImageSourceType<BitmapResult> UNKNOWN = new ImageSourceType<>(
-            new ImageFetcher<BitmapResult>() {
+    public static final ImageSourceType<Bitmap> UNKNOWN = new ImageSourceType<>(
+            new ImageFetcher<Bitmap>() {
                 @Override
-                public BitmapResult fetchFromUrl(@NonNull String url,
-                                                 @NonNull DecodeSpec decodeSpec,
-                                                 @Nullable ProgressListener progressListener,
-                                                 @Nullable ErrorListener errorListener)
+                public Bitmap fetchFromUrl(@NonNull String url,
+                                           @NonNull DecodeSpec decodeSpec,
+                                           @Nullable ProgressListener progressListener,
+                                           @Nullable ErrorListener errorListener)
                         throws Exception {
                     if (errorListener != null) {
                         errorListener.onError(new Cause(new IllegalArgumentException("Unknown image source called.")));
@@ -111,7 +110,7 @@ public class ImageSourceType<X> {
                 }
 
                 @Override
-                public ImageFetcher<BitmapResult> prepare(Context context, LoaderConfig config) {
+                public ImageFetcher<Bitmap> prepare(Context context, LoaderConfig config) {
                     return this;
                 }
             }, null);
@@ -178,7 +177,7 @@ public class ImageSourceType<X> {
         }
 
         @Override
-        protected void callOnStart(ProgressListener<BitmapResult> listener) {
+        protected void callOnStart(ProgressListener<Bitmap> listener) {
             // Hooked, won't call.
         }
     }

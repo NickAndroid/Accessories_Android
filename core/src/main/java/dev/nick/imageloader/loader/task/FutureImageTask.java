@@ -21,11 +21,10 @@ import android.support.annotation.Nullable;
 
 import java.util.concurrent.FutureTask;
 
-import dev.nick.imageloader.loader.result.Result;
 import dev.nick.imageloader.queue.Priority;
 import dev.nick.imageloader.queue.PriorityRemarkable;
 
-public class FutureImageTask extends FutureTask<Result<Bitmap>> implements PriorityRemarkable {
+public class FutureImageTask extends FutureTask<Bitmap> implements PriorityRemarkable {
 
     private TaskActionListener mListener;
     private DisplayTask<Bitmap> mTask;

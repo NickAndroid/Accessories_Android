@@ -16,16 +16,16 @@
 
 package dev.nick.imageloader;
 
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import dev.nick.imageloader.annotation.CallingOnUIThread;
 import dev.nick.imageloader.loader.ProgressListener;
-import dev.nick.imageloader.loader.result.BitmapResult;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
 
-public interface LoadingListener extends ProgressListener<BitmapResult>, ErrorListener {
+public interface LoadingListener extends ProgressListener<Bitmap>, ErrorListener {
 
     @Override
     @CallingOnUIThread
@@ -33,7 +33,7 @@ public interface LoadingListener extends ProgressListener<BitmapResult>, ErrorLi
 
     @Override
     @CallingOnUIThread
-    void onComplete(@Nullable BitmapResult result);
+    void onComplete(@Nullable Bitmap result);
 
     @Override
     @CallingOnUIThread
@@ -51,7 +51,7 @@ public interface LoadingListener extends ProgressListener<BitmapResult>, ErrorLi
         }
 
         @Override
-        public void onComplete(@Nullable BitmapResult result) {
+        public void onComplete(@Nullable Bitmap result) {
             // Nothing.
         }
 
