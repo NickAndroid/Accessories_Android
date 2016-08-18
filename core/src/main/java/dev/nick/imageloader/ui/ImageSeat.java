@@ -1,0 +1,18 @@
+package dev.nick.imageloader.ui;
+
+import android.support.annotation.NonNull;
+import android.support.annotation.UiThread;
+import android.view.animation.Animation;
+
+public interface ImageSeat<T> {
+
+    @UiThread
+    void setImage(@NonNull T image);
+
+    int getWidth();
+
+    int getHeight();
+
+    @UiThread
+    void startAnimation(Animation animation);
+}

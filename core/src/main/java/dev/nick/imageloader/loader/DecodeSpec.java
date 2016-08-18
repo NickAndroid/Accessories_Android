@@ -16,7 +16,7 @@
 
 package dev.nick.imageloader.loader;
 
-import dev.nick.imageloader.display.ImageQuality;
+import dev.nick.imageloader.ui.ImageQuality;
 
 public class DecodeSpec {
 

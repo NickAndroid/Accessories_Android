@@ -19,15 +19,17 @@ package dev.nick.imageloader;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import dev.nick.imageloader.annotation.LoaderApi;
 import dev.nick.imageloader.cache.CachePolicy;
 import dev.nick.imageloader.loader.network.NetworkPolicy;
-import dev.nick.imageloader.logger.LoggerManager;
+import dev.nick.imageloader.debug.LoggerManager;
 import dev.nick.imageloader.queue.QueuePolicy;
 
 /**
  * Configuration for {@link ImageLoader}, use a {@link Builder}
  * to build one, or using {@link #DEFAULT_CONFIG} as a default config.
  */
+@LoaderApi
 public class LoaderConfig {
 
     public static final LoaderConfig DEFAULT_CONFIG = LoaderConfig.builder()
@@ -145,7 +147,7 @@ public class LoaderConfig {
         }
 
         /**
-         * @param debugLevel Debug level of {@link dev.nick.imageloader.logger.Logger}
+         * @param debugLevel Debug level of {@link dev.nick.imageloader.debug.Logger}
          * @return Builder instance.
          */
         public Builder debugLevel(int debugLevel) {

@@ -26,10 +26,10 @@ import com.nick.scalpel.annotation.binding.FindView;
 
 import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.LoadingListener;
-import dev.nick.imageloader.display.DisplayOption;
-import dev.nick.imageloader.display.ImageQuality;
-import dev.nick.imageloader.display.animator.FadeInImageAnimator;
-import dev.nick.imageloader.display.handler.BlackWhiteBitmapHandler;
+import dev.nick.imageloader.ui.DisplayOption;
+import dev.nick.imageloader.ui.ImageQuality;
+import dev.nick.imageloader.ui.animator.FadeInImageAnimator;
+import dev.nick.imageloader.ui.art.BlackWhiteImageArt;
 import dev.nick.imageloader.queue.Priority;
 
 public class AssetsImageTest extends BaseTest {
@@ -59,9 +59,9 @@ public class AssetsImageTest extends BaseTest {
                         super.onComplete(result);
                     }
                 })
-                .option(DisplayOption.builder()
+                .option(DisplayOption.bitmapBuilder()
                         .showWithDefault(R.drawable.ic_launcher)
-                        .bitmapHandler(new BlackWhiteBitmapHandler())
+                        .imageArt(new BlackWhiteImageArt())
                         .imageQuality(ImageQuality.RAW)
                         .imageAnimator(new FadeInImageAnimator())
                         .build())

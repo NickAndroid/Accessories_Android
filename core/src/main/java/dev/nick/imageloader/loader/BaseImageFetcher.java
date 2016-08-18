@@ -17,7 +17,6 @@
 package dev.nick.imageloader.loader;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -27,8 +26,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.loader.result.Cause;
 import dev.nick.imageloader.loader.result.ErrorListener;
-import dev.nick.imageloader.logger.Logger;
-import dev.nick.imageloader.logger.LoggerManager;
+import dev.nick.imageloader.debug.Logger;
+import dev.nick.imageloader.debug.LoggerManager;
 
 class BaseImageFetcher<T> implements ImageFetcher<T> {
 

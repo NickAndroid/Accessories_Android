@@ -16,6 +16,12 @@
 
 package dev.nick.imageloader.loader.task;
 
-public interface TaskManager {
+import dev.nick.imageloader.Terminable;
+
+public interface TaskManager extends TaskInterrupter, Terminable {
     int nextTaskId();
+
+    void clearTasks();
+
+    void onDisplayTaskCreated(DisplayTaskRecord displayTaskRecord);
 }

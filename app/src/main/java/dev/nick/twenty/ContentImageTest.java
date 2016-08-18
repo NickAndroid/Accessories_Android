@@ -38,10 +38,10 @@ import java.util.List;
 import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.cache.CachePolicy;
-import dev.nick.imageloader.display.DisplayOption;
-import dev.nick.imageloader.display.ImageQuality;
-import dev.nick.imageloader.display.animator.FadeInImageAnimator;
 import dev.nick.imageloader.loader.network.NetworkPolicy;
+import dev.nick.imageloader.ui.DisplayOption;
+import dev.nick.imageloader.ui.ImageQuality;
+import dev.nick.imageloader.ui.animator.FadeInImageAnimator;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
 public class ContentImageTest extends BaseTest {
@@ -111,14 +111,13 @@ public class ContentImageTest extends BaseTest {
 
                 mLoader.loadBitmap()
                         .from(uri)
-                        .option(DisplayOption.builder()
-                                .oneAfterOne()
+                        .option(DisplayOption.bitmapBuilder()
                                 .imageQuality(ImageQuality.RAW)
                                 .viewMaybeReused()
                                 .imageAnimator(new FadeInImageAnimator())
                                 .build())
                         .into(holder.imageView)
-                .start();
+                        .start();
 
                 return convertView;
             }

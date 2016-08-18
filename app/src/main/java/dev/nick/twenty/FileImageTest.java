@@ -38,10 +38,10 @@ import java.util.List;
 
 import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.LoadingListener;
-import dev.nick.imageloader.display.DisplayOption;
-import dev.nick.imageloader.display.ImageQuality;
-import dev.nick.imageloader.display.animator.FadeInImageAnimator;
 import dev.nick.imageloader.loader.ImageSourceType;
+import dev.nick.imageloader.ui.DisplayOption;
+import dev.nick.imageloader.ui.ImageQuality;
+import dev.nick.imageloader.ui.animator.FadeInImageAnimator;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
 public class FileImageTest extends BaseTest {
@@ -101,12 +101,11 @@ public class FileImageTest extends BaseTest {
 
                 ImageLoader.shared().loadBitmap()
                         .from(uri)
-                        .option(DisplayOption.builder()
+                        .option(DisplayOption.bitmapBuilder()
                                 .showWithDefault(R.drawable.aio_image_fail)
                                 .imageQuality(ImageQuality.OPT)
                                 .viewMaybeReused()
                                 .animateOnlyNewLoaded()
-                                .oneAfterOne()
                                 .imageAnimator(new FadeInImageAnimator())
                                 .build())
                         .listener(new LoadingListener.Stub())

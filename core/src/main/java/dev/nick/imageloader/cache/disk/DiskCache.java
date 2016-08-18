@@ -37,9 +37,9 @@ import dev.nick.imageloader.cache.Cache;
 import dev.nick.imageloader.cache.CachePolicy;
 import dev.nick.imageloader.cache.FileNameGenerator;
 import dev.nick.imageloader.control.StorageStats;
+import dev.nick.imageloader.debug.Logger;
+import dev.nick.imageloader.debug.LoggerManager;
 import dev.nick.imageloader.utils.FileUtils;
-import dev.nick.imageloader.logger.Logger;
-import dev.nick.imageloader.logger.LoggerManager;
 
 public class DiskCache implements Cache<String, Bitmap> {
 

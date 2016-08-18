@@ -46,9 +46,9 @@ public class ContentImageFetcher extends BaseImageFetcher<Bitmap> {
 
     @Override
     public Bitmap fetchFromUrl(@NonNull String url,
-                                     @NonNull DecodeSpec decodeSpec,
-                                     @Nullable ProgressListener<Bitmap> progressListener,
-                                     @Nullable ErrorListener errorListener)
+                               @NonNull DecodeSpec decodeSpec,
+                               @Nullable ProgressListener<Bitmap> progressListener,
+                               @Nullable ErrorListener errorListener)
             throws Exception {
 
         super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);
