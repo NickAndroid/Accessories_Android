@@ -1,26 +1,28 @@
 package dev.nick.imageloader;
 
 import android.graphics.Bitmap;
-import android.support.annotation.NonNull;
 
-import dev.nick.imageloader.ui.BitmapImageSeat;
+import dev.nick.imageloader.loader.ProgressListener;
+import dev.nick.imageloader.loader.ViewSpec;
+import dev.nick.imageloader.loader.task.DisplayTaskRecord;
+import dev.nick.imageloader.loader.task.TaskManager;
 import dev.nick.imageloader.ui.DisplayOption;
 import dev.nick.imageloader.ui.ImageSeat;
 import dev.nick.imageloader.ui.animator.ImageAnimator;
 import dev.nick.imageloader.ui.art.ImageArt;
-import dev.nick.imageloader.loader.ProgressListener;
-import dev.nick.imageloader.loader.ViewSpec;
-import dev.nick.imageloader.loader.task.DisplayTaskRecord;
 
 public class BitmapProgressListenerDelegate extends ProgressListenerDelegate<Bitmap> {
 
-    public BitmapProgressListenerDelegate(ProgressListener<Bitmap> listener,
+
+    public BitmapProgressListenerDelegate(CacheManager<Bitmap> cacheManager,
+                                          TaskManager taskManager,
+                                          ProgressListener<Bitmap> listener,
                                           ViewSpec viewSpec,
-                                          DisplayOption option,
-                                          @NonNull ImageSeat<Bitmap> settable,
+                                          DisplayOption<Bitmap> option,
+                                          ImageSeat<Bitmap> imageSeat,
                                           DisplayTaskRecord taskRecord,
                                           String url) {
-        super(listener, viewSpec, option, settable, taskRecord, url);
+        super(cacheManager, taskManager, listener, viewSpec, option, imageSeat, taskRecord, url);
     }
 
     @Override
@@ -30,7 +32,7 @@ public class BitmapProgressListenerDelegate extends ProgressListenerDelegate<Bit
         }
 
         if (canceled) {
-            cacheManager.cache(keyGenerator.fromUrl(url, viewSpec), result);
+            cacheManager.cache(url, result);
             return;
         }
 
@@ -39,10 +41,10 @@ public class BitmapProgressListenerDelegate extends ProgressListenerDelegate<Bit
         final boolean isViewMaybeReused = option.isViewMaybeReused();
 
         if (!isViewMaybeReused || !checkTaskDirty()) {
-            ImageAnimator animator = (option == null ? null : option.getAnimator());
-            ImageArt[] handlers = (option == null ? null : option.getHandlers());
+            ImageAnimator<Bitmap> animator = (option == null ? null : option.getAnimator());
+            ImageArt<Bitmap>[] handlers = (option == null ? null : option.getHandlers());
             ImageSettingApplier.getSharedApplier().applyImageSettings(result, handlers, settable, animator);
         }
-        cacheManager.cache(keyGenerator.fromUrl(url, viewSpec), result);
+        cacheManager.cache(url, result);
     }
 }

@@ -32,7 +32,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import dev.nick.imageloader.annotation.LoaderApi;
-import dev.nick.imageloader.cache.CacheManager;
 import dev.nick.imageloader.control.Forkable;
 import dev.nick.imageloader.control.Freezer;
 import dev.nick.imageloader.control.LoaderState;
@@ -89,7 +88,7 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
     private UIThreadRouter mUiThreadRouter;
     private ImageSettingApplier mImageSettingApplier;
 
-    private CacheManager mCacheManager;
+    private CacheManager<Bitmap> mCacheManager;
     private LoaderConfig mConfig;
     private RequestQueueManager<FutureImageTask> mTaskHandleService;
     private RequestQueueManager<Transaction> mTransactionService;
@@ -105,7 +104,7 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
     private ImageSettableIdCreator mSettableIdCreator;
 
     @SuppressLint("DefaultLocale")
-    private ImageLoader(Context context, CacheManager cacheManager, LoaderConfig config) {
+    private ImageLoader(Context context, CacheManager<Bitmap> cacheManager, LoaderConfig config) {
         Preconditions.checkNotNull(context);
         if (config == null) config = LoaderConfig.DEFAULT_CONFIG;
         LoggerManager.setDebugLevel(config.getDebugLevel());
@@ -116,7 +115,7 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
         this.mUiThreadRouter = UIThreadRouter.getSharedRouter();
         this.mImageSettingApplier = ImageSettingApplier.getSharedApplier();
         this.mCacheManager = cacheManager == null
-                ? new CacheManager(config.getCachePolicy(), context)
+                ? new BitmapCacheManager(config.getCachePolicy(), context)
                 : cacheManager;
         //noinspection deprecation
         this.mLoadingService = new ThreadPoolExecutor(
@@ -223,11 +222,9 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
         // 2. If no mem cache, start a loading task from disk cache file or perform first loading.
         // 3. Cache the loaded.
 
-        ViewSpec info = new ViewSpec(settable.getWidth(), settable.getHeight());
-
         if (mCacheManager.isMemCacheEnabled()) {
             Bitmap cached;
-            if ((cached = mCacheManager.getMemCache(source.getUrl(), info)) != null) {
+            if ((cached = mCacheManager.get(source.getUrl())) != null) {
                 mImageSettingApplier.applyImageSettings(
                         cached,
                         option.getHandlers(),
@@ -247,12 +244,12 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
 
         if (mCacheManager.isDiskCacheEnabled()) {
             String cachePath;
-            if ((cachePath = mCacheManager.getDiskCachePath(loadingUrl, info)) != null) {
+            if ((cachePath = mCacheManager.getCachePath(loadingUrl)) != null) {
                 loadingUrl = ImageSourceType.FILE.getPrefix() + cachePath;
                 // Check mem cache again.
                 if (mCacheManager.isMemCacheEnabled()) {
                     Bitmap cached;
-                    if ((cached = mCacheManager.getMemCache(loadingUrl, info)) != null) {
+                    if ((cached = mCacheManager.get(loadingUrl)) != null) {
                         mImageSettingApplier.applyImageSettings(
                                 cached,
                                 option.getHandlers(),
@@ -287,7 +284,7 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
 
     private Future<Bitmap> loadAndDisplayBitmap(ImageSource<Bitmap> source,
                                                 ImageSeat<Bitmap> imageSeat,
-                                                DisplayOption option,
+                                                DisplayOption<Bitmap> option,
                                                 ProgressListener<Bitmap> progressListener,
                                                 ErrorListener errorListener,
                                                 DisplayTaskRecord record,
@@ -298,6 +295,8 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
         ViewSpec viewSpec = new ViewSpec(imageSeat.getWidth(), imageSeat.getHeight());
 
         ProgressListenerDelegate<Bitmap> progressListenerDelegate = new BitmapProgressListenerDelegate(
+                mCacheManager,
+                mTaskManager,
                 progressListener,
                 viewSpec,
                 option,

@@ -1,9 +1,7 @@
 package dev.nick.imageloader;
 
 import android.graphics.Bitmap;
-import android.support.annotation.NonNull;
 
-import dev.nick.imageloader.cache.KeyGenerator;
 import dev.nick.imageloader.loader.ProgressListener;
 import dev.nick.imageloader.loader.ViewSpec;
 import dev.nick.imageloader.loader.task.DisplayTaskRecord;
@@ -15,14 +13,12 @@ abstract class ProgressListenerDelegate<T> implements ProgressListener<T> {
 
     protected TaskManager taskManager;
     protected CacheManager<T> cacheManager;
-    protected KeyGenerator keyGenerator;
 
     protected ProgressListener<T> listener;
 
-    @NonNull
     protected ImageSeat<Bitmap> settable;
     protected String url;
-    protected DisplayOption option;
+    protected DisplayOption<T> option;
     protected ViewSpec viewSpec;
 
     private DisplayTaskRecord taskRecord;
@@ -30,12 +26,17 @@ abstract class ProgressListenerDelegate<T> implements ProgressListener<T> {
     protected Boolean canceled = Boolean.FALSE;
     protected Boolean isTaskDirty = null;
 
-    public ProgressListenerDelegate(ProgressListener<T> listener,
-                                    ViewSpec viewSpec,
-                                    DisplayOption option,
-                                    @NonNull ImageSeat<Bitmap> imageSeat,
-                                    DisplayTaskRecord taskRecord,
-                                    String url) {
+    public ProgressListenerDelegate(
+            CacheManager<T> cacheManager,
+            TaskManager taskManager,
+            ProgressListener<T> listener,
+            ViewSpec viewSpec,
+            DisplayOption<T> option,
+            ImageSeat<Bitmap> imageSeat,
+            DisplayTaskRecord taskRecord,
+            String url) {
+        this.cacheManager = cacheManager;
+        this.taskManager = taskManager;
         this.viewSpec = viewSpec;
         this.listener = listener;
         this.option = option;

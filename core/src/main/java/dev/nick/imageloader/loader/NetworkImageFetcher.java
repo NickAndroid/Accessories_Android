@@ -50,7 +50,7 @@ public class NetworkImageFetcher extends BaseImageFetcher<Bitmap> {
     private KeyGenerator mKeyGenerator = new KeyGenerator() {
         @NonNull
         @Override
-        public String fromUrl(@NonNull String url, ViewSpec info) {
+        public String fromUrl(@NonNull String url) {
             // Careless the spec info.
             return String.valueOf(url.hashCode());
         }
@@ -94,7 +94,7 @@ public class NetworkImageFetcher extends BaseImageFetcher<Bitmap> {
     }
 
     private String buildDownloadFilePath(String url) {
-        return mDownloadDir + File.separator + mFileNameGenerator.fromKey(mKeyGenerator.fromUrl(url, null));
+        return mDownloadDir + File.separator + mFileNameGenerator.fromKey(mKeyGenerator.fromUrl(url));
     }
 
     @Override
