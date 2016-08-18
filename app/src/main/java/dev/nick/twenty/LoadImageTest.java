@@ -40,8 +40,8 @@ import java.util.List;
 
 import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.LoadingListener;
-import dev.nick.imageloader.loader.result.Cause;
-import dev.nick.imageloader.logger.LoggerManager;
+import dev.nick.imageloader.worker.result.Cause;
+import dev.nick.imageloader.debug.LoggerManager;
 import dev.nick.imageloader.queue.Priority;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
@@ -246,7 +246,7 @@ public class LoadImageTest extends BaseTest {
                     }
                 };
 
-                ImageLoader.shared().load()
+                ImageLoader.shared().loadBitmap()
                         .from(uri)
                         .priority(Priority.HIGH)
                         .listener(loadingListener)

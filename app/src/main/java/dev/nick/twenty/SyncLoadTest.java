@@ -45,8 +45,8 @@ public class SyncLoadTest extends BaseTest {
     @Override
     protected void onStart() {
         super.onStart();
-        Bitmap result = (Bitmap) ImageLoader.shared()
-                .load()
+        Bitmap result = ImageLoader.shared()
+                .loadBitmap()
                 .from(urlDrawable)
                 .startSynchronously();
         Preconditions.checkNotNull(result);

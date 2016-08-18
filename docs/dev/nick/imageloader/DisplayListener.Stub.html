@@ -108,7 +108,7 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <dl>
 <dt>������ʵ�ֵĽӿ�:</dt>
-<dd><a href="../../../dev/nick/imageloader/DisplayListener.html" title="dev.nick.imageloader�еĽӿ�">DisplayListener</a>, <a href="../../../dev/nick/imageloader/loader/ProgressListener.html" title="dev.nick.imageloader.loader�еĽӿ�">ProgressListener</a>&lt;<a href="../../../dev/nick/imageloader/loader/result/BitmapResult.html" title="dev.nick.imageloader.loader.result�е���">BitmapResult</a>&gt;, <a href="../../../dev/nick/imageloader/loader/result/ErrorListener.html" title="dev.nick.imageloader.loader.result�еĽӿ�">ErrorListener</a></dd>
+<dd><a href="../../../dev/nick/imageloader/DisplayListener.html" title="dev.nick.imageloader�еĽӿ�">DisplayListener</a>, <a href="../../../dev/nick/imageloader/loader/ProgressListener.html" title="dev.nick.imageloader.loader�еĽӿ�">ProgressListener</a>&lt;<a href="../../../dev/nick/imageloader/loader/result/BitmapResult.html" title="dev.nick.imageloader.worker.result�е���">BitmapResult</a>&gt;, <a href="../../../dev/nick/imageloader/loader/result/ErrorListener.html" title="dev.nick.imageloader.worker.result�еĽӿ�">ErrorListener</a></dd>
 </dl>
 <dl>
 <dt>��սӿ�:</dt>
@@ -175,11 +175,11 @@ implements <a href="../../../dev/nick/imageloader/DisplayListener.html" title="d
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../dev/nick/imageloader/DisplayListener.Stub.html#onComplete-dev.nick.imageloader.loader.result.BitmapResult-">onComplete</a></span>(<a href="../../../dev/nick/imageloader/loader/result/BitmapResult.html" title="dev.nick.imageloader.loader.result�е���">BitmapResult</a>&nbsp;result)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../dev/nick/imageloader/DisplayListener.Stub.html#onComplete-dev.nick.imageloader.loader.result.BitmapResult-">onComplete</a></span>(<a href="../../../dev/nick/imageloader/loader/result/BitmapResult.html" title="dev.nick.imageloader.worker.result�е���">BitmapResult</a>&nbsp;result)</code>&nbsp;</td>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../dev/nick/imageloader/DisplayListener.Stub.html#onError-dev.nick.imageloader.loader.result.Cause-">onError</a></span>(<a href="../../../dev/nick/imageloader/loader/result/Cause.html" title="dev.nick.imageloader.loader.result�е���">Cause</a>&nbsp;cause)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../dev/nick/imageloader/DisplayListener.Stub.html#onError-dev.nick.imageloader.loader.result.Cause-">onError</a></span>(<a href="../../../dev/nick/imageloader/loader/result/Cause.html" title="dev.nick.imageloader.worker.result�е���">Cause</a>&nbsp;cause)</code>&nbsp;</td>
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>void</code></td>
@@ -228,35 +228,35 @@ implements <a href="../../../dev/nick/imageloader/DisplayListener.html" title="d
 <!--   -->
 </a>
 <h3>������ϸ����</h3>
-<a name="onError-dev.nick.imageloader.loader.result.Cause-">
+<a name="onError-dev.nick.imageloader.worker.result.Cause-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>onError</h4>
 <pre>public&nbsp;void&nbsp;onError(@NonNull
-                    <a href="../../../dev/nick/imageloader/loader/result/Cause.html" title="dev.nick.imageloader.loader.result�е���">Cause</a>&nbsp;cause)</pre>
+                    <a href="../../../dev/nick/imageloader/loader/result/Cause.html" title="dev.nick.imageloader.worker.result�е���">Cause</a>&nbsp;cause)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">ָ����:</span></dt>
 <dd><code><a href="../../../dev/nick/imageloader/DisplayListener.html#onError-dev.nick.imageloader.loader.result.Cause-">onError</a></code>&nbsp;�ڽӿ���&nbsp;<code><a href="../../../dev/nick/imageloader/DisplayListener.html" title="dev.nick.imageloader�еĽӿ�">DisplayListener</a></code></dd>
 <dt><span class="overrideSpecifyLabel">ָ����:</span></dt>
-<dd><code><a href="../../../dev/nick/imageloader/loader/result/ErrorListener.html#onError-dev.nick.imageloader.loader.result.Cause-">onError</a></code>&nbsp;�ڽӿ���&nbsp;<code><a href="../../../dev/nick/imageloader/loader/result/ErrorListener.html" title="dev.nick.imageloader.loader.result�еĽӿ�">ErrorListener</a></code></dd>
+<dd><code><a href="../../../dev/nick/imageloader/loader/result/ErrorListener.html#onError-dev.nick.imageloader.loader.result.Cause-">onError</a></code>&nbsp;�ڽӿ���&nbsp;<code><a href="../../../dev/nick/imageloader/loader/result/ErrorListener.html" title="dev.nick.imageloader.worker.result�еĽӿ�">ErrorListener</a></code></dd>
 </dl>
 </li>
 </ul>
-<a name="onComplete-dev.nick.imageloader.loader.result.BitmapResult-">
+<a name="onComplete-dev.nick.imageloader.worker.result.BitmapResult-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>onComplete</h4>
 <pre>public&nbsp;void&nbsp;onComplete(@Nullable
-                       <a href="../../../dev/nick/imageloader/loader/result/BitmapResult.html" title="dev.nick.imageloader.loader.result�е���">BitmapResult</a>&nbsp;result)</pre>
+                       <a href="../../../dev/nick/imageloader/loader/result/BitmapResult.html" title="dev.nick.imageloader.worker.result�е���">BitmapResult</a>&nbsp;result)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">ָ����:</span></dt>
 <dd><code><a href="../../../dev/nick/imageloader/DisplayListener.html#onComplete-dev.nick.imageloader.loader.result.BitmapResult-">onComplete</a></code>&nbsp;�ڽӿ���&nbsp;<code><a href="../../../dev/nick/imageloader/DisplayListener.html" title="dev.nick.imageloader�еĽӿ�">DisplayListener</a></code></dd>
 <dt><span class="overrideSpecifyLabel">ָ����:</span></dt>
-<dd><code><a href="../../../dev/nick/imageloader/loader/ProgressListener.html#onComplete-T-">onComplete</a></code>&nbsp;�ڽӿ���&nbsp;<code><a href="../../../dev/nick/imageloader/loader/ProgressListener.html" title="dev.nick.imageloader.loader�еĽӿ�">ProgressListener</a>&lt;<a href="../../../dev/nick/imageloader/loader/result/BitmapResult.html" title="dev.nick.imageloader.loader.result�е���">BitmapResult</a>&gt;</code></dd>
+<dd><code><a href="../../../dev/nick/imageloader/loader/ProgressListener.html#onComplete-T-">onComplete</a></code>&nbsp;�ڽӿ���&nbsp;<code><a href="../../../dev/nick/imageloader/loader/ProgressListener.html" title="dev.nick.imageloader.loader�еĽӿ�">ProgressListener</a>&lt;<a href="../../../dev/nick/imageloader/loader/result/BitmapResult.html" title="dev.nick.imageloader.worker.result�е���">BitmapResult</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -271,7 +271,7 @@ implements <a href="../../../dev/nick/imageloader/DisplayListener.html" title="d
 <dt><span class="overrideSpecifyLabel">ָ����:</span></dt>
 <dd><code><a href="../../../dev/nick/imageloader/DisplayListener.html#onProgressUpdate-float-">onProgressUpdate</a></code>&nbsp;�ڽӿ���&nbsp;<code><a href="../../../dev/nick/imageloader/DisplayListener.html" title="dev.nick.imageloader�еĽӿ�">DisplayListener</a></code></dd>
 <dt><span class="overrideSpecifyLabel">ָ����:</span></dt>
-<dd><code><a href="../../../dev/nick/imageloader/loader/ProgressListener.html#onProgressUpdate-float-">onProgressUpdate</a></code>&nbsp;�ڽӿ���&nbsp;<code><a href="../../../dev/nick/imageloader/loader/ProgressListener.html" title="dev.nick.imageloader.loader�еĽӿ�">ProgressListener</a>&lt;<a href="../../../dev/nick/imageloader/loader/result/BitmapResult.html" title="dev.nick.imageloader.loader.result�е���">BitmapResult</a>&gt;</code></dd>
+<dd><code><a href="../../../dev/nick/imageloader/loader/ProgressListener.html#onProgressUpdate-float-">onProgressUpdate</a></code>&nbsp;�ڽӿ���&nbsp;<code><a href="../../../dev/nick/imageloader/loader/ProgressListener.html" title="dev.nick.imageloader.loader�еĽӿ�">ProgressListener</a>&lt;<a href="../../../dev/nick/imageloader/loader/result/BitmapResult.html" title="dev.nick.imageloader.worker.result�е���">BitmapResult</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -284,7 +284,7 @@ implements <a href="../../../dev/nick/imageloader/DisplayListener.html" title="d
 <pre>public&nbsp;void&nbsp;onCancel()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">ָ����:</span></dt>
-<dd><code><a href="../../../dev/nick/imageloader/loader/ProgressListener.html#onCancel--">onCancel</a></code>&nbsp;�ڽӿ���&nbsp;<code><a href="../../../dev/nick/imageloader/loader/ProgressListener.html" title="dev.nick.imageloader.loader�еĽӿ�">ProgressListener</a>&lt;<a href="../../../dev/nick/imageloader/loader/result/BitmapResult.html" title="dev.nick.imageloader.loader.result�е���">BitmapResult</a>&gt;</code></dd>
+<dd><code><a href="../../../dev/nick/imageloader/loader/ProgressListener.html#onCancel--">onCancel</a></code>&nbsp;�ڽӿ���&nbsp;<code><a href="../../../dev/nick/imageloader/loader/ProgressListener.html" title="dev.nick.imageloader.loader�еĽӿ�">ProgressListener</a>&lt;<a href="../../../dev/nick/imageloader/loader/result/BitmapResult.html" title="dev.nick.imageloader.worker.result�е���">BitmapResult</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -299,7 +299,7 @@ implements <a href="../../../dev/nick/imageloader/DisplayListener.html" title="d
 <dt><span class="overrideSpecifyLabel">ָ����:</span></dt>
 <dd><code><a href="../../../dev/nick/imageloader/DisplayListener.html#onStartLoading--">onStartLoading</a></code>&nbsp;�ڽӿ���&nbsp;<code><a href="../../../dev/nick/imageloader/DisplayListener.html" title="dev.nick.imageloader�еĽӿ�">DisplayListener</a></code></dd>
 <dt><span class="overrideSpecifyLabel">ָ����:</span></dt>
-<dd><code><a href="../../../dev/nick/imageloader/loader/ProgressListener.html#onStartLoading--">onStartLoading</a></code>&nbsp;�ڽӿ���&nbsp;<code><a href="../../../dev/nick/imageloader/loader/ProgressListener.html" title="dev.nick.imageloader.loader�еĽӿ�">ProgressListener</a>&lt;<a href="../../../dev/nick/imageloader/loader/result/BitmapResult.html" title="dev.nick.imageloader.loader.result�е���">BitmapResult</a>&gt;</code></dd>
+<dd><code><a href="../../../dev/nick/imageloader/loader/ProgressListener.html#onStartLoading--">onStartLoading</a></code>&nbsp;�ڽӿ���&nbsp;<code><a href="../../../dev/nick/imageloader/loader/ProgressListener.html" title="dev.nick.imageloader.loader�еĽӿ�">ProgressListener</a>&lt;<a href="../../../dev/nick/imageloader/loader/result/BitmapResult.html" title="dev.nick.imageloader.worker.result�е���">BitmapResult</a>&gt;</code></dd>
 </dl>
 </li>
 </ul>

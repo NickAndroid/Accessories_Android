@@ -37,9 +37,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dev.nick.imageloader.ImageLoader;
-import dev.nick.imageloader.display.DisplayOption;
-import dev.nick.imageloader.display.ImageQuality;
-import dev.nick.imageloader.display.animator.FadeInImageAnimator;
+import dev.nick.imageloader.ui.DisplayOption;
+import dev.nick.imageloader.ui.ImageQuality;
+import dev.nick.imageloader.ui.animator.FadeInImageAnimator;
 import dev.nick.imageloader.queue.Priority;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
@@ -209,10 +209,9 @@ public class NetworkImageTest extends BaseTest {
 
                 ImageLoader.shared()
                         .cancel(holder.imageView)
-                        .load()
+                        .loadBitmap()
                         .from(uri)
-                        .option(DisplayOption.builder()
-                                .oneAfterOne()
+                        .option(DisplayOption.bitmapBuilder()
                                 .imageQuality(ImageQuality.OPT)
                                 .viewMaybeReused()
                                 .imageAnimator(new FadeInImageAnimator())
