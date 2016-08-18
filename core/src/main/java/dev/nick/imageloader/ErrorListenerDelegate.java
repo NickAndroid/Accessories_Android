@@ -4,8 +4,8 @@ import android.support.annotation.NonNull;
 
 import java.io.InterruptedIOException;
 
-import dev.nick.imageloader.loader.result.Cause;
-import dev.nick.imageloader.loader.result.ErrorListener;
+import dev.nick.imageloader.worker.result.Cause;
+import dev.nick.imageloader.worker.result.ErrorListener;
 
 class ErrorListenerDelegate implements ErrorListener {
 

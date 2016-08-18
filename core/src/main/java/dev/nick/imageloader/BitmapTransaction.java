@@ -9,7 +9,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
 import dev.nick.imageloader.annotation.LoaderApi;
-import dev.nick.imageloader.loader.ProgressListener;
+import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.queue.Priority;
 import dev.nick.imageloader.ui.BitmapImageViewDelegate;
 import dev.nick.imageloader.ui.DisplayOption;

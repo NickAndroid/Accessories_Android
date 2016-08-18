@@ -40,7 +40,7 @@ import java.util.List;
 
 import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.LoadingListener;
-import dev.nick.imageloader.loader.result.Cause;
+import dev.nick.imageloader.worker.result.Cause;
 import dev.nick.imageloader.debug.LoggerManager;
 import dev.nick.imageloader.queue.Priority;
 

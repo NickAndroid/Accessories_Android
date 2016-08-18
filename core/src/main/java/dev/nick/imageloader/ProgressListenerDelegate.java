@@ -2,10 +2,11 @@ package dev.nick.imageloader;
 
 import android.graphics.Bitmap;
 
-import dev.nick.imageloader.loader.ProgressListener;
-import dev.nick.imageloader.loader.ViewSpec;
-import dev.nick.imageloader.loader.task.DisplayTaskRecord;
-import dev.nick.imageloader.loader.task.TaskManager;
+import dev.nick.imageloader.cache.CacheManager;
+import dev.nick.imageloader.worker.ProgressListener;
+import dev.nick.imageloader.worker.ViewSpec;
+import dev.nick.imageloader.worker.task.DisplayTaskRecord;
+import dev.nick.imageloader.worker.task.TaskManager;
 import dev.nick.imageloader.ui.DisplayOption;
 import dev.nick.imageloader.ui.ImageSeat;
 

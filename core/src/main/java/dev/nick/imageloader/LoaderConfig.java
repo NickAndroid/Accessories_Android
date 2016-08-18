@@ -21,7 +21,7 @@ import android.util.Log;
 
 import dev.nick.imageloader.annotation.LoaderApi;
 import dev.nick.imageloader.cache.CachePolicy;
-import dev.nick.imageloader.loader.network.NetworkPolicy;
+import dev.nick.imageloader.worker.network.NetworkPolicy;
 import dev.nick.imageloader.debug.LoggerManager;
 import dev.nick.imageloader.queue.QueuePolicy;
 

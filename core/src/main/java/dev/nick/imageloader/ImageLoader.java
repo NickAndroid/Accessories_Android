@@ -32,6 +32,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import dev.nick.imageloader.annotation.LoaderApi;
+import dev.nick.imageloader.cache.BitmapCacheManager;
+import dev.nick.imageloader.cache.CacheManager;
 import dev.nick.imageloader.control.Forkable;
 import dev.nick.imageloader.control.Freezer;
 import dev.nick.imageloader.control.LoaderState;
@@ -39,17 +41,6 @@ import dev.nick.imageloader.control.StorageStats;
 import dev.nick.imageloader.control.TrafficStats;
 import dev.nick.imageloader.debug.Logger;
 import dev.nick.imageloader.debug.LoggerManager;
-import dev.nick.imageloader.loader.ImageSource;
-import dev.nick.imageloader.loader.ImageSourceType;
-import dev.nick.imageloader.loader.ProgressListener;
-import dev.nick.imageloader.loader.ViewSpec;
-import dev.nick.imageloader.loader.result.ErrorListener;
-import dev.nick.imageloader.loader.task.DisplayTask;
-import dev.nick.imageloader.loader.task.DisplayTaskMonitor;
-import dev.nick.imageloader.loader.task.DisplayTaskRecord;
-import dev.nick.imageloader.loader.task.FutureImageTask;
-import dev.nick.imageloader.loader.task.MokeFutureImageTask;
-import dev.nick.imageloader.loader.task.TaskManager;
 import dev.nick.imageloader.queue.FIFOPriorityBlockingQueue;
 import dev.nick.imageloader.queue.IdleStateMonitor;
 import dev.nick.imageloader.queue.LIFOPriorityBlockingQueue;
@@ -57,7 +48,6 @@ import dev.nick.imageloader.queue.Priority;
 import dev.nick.imageloader.queue.QueuePolicy;
 import dev.nick.imageloader.queue.RequestHandler;
 import dev.nick.imageloader.queue.RequestQueueManager;
-import dev.nick.imageloader.ui.BitmapImageSeat;
 import dev.nick.imageloader.ui.BitmapImageViewDelegate;
 import dev.nick.imageloader.ui.DisplayOption;
 import dev.nick.imageloader.ui.ImageQuality;
@@ -65,6 +55,19 @@ import dev.nick.imageloader.ui.ImageSeat;
 import dev.nick.imageloader.ui.ImageSettableIdCreator;
 import dev.nick.imageloader.ui.ImageSettableIdCreatorImpl;
 import dev.nick.imageloader.utils.Preconditions;
+import dev.nick.imageloader.worker.ImageSource;
+import dev.nick.imageloader.worker.ImageSourceType;
+import dev.nick.imageloader.worker.ProgressListener;
+import dev.nick.imageloader.worker.ViewSpec;
+import dev.nick.imageloader.worker.result.ErrorListener;
+import dev.nick.imageloader.worker.task.BitmapDisplayTask;
+import dev.nick.imageloader.worker.task.DisplayTask;
+import dev.nick.imageloader.worker.task.DisplayTaskMonitor;
+import dev.nick.imageloader.worker.task.DisplayTaskRecord;
+import dev.nick.imageloader.worker.task.FutureImageTask;
+import dev.nick.imageloader.worker.task.MokeFutureImageTask;
+import dev.nick.imageloader.worker.task.TaskManager;
+import dev.nick.imageloader.worker.task.TaskManagerImpl;
 
 /**
  * Main class of {@link ImageLoader} library.
@@ -199,7 +202,7 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
      * Display image from the from to the view.
      *
      * @param source           Image source from, one of {@link ImageSource}
-     * @param settable         Target {@link BitmapImageSeat} to display the image.
+     * @param settable         Target {@link ImageSeat} to display the image.
      * @param option           {@link DisplayOption} is options using when display the image.
      * @param progressListener The progress progressListener using to watch the progress of the loading.
      */

@@ -4,9 +4,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
-import dev.nick.imageloader.loader.ProgressListener;
-import dev.nick.imageloader.loader.result.Cause;
-import dev.nick.imageloader.loader.result.ErrorListener;
+import dev.nick.imageloader.worker.ProgressListener;
+import dev.nick.imageloader.worker.result.Cause;
+import dev.nick.imageloader.worker.result.ErrorListener;
 
 class UIThreadRouter implements Handler.Callback {
 

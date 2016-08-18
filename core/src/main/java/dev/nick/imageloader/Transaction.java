@@ -4,15 +4,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import dev.nick.imageloader.annotation.LoaderApi;
-import dev.nick.imageloader.loader.ImageSource;
-import dev.nick.imageloader.loader.ImageSourceType;
-import dev.nick.imageloader.loader.ProgressListener;
-import dev.nick.imageloader.loader.result.ErrorListener;
 import dev.nick.imageloader.queue.Priority;
-import dev.nick.imageloader.ui.BitmapImageSeat;
 import dev.nick.imageloader.ui.DisplayOption;
 import dev.nick.imageloader.ui.ImageSeat;
 import dev.nick.imageloader.utils.Preconditions;
+import dev.nick.imageloader.worker.ImageSource;
+import dev.nick.imageloader.worker.ImageSourceType;
+import dev.nick.imageloader.worker.ProgressListener;
+import dev.nick.imageloader.worker.result.ErrorListener;
 
 public abstract class Transaction<T> {
 
@@ -42,7 +41,7 @@ public abstract class Transaction<T> {
 
     /**
      * @param option {@link DisplayOption} is options using when display the image.
-     *               * @param settable Target {@link BitmapImageSeat} to display the image.
+     *               * @param settable Target {@link ImageSeat} to display the image.
      * @return Instance of Transaction.
      */
     @LoaderApi
