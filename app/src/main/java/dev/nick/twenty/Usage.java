@@ -24,6 +24,7 @@ import com.nick.scalpel.ScalpelAutoActivity;
 import com.nick.scalpel.annotation.binding.FindView;
 
 import dev.nick.imageloader.ImageLoader;
+import dev.nick.imageloader.control.StorageStats;
 
 public class Usage extends ScalpelAutoActivity {
 
@@ -46,5 +47,7 @@ public class Usage extends ScalpelAutoActivity {
                         + MiscUtils.formatedFileSize(ImageLoader.shared().getWifiTrafficUsage());
 
         textView.setText(string);
+
+        StorageStats storageStats = StorageStats.from(this);
     }
 }

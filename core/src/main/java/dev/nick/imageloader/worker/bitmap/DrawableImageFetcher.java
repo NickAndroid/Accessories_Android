@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package dev.nick.imageloader.worker;
+package dev.nick.imageloader.worker.bitmap;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -22,6 +22,11 @@ import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import dev.nick.imageloader.worker.BaseImageFetcher;
+import dev.nick.imageloader.worker.DecodeSpec;
+import dev.nick.imageloader.worker.DimenSpec;
+import dev.nick.imageloader.worker.PathSplitter;
+import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.result.Cause;
 import dev.nick.imageloader.worker.result.ErrorListener;
 
@@ -54,9 +59,9 @@ public class DrawableImageFetcher extends BaseImageFetcher<Bitmap> {
         callOnStart(progressListener);
 
         BitmapFactory.Options decodeOptions = null;
-        ViewSpec viewSpec = decodeSpec.viewSpec;
+        DimenSpec dimenSpec = decodeSpec.getDimenSpec();
 
-        switch (decodeSpec.quality) {
+        switch (decodeSpec.getQuality()) {
             case OPT:
                 decodeOptions = new BitmapFactory.Options();
 
@@ -68,9 +73,9 @@ public class DrawableImageFetcher extends BaseImageFetcher<Bitmap> {
                 decodeOptions.inJustDecodeBounds = false;
                 decodeOptions.inSampleSize =
                         computeSampleSize(decodeOptions, UNCONSTRAINED,
-                                (viewSpec.height * viewSpec.height == 0 ?
+                                (dimenSpec.height * dimenSpec.height == 0 ?
                                         MAX_NUM_PIXELS_THUMBNAIL
-                                        : viewSpec.width * viewSpec.height));
+                                        : dimenSpec.width * dimenSpec.height));
             default:
                 break;
         }

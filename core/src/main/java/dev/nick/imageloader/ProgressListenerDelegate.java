@@ -1,10 +1,8 @@
 package dev.nick.imageloader;
 
-import android.graphics.Bitmap;
-
 import dev.nick.imageloader.cache.CacheManager;
 import dev.nick.imageloader.worker.ProgressListener;
-import dev.nick.imageloader.worker.ViewSpec;
+import dev.nick.imageloader.worker.DimenSpec;
 import dev.nick.imageloader.worker.task.DisplayTaskRecord;
 import dev.nick.imageloader.worker.task.TaskManager;
 import dev.nick.imageloader.ui.DisplayOption;
@@ -17,10 +15,10 @@ abstract class ProgressListenerDelegate<T> implements ProgressListener<T> {
 
     protected ProgressListener<T> listener;
 
-    protected ImageSeat<Bitmap> settable;
+    protected ImageSeat<T> settable;
     protected String url;
     protected DisplayOption<T> option;
-    protected ViewSpec viewSpec;
+    protected DimenSpec dimenSpec;
 
     private DisplayTaskRecord taskRecord;
 
@@ -31,14 +29,14 @@ abstract class ProgressListenerDelegate<T> implements ProgressListener<T> {
             CacheManager<T> cacheManager,
             TaskManager taskManager,
             ProgressListener<T> listener,
-            ViewSpec viewSpec,
+            DimenSpec dimenSpec,
             DisplayOption<T> option,
-            ImageSeat<Bitmap> imageSeat,
+            ImageSeat<T> imageSeat,
             DisplayTaskRecord taskRecord,
             String url) {
         this.cacheManager = cacheManager;
         this.taskManager = taskManager;
-        this.viewSpec = viewSpec;
+        this.dimenSpec = dimenSpec;
         this.listener = listener;
         this.option = option;
         this.settable = imageSeat;

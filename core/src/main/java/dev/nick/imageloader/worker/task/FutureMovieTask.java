@@ -14,21 +14,13 @@
  * limitations under the License.
  */
 
-package dev.nick.imageloader.ui.art;
+package dev.nick.imageloader.worker.task;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.WorkerThread;
+import android.graphics.Movie;
+import android.support.annotation.Nullable;
 
-import dev.nick.imageloader.ui.ImageSeat;
-
-public abstract class BitmapHandlerCaller {
-
-    @WorkerThread
-    public static <T> T call(@NonNull ImageArt<T>[] arts, @NonNull T in,
-                             @NonNull ImageSeat<T> imageSeat) {
-        for (ImageArt<T> art : arts) {
-            in = art.process(in, imageSeat);
-        }
-        return in;
+public class FutureMovieTask extends BaseFutureTask<Movie> {
+    public FutureMovieTask(BaseDisplayTask<Movie> task, @Nullable TaskActionListener listener, boolean cancelOthersBeforeRun) {
+        super(task, listener, cancelOthersBeforeRun);
     }
 }

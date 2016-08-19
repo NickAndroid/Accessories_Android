@@ -15,7 +15,7 @@ class FakeBitmapImageSeat implements ImageSeat<Bitmap> {
     }
 
     @Override
-    public void setImage(@NonNull Bitmap bitmap) {
+    public void seat(@NonNull Bitmap bitmap) {
         // Nothing.
     }
 

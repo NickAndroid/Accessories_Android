@@ -18,6 +18,6 @@ package dev.nick.imageloader.worker;
 
 import android.support.annotation.NonNull;
 
-interface PathSplitter<T> {
+public interface PathSplitter<T> {
     T getRealPath(@NonNull String fullPath);
 }

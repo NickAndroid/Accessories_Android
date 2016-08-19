@@ -24,17 +24,17 @@ import android.support.annotation.Nullable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import dev.nick.imageloader.LoaderConfig;
-import dev.nick.imageloader.worker.result.Cause;
-import dev.nick.imageloader.worker.result.ErrorListener;
 import dev.nick.imageloader.debug.Logger;
 import dev.nick.imageloader.debug.LoggerManager;
+import dev.nick.imageloader.worker.result.Cause;
+import dev.nick.imageloader.worker.result.ErrorListener;
 
-class BaseImageFetcher<T> implements ImageFetcher<T> {
+public class BaseImageFetcher<T> implements ImageFetcher<T> {
 
-    static final int UNCONSTRAINED = -1;
+    protected static final int UNCONSTRAINED = -1;
 
     /* Maximum pixels size for created bitmap. */
-    static final int MAX_NUM_PIXELS_THUMBNAIL = 512 * 512;
+    protected static final int MAX_NUM_PIXELS_THUMBNAIL = 512 * 512;
 
     protected PathSplitter<String> mSplitter;
 

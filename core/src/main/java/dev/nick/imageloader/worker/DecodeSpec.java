@@ -21,18 +21,18 @@ import dev.nick.imageloader.ui.ImageQuality;
 public class DecodeSpec {
 
     ImageQuality quality;
-    ViewSpec viewSpec;
+    DimenSpec dimenSpec;
 
-    public DecodeSpec(ImageQuality quality, ViewSpec viewSpec) {
+    public DecodeSpec(ImageQuality quality, DimenSpec dimenSpec) {
         this.quality = quality;
-        this.viewSpec = viewSpec;
+        this.dimenSpec = dimenSpec;
     }
 
     public ImageQuality getQuality() {
         return quality;
     }
 
-    public ViewSpec getViewSpec() {
-        return viewSpec;
+    public DimenSpec getDimenSpec() {
+        return dimenSpec;
     }
 }

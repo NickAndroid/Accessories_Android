@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package dev.nick.imageloader.worker;
+package dev.nick.imageloader.worker.bitmap;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -31,6 +31,12 @@ import dev.nick.imageloader.cache.CachePolicy;
 import dev.nick.imageloader.cache.FileNameGenerator;
 import dev.nick.imageloader.cache.KeyGenerator;
 import dev.nick.imageloader.control.TrafficStats;
+import dev.nick.imageloader.worker.BaseImageFetcher;
+import dev.nick.imageloader.worker.DecodeSpec;
+import dev.nick.imageloader.worker.ImageFetcher;
+import dev.nick.imageloader.worker.ImageSource;
+import dev.nick.imageloader.worker.PathSplitter;
+import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.network.HttpImageDownloader;
 import dev.nick.imageloader.worker.network.ImageDownloader;
 import dev.nick.imageloader.worker.network.NetworkPolicy;
@@ -173,7 +179,7 @@ public class NetworkImageFetcher extends BaseImageFetcher<Bitmap> {
         if (exists) {
             try {
                 mLogger.info("Using exist file instead of download.");
-                mFileImageFetcher.fetchFromUrl(ImageSourceType.FILE.getPrefix() + downloadPath,
+                mFileImageFetcher.fetchFromUrl(ImageSource.Prefix.FILE + downloadPath,
                         decodeSpec, progressListener, errorListener);
                 return null;
             } catch (Exception e) {
@@ -195,7 +201,7 @@ public class NetworkImageFetcher extends BaseImageFetcher<Bitmap> {
         }
 
         if (ok) {
-            return mFileImageFetcher.fetchFromUrl(ImageSourceType.FILE.getPrefix() + tmpPath, decodeSpec, progressListener, errorListener);
+            return mFileImageFetcher.fetchFromUrl(ImageSource.Prefix.FILE + tmpPath, decodeSpec, progressListener, errorListener);
         }
         return null;
     }

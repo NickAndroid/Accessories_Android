@@ -20,8 +20,8 @@ public interface Forkable<T, X> {
     /**
      * Fork an instance of {@link T}
      *
-     * @param in Instance of {@link X} used for the forked one.
+     * @param param Instance of {@link X} used for the forked one.
      * @return The forked instance of {@link T}
      */
-    T fork(X in);
+    T fork(X param);
 }

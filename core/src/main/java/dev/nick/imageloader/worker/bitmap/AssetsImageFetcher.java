@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package dev.nick.imageloader.worker;
+package dev.nick.imageloader.worker.bitmap;
 
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
@@ -26,6 +26,11 @@ import android.support.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 
+import dev.nick.imageloader.worker.BaseImageFetcher;
+import dev.nick.imageloader.worker.DecodeSpec;
+import dev.nick.imageloader.worker.DimenSpec;
+import dev.nick.imageloader.worker.PathSplitter;
+import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.result.Cause;
 import dev.nick.imageloader.worker.result.ErrorListener;
 
@@ -63,7 +68,7 @@ public class AssetsImageFetcher extends BaseImageFetcher<Bitmap> {
 
         Rect rect = new Rect(0, 0, 0, 0);
 
-        ViewSpec viewSpec = decodeSpec.viewSpec;
+        DimenSpec dimenSpec = decodeSpec.getDimenSpec();
 
         // If we have to resize this image, first get the natural bounds.
         decodeOptions.inJustDecodeBounds = true;
@@ -74,9 +79,9 @@ public class AssetsImageFetcher extends BaseImageFetcher<Bitmap> {
         decodeOptions.inSampleSize = computeSampleSize(
                 decodeOptions,
                 UNCONSTRAINED,
-                (viewSpec.height * viewSpec.height == 0 ?
+                (dimenSpec.height * dimenSpec.height == 0 ?
                         MAX_NUM_PIXELS_THUMBNAIL
-                        : viewSpec.width * viewSpec.height));
+                        : dimenSpec.width * dimenSpec.height));
 
         Bitmap tempBitmap = null;
 

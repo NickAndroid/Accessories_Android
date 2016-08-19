@@ -17,6 +17,7 @@
 package dev.nick.imageloader.ui;
 
 import android.graphics.Bitmap;
+import android.graphics.Movie;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 
@@ -85,6 +86,10 @@ public class DisplayOption<T> {
     }
 
     public static Builder<Bitmap> bitmapBuilder() {
+        return new Builder<>();
+    }
+
+    public static Builder<Movie> movieBuilder() {
         return new Builder<>();
     }
 

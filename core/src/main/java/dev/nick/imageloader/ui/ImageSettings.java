@@ -24,12 +24,12 @@ public abstract class ImageSettings<T> implements Runnable {
 
     protected ImageAnimator<T> mAnimator;
     @NonNull
-    protected ImageSeat<T> mSettable;
+    protected ImageSeat<T> mSeat;
 
     public ImageSettings(ImageAnimator<T> animator,
                          @NonNull ImageSeat<T> imageSeat) {
         this.mAnimator = animator;
-        this.mSettable = imageSeat;
+        this.mSeat = imageSeat;
     }
 
     protected abstract void apply();

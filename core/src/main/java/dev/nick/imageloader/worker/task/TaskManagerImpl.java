@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import dev.nick.imageloader.control.LoaderState;
+
 public class TaskManagerImpl implements TaskManager {
 
     private final AtomicInteger mTaskId = new AtomicInteger(0);
@@ -27,6 +29,8 @@ public class TaskManagerImpl implements TaskManager {
     private final Map<Long, DisplayTaskRecord> mTaskLockMap;
 
     private long mClearTaskRequestedTimeMills;
+
+    private LoaderState mState = LoaderState.RUNNING;
 
     public TaskManagerImpl() {
         this.mTaskLockMap = new HashMap<>();
@@ -68,6 +72,8 @@ public class TaskManagerImpl implements TaskManager {
 
     private boolean isTaskDirty(DisplayTaskRecord task) {
 
+        if (mState == LoaderState.TERMINATED) return true;
+
         boolean outDated = task.upTime() <= mClearTaskRequestedTimeMills;
 
         if (outDated) {
@@ -88,9 +94,10 @@ public class TaskManagerImpl implements TaskManager {
     }
 
     @Override
-    public void terminate() {
+    public synchronized void terminate() {
         synchronized (mTaskLockMap) {
             mTaskLockMap.clear();
         }
+        mState = LoaderState.TERMINATED;
     }
 }

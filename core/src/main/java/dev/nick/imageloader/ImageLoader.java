@@ -19,6 +19,7 @@ package dev.nick.imageloader;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Movie;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
@@ -34,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 import dev.nick.imageloader.annotation.LoaderApi;
 import dev.nick.imageloader.cache.BitmapCacheManager;
 import dev.nick.imageloader.cache.CacheManager;
+import dev.nick.imageloader.cache.MovieCacheManager;
 import dev.nick.imageloader.control.Forkable;
 import dev.nick.imageloader.control.Freezer;
 import dev.nick.imageloader.control.LoaderState;
@@ -55,25 +57,27 @@ import dev.nick.imageloader.ui.ImageSeat;
 import dev.nick.imageloader.ui.ImageSettableIdCreator;
 import dev.nick.imageloader.ui.ImageSettableIdCreatorImpl;
 import dev.nick.imageloader.utils.Preconditions;
+import dev.nick.imageloader.worker.DimenSpec;
+import dev.nick.imageloader.worker.ImageData;
 import dev.nick.imageloader.worker.ImageSource;
-import dev.nick.imageloader.worker.ImageSourceType;
 import dev.nick.imageloader.worker.ProgressListener;
-import dev.nick.imageloader.worker.ViewSpec;
+import dev.nick.imageloader.worker.bitmap.BitmapImageSource;
 import dev.nick.imageloader.worker.result.ErrorListener;
+import dev.nick.imageloader.worker.task.BaseFutureTask;
 import dev.nick.imageloader.worker.task.BitmapDisplayTask;
-import dev.nick.imageloader.worker.task.DisplayTask;
-import dev.nick.imageloader.worker.task.DisplayTaskMonitor;
 import dev.nick.imageloader.worker.task.DisplayTaskRecord;
-import dev.nick.imageloader.worker.task.FutureImageTask;
+import dev.nick.imageloader.worker.task.FutureBitmapTask;
+import dev.nick.imageloader.worker.task.FutureMovieTask;
 import dev.nick.imageloader.worker.task.MokeFutureImageTask;
+import dev.nick.imageloader.worker.task.MovieDisplayTask;
 import dev.nick.imageloader.worker.task.TaskManager;
 import dev.nick.imageloader.worker.task.TaskManagerImpl;
 
 /**
  * Main class of {@link ImageLoader} library.
  */
-public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
-        FutureImageTask.TaskActionListener,
+public class ImageLoader implements
+        BaseFutureTask.TaskActionListener,
         Forkable<ImageLoader, LoaderConfig>,
         Terminable {
 
@@ -82,18 +86,25 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
             .viewMaybeReused()
             .build();
 
+    private static final DisplayOption<Movie> sDefDisplayOptionMovie = DisplayOption.movieBuilder()
+            .imageQuality(ImageQuality.OPT)
+            .viewMaybeReused()
+            .build();
+
     private static ImageLoader sLoader;
 
-    private final List<FutureImageTask> mFutures;
+    private final List<BaseFutureTask> mFutures;
 
     private Context mContext;
 
     private UIThreadRouter mUiThreadRouter;
     private ImageSettingApplier mImageSettingApplier;
 
-    private CacheManager<Bitmap> mCacheManager;
+    private CacheManager<Bitmap> mBitmapCacheManager;
+    private CacheManager<Movie> mMovieCacheManager;
+
     private LoaderConfig mConfig;
-    private RequestQueueManager<FutureImageTask> mTaskHandleService;
+    private RequestQueueManager<BaseFutureTask> mTaskHandleService;
     private RequestQueueManager<Transaction> mTransactionService;
 
     private Logger mLogger;
@@ -107,7 +118,7 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
     private ImageSettableIdCreator mSettableIdCreator;
 
     @SuppressLint("DefaultLocale")
-    private ImageLoader(Context context, CacheManager<Bitmap> cacheManager, LoaderConfig config) {
+    private ImageLoader(Context context, LoaderConfig config) {
         Preconditions.checkNotNull(context);
         if (config == null) config = LoaderConfig.DEFAULT_CONFIG;
         LoggerManager.setDebugLevel(config.getDebugLevel());
@@ -117,9 +128,46 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
         this.mSettableIdCreator = new ImageSettableIdCreatorImpl();
         this.mUiThreadRouter = UIThreadRouter.getSharedRouter();
         this.mImageSettingApplier = ImageSettingApplier.getSharedApplier();
-        this.mCacheManager = cacheManager == null
-                ? new BitmapCacheManager(config.getCachePolicy(), context)
-                : cacheManager;
+        this.mBitmapCacheManager = new BitmapCacheManager(config.getCachePolicy(), context);
+        this.mMovieCacheManager = new MovieCacheManager(config.getCachePolicy(), context);
+        //noinspection deprecation
+        this.mLoadingService = new ThreadPoolExecutor(
+                config.getLoadingThreads(),
+                config.getLoadingThreads(),
+                0L,
+                TimeUnit.MILLISECONDS,
+                config.getQueuePolicy() == QueuePolicy.FIFO
+                        ? new FIFOPriorityBlockingQueue<Runnable>()
+                        : new LIFOPriorityBlockingQueue<Runnable>());
+        int loaderId = LoaderFactory.assignLoaderId();
+        this.mTaskHandleService = RequestQueueManager.createStarted(new TaskHandler(), null, null, "TaskHandleService#" + loaderId);
+        this.mTransactionService = RequestQueueManager.createStarted(new TransactionHandler(), new IdleStateMonitor() {
+            @Override
+            public void onIdle() {
+                LoggerManager.getLogger(IdleStateMonitor.class).funcEnter();
+                TrafficStats.from(mContext).flush();
+                StorageStats.from(mContext).flush();
+            }
+        }, QueuePolicy.FIFO, "TransactionService#" + loaderId);
+        this.mFutures = new ArrayList<>();
+        this.mState = LoaderState.RUNNING;
+        this.mLogger = LoggerManager.getLogger(getClass().getSimpleName() + "#" + loaderId);
+        this.mLogger.verbose(String.format("Create loader-%d with config %s", loaderId, config));
+    }
+
+
+    @SuppressLint("DefaultLocale")
+    private ImageLoader(ImageLoader from, LoaderConfig config) {
+        Preconditions.checkNotNull(from);
+        if (config == null) config = LoaderConfig.DEFAULT_CONFIG;
+        LoggerManager.setDebugLevel(config.getDebugLevel());
+        this.mContext = from.mContext;
+        this.mConfig = config;
+        this.mTaskManager = from.mTaskManager;
+        this.mSettableIdCreator = from.mSettableIdCreator;
+        this.mUiThreadRouter = UIThreadRouter.getSharedRouter();
+        this.mImageSettingApplier = ImageSettingApplier.getSharedApplier();
+        this.mBitmapCacheManager = from.mBitmapCacheManager;
         //noinspection deprecation
         this.mLoadingService = new ThreadPoolExecutor(
                 config.getLoadingThreads(),
@@ -147,7 +195,7 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
 
     @LoaderApi
     private static ImageLoader clone(ImageLoader from, LoaderConfig config) {
-        return new ImageLoader(from.mContext, from.mCacheManager, config);
+        return new ImageLoader(from, config);
     }
 
     /**
@@ -171,7 +219,7 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
     @LoaderApi
     public static void createShared(Context context, LoaderConfig config) {
         if (sLoader == null || sLoader.isTerminated()) {
-            sLoader = new ImageLoader(context, null, config);
+            sLoader = new ImageLoader(context, config);
         }
     }
 
@@ -199,14 +247,26 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
     }
 
     /**
+     * Start a quick optional transaction builder,
+     * do not forget to call {@link Transaction#start()} to start this task.
+     *
+     * @return An optional params wrapper.
+     * @see Transaction
+     */
+    @LoaderApi
+    public MovieTransaction loadMovie() {
+        return new MovieTransaction(this);
+    }
+
+    /**
      * Display image from the from to the view.
      *
-     * @param source           Image source from, one of {@link ImageSource}
+     * @param source           Image source from, one of {@link ImageData}
      * @param settable         Target {@link ImageSeat} to display the image.
      * @param option           {@link DisplayOption} is options using when display the image.
      * @param progressListener The progress progressListener using to watch the progress of the loading.
      */
-    Future<Bitmap> displayBitmap(@NonNull ImageSource<Bitmap> source,
+    Future<Bitmap> displayBitmap(@NonNull ImageData<Bitmap> source,
                                  @NonNull ImageSeat<Bitmap> settable,
                                  @Nullable DisplayOption<Bitmap> option,
                                  @Nullable ProgressListener<Bitmap> progressListener,
@@ -215,19 +275,19 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
 
         ensureNotTerminated();
 
-        Preconditions.checkNotNull(source.getUrl(), "imageSource is null");
+        Preconditions.checkNotNull(source.getUrl(), "imageData is null");
 
         DisplayTaskRecord record = createTaskRecord(Preconditions.checkNotNull(settable));
 
-        option = assignOptionIfNull(option);
+        option = assignBitmapOption(option);
 
         // 1. Get from cache.
         // 2. If no mem cache, start a loading task from disk cache file or perform first loading.
         // 3. Cache the loaded.
 
-        if (mCacheManager.isMemCacheEnabled()) {
+        if (mBitmapCacheManager.isMemCacheEnabled()) {
             Bitmap cached;
-            if ((cached = mCacheManager.get(source.getUrl())) != null) {
+            if ((cached = mBitmapCacheManager.get(source.getUrl())) != null) {
                 mImageSettingApplier.applyImageSettings(
                         cached,
                         option.getHandlers(),
@@ -241,18 +301,18 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
             }
         }
 
-        beforeLoading(settable, option);
+        beforeLoadBitmap(settable, option);
 
         String loadingUrl = source.getUrl();
 
-        if (mCacheManager.isDiskCacheEnabled()) {
+        if (mBitmapCacheManager.isDiskCacheEnabled()) {
             String cachePath;
-            if ((cachePath = mCacheManager.getCachePath(loadingUrl)) != null) {
-                loadingUrl = ImageSourceType.FILE.getPrefix() + cachePath;
+            if ((cachePath = mBitmapCacheManager.getCachePath(loadingUrl)) != null) {
+                loadingUrl = BitmapImageSource.FILE.getPrefix() + cachePath;
                 // Check mem cache again.
-                if (mCacheManager.isMemCacheEnabled()) {
+                if (mBitmapCacheManager.isMemCacheEnabled()) {
                     Bitmap cached;
-                    if ((cached = mCacheManager.get(loadingUrl)) != null) {
+                    if ((cached = mBitmapCacheManager.get(loadingUrl)) != null) {
                         mImageSettingApplier.applyImageSettings(
                                 cached,
                                 option.getHandlers(),
@@ -272,7 +332,71 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
         return loadAndDisplayBitmap(source, settable, option, progressListener, errorListener, record, priority);
     }
 
-    private DisplayTaskRecord createTaskRecord(ImageSeat<Bitmap> settable) {
+    Future<Movie> displayMovie(@NonNull ImageData<Movie> source,
+                               @NonNull ImageSeat<Movie> settable,
+                               @Nullable DisplayOption<Movie> option,
+                               @Nullable ProgressListener<Movie> progressListener,
+                               @Nullable ErrorListener errorListener,
+                               @Nullable Priority priority) {
+        ensureNotTerminated();
+
+        Preconditions.checkNotNull(source.getUrl(), "imageData is null");
+
+        DisplayTaskRecord record = createTaskRecord(Preconditions.checkNotNull(settable));
+
+        option = assignMovieOption(option);
+
+        // 1. Get from cache.
+        // 2. If no mem cache, start a loading task from disk cache file or perform first loading.
+        // 3. Cache the loaded.
+
+        if (mMovieCacheManager.isMemCacheEnabled()) {
+            Movie cached;
+            if ((cached = mMovieCacheManager.get(source.getUrl())) != null) {
+                mImageSettingApplier.applyImageSettings(
+                        cached,
+                        option.getHandlers(),
+                        settable,
+                        option.isAnimateOnlyNewLoaded() ? null : option.getAnimator());
+                // Call complete.
+                if (progressListener != null) {
+                    progressListener.onComplete(cached);
+                }
+                return new MokeFutureImageTask<>(cached);
+            }
+        }
+
+        beforeLoadMovie(settable, option);
+
+        String loadingUrl = source.getUrl();
+
+        if (mMovieCacheManager.isDiskCacheEnabled()) {
+            String cachePath;
+            if ((cachePath = mMovieCacheManager.getCachePath(loadingUrl)) != null) {
+                loadingUrl = BitmapImageSource.FILE.getPrefix() + cachePath;
+                // Check mem cache again.
+                if (mMovieCacheManager.isMemCacheEnabled()) {
+                    Movie cached;
+                    if ((cached = mMovieCacheManager.get(loadingUrl)) != null) {
+                        mImageSettingApplier.applyImageSettings(
+                                cached,
+                                option.getHandlers(),
+                                settable,
+                                option.isAnimateOnlyNewLoaded() ? null : option.getAnimator());
+                        // Call complete.
+                        if (progressListener != null) {
+                            progressListener.onComplete(cached);
+                        }
+                        return new MokeFutureImageTask<>(cached);
+                    }
+                }
+                source.setUrl(loadingUrl);
+            }
+        }
+        return loadAndDisplayMovie(source, settable, option, progressListener, errorListener, record, priority);
+    }
+
+    private DisplayTaskRecord createTaskRecord(ImageSeat settable) {
         long settableId = mSettableIdCreator.createSettableId(settable);
         int taskId = mTaskManager.nextTaskId();
         DisplayTaskRecord displayTaskRecord = new DisplayTaskRecord(settableId, taskId);
@@ -280,12 +404,17 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
         return displayTaskRecord;
     }
 
-    private void beforeLoading(ImageSeat<Bitmap> settable, DisplayOption option) {
+    private void beforeLoadBitmap(ImageSeat<Bitmap> settable, DisplayOption option) {
         int showWhenLoading = option.getLoadingImgRes();
         mImageSettingApplier.applyImageSettings(showWhenLoading, settable, null);
     }
 
-    private Future<Bitmap> loadAndDisplayBitmap(ImageSource<Bitmap> source,
+    private void beforeLoadMovie(ImageSeat<Movie> settable, DisplayOption option) {
+        //FIXME
+    }
+
+
+    private Future<Bitmap> loadAndDisplayBitmap(ImageData<Bitmap> source,
                                                 ImageSeat<Bitmap> imageSeat,
                                                 DisplayOption<Bitmap> option,
                                                 ProgressListener<Bitmap> progressListener,
@@ -295,13 +424,13 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
 
         ImageQuality imageQuality = option.getQuality();
 
-        ViewSpec viewSpec = new ViewSpec(imageSeat.getWidth(), imageSeat.getHeight());
+        DimenSpec dimenSpec = new DimenSpec(imageSeat.getWidth(), imageSeat.getHeight());
 
         ProgressListenerDelegate<Bitmap> progressListenerDelegate = new BitmapProgressListenerDelegate(
-                mCacheManager,
+                mBitmapCacheManager,
                 mTaskManager,
                 progressListener,
-                viewSpec,
+                dimenSpec,
                 option,
                 imageSeat,
                 record,
@@ -316,50 +445,101 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
         BitmapDisplayTask imageTask = new BitmapDisplayTask(
                 mContext,
                 mConfig,
-                this,
+                mTaskManager,
                 source,
-                viewSpec,
+                dimenSpec,
                 imageQuality,
                 progressListenerDelegate,
                 errorListenerDelegate,
                 record);
 
-        FutureImageTask future = new FutureImageTask(imageTask, this, option.isViewMaybeReused());
+        FutureBitmapTask future = new FutureBitmapTask(imageTask, this, option.isViewMaybeReused());
         future.setPriority(priority == null ? Priority.NORMAL : priority);
 
         mTaskHandleService.push(future);
         return future;
     }
 
-    private DisplayOption<Bitmap> assignOptionIfNull(DisplayOption<Bitmap> option) {
+    private Future<Movie> loadAndDisplayMovie(ImageData<Movie> source,
+                                              ImageSeat<Movie> imageSeat,
+                                              DisplayOption<Movie> option,
+                                              ProgressListener<Movie> progressListener,
+                                              ErrorListener errorListener,
+                                              DisplayTaskRecord record,
+                                              Priority priority) {
+
+        ImageQuality imageQuality = option.getQuality();
+
+        DimenSpec dimenSpec = new DimenSpec(imageSeat.getWidth(), imageSeat.getHeight());
+
+        ProgressListenerDelegate<Movie> progressListenerDelegate = new MovieProgressListenerDelegate(
+                mMovieCacheManager,
+                mTaskManager,
+                progressListener,
+                dimenSpec,
+                option,
+                imageSeat,
+                record,
+                source.getUrl());
+
+        ErrorListenerDelegate errorListenerDelegate = null;
+
+        if (progressListener != null) {
+            errorListenerDelegate = new ErrorListenerDelegate(errorListener);
+        }
+
+        MovieDisplayTask imageTask = new MovieDisplayTask(
+                mContext,
+                mConfig,
+                mTaskManager,
+                source,
+                dimenSpec,
+                imageQuality,
+                progressListenerDelegate,
+                errorListenerDelegate,
+                record);
+
+        FutureMovieTask future = new FutureMovieTask(imageTask, this, option.isViewMaybeReused());
+        future.setPriority(priority == null ? Priority.NORMAL : priority);
+
+        mTaskHandleService.push(future);
+        return future;
+    }
+
+    private DisplayOption<Bitmap> assignBitmapOption(DisplayOption<Bitmap> option) {
         if (option != null) return option;
         return sDefDisplayOption;
     }
 
-    private boolean onFutureSubmit(FutureImageTask futureImageTask) {
-        if (futureImageTask.shouldCancelOthersBeforeRun()) {
-            cancel(futureImageTask.getListenableTask().getTaskRecord().getSettableId());
+    private DisplayOption<Movie> assignMovieOption(DisplayOption<Movie> option) {
+        if (option != null) return option;
+        return sDefDisplayOptionMovie;
+    }
+
+    private boolean onFutureSubmit(BaseFutureTask futureTask) {
+        if (futureTask.shouldCancelOthersBeforeRun()) {
+            cancel(futureTask.getListenableTask().getTaskRecord().getSettableId());
         }
         synchronized (mFutures) {
-            mFutures.add(futureImageTask);
+            mFutures.add(futureTask);
         }
         return true;
     }
 
-    private void onFutureDone(FutureImageTask futureImageTask) {
+    private void onFutureDone(BaseFutureTask task) {
         synchronized (mFutures) {
-            mFutures.remove(futureImageTask);
+            mFutures.remove(task);
         }
     }
 
-    private void onFutureCancel(FutureImageTask futureImageTask) {
+    private void onFutureCancel(BaseFutureTask task) {
         synchronized (mFutures) {
-            mFutures.remove(futureImageTask);
+            mFutures.remove(task);
         }
     }
 
-    private ExecutorService getExecutor(ImageSourceType type) {
-        if (type.isOneOf(ImageSourceType.NETWORK_HTTP, ImageSourceType.NETWORK_HTTPS)) {
+    private ExecutorService getExecutor(ImageSource type) {
+        if (type.maybeSlow()) {
             return mLoadingService;
         } else {
             int activeThreads = mLoadingService.getActiveCount();
@@ -392,14 +572,6 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
                             : new LIFOPriorityBlockingQueue<Runnable>());
             mLogger.verbose("Created fallback service with pool size:" + poolSize);
         }
-    }
-
-    /**
-     * @return {@link CacheManager} instance of this loader is using.
-     */
-    @LoaderApi
-    public CacheManager getCacheManager() {
-        return mCacheManager;
     }
 
     /**
@@ -464,7 +636,7 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
      */
     @LoaderApi
     @Override
-    public void terminate() {
+    public synchronized void terminate() {
         ensureNotTerminated();
         mState = LoaderState.TERMINATED;
         mTaskHandleService.terminate();
@@ -484,8 +656,8 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
     @LoaderApi
     public void cancelAllTasks() {
         synchronized (mFutures) {
-            for (FutureImageTask futureImageTask : mFutures) {
-                futureImageTask.cancel(true);
+            for (BaseFutureTask futureTask : mFutures) {
+                futureTask.cancel(true);
             }
             mFutures.clear();
         }
@@ -499,9 +671,9 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
     @LoaderApi
     public ImageLoader cancel(@NonNull String url) {
         Preconditions.checkNotNull(url);
-        List<FutureImageTask> pendingCancels = findTasks(url);
+        List<BaseFutureTask> pendingCancels = findTasks(url);
         if (pendingCancels.size() > 0) {
-            for (FutureImageTask toBeCanceled : pendingCancels) {
+            for (BaseFutureTask toBeCanceled : pendingCancels) {
                 toBeCanceled.cancel(true);
                 mUiThreadRouter.callOnCancel(toBeCanceled.getListenableTask().getProgressListener());
                 mLogger.info("Cancel task for from:" + url);
@@ -539,9 +711,9 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
     @LoaderApi
     public ImageLoader cancel(long settableId) {
         Preconditions.checkState(settableId != 0, "Invalid settable with id:0");
-        List<FutureImageTask> pendingCancels = findTasks(settableId);
+        List<BaseFutureTask> pendingCancels = findTasks(settableId);
         if (pendingCancels.size() > 0) {
-            for (FutureImageTask toBeCanceled : pendingCancels) {
+            for (BaseFutureTask toBeCanceled : pendingCancels) {
                 toBeCanceled.cancel(true);
                 mUiThreadRouter.callOnCancel(toBeCanceled.getListenableTask().getProgressListener());
                 mLogger.verbose("Cancel task for settable:" + settableId);
@@ -551,28 +723,28 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
         return this;
     }
 
-    private List<FutureImageTask> findTasks(@NonNull String url) {
-        List<FutureImageTask> pendingCancels = new ArrayList<>();
+    private List<BaseFutureTask> findTasks(@NonNull String url) {
+        List<BaseFutureTask> pendingCancels = new ArrayList<>();
         synchronized (mFutures) {
-            for (FutureImageTask futureImageTask : mFutures) {
-                if (!futureImageTask.isCancelled()
-                        && !futureImageTask.isDone()
-                        && url.equals(futureImageTask.getListenableTask().getUrl())) {
-                    pendingCancels.add(futureImageTask);
+            for (BaseFutureTask futureTask : mFutures) {
+                if (!futureTask.isCancelled()
+                        && !futureTask.isDone()
+                        && url.equals(futureTask.getListenableTask().getImageData())) {
+                    pendingCancels.add(futureTask);
                 }
             }
         }
         return pendingCancels;
     }
 
-    private List<FutureImageTask> findTasks(long settableId) {
-        List<FutureImageTask> pendingCancels = new ArrayList<>();
+    private List<BaseFutureTask> findTasks(long settableId) {
+        List<BaseFutureTask> pendingCancels = new ArrayList<>();
         synchronized (mFutures) {
-            for (FutureImageTask futureImageTask : mFutures) {
-                if (!futureImageTask.isCancelled()
-                        && !futureImageTask.isDone()
-                        && settableId == futureImageTask.getListenableTask().getTaskRecord().getSettableId()) {
-                    pendingCancels.add(futureImageTask);
+            for (BaseFutureTask futureTask : mFutures) {
+                if (!futureTask.isCancelled()
+                        && !futureTask.isDone()
+                        && settableId == futureTask.getListenableTask().getTaskRecord().getSettableId()) {
+                    pendingCancels.add(futureTask);
                 }
             }
         }
@@ -588,31 +760,15 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
 
     @WorkerThread
     public void clearDiskCache() {
-        mCacheManager.evictDisk();
+        mBitmapCacheManager.evictDisk();
         StorageStats.from(mContext).reset();
         mLogger.funcExit();
     }
 
     @WorkerThread
     public void clearMemCache() {
-        mCacheManager.evictMem();
+        mBitmapCacheManager.evictMem();
         mLogger.funcExit();
-    }
-
-    @Override
-    public boolean shouldRun(@NonNull DisplayTask<Bitmap> task) {
-        if (!checkInRunningState()) return false;
-
-        boolean isTaskDirty = mTaskManager.interruptExecute(task.getTaskRecord());
-        if (isTaskDirty) {
-            mLogger.verbose("Won't run task:" + task);
-            return false;
-        }
-        return true;
-    }
-
-    boolean checkInRunningState() {
-        return mState != LoaderState.TERMINATED;
     }
 
     void freezeIfRequested() {
@@ -625,20 +781,20 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
     }
 
     @Override
-    public void onDone(FutureImageTask futureImageTask) {
-        mLogger.verbose(futureImageTask.getListenableTask().getTaskRecord());
-        onFutureDone(futureImageTask);
+    public void onDone(BaseFutureTask futureTask) {
+        mLogger.verbose(futureTask.getListenableTask().getTaskRecord());
+        onFutureDone(futureTask);
     }
 
     @Override
-    public void onCancel(FutureImageTask futureImageTask) {
-        mLogger.verbose(futureImageTask.getListenableTask().getTaskRecord());
-        onFutureCancel(futureImageTask);
+    public void onCancel(BaseFutureTask futureTask) {
+        mLogger.verbose(futureTask.getListenableTask().getTaskRecord());
+        onFutureCancel(futureTask);
     }
 
     @Override
-    public ImageLoader fork(LoaderConfig config) {
-        return clone(this, config);
+    public ImageLoader fork(LoaderConfig param) {
+        return clone(this, param);
     }
 
     @LoaderApi
@@ -671,12 +827,12 @@ public class ImageLoader implements DisplayTaskMonitor<Bitmap>,
         return TrafficStats.from(mContext).getWifiTrafficUsage();
     }
 
-    private class TaskHandler implements RequestHandler<FutureImageTask> {
+    private class TaskHandler implements RequestHandler<BaseFutureTask> {
         @Override
-        public boolean handleRequest(FutureImageTask request) {
+        public boolean handleRequest(BaseFutureTask request) {
             freezeIfRequested();
             if (!onFutureSubmit(request)) return false;
-            getExecutor(ImageSourceType.of(request.getListenableTask().getUrl())).submit(request);
+            getExecutor(request.getListenableTask().getImageData().getType()).submit(request);
             return true;
         }
     }

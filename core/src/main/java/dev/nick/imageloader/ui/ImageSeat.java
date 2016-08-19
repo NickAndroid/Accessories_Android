@@ -7,7 +7,7 @@ import android.view.animation.Animation;
 public interface ImageSeat<T> {
 
     @UiThread
-    void setImage(@NonNull T image);
+    void seat(@NonNull T image);
 
     int getWidth();
 

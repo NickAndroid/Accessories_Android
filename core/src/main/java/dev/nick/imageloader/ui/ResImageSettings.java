@@ -32,7 +32,7 @@ public class ResImageSettings extends ImageSettings<Bitmap> {
 
     protected void apply() {
         if (mAnimator != null) {
-            mAnimator.animate(mSettable);
+            mAnimator.animate(mSeat);
         }
         throw new UnsupportedOperationException();
     }

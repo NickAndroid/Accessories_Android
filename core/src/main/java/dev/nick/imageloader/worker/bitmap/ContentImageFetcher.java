@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package dev.nick.imageloader.worker;
+package dev.nick.imageloader.worker.bitmap;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -25,6 +25,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import dev.nick.imageloader.LoaderConfig;
+import dev.nick.imageloader.worker.BaseImageFetcher;
+import dev.nick.imageloader.worker.DecodeSpec;
+import dev.nick.imageloader.worker.ImageFetcher;
+import dev.nick.imageloader.worker.ImageSource;
+import dev.nick.imageloader.worker.PathSplitter;
+import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.result.Cause;
 import dev.nick.imageloader.worker.result.ErrorListener;
 
@@ -83,7 +89,7 @@ public class ContentImageFetcher extends BaseImageFetcher<Bitmap> {
 
             String filePath = cursor.getString(index);
 
-            return mFileImageFetcher.fetchFromUrl(ImageSourceType.FILE.getPrefix() + filePath,
+            return mFileImageFetcher.fetchFromUrl(ImageSource.Prefix.FILE + filePath,
                     decodeSpec, progressListener, errorListener);
         } finally {
             cursor.close();

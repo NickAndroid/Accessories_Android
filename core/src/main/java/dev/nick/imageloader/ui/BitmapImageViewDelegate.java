@@ -35,7 +35,7 @@ public class BitmapImageViewDelegate implements ImageSeat<Bitmap> {
     }
 
     @Override
-    public void setImage(@NonNull Bitmap bitmap) {
+    public void seat(@NonNull Bitmap bitmap) {
         mImageView.setImageBitmap(bitmap);
     }
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package dev.nick.imageloader.worker;
+package dev.nick.imageloader.worker.bitmap;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -24,6 +24,11 @@ import android.support.annotation.Nullable;
 import java.io.File;
 import java.io.FileNotFoundException;
 
+import dev.nick.imageloader.worker.BaseImageFetcher;
+import dev.nick.imageloader.worker.DecodeSpec;
+import dev.nick.imageloader.worker.DimenSpec;
+import dev.nick.imageloader.worker.PathSplitter;
+import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.result.Cause;
 import dev.nick.imageloader.worker.result.ErrorListener;
 import dev.nick.imageloader.utils.Preconditions;
@@ -50,13 +55,13 @@ public class FileImageFetcher extends BaseImageFetcher<Bitmap> {
         }
 
         BitmapFactory.Options decodeOptions = null;
-        ViewSpec viewSpec = decodeSpec.viewSpec;
+        DimenSpec dimenSpec = decodeSpec.getDimenSpec();
 
         callOnStart(progressListener);
 
-        switch (decodeSpec.quality) {
+        switch (decodeSpec.getQuality()) {
             case OPT:
-                Preconditions.checkNotNull(viewSpec, "Spec can not be null when defined quality which not RAW");
+                Preconditions.checkNotNull(dimenSpec, "Spec can not be null when defined quality which not RAW");
                 decodeOptions = new BitmapFactory.Options();
                 // If we have to resize this image, first get the natural bounds.
                 decodeOptions.inJustDecodeBounds = true;
@@ -66,9 +71,9 @@ public class FileImageFetcher extends BaseImageFetcher<Bitmap> {
                 decodeOptions.inJustDecodeBounds = false;
                 decodeOptions.inSampleSize =
                         computeSampleSize(decodeOptions, UNCONSTRAINED,
-                                (viewSpec.height * viewSpec.height == 0 ?
+                                (dimenSpec.height * dimenSpec.height == 0 ?
                                         MAX_NUM_PIXELS_THUMBNAIL
-                                        : viewSpec.width * viewSpec.height));
+                                        : dimenSpec.width * dimenSpec.height));
             default:
                 break;
         }

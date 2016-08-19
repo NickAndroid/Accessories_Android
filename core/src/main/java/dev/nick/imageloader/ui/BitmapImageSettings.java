@@ -33,9 +33,9 @@ public class BitmapImageSettings extends ImageSettings<Bitmap> {
     @Override
     protected void apply() {
         if (mBitmap != null) {
-            mSettable.setImage(mBitmap);
+            mSeat.seat(mBitmap);
             if (mAnimator != null) {
-                mAnimator.animate(mSettable);
+                mAnimator.animate(mSeat);
             }
         }
     }

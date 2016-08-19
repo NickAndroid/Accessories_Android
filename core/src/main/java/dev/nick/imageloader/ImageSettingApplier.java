@@ -1,6 +1,7 @@
 package dev.nick.imageloader;
 
 import android.graphics.Bitmap;
+import android.graphics.Movie;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -8,9 +9,10 @@ import android.support.annotation.WorkerThread;
 
 import dev.nick.imageloader.ui.BitmapImageSettings;
 import dev.nick.imageloader.ui.ImageSeat;
+import dev.nick.imageloader.ui.MovieImageSettings;
 import dev.nick.imageloader.ui.ResImageSettings;
 import dev.nick.imageloader.ui.animator.ImageAnimator;
-import dev.nick.imageloader.ui.art.BitmapHandlerCaller;
+import dev.nick.imageloader.ui.art.ImageArtistCaller;
 import dev.nick.imageloader.ui.art.ImageArt;
 
 class ImageSettingApplier implements Handler.Callback {
@@ -53,7 +55,7 @@ class ImageSettingApplier implements Handler.Callback {
                     imageSeat,
                     (handlers == null || handlers.length == 0
                             ? bitmap
-                            : BitmapHandlerCaller.call(handlers, bitmap, imageSeat)));
+                            : ImageArtistCaller.call(handlers, bitmap, imageSeat)));
             mUIThreadHandler.obtainMessage(MSG_APPLY_IMAGE_SETTINGS, settings).sendToTarget();
         }
     }
@@ -62,6 +64,19 @@ class ImageSettingApplier implements Handler.Callback {
     void applyImageSettings(int resId, ImageSeat<Bitmap> imageSeat, ImageAnimator<Bitmap> animator) {
         if (imageSeat != null) {
             ResImageSettings settings = new ResImageSettings(animator, imageSeat, resId);
+            mUIThreadHandler.obtainMessage(MSG_APPLY_IMAGE_SETTINGS, settings).sendToTarget();
+        }
+    }
+
+    void applyImageSettings(Movie movie, ImageArt<Movie>[] handlers, ImageSeat<Movie> imageSeat,
+                            ImageAnimator<Movie> animator) {
+        if (imageSeat != null) {
+            MovieImageSettings settings = new MovieImageSettings(
+                    animator,
+                    imageSeat,
+                    (handlers == null || handlers.length == 0
+                            ? movie
+                            : ImageArtistCaller.call(handlers, movie, imageSeat)));
             mUIThreadHandler.obtainMessage(MSG_APPLY_IMAGE_SETTINGS, settings).sendToTarget();
         }
     }

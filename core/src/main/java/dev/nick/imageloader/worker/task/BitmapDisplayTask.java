@@ -27,19 +27,19 @@ import java.io.InterruptedIOException;
 import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.ui.ImageQuality;
 import dev.nick.imageloader.worker.DecodeSpec;
+import dev.nick.imageloader.worker.DimenSpec;
+import dev.nick.imageloader.worker.ImageData;
 import dev.nick.imageloader.worker.ImageFetcher;
 import dev.nick.imageloader.worker.ImageSource;
-import dev.nick.imageloader.worker.ImageSourceType;
 import dev.nick.imageloader.worker.ProgressListener;
-import dev.nick.imageloader.worker.ViewSpec;
 import dev.nick.imageloader.worker.result.Cause;
 import dev.nick.imageloader.worker.result.ErrorListener;
 
-public class BitmapDisplayTask implements DisplayTask<Bitmap> {
+public class BitmapDisplayTask extends BaseDisplayTask<Bitmap> {
 
-    private ImageSource<Bitmap> mImageSource;
+    private ImageData<Bitmap> mImageData;
 
-    private ViewSpec mViewSpec;
+    private DimenSpec mDimenSpec;
     private ImageQuality mQuality;
 
     private LoaderConfig mLoaderConfig;
@@ -47,7 +47,7 @@ public class BitmapDisplayTask implements DisplayTask<Bitmap> {
     private ProgressListener<Bitmap> mProgressListener;
     private ErrorListener mErrorListener;
 
-    private DisplayTaskMonitor<Bitmap> mDisplayTaskMonitor;
+    private TaskInterrupter mDisplayTaskMonitor;
 
     private DisplayTaskRecord mTaskRecord;
 
@@ -57,9 +57,9 @@ public class BitmapDisplayTask implements DisplayTask<Bitmap> {
 
     public BitmapDisplayTask(Context context,
                              LoaderConfig loaderConfig,
-                             DisplayTaskMonitor<Bitmap> displayTaskMonitor,
-                             ImageSource<Bitmap> url,
-                             ViewSpec spec,
+                             TaskInterrupter displayTaskMonitor,
+                             ImageData<Bitmap> url,
+                             DimenSpec spec,
                              ImageQuality quality,
                              ProgressListener<Bitmap> progressListener,
                              ErrorListener errorListener,
@@ -67,8 +67,8 @@ public class BitmapDisplayTask implements DisplayTask<Bitmap> {
         this.mContext = context;
         this.mLoaderConfig = loaderConfig;
         this.mDisplayTaskMonitor = displayTaskMonitor;
-        this.mImageSource = url;
-        this.mViewSpec = spec;
+        this.mImageData = url;
+        this.mDimenSpec = spec;
         this.mQuality = quality;
         this.mProgressListener = progressListener;
         this.mErrorListener = errorListener;
@@ -80,15 +80,15 @@ public class BitmapDisplayTask implements DisplayTask<Bitmap> {
 
         Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
 
-        if (!mDisplayTaskMonitor.shouldRun(this)) return;
+        if (!mDisplayTaskMonitor.interruptExecute(mTaskRecord)) return;
 
-        ImageSourceType<Bitmap> source = mImageSource.getType();
+        ImageSource<Bitmap> source = mImageData.getType();
 
         ImageFetcher<Bitmap> fetcher = source.getFetcher(mContext, mLoaderConfig);
 
-        DecodeSpec decodeSpec = new DecodeSpec(mQuality, mViewSpec);
+        DecodeSpec decodeSpec = new DecodeSpec(mQuality, mDimenSpec);
         try {
-            mResult = fetcher.fetchFromUrl(mImageSource.getUrl(), decodeSpec, mProgressListener, mErrorListener);
+            mResult = fetcher.fetchFromUrl(mImageData.getUrl(), decodeSpec, mProgressListener, mErrorListener);
         } catch (InterruptedIOException | InterruptedException ignored) {
 
         } catch (Exception e) {
@@ -109,8 +109,8 @@ public class BitmapDisplayTask implements DisplayTask<Bitmap> {
 
     @NonNull
     @Override
-    public String getUrl() {
-        return mImageSource.getUrl();
+    public ImageData<Bitmap> getImageData() {
+        return mImageData;
     }
 
     @Override

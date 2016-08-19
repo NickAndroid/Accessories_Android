@@ -16,12 +16,12 @@
 
 package dev.nick.imageloader.worker;
 
-public class ViewSpec {
+public class DimenSpec {
 
-    int width;
-    int height;
+    public int width;
+    public int height;
 
-    public ViewSpec(int width, int height) {
+    public DimenSpec(int width, int height) {
         this.width = width;
         this.height = height;
     }
@@ -31,7 +31,7 @@ public class ViewSpec {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        ViewSpec info = (ViewSpec) o;
+        DimenSpec info = (DimenSpec) o;
 
         if (width != info.width) return false;
         return height == info.height;
@@ -46,7 +46,7 @@ public class ViewSpec {
 
     @Override
     public String toString() {
-        return "ViewSpec{" +
+        return "DimenSpec{" +
                 "height=" + height +
                 ", width=" + width +
                 '}';

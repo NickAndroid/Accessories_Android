@@ -16,8 +16,12 @@
 
 package dev.nick.imageloader.worker.task;
 
-import android.support.annotation.NonNull;
+import android.graphics.Bitmap;
+import android.support.annotation.Nullable;
 
-public interface DisplayTaskMonitor<T> {
-    boolean shouldRun(@NonNull DisplayTask<T> task);
+public class FutureBitmapTask extends BaseFutureTask<Bitmap> {
+
+    public FutureBitmapTask(BaseDisplayTask<Bitmap> task, @Nullable TaskActionListener listener, boolean cancelOthersBeforeRun) {
+        super(task, listener, cancelOthersBeforeRun);
+    }
 }

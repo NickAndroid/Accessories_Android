@@ -8,14 +8,14 @@ import dev.nick.imageloader.queue.Priority;
 import dev.nick.imageloader.ui.DisplayOption;
 import dev.nick.imageloader.ui.ImageSeat;
 import dev.nick.imageloader.utils.Preconditions;
+import dev.nick.imageloader.worker.ImageData;
 import dev.nick.imageloader.worker.ImageSource;
-import dev.nick.imageloader.worker.ImageSourceType;
 import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.result.ErrorListener;
 
 public abstract class Transaction<T> {
 
-    protected ImageSource<T> imageSource;
+    protected ImageData<T> imageData;
     protected DisplayOption<T> option;
     protected ProgressListener<T> progressListener;
     protected ErrorListener errorListener;
@@ -29,15 +29,17 @@ public abstract class Transaction<T> {
     }
 
     /**
-     * @param url Image source from, one of {@link ImageSourceType}
+     * @param url Image source from, one of {@link BitmapImageSourceType}
      * @return Instance of Transaction.
      */
     @LoaderApi
     public Transaction<T> from(@NonNull String url) {
-        ImageSourceType<T> type = ImageSourceType.of(Preconditions.checkNotNull(url));
-        this.imageSource = new ImageSource<>(type, url);
+        ImageSource<T> type = onCreateSource(url);
+        this.imageData = new ImageData<>(type, url);
         return Transaction.this;
     }
+
+    abstract ImageSource<T> onCreateSource(String url);
 
     /**
      * @param option {@link DisplayOption} is options using when display the image.

@@ -9,11 +9,13 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
 import dev.nick.imageloader.annotation.LoaderApi;
-import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.queue.Priority;
 import dev.nick.imageloader.ui.BitmapImageViewDelegate;
 import dev.nick.imageloader.ui.DisplayOption;
 import dev.nick.imageloader.ui.ImageSeat;
+import dev.nick.imageloader.worker.ImageSource;
+import dev.nick.imageloader.worker.ProgressListener;
+import dev.nick.imageloader.worker.bitmap.BitmapImageSource;
 
 public class BitmapTransaction extends Transaction<Bitmap> {
 
@@ -25,6 +27,11 @@ public class BitmapTransaction extends Transaction<Bitmap> {
     public BitmapTransaction from(@NonNull String url) {
         super.from(url);
         return this;
+    }
+
+    @Override
+    ImageSource<Bitmap> onCreateSource(String url) {
+        return BitmapImageSource.from(url);
     }
 
     @Override
@@ -68,7 +75,7 @@ public class BitmapTransaction extends Transaction<Bitmap> {
     public Bitmap startSynchronously() {
         try {
             return loader.displayBitmap(
-                    imageSource,
+                    imageData,
                     noneNullSettable(),
                     option,
                     progressListener,
@@ -85,7 +92,7 @@ public class BitmapTransaction extends Transaction<Bitmap> {
     @LoaderApi
     void startAsync() {
         loader.displayBitmap(
-                imageSource,
+                imageData,
                 noneNullSettable(),
                 option,
                 progressListener,
@@ -95,6 +102,6 @@ public class BitmapTransaction extends Transaction<Bitmap> {
 
 
     protected ImageSeat<Bitmap> noneNullSettable() {
-        return settable == null ? new FakeBitmapImageSeat(imageSource.getUrl()) : settable;
+        return settable == null ? new FakeBitmapImageSeat(imageData.getUrl()) : settable;
     }
 }

@@ -16,7 +16,6 @@
 
 package dev.nick.imageloader.worker.task;
 
-import android.graphics.Bitmap;
 import android.support.annotation.Nullable;
 
 import java.util.concurrent.FutureTask;
@@ -24,16 +23,16 @@ import java.util.concurrent.FutureTask;
 import dev.nick.imageloader.queue.Priority;
 import dev.nick.imageloader.queue.PriorityRemarkable;
 
-public class FutureImageTask extends FutureTask<Bitmap> implements PriorityRemarkable {
+public class BaseFutureTask<T> extends FutureTask<T> implements PriorityRemarkable {
 
     private TaskActionListener mListener;
-    private DisplayTask<Bitmap> mTask;
+    private BaseDisplayTask<T> mTask;
 
     private Priority mPriority;
 
     private boolean mCancelOthersBeforeRun;
 
-    public FutureImageTask(DisplayTask<Bitmap> task, @Nullable TaskActionListener listener, boolean cancelOthersBeforeRun) {
+    public BaseFutureTask(BaseDisplayTask<T> task, @Nullable TaskActionListener listener, boolean cancelOthersBeforeRun) {
         super(task);
         this.mTask = task;
         this.mListener = listener;
@@ -60,7 +59,7 @@ public class FutureImageTask extends FutureTask<Bitmap> implements PriorityRemar
 
     @Override
     public String toString() {
-        return "FutureImageTask{" +
+        return "FutureTTask{" +
                 "mListener=" + mListener +
                 ", mTask=" + mTask +
                 ", mCancelOthersBeforeRun=" + mCancelOthersBeforeRun +
@@ -71,7 +70,7 @@ public class FutureImageTask extends FutureTask<Bitmap> implements PriorityRemar
         return mCancelOthersBeforeRun;
     }
 
-    public DisplayTask<Bitmap> getListenableTask() {
+    public BaseDisplayTask<T> getListenableTask() {
         return mTask;
     }
 
@@ -81,8 +80,8 @@ public class FutureImageTask extends FutureTask<Bitmap> implements PriorityRemar
     }
 
     public interface TaskActionListener {
-        void onDone(FutureImageTask futureImageTask);
+        void onDone(BaseFutureTask futureTTask);
 
-        void onCancel(FutureImageTask futureImageTask);
+        void onCancel(BaseFutureTask futureTTask);
     }
 }
