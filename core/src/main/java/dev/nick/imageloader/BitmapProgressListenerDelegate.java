@@ -2,6 +2,8 @@ package dev.nick.imageloader;
 
 import android.graphics.Bitmap;
 
+import java.util.ArrayList;
+
 import dev.nick.imageloader.cache.CacheManager;
 import dev.nick.imageloader.ui.DisplayOption;
 import dev.nick.imageloader.ui.ImageSeat;
@@ -28,12 +30,15 @@ class BitmapProgressListenerDelegate extends ProgressListenerDelegate<Bitmap> {
 
     @Override
     public void onComplete(Bitmap result) {
+
         if (result == null) {
+            mLogger.warn("onComplete call with null result");
             return;
         }
 
         if (canceled) {
             cacheManager.cache(url, result);
+            mLogger.verbose("Skip calling back, canceled");
             return;
         }
 
@@ -41,10 +46,12 @@ class BitmapProgressListenerDelegate extends ProgressListenerDelegate<Bitmap> {
 
         final boolean isViewMaybeReused = option.isViewMaybeReused();
 
+        mLogger.verbose("isViewMaybeReused: " + isViewMaybeReused);
+
         if (!isViewMaybeReused || !checkTaskDirty()) {
             ImageAnimator<Bitmap> animator = (option == null ? null : option.getAnimator());
-            ImageArt<Bitmap>[] handlers = (option == null ? null : option.getHandlers());
-            ImageSettingApplier.getSharedApplier().applyImageSettings(result, handlers, settable, animator);
+            ArrayList<ImageArt<Bitmap>> imageArts = (option == null ? null : option.getArtist());
+            ImageSettingApplier.getSharedApplier().applyImageSettings(result, imageArts, settable, animator);
         }
         cacheManager.cache(url, result);
     }

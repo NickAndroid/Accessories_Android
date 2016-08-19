@@ -1,11 +1,13 @@
 package dev.nick.imageloader.cache;
 
+import android.support.annotation.NonNull;
+
 public interface CacheManager<T> {
     T get(String url);
 
     String getCachePath(String url);
 
-    boolean cache(String url, T value);
+    boolean cache(@NonNull String url, @NonNull T value);
 
     boolean isDiskCacheEnabled();
 

@@ -34,7 +34,7 @@ public class DisplayOption<T> {
 
     private ImageQuality quality;
 
-    private ImageArt<T>[] handlers;
+    private ArrayList<ImageArt<T>> handlers;
     private ImageAnimator<T> animator;
 
     private boolean viewMaybeReused;
@@ -44,7 +44,7 @@ public class DisplayOption<T> {
     private DisplayOption(int defaultImgRes,
                           int loadingImgRes,
                           ImageQuality quality,
-                          ImageArt<T>[] handlers,
+                          ArrayList<ImageArt<T>> handlers,
                           ImageAnimator<T> animator,
                           boolean viewMaybeReused,
                           boolean animateOnlyNewLoaded) {
@@ -55,6 +55,14 @@ public class DisplayOption<T> {
         this.animator = animator;
         this.viewMaybeReused = viewMaybeReused;
         this.animateOnlyNewLoaded = animateOnlyNewLoaded;
+    }
+
+    public static Builder<Bitmap> bitmapBuilder() {
+        return new Builder<>();
+    }
+
+    public static Builder<Movie> movieBuilder() {
+        return new Builder<>();
     }
 
     public int getDefaultImgRes() {
@@ -69,7 +77,7 @@ public class DisplayOption<T> {
         return quality;
     }
 
-    public ImageArt<T>[] getHandlers() {
+    public ArrayList<ImageArt<T>> getArtist() {
         return handlers;
     }
 
@@ -83,14 +91,6 @@ public class DisplayOption<T> {
 
     public boolean isAnimateOnlyNewLoaded() {
         return animateOnlyNewLoaded;
-    }
-
-    public static Builder<Bitmap> bitmapBuilder() {
-        return new Builder<>();
-    }
-
-    public static Builder<Movie> movieBuilder() {
-        return new Builder<>();
     }
 
     public static class Builder<T> {
@@ -187,7 +187,7 @@ public class DisplayOption<T> {
                     defaultImgRes,
                     loadingImgRes,
                     quality,
-                    artList == null ? null : (ImageArt<T>[]) artList.toArray(),
+                    artList,
                     animator,
                     viewMaybeReused,
                     animateOnlyNewLoaded);

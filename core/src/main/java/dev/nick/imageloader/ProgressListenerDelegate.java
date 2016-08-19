@@ -1,12 +1,14 @@
 package dev.nick.imageloader;
 
 import dev.nick.imageloader.cache.CacheManager;
-import dev.nick.imageloader.worker.ProgressListener;
-import dev.nick.imageloader.worker.DimenSpec;
-import dev.nick.imageloader.worker.task.DisplayTaskRecord;
-import dev.nick.imageloader.worker.task.TaskManager;
+import dev.nick.imageloader.debug.Logger;
+import dev.nick.imageloader.debug.LoggerManager;
 import dev.nick.imageloader.ui.DisplayOption;
 import dev.nick.imageloader.ui.ImageSeat;
+import dev.nick.imageloader.worker.DimenSpec;
+import dev.nick.imageloader.worker.ProgressListener;
+import dev.nick.imageloader.worker.task.DisplayTaskRecord;
+import dev.nick.imageloader.worker.task.TaskManager;
 
 abstract class ProgressListenerDelegate<T> implements ProgressListener<T> {
 
@@ -19,11 +21,10 @@ abstract class ProgressListenerDelegate<T> implements ProgressListener<T> {
     protected String url;
     protected DisplayOption<T> option;
     protected DimenSpec dimenSpec;
-
-    private DisplayTaskRecord taskRecord;
-
     protected Boolean canceled = Boolean.FALSE;
     protected Boolean isTaskDirty = null;
+    protected Logger mLogger;
+    private DisplayTaskRecord taskRecord;
 
     public ProgressListenerDelegate(
             CacheManager<T> cacheManager,
@@ -42,6 +43,7 @@ abstract class ProgressListenerDelegate<T> implements ProgressListener<T> {
         this.settable = imageSeat;
         this.taskRecord = taskRecord;
         this.url = url;
+        this.mLogger = LoggerManager.getLogger(getClass());
     }
 
     @Override
@@ -70,6 +72,7 @@ abstract class ProgressListenerDelegate<T> implements ProgressListener<T> {
         if (isTaskDirty == null || !isTaskDirty) {
             isTaskDirty = taskManager.interruptDisplay(taskRecord);
         }
+        mLogger.verbose("isTaskDirty: " + isTaskDirty);
         return isTaskDirty;
     }
 }

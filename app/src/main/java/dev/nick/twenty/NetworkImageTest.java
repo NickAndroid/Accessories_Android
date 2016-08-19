@@ -17,7 +17,9 @@
 package dev.nick.twenty;
 
 import android.Manifest;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,10 +39,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dev.nick.imageloader.ImageLoader;
+import dev.nick.imageloader.debug.LoggerManager;
+import dev.nick.imageloader.queue.Priority;
 import dev.nick.imageloader.ui.DisplayOption;
 import dev.nick.imageloader.ui.ImageQuality;
 import dev.nick.imageloader.ui.animator.FadeInImageAnimator;
-import dev.nick.imageloader.queue.Priority;
+import dev.nick.imageloader.worker.ProgressListener;
+import dev.nick.imageloader.worker.result.Cause;
+import dev.nick.imageloader.worker.result.ErrorListener;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
 public class NetworkImageTest extends BaseTest {
@@ -205,7 +211,7 @@ public class NetworkImageTest extends BaseTest {
                 String uri = tracks.get(position).getUrl();
 
                 holder.progressBar.setProgress(0);
-                holder.textView.setText("");
+                holder.textView.setText("---");
 
                 ImageLoader.shared()
                         .cancel(holder.imageView)
@@ -216,6 +222,38 @@ public class NetworkImageTest extends BaseTest {
                                 .viewMaybeReused()
                                 .imageAnimator(new FadeInImageAnimator())
                                 .build())
+                        .errorListener(new ErrorListener() {
+                            @Override
+                            public void onError(@NonNull Cause cause) {
+                                LoggerManager.getLogger(getClass()).warn(cause);
+                                holder.textView.setText(cause.toString());
+                            }
+                        })
+                        .progressListener(new ProgressListener<Bitmap>() {
+                            @Override
+                            public void onStartLoading() {
+                                holder.textView.setText("onStartLoading");
+                                holder.progressBar.setProgress(0);
+                            }
+
+                            @Override
+                            public void onProgressUpdate(float progress) {
+                                holder.textView.setText("onProgressUpdate");
+                                holder.progressBar.setProgress((int) progress * 100);
+                            }
+
+                            @Override
+                            public void onCancel() {
+                                holder.textView.setText("onCancel");
+                                holder.progressBar.setProgress(0);
+                            }
+
+                            @Override
+                            public void onComplete(Bitmap result) {
+                                holder.textView.setText("onComplete");
+                                holder.progressBar.setProgress(100);
+                            }
+                        })
                         .into(holder.imageView)
                         .priority(Priority.HIGH)
                         .start();

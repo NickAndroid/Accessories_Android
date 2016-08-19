@@ -80,7 +80,7 @@ public class BitmapDisplayTask extends BaseDisplayTask<Bitmap> {
 
         Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
 
-        if (!mDisplayTaskMonitor.interruptExecute(mTaskRecord)) return;
+        if (mDisplayTaskMonitor.interruptExecute(mTaskRecord)) return;
 
         ImageSource<Bitmap> source = mImageData.getType();
 

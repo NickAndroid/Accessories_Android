@@ -38,4 +38,12 @@ public abstract class ImageSettings<T> implements Runnable {
     public final void run() {
         apply();
     }
+
+    @Override
+    public String toString() {
+        return "ImageSettings{" +
+                "mAnimator=" + mAnimator +
+                ", mSeat=" + mSeat +
+                '}';
+    }
 }

@@ -169,11 +169,12 @@ public class ImageLoader implements
         LoggerManager.setDebugLevel(config.getDebugLevel());
         this.mContext = from.mContext;
         this.mConfig = config;
-        this.mTaskManager = from.mTaskManager;
+        this.mTaskManager = new TaskManagerImpl();
         this.mSettableIdCreator = from.mSettableIdCreator;
         this.mUiThreadRouter = UIThreadRouter.getSharedRouter();
         this.mImageSettingApplier = ImageSettingApplier.getSharedApplier();
-        this.mBitmapCacheManager = from.mBitmapCacheManager;
+        this.mBitmapCacheManager = from.lazyGetBitmapCacheManager();
+        this.mMovieCacheManager = from.lazyGetMovieCacheManager();
         //noinspection deprecation
         this.mLoadingService = new ThreadPoolExecutor(
                 config.getLoadingThreads(),
@@ -298,7 +299,7 @@ public class ImageLoader implements
             if ((cached = mBitmapCacheManager.get(data.getUrl())) != null) {
                 mImageSettingApplier.applyImageSettings(
                         cached,
-                        option.getHandlers(),
+                        option.getArtist(),
                         settable,
                         option.isAnimateOnlyNewLoaded() ? null : option.getAnimator());
                 // Call complete.
@@ -323,7 +324,7 @@ public class ImageLoader implements
                     if ((cached = mBitmapCacheManager.get(loadingUrl)) != null) {
                         mImageSettingApplier.applyImageSettings(
                                 cached,
-                                option.getHandlers(),
+                                option.getArtist(),
                                 settable,
                                 option.isAnimateOnlyNewLoaded() ? null : option.getAnimator());
                         // Call complete.
@@ -365,7 +366,7 @@ public class ImageLoader implements
             if ((cached = mMovieCacheManager.get(source.getUrl())) != null) {
                 mImageSettingApplier.applyImageSettings(
                         cached,
-                        option.getHandlers(),
+                        option.getArtist(),
                         settable,
                         option.isAnimateOnlyNewLoaded() ? null : option.getAnimator());
                 // Call complete.
@@ -390,7 +391,7 @@ public class ImageLoader implements
                     if ((cached = mMovieCacheManager.get(loadingUrl)) != null) {
                         mImageSettingApplier.applyImageSettings(
                                 cached,
-                                option.getHandlers(),
+                                option.getArtist(),
                                 settable,
                                 option.isAnimateOnlyNewLoaded() ? null : option.getAnimator());
                         // Call complete.
@@ -432,7 +433,9 @@ public class ImageLoader implements
         Bitmap decoded = mBitmapCacheManager.get(url);
         if (decoded == null) {
             decoded = BitmapFactory.decodeResource(mContext.getResources(), showWhenLoading);
-            mBitmapCacheManager.cache(url, decoded);
+            if (decoded != null) {
+                mBitmapCacheManager.cache(url, decoded);
+            }
         }
         mImageSettingApplier.applyImageSettings(decoded, null, settable, null);
     }

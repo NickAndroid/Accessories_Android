@@ -17,17 +17,26 @@ public class BitmapImageSource extends ImageSource<Bitmap> {
     public static final BitmapImageSource HTTP = new HttpSource();
     public static final BitmapImageSource HTTPS = new HttpsSource();
 
+    private static final BitmapImageSource[] PREBUILT = new BitmapImageSource[]{
+            FILE, ASSETS, DRAWABLE, CONTENT, HTTP, HTTPS
+    };
+
     public BitmapImageSource(ImageFetcher<Bitmap> fetcher, String prefix) {
         super(fetcher, prefix);
+    }
+
+    public static BitmapImageSource from(String url) {
+        for (BitmapImageSource source : PREBUILT) {
+            if (url.startsWith(source.getPrefix())) {
+                return source;
+            }
+        }
+        return null;
     }
 
     @Override
     public boolean maybeSlow() {
         return false;
-    }
-
-    public static BitmapImageSource from(String url) {
-        return FILE;
     }
 
     static class FileSource extends BitmapImageSource {

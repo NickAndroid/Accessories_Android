@@ -2,6 +2,7 @@ package dev.nick.imageloader.cache;
 
 import android.content.Context;
 import android.graphics.Movie;
+import android.support.annotation.NonNull;
 
 public class MovieCacheManager implements CacheManager<Movie> {
 
@@ -20,7 +21,7 @@ public class MovieCacheManager implements CacheManager<Movie> {
     }
 
     @Override
-    public boolean cache(String url, Movie value) {
+    public boolean cache(@NonNull String url, @NonNull Movie value) {
         return false;
     }
 

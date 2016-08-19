@@ -107,7 +107,7 @@ public class FileImageTest extends BaseTest {
                                 .animateOnlyNewLoaded()
                                 .imageAnimator(new FadeInImageAnimator())
                                 .build())
-                        .listener(new LoadingListener.Stub())
+                        .progressListener(new LoadingListener.Stub())
                         .into(holder.imageView)
                         .start();
 

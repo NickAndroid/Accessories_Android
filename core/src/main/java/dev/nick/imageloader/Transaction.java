@@ -29,13 +29,13 @@ public abstract class Transaction<T> {
     }
 
     /**
-     * @param url Image source from, one of {@link BitmapImageSourceType}
+     * @param url Image source from, one of {@link ImageSource}
      * @return Instance of Transaction.
      */
     @LoaderApi
     public Transaction<T> from(@NonNull String url) {
         ImageSource<T> type = onCreateSource(url);
-        this.imageData = new ImageData<>(type, url);
+        this.imageData = new ImageData<>(Preconditions.checkNotNull(type, "Unknown image source"), url);
         return Transaction.this;
     }
 
@@ -53,12 +53,22 @@ public abstract class Transaction<T> {
     }
 
     /**
-     * @param listener The progress progressListener using to watch the progress of the loading.
+     * @param listener The {@link ProgressListener} using to watch the progress of the loading.
      * @return Instance of Transaction.
      */
     @LoaderApi
-    public Transaction<T> listener(@NonNull ProgressListener<T> listener) {
+    public Transaction<T> progressListener(@NonNull ProgressListener<T> listener) {
         this.progressListener = Preconditions.checkNotNull(listener);
+        return Transaction.this;
+    }
+
+    /**
+     * @param listener The {@link ErrorListener} using to watch the progress of the loading.
+     * @return Instance of Transaction.
+     */
+    @LoaderApi
+    public Transaction<T> errorListener(@NonNull ErrorListener listener) {
+        this.errorListener = Preconditions.checkNotNull(listener);
         return Transaction.this;
     }
 

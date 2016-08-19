@@ -58,6 +58,7 @@ public class BaseImageFetcher<T> implements ImageFetcher<T> {
                           @Nullable ErrorListener errorListener)
             throws Exception {
         if (!mPrepared.get()) throw new IllegalStateException("Fetcher not prepared.");
+        mLogger.funcEnter();
         return null;
     }
 

@@ -16,6 +16,7 @@ import dev.nick.imageloader.ui.ImageSeat;
 import dev.nick.imageloader.worker.ImageSource;
 import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.bitmap.BitmapImageSource;
+import dev.nick.imageloader.worker.result.ErrorListener;
 
 public class BitmapTransaction extends Transaction<Bitmap> {
 
@@ -41,8 +42,14 @@ public class BitmapTransaction extends Transaction<Bitmap> {
     }
 
     @Override
-    public BitmapTransaction listener(@NonNull ProgressListener<Bitmap> listener) {
-        super.listener(listener);
+    public BitmapTransaction progressListener(@NonNull ProgressListener<Bitmap> listener) {
+        super.progressListener(listener);
+        return this;
+    }
+
+    @Override
+    public BitmapTransaction errorListener(@NonNull ErrorListener listener) {
+        super.errorListener(listener);
         return this;
     }
 

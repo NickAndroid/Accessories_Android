@@ -53,7 +53,7 @@ public class AssetsImageTest extends BaseTest {
         ImageLoader.shared()
                 .loadBitmap()
                 .from(urlAssets)
-                .listener(new LoadingListener.Stub() {
+                .progressListener(new LoadingListener.Stub() {
                     @Override
                     public void onComplete(@Nullable Bitmap result) {
                         super.onComplete(result);

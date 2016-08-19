@@ -14,6 +14,7 @@ import dev.nick.imageloader.ui.ImageSeat;
 import dev.nick.imageloader.worker.ImageSource;
 import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.movie.MovieImageSource;
+import dev.nick.imageloader.worker.result.ErrorListener;
 
 public class MovieTransaction extends Transaction<Movie> {
 
@@ -39,8 +40,14 @@ public class MovieTransaction extends Transaction<Movie> {
     }
 
     @Override
-    public MovieTransaction listener(@NonNull ProgressListener<Movie> listener) {
-        super.listener(listener);
+    public MovieTransaction progressListener(@NonNull ProgressListener<Movie> listener) {
+        super.progressListener(listener);
+        return this;
+    }
+
+    @Override
+    public MovieTransaction errorListener(@NonNull ErrorListener listener) {
+        super.errorListener(listener);
         return this;
     }
 

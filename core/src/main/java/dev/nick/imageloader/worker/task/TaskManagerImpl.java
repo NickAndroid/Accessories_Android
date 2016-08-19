@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import dev.nick.imageloader.control.LoaderState;
+import dev.nick.imageloader.debug.Logger;
+import dev.nick.imageloader.debug.LoggerManager;
 
 public class TaskManagerImpl implements TaskManager {
 
@@ -30,10 +32,13 @@ public class TaskManagerImpl implements TaskManager {
 
     private long mClearTaskRequestedTimeMills;
 
+    private Logger mLogger;
+
     private LoaderState mState = LoaderState.RUNNING;
 
     public TaskManagerImpl() {
         this.mTaskLockMap = new HashMap<>();
+        this.mLogger = LoggerManager.getLogger(getClass());
     }
 
     @Override
@@ -62,21 +67,25 @@ public class TaskManagerImpl implements TaskManager {
 
     @Override
     public boolean interruptDisplay(DisplayTaskRecord record) {
-        return !isTaskDirty(record);
+        return isTaskDirty(record);
     }
 
     @Override
     public boolean interruptExecute(DisplayTaskRecord record) {
-        return !isTaskDirty(record);
+        return isTaskDirty(record);
     }
 
     private boolean isTaskDirty(DisplayTaskRecord task) {
 
-        if (mState == LoaderState.TERMINATED) return true;
+        if (mState == LoaderState.TERMINATED) {
+            mLogger.debug("Mark as dirty when terminated");
+            return true;
+        }
 
         boolean outDated = task.upTime() <= mClearTaskRequestedTimeMills;
 
         if (outDated) {
+            mLogger.verbose("Mark as dirty when outDated.");
             return true;
         }
 
@@ -86,6 +95,7 @@ public class TaskManagerImpl implements TaskManager {
                 int taskId = lock.getTaskId();
                 // We have new task to load for this settle.
                 if (taskId > task.getTaskId()) {
+                    mLogger.verbose("Mark as dirty when found new same task");
                     return true;
                 }
             }

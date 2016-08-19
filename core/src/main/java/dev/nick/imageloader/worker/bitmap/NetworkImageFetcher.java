@@ -139,6 +139,7 @@ public class NetworkImageFetcher extends BaseImageFetcher<Bitmap> {
 
         // No connection.
         if (!readyToLoad) {
+            mLogger.verbose("No network is available, returning");
             callOnError(errorListener, new Cause(new IllegalStateException("No network is available.")));
             return null;
         }

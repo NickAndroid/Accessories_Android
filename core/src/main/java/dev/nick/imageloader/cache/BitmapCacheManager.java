@@ -3,6 +3,7 @@ package dev.nick.imageloader.cache;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Process;
+import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
 
 import java.util.concurrent.ExecutorService;
@@ -43,7 +44,7 @@ public class BitmapCacheManager implements CacheManager<Bitmap> {
     }
 
     @Override
-    public boolean cache(final String url, final Bitmap value) {
+    public boolean cache(@NonNull final String url, @NonNull final Bitmap value) {
         if (isMemCacheEnabled) {
             mMemCache.cache(url, value);
         } else if (isDiskCacheEnabled) {

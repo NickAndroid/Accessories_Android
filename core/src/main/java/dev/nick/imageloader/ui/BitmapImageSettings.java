@@ -39,4 +39,11 @@ public class BitmapImageSettings extends ImageSettings<Bitmap> {
             }
         }
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + " BitmapImageSettings{" +
+                "mBitmap=" + mBitmap +
+                '}';
+    }
 }

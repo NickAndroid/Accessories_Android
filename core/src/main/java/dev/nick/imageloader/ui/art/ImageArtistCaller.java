@@ -19,12 +19,14 @@ package dev.nick.imageloader.ui.art;
 import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
 
+import java.util.List;
+
 import dev.nick.imageloader.ui.ImageSeat;
 
 public abstract class ImageArtistCaller {
 
     @WorkerThread
-    public static <T> T call(@NonNull ImageArt<T>[] arts, @NonNull T in,
+    public static <T> T call(@NonNull List<ImageArt<T>> arts, @NonNull T in,
                              @NonNull ImageSeat<T> imageSeat) {
         for (ImageArt<T> art : arts) {
             in = art.process(in, imageSeat);

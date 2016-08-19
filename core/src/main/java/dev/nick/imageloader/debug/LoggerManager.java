@@ -29,6 +29,10 @@ public class LoggerManager {
 
     static String TAG_PREFIX = "LoggerManager";
 
+    public static int getDebugLevel() {
+        return sDebugLevel.get();
+    }
+
     public static void setDebugLevel(int level) {
         sDebugLevel.set(level);
     }

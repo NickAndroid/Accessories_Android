@@ -249,7 +249,7 @@ public class LoadImageTest extends BaseTest {
                 ImageLoader.shared().loadBitmap()
                         .from(uri)
                         .priority(Priority.HIGH)
-                        .listener(loadingListener)
+                        .progressListener(loadingListener)
                         .start();
 
                 return convertView;
