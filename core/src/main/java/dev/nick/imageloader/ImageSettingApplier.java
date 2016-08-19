@@ -7,6 +7,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.WorkerThread;
 
+import dev.nick.imageloader.annotation.Shared;
 import dev.nick.imageloader.ui.BitmapImageSettings;
 import dev.nick.imageloader.ui.ImageSeat;
 import dev.nick.imageloader.ui.MovieImageSettings;
@@ -20,6 +21,7 @@ class ImageSettingApplier implements Handler.Callback {
 
     private Handler mUIThreadHandler;
 
+    @Shared
     private static ImageSettingApplier sharedApplier;
 
     private ImageSettingApplier() {

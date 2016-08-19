@@ -33,7 +33,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import dev.nick.imageloader.annotation.Lazy;
 import dev.nick.imageloader.annotation.LoaderApi;
+import dev.nick.imageloader.annotation.Shared;
 import dev.nick.imageloader.cache.BitmapCacheManager;
 import dev.nick.imageloader.cache.CacheManager;
 import dev.nick.imageloader.cache.MovieCacheManager;
@@ -92,6 +94,7 @@ public class ImageLoader implements
             .viewMaybeReused()
             .build();
 
+    @Shared
     private static ImageLoader sLoader;
 
     private final List<BaseFutureTask> mFutures;
@@ -101,7 +104,9 @@ public class ImageLoader implements
     private UIThreadRouter mUiThreadRouter;
     private ImageSettingApplier mImageSettingApplier;
 
+    @Lazy
     private CacheManager<Bitmap> mBitmapCacheManager;
+    @Lazy
     private CacheManager<Movie> mMovieCacheManager;
 
     private LoaderConfig mConfig;
@@ -110,7 +115,9 @@ public class ImageLoader implements
 
     private Logger mLogger;
 
-    private ThreadPoolExecutor mLoadingService, mFallbackService;
+    private ThreadPoolExecutor mLoadingService;
+    @Lazy
+    private ThreadPoolExecutor mFallbackService;
 
     private Freezer mFreezer;
     private LoaderState mState;
@@ -129,8 +136,6 @@ public class ImageLoader implements
         this.mSettableIdCreator = new ImageSettableIdCreatorImpl();
         this.mUiThreadRouter = UIThreadRouter.getSharedRouter();
         this.mImageSettingApplier = ImageSettingApplier.getSharedApplier();
-        this.mBitmapCacheManager = new BitmapCacheManager(config.getCachePolicy(), context);
-        this.mMovieCacheManager = new MovieCacheManager(config.getCachePolicy(), context);
         //noinspection deprecation
         this.mLoadingService = new ThreadPoolExecutor(
                 config.getLoadingThreads(),
@@ -262,7 +267,7 @@ public class ImageLoader implements
     /**
      * Display image from the from to the view.
      *
-     * @param data           Image data from, one of {@link ImageData}
+     * @param data             Image data from, one of {@link ImageData}
      * @param settable         Target {@link ImageSeat} to display the image.
      * @param option           {@link DisplayOption} is options using when display the image.
      * @param progressListener The progress progressListener using to watch the progress of the loading.
@@ -285,6 +290,8 @@ public class ImageLoader implements
         // 1. Get from cache.
         // 2. If no mem cache, start a loading task from disk cache file or perform first loading.
         // 3. Cache the loaded.
+
+        lazyGetBitmapCacheManager();
 
         if (mBitmapCacheManager.isMemCacheEnabled()) {
             Bitmap cached;
@@ -351,6 +358,8 @@ public class ImageLoader implements
         // 2. If no mem cache, start a loading task from disk cache file or perform first loading.
         // 3. Cache the loaded.
 
+        lazyGetMovieCacheManager();
+
         if (mMovieCacheManager.isMemCacheEnabled()) {
             Movie cached;
             if ((cached = mMovieCacheManager.get(source.getUrl())) != null) {
@@ -395,6 +404,18 @@ public class ImageLoader implements
             }
         }
         return loadAndDisplayMovie(source, settable, option, progressListener, errorListener, record, priority);
+    }
+
+    private synchronized CacheManager<Bitmap> lazyGetBitmapCacheManager() {
+        if (mBitmapCacheManager == null)
+            this.mBitmapCacheManager = new BitmapCacheManager(mConfig.getCachePolicy(), mContext);
+        return mBitmapCacheManager;
+    }
+
+    private synchronized CacheManager<Movie> lazyGetMovieCacheManager() {
+        if (mMovieCacheManager == null)
+            this.mMovieCacheManager = new MovieCacheManager(mConfig.getCachePolicy(), mContext);
+        return mMovieCacheManager;
     }
 
     private DisplayTaskRecord createTaskRecord(ImageSeat settable) {

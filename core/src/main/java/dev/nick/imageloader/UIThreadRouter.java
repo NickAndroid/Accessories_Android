@@ -4,6 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
+import dev.nick.imageloader.annotation.Shared;
 import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.result.Cause;
 import dev.nick.imageloader.worker.result.ErrorListener;
@@ -22,6 +23,7 @@ class UIThreadRouter implements Handler.Callback {
         this.mUIThreadHandler = new Handler(Looper.getMainLooper(), this);
     }
 
+    @Shared
     private static UIThreadRouter sharedRouter;
 
     public synchronized static UIThreadRouter getSharedRouter() {
