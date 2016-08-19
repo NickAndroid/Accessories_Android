@@ -17,6 +17,7 @@
 package dev.nick.twenty;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.widget.ImageView;
@@ -26,11 +27,11 @@ import com.nick.scalpel.annotation.binding.FindView;
 
 import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.LoadingListener;
+import dev.nick.imageloader.queue.Priority;
 import dev.nick.imageloader.ui.DisplayOption;
 import dev.nick.imageloader.ui.ImageQuality;
 import dev.nick.imageloader.ui.animator.FadeInImageAnimator;
 import dev.nick.imageloader.ui.art.BlackWhiteImageArt;
-import dev.nick.imageloader.queue.Priority;
 
 public class AssetsImageTest extends BaseTest {
 
@@ -42,7 +43,7 @@ public class AssetsImageTest extends BaseTest {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.drawable_list_layout);
+        setContentView(R.layout.single_image_layout);
         setTitle(getClass().getSimpleName());
         Scalpel.getInstance().wire(this);
     }
@@ -60,7 +61,7 @@ public class AssetsImageTest extends BaseTest {
                     }
                 })
                 .option(DisplayOption.bitmapBuilder()
-                        .showWithDefault(R.drawable.ic_launcher)
+                        .showOnFailure(BitmapFactory.decodeResource(getResources(), R.drawable.aio_image_fail))
                         .imageArt(new BlackWhiteImageArt())
                         .imageQuality(ImageQuality.RAW)
                         .imageAnimator(new FadeInImageAnimator())

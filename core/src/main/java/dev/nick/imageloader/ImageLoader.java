@@ -19,7 +19,6 @@ package dev.nick.imageloader;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Movie;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -427,17 +426,9 @@ public class ImageLoader implements
         return displayTaskRecord;
     }
 
-    private void showOnLoadingBm(ImageSeat<Bitmap> settable, DisplayOption option) {
-        int showWhenLoading = option.getLoadingImgRes();
-        String url = "res_cache:" + showWhenLoading;
-        Bitmap decoded = mBitmapCacheManager.get(url);
-        if (decoded == null) {
-            decoded = BitmapFactory.decodeResource(mContext.getResources(), showWhenLoading);
-            if (decoded != null) {
-                mBitmapCacheManager.cache(url, decoded);
-            }
-        }
-        mImageSettingApplier.applyImageSettings(decoded, null, settable, null);
+    private void showOnLoadingBm(ImageSeat<Bitmap> settable, DisplayOption<Bitmap> option) {
+        Bitmap showWhenLoading = option.getLoadingImg();
+        mImageSettingApplier.applyImageSettings(showWhenLoading, null, settable, null);
     }
 
     private void showOnLoadingMov(ImageSeat<Movie> settable, DisplayOption option) {
@@ -466,10 +457,10 @@ public class ImageLoader implements
                 record,
                 source.getUrl());
 
-        ErrorListenerDelegate errorListenerDelegate = null;
+        ErrorListenerDelegate<Bitmap> errorListenerDelegate = null;
 
         if (progressListener != null) {
-            errorListenerDelegate = new ErrorListenerDelegate(errorListener);
+            errorListenerDelegate = new BitmapErrorListenerDelegate(errorListener, option.getFailureImg(), imageSeat);
         }
 
         BitmapDisplayTask imageTask = new BitmapDisplayTask(
@@ -515,7 +506,7 @@ public class ImageLoader implements
         ErrorListenerDelegate errorListenerDelegate = null;
 
         if (progressListener != null) {
-            errorListenerDelegate = new ErrorListenerDelegate(errorListener);
+            errorListenerDelegate = new MovieErrorListenerDelegate(errorListener, option.getFailureImg(), imageSeat);
         }
 
         MovieDisplayTask imageTask = new MovieDisplayTask(
@@ -875,4 +866,5 @@ public class ImageLoader implements
             return true;
         }
     }
+
 }

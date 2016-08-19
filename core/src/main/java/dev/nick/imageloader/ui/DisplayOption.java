@@ -18,7 +18,6 @@ package dev.nick.imageloader.ui;
 
 import android.graphics.Bitmap;
 import android.graphics.Movie;
-import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
@@ -29,8 +28,8 @@ import dev.nick.imageloader.utils.Preconditions;
 
 public class DisplayOption<T> {
 
-    private int defaultImgRes;
-    private int loadingImgRes;
+    private T failureImg;
+    private T loadingImg;
 
     private ImageQuality quality;
 
@@ -41,15 +40,15 @@ public class DisplayOption<T> {
 
     private boolean animateOnlyNewLoaded;
 
-    private DisplayOption(int defaultImgRes,
-                          int loadingImgRes,
+    private DisplayOption(T failureImg,
+                          T loadingImg,
                           ImageQuality quality,
                           ArrayList<ImageArt<T>> handlers,
                           ImageAnimator<T> animator,
                           boolean viewMaybeReused,
                           boolean animateOnlyNewLoaded) {
-        this.defaultImgRes = defaultImgRes;
-        this.loadingImgRes = loadingImgRes;
+        this.failureImg = failureImg;
+        this.loadingImg = loadingImg;
         this.quality = quality;
         this.handlers = handlers;
         this.animator = animator;
@@ -65,12 +64,12 @@ public class DisplayOption<T> {
         return new Builder<>();
     }
 
-    public int getDefaultImgRes() {
-        return defaultImgRes;
+    public T getFailureImg() {
+        return failureImg;
     }
 
-    public int getLoadingImgRes() {
-        return loadingImgRes;
+    public T getLoadingImg() {
+        return loadingImg;
     }
 
     public ImageQuality getQuality() {
@@ -95,8 +94,8 @@ public class DisplayOption<T> {
 
     public static class Builder<T> {
 
-        private int defaultImgRes;
-        private int loadingImgRes;
+        private T failureImg;
+        private T loadingImg;
 
         private ImageQuality quality = ImageQuality.OPT;
 
@@ -111,20 +110,20 @@ public class DisplayOption<T> {
         }
 
         /**
-         * @param defaultImgRes Image res showing when load failure.
+         * @param failureImage Image res showing when load failure.
          * @return Instance of this builder.
          */
-        public Builder<T> showWithDefault(@DrawableRes int defaultImgRes) {
-            this.defaultImgRes = defaultImgRes;
+        public Builder<T> showOnFailure(T failureImage) {
+            this.failureImg = failureImage;
             return this;
         }
 
         /**
-         * @param loadingImgRes Image res showing when loading.
+         * @param loadingImg Image res showing when loading.
          * @return Instance of this builder.
          */
-        public Builder<T> showOnLoading(@DrawableRes int loadingImgRes) {
-            this.loadingImgRes = loadingImgRes;
+        public Builder<T> showOnLoading(T loadingImg) {
+            this.loadingImg = loadingImg;
             return this;
         }
 
@@ -184,8 +183,8 @@ public class DisplayOption<T> {
         public DisplayOption<T> build() {
             //noinspection unchecked
             return new DisplayOption<>(
-                    defaultImgRes,
-                    loadingImgRes,
+                    failureImg,
+                    loadingImg,
                     quality,
                     artList,
                     animator,

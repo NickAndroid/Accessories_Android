@@ -16,6 +16,7 @@
 
 package dev.nick.twenty;
 
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.widget.ImageView;
@@ -38,7 +39,7 @@ public class DrawableImageTest extends BaseTest {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.drawable_list_layout);
+        setContentView(R.layout.single_image_layout);
         setTitle(getClass().getSimpleName());
         Scalpel.getInstance().wire(this);
     }
@@ -50,7 +51,7 @@ public class DrawableImageTest extends BaseTest {
                 .loadBitmap()
                 .from(urlDrawable)
                 .option(DisplayOption.bitmapBuilder()
-                        .showWithDefault(R.drawable.ic_launcher)
+                        .showOnFailure(BitmapFactory.decodeResource(getResources(), R.drawable.aio_image_fail))
                         .imageArt(new BlurImageArt(24))
                         .imageQuality(ImageQuality.RAW)
                         .build())

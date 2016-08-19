@@ -37,7 +37,7 @@ public class SyncLoadTest extends BaseTest {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.drawable_list_layout);
+        setContentView(R.layout.single_image_layout);
         setTitle(getClass().getSimpleName());
         Scalpel.getInstance().wire(this);
     }

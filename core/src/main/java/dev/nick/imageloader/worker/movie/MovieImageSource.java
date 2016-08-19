@@ -10,18 +10,28 @@ import dev.nick.imageloader.worker.PathSplitter;
 public class MovieImageSource extends ImageSource<Movie> {
 
     public static final MovieImageSource FILE = new FileSource();
+    public static final MovieImageSource ASSETS = new AssetsSource();
+
+    private static final MovieImageSource[] PREBUILT = new MovieImageSource[]{
+            FILE, ASSETS
+    };
 
     public MovieImageSource(ImageFetcher<Movie> fetcher, String prefix) {
         super(fetcher, prefix);
     }
 
+    public static MovieImageSource from(String url) {
+        for (MovieImageSource source : PREBUILT) {
+            if (url.startsWith(source.getPrefix())) {
+                return source;
+            }
+        }
+        return null;
+    }
+
     @Override
     public boolean maybeSlow() {
         return false;
-    }
-
-    public static MovieImageSource from(String url) {
-        return FILE;
     }
 
     static class FileSource extends MovieImageSource {
@@ -33,6 +43,18 @@ public class MovieImageSource extends ImageSource<Movie> {
                     return fullPath.substring(Prefix.FILE.length(), fullPath.length());
                 }
             }), Prefix.FILE);
+        }
+    }
+
+    static class AssetsSource extends MovieImageSource {
+
+        public AssetsSource() {
+            super(new AssetsImageFetcher(new PathSplitter<String>() {
+                @Override
+                public String getRealPath(@NonNull String fullPath) {
+                    return fullPath.substring(Prefix.ASSETS.length(), fullPath.length());
+                }
+            }), Prefix.ASSETS);
         }
     }
 }

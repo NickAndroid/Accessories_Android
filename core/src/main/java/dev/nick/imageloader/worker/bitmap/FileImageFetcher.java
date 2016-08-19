@@ -24,6 +24,7 @@ import android.support.annotation.Nullable;
 import java.io.File;
 import java.io.FileNotFoundException;
 
+import dev.nick.imageloader.utils.Preconditions;
 import dev.nick.imageloader.worker.BaseImageFetcher;
 import dev.nick.imageloader.worker.DecodeSpec;
 import dev.nick.imageloader.worker.DimenSpec;
@@ -31,7 +32,6 @@ import dev.nick.imageloader.worker.PathSplitter;
 import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.result.Cause;
 import dev.nick.imageloader.worker.result.ErrorListener;
-import dev.nick.imageloader.utils.Preconditions;
 
 public class FileImageFetcher extends BaseImageFetcher<Bitmap> {
 

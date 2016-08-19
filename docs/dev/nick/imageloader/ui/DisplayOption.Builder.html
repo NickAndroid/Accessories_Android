@@ -162,11 +162,11 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i5" class="rowColor">
 <td class="colFirst"><code><a href="../../../../dev/nick/imageloader/ui/DisplayOption.Builder.html" title="class in dev.nick.imageloader.ui">DisplayOption.Builder</a>&lt;<a href="../../../../dev/nick/imageloader/ui/DisplayOption.Builder.html" title="type parameter in DisplayOption.Builder">T</a>&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../dev/nick/imageloader/ui/DisplayOption.Builder.html#showOnLoading-int-">showOnLoading</a></span>(int&nbsp;loadingImgRes)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../dev/nick/imageloader/ui/DisplayOption.Builder.html#showOnLoading-int-">showOnLoading</a></span>(int&nbsp;loadingImg)</code>&nbsp;</td>
 </tr>
 <tr id="i6" class="altColor">
 <td class="colFirst"><code><a href="../../../../dev/nick/imageloader/ui/DisplayOption.Builder.html" title="class in dev.nick.imageloader.ui">DisplayOption.Builder</a>&lt;<a href="../../../../dev/nick/imageloader/ui/DisplayOption.Builder.html" title="type parameter in DisplayOption.Builder">T</a>&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../dev/nick/imageloader/ui/DisplayOption.Builder.html#showWithDefault-int-">showWithDefault</a></span>(int&nbsp;defaultImgRes)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../dev/nick/imageloader/ui/DisplayOption.Builder.html#showWithDefault-int-">showWithDefault</a></span>(int&nbsp;failureImg)</code>&nbsp;</td>
 </tr>
 <tr id="i7" class="rowColor">
 <td class="colFirst"><code><a href="../../../../dev/nick/imageloader/ui/DisplayOption.Builder.html" title="class in dev.nick.imageloader.ui">DisplayOption.Builder</a>&lt;<a href="../../../../dev/nick/imageloader/ui/DisplayOption.Builder.html" title="type parameter in DisplayOption.Builder">T</a>&gt;</code></td>
@@ -203,10 +203,10 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>showWithDefault</h4>
 <pre>public&nbsp;<a href="../../../../dev/nick/imageloader/ui/DisplayOption.Builder.html" title="class in dev.nick.imageloader.ui">DisplayOption.Builder</a>&lt;<a href="../../../../dev/nick/imageloader/ui/DisplayOption.Builder.html" title="type parameter in DisplayOption.Builder">T</a>&gt;&nbsp;showWithDefault(@DrawableRes
-                                                int&nbsp;defaultImgRes)</pre>
+                                                int&nbsp;failureImg)</pre>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>defaultImgRes</code> - Image res showing when load failure.</dd>
+<dd><code>failureImg</code> - Image res showing when load failure.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>Instance of this builder.</dd>
 </dl>
@@ -219,10 +219,10 @@ extends java.lang.Object</pre>
 <li class="blockList">
 <h4>showOnLoading</h4>
 <pre>public&nbsp;<a href="../../../../dev/nick/imageloader/ui/DisplayOption.Builder.html" title="class in dev.nick.imageloader.ui">DisplayOption.Builder</a>&lt;<a href="../../../../dev/nick/imageloader/ui/DisplayOption.Builder.html" title="type parameter in DisplayOption.Builder">T</a>&gt;&nbsp;showOnLoading(@DrawableRes
-                                              int&nbsp;loadingImgRes)</pre>
+                                              int&nbsp;loadingImg)</pre>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>loadingImgRes</code> - Image res showing when loading.</dd>
+<dd><code>loadingImg</code> - Image res showing when loading.</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>Instance of this builder.</dd>
 </dl>
