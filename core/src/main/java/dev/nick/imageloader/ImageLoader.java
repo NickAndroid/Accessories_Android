@@ -19,6 +19,7 @@ package dev.nick.imageloader;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Movie;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -261,12 +262,12 @@ public class ImageLoader implements
     /**
      * Display image from the from to the view.
      *
-     * @param source           Image source from, one of {@link ImageData}
+     * @param data           Image data from, one of {@link ImageData}
      * @param settable         Target {@link ImageSeat} to display the image.
      * @param option           {@link DisplayOption} is options using when display the image.
      * @param progressListener The progress progressListener using to watch the progress of the loading.
      */
-    Future<Bitmap> displayBitmap(@NonNull ImageData<Bitmap> source,
+    Future<Bitmap> displayBitmap(@NonNull ImageData<Bitmap> data,
                                  @NonNull ImageSeat<Bitmap> settable,
                                  @Nullable DisplayOption<Bitmap> option,
                                  @Nullable ProgressListener<Bitmap> progressListener,
@@ -275,7 +276,7 @@ public class ImageLoader implements
 
         ensureNotTerminated();
 
-        Preconditions.checkNotNull(source.getUrl(), "imageData is null");
+        Preconditions.checkNotNull(data.getUrl(), "imageData is null");
 
         DisplayTaskRecord record = createTaskRecord(Preconditions.checkNotNull(settable));
 
@@ -287,7 +288,7 @@ public class ImageLoader implements
 
         if (mBitmapCacheManager.isMemCacheEnabled()) {
             Bitmap cached;
-            if ((cached = mBitmapCacheManager.get(source.getUrl())) != null) {
+            if ((cached = mBitmapCacheManager.get(data.getUrl())) != null) {
                 mImageSettingApplier.applyImageSettings(
                         cached,
                         option.getHandlers(),
@@ -301,9 +302,9 @@ public class ImageLoader implements
             }
         }
 
-        beforeLoadBitmap(settable, option);
+        if (data.getType().maybeSlow()) showOnLoadingBm(settable, option);
 
-        String loadingUrl = source.getUrl();
+        String loadingUrl = data.getUrl();
 
         if (mBitmapCacheManager.isDiskCacheEnabled()) {
             String cachePath;
@@ -325,11 +326,11 @@ public class ImageLoader implements
                         return new MokeFutureImageTask<>(cached);
                     }
                 }
-                source.setUrl(loadingUrl);
+                data.setUrl(loadingUrl);
             }
         }
 
-        return loadAndDisplayBitmap(source, settable, option, progressListener, errorListener, record, priority);
+        return loadAndDisplayBitmap(data, settable, option, progressListener, errorListener, record, priority);
     }
 
     Future<Movie> displayMovie(@NonNull ImageData<Movie> source,
@@ -366,7 +367,7 @@ public class ImageLoader implements
             }
         }
 
-        beforeLoadMovie(settable, option);
+        showOnLoadingMov(settable, option);
 
         String loadingUrl = source.getUrl();
 
@@ -404,15 +405,20 @@ public class ImageLoader implements
         return displayTaskRecord;
     }
 
-    private void beforeLoadBitmap(ImageSeat<Bitmap> settable, DisplayOption option) {
+    private void showOnLoadingBm(ImageSeat<Bitmap> settable, DisplayOption option) {
         int showWhenLoading = option.getLoadingImgRes();
-        mImageSettingApplier.applyImageSettings(showWhenLoading, settable, null);
+        String url = "res_cache:" + showWhenLoading;
+        Bitmap decoded = mBitmapCacheManager.get(url);
+        if (decoded == null) {
+            decoded = BitmapFactory.decodeResource(mContext.getResources(), showWhenLoading);
+            mBitmapCacheManager.cache(url, decoded);
+        }
+        mImageSettingApplier.applyImageSettings(decoded, null, settable, null);
     }
 
-    private void beforeLoadMovie(ImageSeat<Movie> settable, DisplayOption option) {
+    private void showOnLoadingMov(ImageSeat<Movie> settable, DisplayOption option) {
         //FIXME
     }
-
 
     private Future<Bitmap> loadAndDisplayBitmap(ImageData<Bitmap> source,
                                                 ImageSeat<Bitmap> imageSeat,

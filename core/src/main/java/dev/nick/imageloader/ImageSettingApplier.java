@@ -10,10 +10,9 @@ import android.support.annotation.WorkerThread;
 import dev.nick.imageloader.ui.BitmapImageSettings;
 import dev.nick.imageloader.ui.ImageSeat;
 import dev.nick.imageloader.ui.MovieImageSettings;
-import dev.nick.imageloader.ui.ResImageSettings;
 import dev.nick.imageloader.ui.animator.ImageAnimator;
-import dev.nick.imageloader.ui.art.ImageArtistCaller;
 import dev.nick.imageloader.ui.art.ImageArt;
+import dev.nick.imageloader.ui.art.ImageArtistCaller;
 
 class ImageSettingApplier implements Handler.Callback {
 
@@ -56,14 +55,6 @@ class ImageSettingApplier implements Handler.Callback {
                     (handlers == null || handlers.length == 0
                             ? bitmap
                             : ImageArtistCaller.call(handlers, bitmap, imageSeat)));
-            mUIThreadHandler.obtainMessage(MSG_APPLY_IMAGE_SETTINGS, settings).sendToTarget();
-        }
-    }
-
-    @WorkerThread
-    void applyImageSettings(int resId, ImageSeat<Bitmap> imageSeat, ImageAnimator<Bitmap> animator) {
-        if (imageSeat != null) {
-            ResImageSettings settings = new ResImageSettings(animator, imageSeat, resId);
             mUIThreadHandler.obtainMessage(MSG_APPLY_IMAGE_SETTINGS, settings).sendToTarget();
         }
     }
