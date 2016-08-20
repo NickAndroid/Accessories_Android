@@ -18,6 +18,7 @@ package dev.nick.twenty;
 
 import android.Manifest;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
@@ -37,7 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dev.nick.imageloader.ImageLoader;
-import dev.nick.imageloader.LoadingListener;
+import dev.nick.imageloader.ProgressListenerStub;
 import dev.nick.imageloader.ui.DisplayOption;
 import dev.nick.imageloader.ui.ImageQuality;
 import dev.nick.imageloader.ui.animator.FadeInImageAnimator;
@@ -107,7 +108,7 @@ public class FileImageTest extends BaseTest {
                                 .animateOnlyNewLoaded()
                                 .imageAnimator(new FadeInImageAnimator())
                                 .build())
-                        .progressListener(new LoadingListener.Stub())
+                        .progressListener(new ProgressListenerStub<Bitmap>())
                         .into(holder.imageView)
                         .start();
 

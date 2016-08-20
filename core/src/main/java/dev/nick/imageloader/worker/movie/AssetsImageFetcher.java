@@ -40,15 +40,18 @@ public class AssetsImageFetcher extends BaseImageFetcher<Movie> {
     }
 
     @Override
-    public Movie fetchFromUrl(@NonNull String url, @NonNull DecodeSpec decodeSpec, @Nullable ProgressListener<Movie> progressListener, @Nullable ErrorListener errorListener) throws Exception {
+    public Movie fetchFromUrl(@NonNull String url, @NonNull DecodeSpec decodeSpec,
+                              @Nullable ProgressListener<Movie> progressListener,
+                              @Nullable ErrorListener errorListener) throws Exception {
         super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);
 
         String path = mSplitter.getRealPath(url);
 
-        if (mAssets == null) mAssets = mContext.getAssets();
+        synchronized (this) {
+            if (mAssets == null) mAssets = mContext.getAssets();
+        }
 
         InputStream in = null;
-
         try {
             in = mAssets.open(path);
             callOnStart(progressListener);

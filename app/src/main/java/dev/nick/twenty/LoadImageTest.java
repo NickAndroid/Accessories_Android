@@ -39,10 +39,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dev.nick.imageloader.ImageLoader;
-import dev.nick.imageloader.LoadingListener;
-import dev.nick.imageloader.worker.result.Cause;
+import dev.nick.imageloader.ProgressListenerStub;
 import dev.nick.imageloader.debug.LoggerManager;
 import dev.nick.imageloader.queue.Priority;
+import dev.nick.imageloader.worker.result.Cause;
+import dev.nick.imageloader.worker.result.ErrorListener;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
 public class LoadImageTest extends BaseTest {
@@ -209,13 +210,7 @@ public class LoadImageTest extends BaseTest {
                 holder.progressBar.setProgress(0);
                 holder.textView.setText("");
 
-                LoadingListener loadingListener = new LoadingListener.Stub() {
-                    @Override
-                    public void onError(@NonNull Cause cause) {
-                        LoggerManager.getLogger(getClass()).error(cause);
-                        holder.textView.setText("Error");
-                    }
-
+                ProgressListenerStub<Bitmap> progressListenerStub = new ProgressListenerStub<Bitmap>() {
                     @Override
                     public void onComplete(@Nullable Bitmap result) {
                         if (result != null) {
@@ -249,7 +244,14 @@ public class LoadImageTest extends BaseTest {
                 ImageLoader.shared().loadBitmap()
                         .from(uri)
                         .priority(Priority.HIGH)
-                        .progressListener(loadingListener)
+                        .progressListener(progressListenerStub)
+                        .errorListener(new ErrorListener() {
+                            @Override
+                            public void onError(@NonNull Cause cause) {
+                                LoggerManager.getLogger(getClass()).error(cause);
+                                holder.textView.setText("Error");
+                            }
+                        })
                         .start();
 
                 return convertView;

@@ -18,43 +18,27 @@ package dev.nick.imageloader;
 
 import android.support.annotation.Nullable;
 
-import dev.nick.imageloader.annotation.CallingOnUIThread;
 import dev.nick.imageloader.worker.ProgressListener;
 
-public interface ProgressListenerStub<T> extends ProgressListener<T> {
+public class ProgressListenerStub<T> implements ProgressListener<T> {
 
     @Override
-    @CallingOnUIThread
-    void onComplete(@Nullable T result);
+    public void onComplete(@Nullable T result) {
+        // Nothing.
+    }
 
     @Override
-    @CallingOnUIThread
-    void onProgressUpdate(float progress);
+    public void onProgressUpdate(float progress) {
+        // Nothing.
+    }
 
     @Override
-    @CallingOnUIThread
-    void onStartLoading();
+    public void onCancel() {
+        // Nothing.
+    }
 
-    class Stub<T> implements ProgressListenerStub<T> {
-
-        @Override
-        public void onComplete(@Nullable T result) {
-            // Nothing.
-        }
-
-        @Override
-        public void onProgressUpdate(float progress) {
-            // Nothing.
-        }
-
-        @Override
-        public void onCancel() {
-            // Nothing.
-        }
-
-        @Override
-        public void onStartLoading() {
-
-        }
+    @Override
+    public void onStartLoading() {
+        // Nothing.
     }
 }
