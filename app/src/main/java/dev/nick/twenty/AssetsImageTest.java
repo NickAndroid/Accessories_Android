@@ -26,7 +26,7 @@ import com.nick.scalpel.Scalpel;
 import com.nick.scalpel.annotation.binding.FindView;
 
 import dev.nick.imageloader.ImageLoader;
-import dev.nick.imageloader.LoadingListener;
+import dev.nick.imageloader.ProgressListenerStub;
 import dev.nick.imageloader.queue.Priority;
 import dev.nick.imageloader.ui.DisplayOption;
 import dev.nick.imageloader.ui.ImageQuality;
@@ -54,7 +54,7 @@ public class AssetsImageTest extends BaseTest {
         ImageLoader.shared()
                 .loadBitmap()
                 .from(urlAssets)
-                .progressListener(new LoadingListener.Stub() {
+                .progressListener(new ProgressListenerStub<Bitmap>() {
                     @Override
                     public void onComplete(@Nullable Bitmap result) {
                         super.onComplete(result);
