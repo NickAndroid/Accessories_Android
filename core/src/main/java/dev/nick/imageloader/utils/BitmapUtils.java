@@ -13,12 +13,6 @@
 package dev.nick.imageloader.utils;
 
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
-import android.graphics.RectF;
 
 /**
  * {@link Bitmap} specific helpers.
@@ -300,23 +294,6 @@ public final class BitmapUtils {
         }
         Bitmap newBmp = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
         newBmp.setPixels(pixels, 0, width, 0, 0, width, height);
-        return newBmp;
-    }
-
-    public static Bitmap roundCorner(Bitmap in, float roundPx) {
-        Bitmap newBmp = Bitmap.createBitmap(in.getWidth(), in.getHeight(),
-                Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(newBmp);
-        final int color = 0xff424242;
-        final Paint paint = new Paint();
-        final Rect rect = new Rect(0, 0, in.getWidth(), in.getHeight());
-        final RectF rectF = new RectF(rect);
-        paint.setAntiAlias(true);
-        canvas.drawARGB(0, 0, 0, 0);
-        paint.setColor(color);
-        canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        canvas.drawBitmap(in, rect, rect, paint);
         return newBmp;
     }
 }

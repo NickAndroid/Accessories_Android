@@ -74,7 +74,7 @@ class ImageSettingApplier implements Handler.Callback {
     void applyImageSettings(Bitmap bitmap, List<ImageArt<Bitmap>> arts, ImageChair<Bitmap> imageChair,
                             ImageAnimator<Bitmap> animator) {
 
-        mLogger.verbose("imageChair: " + imageChair + "bitmap: " + bitmap);
+        mLogger.verbose("imageChair: " + imageChair + ", bitmap: " + bitmap + ", animator:" + animator);
 
         if (imageChair != null) {
             BitmapImageSettings settings = new BitmapImageSettings(

@@ -153,6 +153,7 @@ public class NetworkImageFetcher extends BaseImageFetcher<Bitmap> {
         mLogger.verbose("Using tmp path for image download:" + tmpPath);
 
         HttpImageDownloader.ByteReadingListener byteReadingListener = null;
+
         if (mTrafficStatsEnabled) {
             final int finalUsingNetworkType = usingNetworkType;
             byteReadingListener = new HttpImageDownloader.ByteReadingListener() {
@@ -170,6 +171,7 @@ public class NetworkImageFetcher extends BaseImageFetcher<Bitmap> {
                 }
             };
         }
+
         ImageDownloader<Boolean> downloader = new HttpImageDownloader(tmpPath, byteReadingListener);
 
         String downloadPath = buildDownloadFilePath(url);
@@ -180,9 +182,8 @@ public class NetworkImageFetcher extends BaseImageFetcher<Bitmap> {
         if (exists) {
             try {
                 mLogger.info("Using exist file instead of download.");
-                mFileImageFetcher.fetchFromUrl(ImageSource.Prefix.FILE + downloadPath,
+                return mFileImageFetcher.fetchFromUrl(ImageSource.Prefix.FILE + downloadPath,
                         decodeSpec, progressListener, errorListener);
-                return null;
             } catch (Exception e) {
                 mLogger.warn("Error when fetch exists file:" + downloadPath);
                 //noinspection ResultOfMethodCallIgnored
@@ -198,11 +199,12 @@ public class NetworkImageFetcher extends BaseImageFetcher<Bitmap> {
         }
         // Delete the tmp file.
         if (!ok && !new File(tmpPath).delete()) {
-            mLogger.verbose("Failed to delete the tmp file:" + tmpPath);
+            mLogger.warn("Failed to delete the tmp file:" + tmpPath);
         }
 
         if (ok) {
-            return mFileImageFetcher.fetchFromUrl(ImageSource.Prefix.FILE + tmpPath, decodeSpec, progressListener, errorListener);
+            return mFileImageFetcher.fetchFromUrl(ImageSource.Prefix.FILE + tmpPath, decodeSpec,
+                    progressListener, errorListener);
         }
         return null;
     }

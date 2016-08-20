@@ -45,6 +45,13 @@ class BitmapProgressListenerDelegate extends ProgressListenerDelegate<Bitmap> {
     }
 
     @Override
+    protected void callOnComplete(Bitmap result) {
+        if (!canceled) {
+            UIThreadRouter.getSharedRouter().callOnComplete(listener, result);
+        }
+    }
+
+    @Override
     public void onComplete(Bitmap result) {
 
         if (result == null) {

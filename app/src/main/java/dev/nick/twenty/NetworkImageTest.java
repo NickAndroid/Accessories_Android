@@ -220,6 +220,7 @@ public class NetworkImageTest extends BaseTest {
                         .option(DisplayOption.bitmapBuilder()
                                 .imageQuality(ImageQuality.OPT)
                                 .viewMaybeReused()
+                                .animateOnlyNewLoaded()
                                 .imageAnimator(new FadeInImageAnimator())
                                 .build())
                         .errorListener(new ErrorListener() {

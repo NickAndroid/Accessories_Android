@@ -23,6 +23,7 @@ import android.graphics.Movie;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
+import android.widget.AbsListView;
 import android.widget.ImageView;
 
 import java.util.ArrayList;
@@ -52,6 +53,7 @@ import dev.nick.imageloader.queue.Priority;
 import dev.nick.imageloader.queue.QueuePolicy;
 import dev.nick.imageloader.queue.RequestHandler;
 import dev.nick.imageloader.queue.RequestQueueManager;
+import dev.nick.imageloader.scrollable.AbsListViewScrollDetector;
 import dev.nick.imageloader.ui.BitmapImageViewDelegate;
 import dev.nick.imageloader.ui.DisplayOption;
 import dev.nick.imageloader.ui.ImageChair;
@@ -267,13 +269,13 @@ public class ImageLoader implements
     /**
      * Display image from the from to the view.
      *
-     * @param data             Image data from, one of {@link ImageData}
-     * @param settable         Target {@link ImageChair} to display the image.
+     * @param source           Image source from, one of {@link ImageData}
+     * @param imageChair       Target {@link ImageChair} to display the image.
      * @param option           {@link DisplayOption} is options using when display the image.
      * @param progressListener The progress progressListener using to watch the progress of the loading.
      */
-    Future<Bitmap> displayBitmap(@NonNull ImageData<Bitmap> data,
-                                 @NonNull ImageChair<Bitmap> settable,
+    Future<Bitmap> displayBitmap(@NonNull ImageData<Bitmap> source,
+                                 @NonNull ImageChair<Bitmap> imageChair,
                                  @Nullable DisplayOption<Bitmap> option,
                                  @Nullable ProgressListener<Bitmap> progressListener,
                                  @Nullable ErrorListener errorListener,
@@ -281,9 +283,9 @@ public class ImageLoader implements
 
         ensureNotTerminated();
 
-        Preconditions.checkNotNull(data.getUrl(), "imageData is null");
+        Preconditions.checkNotNull(source.getUrl(), "imageData is null");
 
-        DisplayTaskRecord record = createTaskRecord(Preconditions.checkNotNull(settable));
+        DisplayTaskRecord record = createTaskRecord(Preconditions.checkNotNull(imageChair));
 
         option = assignBitmapOption(option);
 
@@ -293,25 +295,36 @@ public class ImageLoader implements
 
         lazyGetBitmapCacheManager();
 
+        ImageQuality imageQuality = option.getQuality();
+
+        DimenSpec dimenSpec = new DimenSpec(imageChair.getWidth(), imageChair.getHeight());
+
+        ProgressListenerDelegate<Bitmap> progressListenerDelegate = new BitmapProgressListenerDelegate(
+                mBitmapCacheManager,
+                mTaskManager,
+                progressListener,
+                dimenSpec,
+                option,
+                imageChair,
+                record,
+                source.getUrl());
+
         if (mBitmapCacheManager.isMemCacheEnabled()) {
             Bitmap cached;
-            if ((cached = mBitmapCacheManager.get(data.getUrl())) != null) {
+            if ((cached = mBitmapCacheManager.get(source.getUrl())) != null) {
+                mLogger.verbose("Using mem cached bitmap for:" + source.getUrl());
                 mImageSettingApplier.applyImageSettings(
                         cached,
                         option.getArtist(),
-                        settable,
+                        imageChair,
                         option.isAnimateOnlyNewLoaded() ? null : option.getAnimator());
-                // Call complete.
-                if (progressListener != null) {
-                    progressListener.onComplete(cached);
-                }
+                progressListenerDelegate.callOnComplete(cached);
                 return new MokeFutureImageTask<>(cached);
             }
         }
 
-        if (data.getType().maybeSlow()) showOnLoadingBm(settable, option);
-
-        String loadingUrl = data.getUrl();
+        String loadingUrl = source.getUrl();
+        boolean usingDiskCacheUrl = false;
 
         if (mBitmapCacheManager.isDiskCacheEnabled()) {
             String cachePath;
@@ -321,27 +334,56 @@ public class ImageLoader implements
                 if (mBitmapCacheManager.isMemCacheEnabled()) {
                     Bitmap cached;
                     if ((cached = mBitmapCacheManager.get(loadingUrl)) != null) {
+                        mLogger.verbose("Using mem cached bitmap for:" + source.getUrl());
                         mImageSettingApplier.applyImageSettings(
                                 cached,
                                 option.getArtist(),
-                                settable,
+                                imageChair,
                                 option.isAnimateOnlyNewLoaded() ? null : option.getAnimator());
-                        // Call complete.
-                        if (progressListener != null) {
-                            progressListener.onComplete(cached);
-                        }
+                        progressListenerDelegate.callOnComplete(cached);
                         return new MokeFutureImageTask<>(cached);
                     }
                 }
-                data.setUrl(loadingUrl);
+                source.setUrl(loadingUrl);
+                usingDiskCacheUrl = true;
             }
         }
 
-        return loadAndDisplayBitmap(data, settable, option, progressListener, errorListener, record, priority);
+        if (source.getType().maybeSlow()) showOnLoadingBm(imageChair, option);
+
+        ErrorListenerDelegate<Bitmap> errorListenerDelegate = null;
+
+        if (errorListener != null) {
+            errorListenerDelegate = new BitmapErrorListenerDelegate(errorListener, option.getFailureImg(), imageChair);
+        }
+
+        if (usingDiskCacheUrl) {
+            mLogger.verbose("Using disk cache url for loading:" + loadingUrl);
+        } else {
+            mLogger.verbose("No cache found, perform loading: " + loadingUrl);
+        }
+
+        BitmapDisplayTask imageTask = new BitmapDisplayTask(
+                mContext,
+                mConfig,
+                mTaskManager,
+                source,
+                dimenSpec,
+                imageQuality,
+                progressListenerDelegate,
+                errorListenerDelegate,
+                record);
+
+        FutureBitmapTask future = new FutureBitmapTask(imageTask, this, option.isViewMaybeReused());
+        future.setPriority(priority == null ? Priority.NORMAL : priority);
+
+        mTaskHandleService.push(future);
+
+        return future;
     }
 
     Future<Movie> displayMovie(@NonNull ImageData<Movie> source,
-                               @NonNull ImageChair<Movie> settable,
+                               @NonNull ImageChair<Movie> imageChair,
                                @Nullable DisplayOption<Movie> option,
                                @Nullable ProgressListener<Movie> progressListener,
                                @Nullable ErrorListener errorListener,
@@ -350,7 +392,7 @@ public class ImageLoader implements
 
         Preconditions.checkNotNull(source.getUrl(), "imageData is null");
 
-        DisplayTaskRecord record = createTaskRecord(Preconditions.checkNotNull(settable));
+        DisplayTaskRecord record = createTaskRecord(Preconditions.checkNotNull(imageChair));
 
         option = assignMovieOption(option);
 
@@ -360,25 +402,34 @@ public class ImageLoader implements
 
         lazyGetMovieCacheManager();
 
+        ImageQuality imageQuality = option.getQuality();
+        DimenSpec dimenSpec = new DimenSpec(imageChair.getWidth(), imageChair.getHeight());
+
+        ProgressListenerDelegate<Movie> progressListenerDelegate = new MovieProgressListenerDelegate(
+                mMovieCacheManager,
+                mTaskManager,
+                progressListener,
+                dimenSpec,
+                option,
+                imageChair,
+                record,
+                source.getUrl());
+
         if (mMovieCacheManager.isMemCacheEnabled()) {
             Movie cached;
             if ((cached = mMovieCacheManager.get(source.getUrl())) != null) {
                 mImageSettingApplier.applyImageSettings(
                         cached,
                         option.getArtist(),
-                        settable,
+                        imageChair,
                         option.isAnimateOnlyNewLoaded() ? null : option.getAnimator());
-                // Call complete.
-                if (progressListener != null) {
-                    progressListener.onComplete(cached);
-                }
+                progressListenerDelegate.callOnComplete(cached);
                 return new MokeFutureImageTask<>(cached);
             }
         }
 
-        showOnLoadingMov(settable, option);
-
         String loadingUrl = source.getUrl();
+        boolean usingDiskCacheUrl = false;
 
         if (mMovieCacheManager.isDiskCacheEnabled()) {
             String cachePath;
@@ -391,19 +442,48 @@ public class ImageLoader implements
                         mImageSettingApplier.applyImageSettings(
                                 cached,
                                 option.getArtist(),
-                                settable,
+                                imageChair,
                                 option.isAnimateOnlyNewLoaded() ? null : option.getAnimator());
-                        // Call complete.
-                        if (progressListener != null) {
-                            progressListener.onComplete(cached);
-                        }
+                        progressListenerDelegate.callOnComplete(cached);
                         return new MokeFutureImageTask<>(cached);
                     }
                 }
                 source.setUrl(loadingUrl);
+                usingDiskCacheUrl = true;
             }
         }
-        return loadAndDisplayMovie(source, settable, option, progressListener, errorListener, record, priority);
+
+        if (usingDiskCacheUrl) {
+            mLogger.verbose("Using disk cache url for loading:" + loadingUrl);
+        } else {
+            mLogger.verbose("No cache found, perform loading: " + loadingUrl);
+        }
+
+        if (source.getType().maybeSlow()) showOnLoadingMov(imageChair, option);
+
+        ErrorListenerDelegate errorListenerDelegate = null;
+
+        if (errorListener != null) {
+            errorListenerDelegate = new MovieErrorListenerDelegate(errorListener, option.getFailureImg(), imageChair);
+        }
+
+        MovieDisplayTask imageTask = new MovieDisplayTask(
+                mContext,
+                mConfig,
+                mTaskManager,
+                source,
+                dimenSpec,
+                imageQuality,
+                progressListenerDelegate,
+                errorListenerDelegate,
+                record);
+
+        FutureMovieTask future = new FutureMovieTask(imageTask, this, option.isViewMaybeReused());
+        future.setPriority(priority == null ? Priority.NORMAL : priority);
+
+        mTaskHandleService.push(future);
+
+        return future;
     }
 
     private synchronized CacheManager<Bitmap> lazyGetBitmapCacheManager() {
@@ -433,98 +513,6 @@ public class ImageLoader implements
 
     private void showOnLoadingMov(ImageChair<Movie> settable, DisplayOption option) {
         //FIXME
-    }
-
-    private Future<Bitmap> loadAndDisplayBitmap(ImageData<Bitmap> source,
-                                                ImageChair<Bitmap> imageChair,
-                                                DisplayOption<Bitmap> option,
-                                                ProgressListener<Bitmap> progressListener,
-                                                ErrorListener errorListener,
-                                                DisplayTaskRecord record,
-                                                Priority priority) {
-
-        ImageQuality imageQuality = option.getQuality();
-
-        DimenSpec dimenSpec = new DimenSpec(imageChair.getWidth(), imageChair.getHeight());
-
-        ProgressListenerDelegate<Bitmap> progressListenerDelegate = new BitmapProgressListenerDelegate(
-                mBitmapCacheManager,
-                mTaskManager,
-                progressListener,
-                dimenSpec,
-                option,
-                imageChair,
-                record,
-                source.getUrl());
-
-        ErrorListenerDelegate<Bitmap> errorListenerDelegate = null;
-
-        if (progressListener != null) {
-            errorListenerDelegate = new BitmapErrorListenerDelegate(errorListener, option.getFailureImg(), imageChair);
-        }
-
-        BitmapDisplayTask imageTask = new BitmapDisplayTask(
-                mContext,
-                mConfig,
-                mTaskManager,
-                source,
-                dimenSpec,
-                imageQuality,
-                progressListenerDelegate,
-                errorListenerDelegate,
-                record);
-
-        FutureBitmapTask future = new FutureBitmapTask(imageTask, this, option.isViewMaybeReused());
-        future.setPriority(priority == null ? Priority.NORMAL : priority);
-
-        mTaskHandleService.push(future);
-        return future;
-    }
-
-    private Future<Movie> loadAndDisplayMovie(ImageData<Movie> source,
-                                              ImageChair<Movie> imageChair,
-                                              DisplayOption<Movie> option,
-                                              ProgressListener<Movie> progressListener,
-                                              ErrorListener errorListener,
-                                              DisplayTaskRecord record,
-                                              Priority priority) {
-
-        ImageQuality imageQuality = option.getQuality();
-
-        DimenSpec dimenSpec = new DimenSpec(imageChair.getWidth(), imageChair.getHeight());
-
-        ProgressListenerDelegate<Movie> progressListenerDelegate = new MovieProgressListenerDelegate(
-                mMovieCacheManager,
-                mTaskManager,
-                progressListener,
-                dimenSpec,
-                option,
-                imageChair,
-                record,
-                source.getUrl());
-
-        ErrorListenerDelegate errorListenerDelegate = null;
-
-        if (progressListener != null) {
-            errorListenerDelegate = new MovieErrorListenerDelegate(errorListener, option.getFailureImg(), imageChair);
-        }
-
-        MovieDisplayTask imageTask = new MovieDisplayTask(
-                mContext,
-                mConfig,
-                mTaskManager,
-                source,
-                dimenSpec,
-                imageQuality,
-                progressListenerDelegate,
-                errorListenerDelegate,
-                record);
-
-        FutureMovieTask future = new FutureMovieTask(imageTask, this, option.isViewMaybeReused());
-        future.setPriority(priority == null ? Priority.NORMAL : priority);
-
-        mTaskHandleService.push(future);
-        return future;
     }
 
     private DisplayOption<Bitmap> assignBitmapOption(DisplayOption<Bitmap> option) {
@@ -595,6 +583,38 @@ public class ImageLoader implements
         }
     }
 
+    public
+    @LoaderApi
+    @NonNull
+    AbsListViewScrollDetector linkScrollStateTo(@NonNull AbsListView view) {
+        mLogger.verbose(view);
+        AbsListViewScrollDetector detector = new AbsListViewScrollDetector() {
+            @Override
+            public void onScrollUp() {
+                pause();
+            }
+
+            @Override
+            public void onScrollDown() {
+                pause();
+            }
+
+            @Override
+            public void onIdle() {
+                resume();
+            }
+        };
+        Preconditions.checkNotNull(view).setOnScrollListener(detector);
+        detector.setListView(view);
+        return detector;
+    }
+
+    @LoaderApi
+    public void unLinkScrollStateTo(@NonNull AbsListView view) {
+        mLogger.verbose(view);
+        view.setOnScrollListener(null);
+    }
+
     /**
      * Call this to pause the {@link ImageLoader}
      */
@@ -603,8 +623,8 @@ public class ImageLoader implements
         ensureNotTerminated();
         if (!isPaused()) {
             mState = LoaderState.PAUSE_REQUESTED;
+            mLogger.funcExit();
         }
-        mLogger.funcExit();
     }
 
     /**
@@ -613,7 +633,9 @@ public class ImageLoader implements
      */
     @LoaderApi
     public boolean isPaused() {
-        return mState == LoaderState.PAUSED || mState == LoaderState.PAUSE_REQUESTED;
+        synchronized (this) {
+            return mState == LoaderState.PAUSED || mState == LoaderState.PAUSE_REQUESTED;
+        }
     }
 
     /**
@@ -622,7 +644,9 @@ public class ImageLoader implements
      */
     @LoaderApi
     public boolean isTerminated() {
-        return mState == LoaderState.TERMINATED;
+        synchronized (this) {
+            return mState == LoaderState.TERMINATED;
+        }
     }
 
     /**
@@ -634,12 +658,14 @@ public class ImageLoader implements
     @LoaderApi
     public void resume() {
         ensureNotTerminated();
-        if (isPaused()) {
-            if (mFreezer != null) {
-                mFreezer.resume();
+        synchronized (this) {
+            if (isPaused()) {
+                if (mFreezer != null) {
+                    mFreezer.resume();
+                }
+                mState = LoaderState.RUNNING;
+                mLogger.funcExit();
             }
-            mState = LoaderState.RUNNING;
-            mLogger.funcExit();
         }
     }
 

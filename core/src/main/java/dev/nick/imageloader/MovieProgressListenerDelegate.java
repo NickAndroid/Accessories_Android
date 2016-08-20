@@ -45,6 +45,13 @@ class MovieProgressListenerDelegate extends ProgressListenerDelegate<Movie> {
     }
 
     @Override
+    protected void callOnComplete(Movie result) {
+        if (!canceled) {
+            UIThreadRouter.getSharedRouter().callOnComplete(listener, result);
+        }
+    }
+
+    @Override
     public void onComplete(Movie result) {
         if (result == null) {
             return;

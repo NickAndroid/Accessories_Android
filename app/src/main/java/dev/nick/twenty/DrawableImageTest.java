@@ -27,11 +27,12 @@ import com.nick.scalpel.annotation.binding.FindView;
 import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.ui.DisplayOption;
 import dev.nick.imageloader.ui.ImageQuality;
+import dev.nick.imageloader.ui.art.BlackWhiteImageArt;
 import dev.nick.imageloader.ui.art.BlurImageArt;
 
 public class DrawableImageTest extends BaseTest {
 
-    final String urlDrawable = "drawable://tree";
+    final String urlDrawable = "drawable://art";
 
     @FindView(id = R.id.image)
     ImageView imageView;
@@ -53,6 +54,7 @@ public class DrawableImageTest extends BaseTest {
                 .option(DisplayOption.bitmapBuilder()
                         .showOnFailure(BitmapFactory.decodeResource(getResources(), R.drawable.aio_image_fail))
                         .imageArt(new BlurImageArt(24))
+                        .imageArt(new BlackWhiteImageArt())
                         .imageQuality(ImageQuality.RAW)
                         .build())
                 .into(imageView)

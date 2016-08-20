@@ -27,6 +27,8 @@ import java.util.concurrent.Executors;
 
 import dev.nick.imageloader.cache.disk.DiskCache;
 import dev.nick.imageloader.cache.mem.MemCache;
+import dev.nick.imageloader.debug.Logger;
+import dev.nick.imageloader.debug.LoggerManager;
 
 public class BitmapCacheManager implements CacheManager<Bitmap> {
 
@@ -40,7 +42,11 @@ public class BitmapCacheManager implements CacheManager<Bitmap> {
     private boolean isMemCacheEnabled;
     private boolean isDiskCacheEnabled;
 
+    private Logger mLogger;
+
     public BitmapCacheManager(CachePolicy cachePolicy, Context context) {
+        mLogger = LoggerManager.getLogger(getClass());
+        mLogger.verbose("Init BitmapCacheManager with policy:" + cachePolicy);
         isDiskCacheEnabled = cachePolicy.isDiskCacheEnabled();
         isMemCacheEnabled = cachePolicy.isMemCacheEnabled();
         mDiskCache = new DiskCache(cachePolicy, context);
@@ -61,14 +67,17 @@ public class BitmapCacheManager implements CacheManager<Bitmap> {
 
     @Override
     public boolean cache(@NonNull final String url, @NonNull final Bitmap value) {
+        final String key = mKeyGenerator.fromUrl(url);
         if (isMemCacheEnabled) {
-            mMemCache.cache(url, value);
-        } else if (isDiskCacheEnabled) {
+            mMemCache.cache(key, value);
+        }
+        if (isDiskCacheEnabled) {
+            mLogger.verbose("About to cache to disk:" + url);
             mCacheService.execute(new Runnable() {
                 @Override
                 public void run() {
                     Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
-                    mDiskCache.cache(url, value);
+                    mDiskCache.cache(key, value);
                 }
             });
         } else {
