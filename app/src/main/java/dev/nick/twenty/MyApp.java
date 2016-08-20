@@ -17,8 +17,11 @@
 package dev.nick.twenty;
 
 import android.graphics.Bitmap;
+import android.graphics.Movie;
 import android.os.Build;
 import android.os.Trace;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.nick.scalpel.ScalpelApplication;
@@ -26,8 +29,16 @@ import com.nick.scalpel.ScalpelApplication;
 import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.cache.CachePolicy;
-import dev.nick.imageloader.worker.network.NetworkPolicy;
+import dev.nick.imageloader.debug.LoggerManager;
 import dev.nick.imageloader.queue.QueuePolicy;
+import dev.nick.imageloader.worker.BaseImageFetcher;
+import dev.nick.imageloader.worker.DecodeSpec;
+import dev.nick.imageloader.worker.PathSplitter;
+import dev.nick.imageloader.worker.ProgressListener;
+import dev.nick.imageloader.worker.bitmap.BitmapImageSource;
+import dev.nick.imageloader.worker.movie.MovieImageSource;
+import dev.nick.imageloader.worker.network.NetworkPolicy;
+import dev.nick.imageloader.worker.result.ErrorListener;
 
 public class MyApp extends ScalpelApplication {
     @Override
@@ -54,5 +65,37 @@ public class MyApp extends ScalpelApplication {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             Trace.endSection();
         }
+
+        // Add custom sources.
+        BitmapImageSource.addBitmapSource(new BitmapImageSource(new BaseImageFetcher<Bitmap>(new PathSplitter<String>() {
+            @Override
+            public String getRealPath(@NonNull String fullPath) {
+                return null;
+            }
+        }) {
+            @Override
+            public Bitmap fetchFromUrl(@NonNull String url, @NonNull DecodeSpec decodeSpec,
+                                       @Nullable ProgressListener<Bitmap> progressListener,
+                                       @Nullable ErrorListener errorListener) throws Exception {
+                LoggerManager.getLogger(getClass()).funcEnter();
+                return super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);
+            }
+        }, "test_bitmap://"));
+
+
+        MovieImageSource.addMovieSource(new MovieImageSource(new BaseImageFetcher<Movie>(new PathSplitter<String>() {
+            @Override
+            public String getRealPath(@NonNull String fullPath) {
+                return null;
+            }
+        }) {
+            @Override
+            public Movie fetchFromUrl(@NonNull String url, @NonNull DecodeSpec decodeSpec,
+                                      @Nullable ProgressListener<Movie> progressListener,
+                                      @Nullable ErrorListener errorListener) throws Exception {
+                LoggerManager.getLogger(getClass()).funcEnter();
+                return super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);
+            }
+        }, "test_movie://"));
     }
 }

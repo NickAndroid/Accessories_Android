@@ -19,6 +19,10 @@ package dev.nick.imageloader.worker.bitmap;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import dev.nick.imageloader.utils.Preconditions;
 import dev.nick.imageloader.worker.ImageFetcher;
 import dev.nick.imageloader.worker.ImageSource;
 import dev.nick.imageloader.worker.PathSplitter;
@@ -33,18 +37,33 @@ public class BitmapImageSource extends ImageSource<Bitmap> {
     public static final BitmapImageSource HTTP = new HttpSource();
     public static final BitmapImageSource HTTPS = new HttpsSource();
 
-    private static final BitmapImageSource[] PREBUILT = new BitmapImageSource[]{
-            FILE, ASSETS, DRAWABLE, CONTENT, HTTP, HTTPS
-    };
+    private static final List<BitmapImageSource> BITMAP_IMAGE_SOURCES = new ArrayList<>();
 
     public BitmapImageSource(ImageFetcher<Bitmap> fetcher, String prefix) {
         super(fetcher, prefix);
     }
 
+    static {
+        addBitmapSource(FILE);
+        addBitmapSource(ASSETS);
+        addBitmapSource(DRAWABLE);
+        addBitmapSource(CONTENT);
+        addBitmapSource(HTTP);
+        addBitmapSource(HTTPS);
+    }
+
+    public static void addBitmapSource(@NonNull BitmapImageSource source) {
+        synchronized (BITMAP_IMAGE_SOURCES) {
+            BITMAP_IMAGE_SOURCES.add(Preconditions.checkNotNull(source));
+        }
+    }
+
     public static BitmapImageSource from(String url) {
-        for (BitmapImageSource source : PREBUILT) {
-            if (url.startsWith(source.getPrefix())) {
-                return source;
+        synchronized (BITMAP_IMAGE_SOURCES) {
+            for (BitmapImageSource source : BITMAP_IMAGE_SOURCES) {
+                if (url.startsWith(source.getPrefix())) {
+                    return source;
+                }
             }
         }
         return null;

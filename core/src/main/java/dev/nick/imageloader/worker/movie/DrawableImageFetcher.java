@@ -26,9 +26,9 @@ import dev.nick.imageloader.worker.PathSplitter;
 import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.result.ErrorListener;
 
-public class FileImageFetcher extends BaseImageFetcher<Movie> {
+public class DrawableImageFetcher extends BaseImageFetcher<Movie> {
 
-    public FileImageFetcher(PathSplitter<String> splitter) {
+    public DrawableImageFetcher(PathSplitter<String> splitter) {
         super(splitter);
     }
 
@@ -36,7 +36,6 @@ public class FileImageFetcher extends BaseImageFetcher<Movie> {
     public Movie fetchFromUrl(@NonNull String url, @NonNull DecodeSpec decodeSpec,
                               @Nullable ProgressListener<Movie> progressListener,
                               @Nullable ErrorListener errorListener) throws Exception {
-        super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);
-        return Movie.decodeFile(mSplitter.getRealPath(url));
+        return super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);
     }
 }

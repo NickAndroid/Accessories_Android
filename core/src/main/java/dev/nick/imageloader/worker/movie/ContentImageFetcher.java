@@ -17,8 +17,11 @@
 package dev.nick.imageloader.worker.movie;
 
 import android.graphics.Movie;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
+import java.io.InputStream;
 
 import dev.nick.imageloader.worker.BaseImageFetcher;
 import dev.nick.imageloader.worker.DecodeSpec;
@@ -26,9 +29,9 @@ import dev.nick.imageloader.worker.PathSplitter;
 import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.result.ErrorListener;
 
-public class FileImageFetcher extends BaseImageFetcher<Movie> {
+public class ContentImageFetcher extends BaseImageFetcher<Movie> {
 
-    public FileImageFetcher(PathSplitter<String> splitter) {
+    public ContentImageFetcher(PathSplitter<String> splitter) {
         super(splitter);
     }
 
@@ -37,6 +40,13 @@ public class FileImageFetcher extends BaseImageFetcher<Movie> {
                               @Nullable ProgressListener<Movie> progressListener,
                               @Nullable ErrorListener errorListener) throws Exception {
         super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);
-        return Movie.decodeFile(mSplitter.getRealPath(url));
+
+        InputStream inputStream = null;
+        try {
+            inputStream = mContext.getContentResolver().openInputStream(Uri.parse(url));
+            return Movie.decodeStream(inputStream);
+        } finally {
+            if (inputStream != null) inputStream.close();
+        }
     }
 }

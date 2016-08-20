@@ -22,13 +22,14 @@ import android.support.annotation.Nullable;
 
 import dev.nick.imageloader.worker.BaseImageFetcher;
 import dev.nick.imageloader.worker.DecodeSpec;
+import dev.nick.imageloader.worker.ImageFetcher;
 import dev.nick.imageloader.worker.PathSplitter;
 import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.result.ErrorListener;
 
-public class FileImageFetcher extends BaseImageFetcher<Movie> {
+public class NetworkImageFetcher extends BaseImageFetcher<Movie> {
 
-    public FileImageFetcher(PathSplitter<String> splitter) {
+    public NetworkImageFetcher(PathSplitter<String> splitter, ImageFetcher<Movie> fileImageFetcher) {
         super(splitter);
     }
 
@@ -36,7 +37,6 @@ public class FileImageFetcher extends BaseImageFetcher<Movie> {
     public Movie fetchFromUrl(@NonNull String url, @NonNull DecodeSpec decodeSpec,
                               @Nullable ProgressListener<Movie> progressListener,
                               @Nullable ErrorListener errorListener) throws Exception {
-        super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);
-        return Movie.decodeFile(mSplitter.getRealPath(url));
+        return super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);
     }
 }
