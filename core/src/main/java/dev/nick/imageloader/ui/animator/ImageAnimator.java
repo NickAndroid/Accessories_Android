@@ -18,13 +18,13 @@ package dev.nick.imageloader.ui.animator;
 
 import android.support.annotation.NonNull;
 
-import dev.nick.imageloader.ui.ImageSeat;
+import dev.nick.imageloader.ui.ImageChair;
 
 public interface ImageAnimator<T> {
 
     long DEFAULT_DURATION = 800;
 
-    void animate(@NonNull ImageSeat<T> imageSeat);
+    void animate(@NonNull ImageChair<T> imageChair);
 
     long getDuration();
 }

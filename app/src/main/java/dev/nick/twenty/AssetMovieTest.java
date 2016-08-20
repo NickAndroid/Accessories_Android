@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2016 Nick Guo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package dev.nick.twenty;
 
 import android.graphics.Movie;
@@ -12,7 +28,7 @@ import com.nick.scalpel.annotation.binding.FindView;
 
 import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.debug.LoggerManager;
-import dev.nick.imageloader.ui.ImageSeat;
+import dev.nick.imageloader.ui.ImageChair;
 import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.result.Cause;
 import dev.nick.imageloader.worker.result.ErrorListener;
@@ -65,7 +81,7 @@ public class AssetMovieTest extends BaseTest {
                         LoggerManager.getLogger(getClass()).debug("onComplete:" + result);
                     }
                 })
-                .into(new ImageSeat<Movie>() {
+                .into(new ImageChair<Movie>() {
                     @Override
                     public void seat(@NonNull Movie image) {
                         LoggerManager.getLogger(getClass()).debug("seat");

@@ -19,5 +19,5 @@ package dev.nick.imageloader.ui;
 import android.support.annotation.NonNull;
 
 public interface ImageSettableIdCreator {
-    long createSettableId(@NonNull ImageSeat settable);
+    long createSettableId(@NonNull ImageChair settable);
 }

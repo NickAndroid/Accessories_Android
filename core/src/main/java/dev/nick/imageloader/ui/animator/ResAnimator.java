@@ -20,7 +20,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.animation.AnimationUtils;
 
-import dev.nick.imageloader.ui.ImageSeat;
+import dev.nick.imageloader.ui.ImageChair;
 
 /**
  * Abs class for a animator that load animation from resource.
@@ -43,7 +43,7 @@ public abstract class ResAnimator implements ImageAnimator {
     }
 
     @Override
-    public void animate(@NonNull ImageSeat settable) {
+    public void animate(@NonNull ImageChair settable) {
         settable.startAnimation(AnimationUtils.loadAnimation(context, getAnimResId()));
     }
 

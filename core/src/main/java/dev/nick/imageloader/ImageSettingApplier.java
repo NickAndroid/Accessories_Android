@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2016 Nick Guo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package dev.nick.imageloader;
 
 import android.graphics.Bitmap;
@@ -13,7 +29,7 @@ import dev.nick.imageloader.annotation.Shared;
 import dev.nick.imageloader.debug.Logger;
 import dev.nick.imageloader.debug.LoggerManager;
 import dev.nick.imageloader.ui.BitmapImageSettings;
-import dev.nick.imageloader.ui.ImageSeat;
+import dev.nick.imageloader.ui.ImageChair;
 import dev.nick.imageloader.ui.ImageSettings;
 import dev.nick.imageloader.ui.MovieImageSettings;
 import dev.nick.imageloader.ui.animator.ImageAnimator;
@@ -55,31 +71,31 @@ class ImageSettingApplier implements Handler.Callback {
     }
 
     @WorkerThread
-    void applyImageSettings(Bitmap bitmap, List<ImageArt<Bitmap>> arts, ImageSeat<Bitmap> imageSeat,
+    void applyImageSettings(Bitmap bitmap, List<ImageArt<Bitmap>> arts, ImageChair<Bitmap> imageChair,
                             ImageAnimator<Bitmap> animator) {
 
-        mLogger.verbose("imageSeat: " + imageSeat + "bitmap: " + bitmap);
+        mLogger.verbose("imageChair: " + imageChair + "bitmap: " + bitmap);
 
-        if (imageSeat != null) {
+        if (imageChair != null) {
             BitmapImageSettings settings = new BitmapImageSettings(
                     animator,
-                    imageSeat,
+                    imageChair,
                     (arts == null || arts.size() == 0
                             ? bitmap
-                            : ImageArtistCaller.call(arts, bitmap, imageSeat)));
+                            : ImageArtistCaller.call(arts, bitmap, imageChair)));
             mUIThreadHandler.obtainMessage(MSG_APPLY_IMAGE_SETTINGS, settings).sendToTarget();
         }
     }
 
-    void applyImageSettings(Movie movie, List<ImageArt<Movie>> arts, ImageSeat<Movie> imageSeat,
+    void applyImageSettings(Movie movie, List<ImageArt<Movie>> arts, ImageChair<Movie> imageChair,
                             ImageAnimator<Movie> animator) {
-        if (imageSeat != null) {
+        if (imageChair != null) {
             MovieImageSettings settings = new MovieImageSettings(
                     animator,
-                    imageSeat,
+                    imageChair,
                     (arts == null || arts.size() == 0
                             ? movie
-                            : ImageArtistCaller.call(arts, movie, imageSeat)));
+                            : ImageArtistCaller.call(arts, movie, imageChair)));
             mUIThreadHandler.obtainMessage(MSG_APPLY_IMAGE_SETTINGS, settings).sendToTarget();
         }
     }

@@ -25,7 +25,7 @@ public class BitmapImageSettings extends ImageSettings<Bitmap> {
 
     Bitmap mBitmap;
 
-    public BitmapImageSettings(ImageAnimator<Bitmap> animator, @NonNull ImageSeat<Bitmap> settable, Bitmap bitmap) {
+    public BitmapImageSettings(ImageAnimator<Bitmap> animator, @NonNull ImageChair<Bitmap> settable, Bitmap bitmap) {
         super(animator, settable);
         this.mBitmap = bitmap;
     }

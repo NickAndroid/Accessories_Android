@@ -19,7 +19,7 @@ package dev.nick.imageloader.ui.art;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
-import dev.nick.imageloader.ui.ImageSeat;
+import dev.nick.imageloader.ui.ImageChair;
 import dev.nick.imageloader.utils.BitmapUtils;
 
 public class BlurImageArt implements ImageArt<Bitmap> {
@@ -36,7 +36,7 @@ public class BlurImageArt implements ImageArt<Bitmap> {
 
     @NonNull
     @Override
-    public Bitmap process(@NonNull Bitmap in, @NonNull ImageSeat<Bitmap> settable) {
+    public Bitmap process(@NonNull Bitmap in, @NonNull ImageChair<Bitmap> settable) {
         if (radius > 0) {
             return BitmapUtils.createBlurredBitmap(in, radius);
         } else {

@@ -14,34 +14,21 @@
  * limitations under the License.
  */
 
-package dev.nick.imageloader.worker;
+package dev.nick.imageloader.ui;
 
-public class ImageData<X> {
+import android.support.annotation.NonNull;
+import android.support.annotation.UiThread;
+import android.view.animation.Animation;
 
-    private ImageSource<X> type;
-    private String url;
+public interface ImageChair<T> {
 
-    public ImageData() {
-    }
+    @UiThread
+    void seat(@NonNull T image);
 
-    public ImageData(ImageSource<X> type, String url) {
-        this.type = type;
-        this.url = url;
-    }
+    int getWidth();
 
-    public ImageSource<X> getType() {
-        return type;
-    }
+    int getHeight();
 
-    public String getUrl() {
-        return url;
-    }
-
-    public void setType(ImageSource<X> type) {
-        this.type = type;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
+    @UiThread
+    void startAnimation(Animation animation);
 }

@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2016 Nick Guo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package dev.nick.imageloader;
 
 import android.support.annotation.NonNull;
@@ -6,7 +22,7 @@ import android.support.annotation.Nullable;
 import dev.nick.imageloader.annotation.LoaderApi;
 import dev.nick.imageloader.queue.Priority;
 import dev.nick.imageloader.ui.DisplayOption;
-import dev.nick.imageloader.ui.ImageSeat;
+import dev.nick.imageloader.ui.ImageChair;
 import dev.nick.imageloader.utils.Preconditions;
 import dev.nick.imageloader.worker.ImageData;
 import dev.nick.imageloader.worker.ImageSource;
@@ -20,7 +36,7 @@ public abstract class Transaction<T> {
     protected ProgressListener<T> progressListener;
     protected ErrorListener errorListener;
     protected Priority priority;
-    protected ImageSeat<T> settable;
+    protected ImageChair<T> settable;
 
     protected ImageLoader loader;
 
@@ -43,7 +59,7 @@ public abstract class Transaction<T> {
 
     /**
      * @param option {@link DisplayOption} is options using when display the image.
-     *               * @param settable Target {@link ImageSeat} to display the image.
+     *               * @param settable Target {@link ImageChair} to display the image.
      * @return Instance of Transaction.
      */
     @LoaderApi
@@ -87,7 +103,7 @@ public abstract class Transaction<T> {
      * @return Instance of Transaction.
      */
     @LoaderApi
-    public Transaction<T> into(@NonNull ImageSeat<T> settable) {
+    public Transaction<T> into(@NonNull ImageChair<T> settable) {
         this.settable = Preconditions.checkNotNull(settable);
         return Transaction.this;
     }

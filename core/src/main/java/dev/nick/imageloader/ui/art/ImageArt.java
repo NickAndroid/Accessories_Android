@@ -18,9 +18,9 @@ package dev.nick.imageloader.ui.art;
 
 import android.support.annotation.NonNull;
 
-import dev.nick.imageloader.ui.ImageSeat;
+import dev.nick.imageloader.ui.ImageChair;
 
 public interface ImageArt<T> {
     @NonNull
-    T process(@NonNull T in, @NonNull ImageSeat<T> seat);
+    T process(@NonNull T in, @NonNull ImageChair<T> seat);
 }

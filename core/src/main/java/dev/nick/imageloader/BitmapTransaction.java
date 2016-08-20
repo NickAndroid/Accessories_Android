@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 2016 Nick Guo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package dev.nick.imageloader;
 
 import android.graphics.Bitmap;
@@ -12,7 +28,7 @@ import dev.nick.imageloader.annotation.LoaderApi;
 import dev.nick.imageloader.queue.Priority;
 import dev.nick.imageloader.ui.BitmapImageViewDelegate;
 import dev.nick.imageloader.ui.DisplayOption;
-import dev.nick.imageloader.ui.ImageSeat;
+import dev.nick.imageloader.ui.ImageChair;
 import dev.nick.imageloader.worker.ImageSource;
 import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.bitmap.BitmapImageSource;
@@ -60,7 +76,7 @@ public class BitmapTransaction extends Transaction<Bitmap> {
     }
 
     @Override
-    public BitmapTransaction into(@NonNull ImageSeat<Bitmap> settable) {
+    public BitmapTransaction into(@NonNull ImageChair<Bitmap> settable) {
         super.into(settable);
         return this;
     }
@@ -108,7 +124,7 @@ public class BitmapTransaction extends Transaction<Bitmap> {
     }
 
 
-    protected ImageSeat<Bitmap> noneNullSettable() {
-        return settable == null ? new FakeBitmapImageSeat(imageData.getUrl()) : settable;
+    protected ImageChair<Bitmap> noneNullSettable() {
+        return settable == null ? new FakeBitmapImageChair(imageData.getUrl()) : settable;
     }
 }

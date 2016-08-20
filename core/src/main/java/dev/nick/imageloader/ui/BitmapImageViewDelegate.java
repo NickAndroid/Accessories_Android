@@ -26,7 +26,7 @@ import dev.nick.imageloader.utils.Preconditions;
 /**
  * Wrapper class for a {@link ImageView}
  */
-public class BitmapImageViewDelegate implements ImageSeat<Bitmap> {
+public class BitmapImageViewDelegate implements ImageChair<Bitmap> {
 
     private ImageView mImageView;
 

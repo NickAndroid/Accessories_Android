@@ -1,10 +1,26 @@
+/*
+ * Copyright (c) 2016 Nick Guo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package dev.nick.imageloader;
 
 import dev.nick.imageloader.cache.CacheManager;
 import dev.nick.imageloader.debug.Logger;
 import dev.nick.imageloader.debug.LoggerManager;
 import dev.nick.imageloader.ui.DisplayOption;
-import dev.nick.imageloader.ui.ImageSeat;
+import dev.nick.imageloader.ui.ImageChair;
 import dev.nick.imageloader.worker.DimenSpec;
 import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.task.DisplayTaskRecord;
@@ -17,7 +33,7 @@ abstract class ProgressListenerDelegate<T> implements ProgressListener<T> {
 
     protected ProgressListener<T> listener;
 
-    protected ImageSeat<T> settable;
+    protected ImageChair<T> settable;
     protected String url;
     protected DisplayOption<T> option;
     protected DimenSpec dimenSpec;
@@ -32,7 +48,7 @@ abstract class ProgressListenerDelegate<T> implements ProgressListener<T> {
             ProgressListener<T> listener,
             DimenSpec dimenSpec,
             DisplayOption<T> option,
-            ImageSeat<T> imageSeat,
+            ImageChair<T> imageChair,
             DisplayTaskRecord taskRecord,
             String url) {
         this.cacheManager = cacheManager;
@@ -40,7 +56,7 @@ abstract class ProgressListenerDelegate<T> implements ProgressListener<T> {
         this.dimenSpec = dimenSpec;
         this.listener = listener;
         this.option = option;
-        this.settable = imageSeat;
+        this.settable = imageChair;
         this.taskRecord = taskRecord;
         this.url = url;
         this.mLogger = LoggerManager.getLogger(getClass());

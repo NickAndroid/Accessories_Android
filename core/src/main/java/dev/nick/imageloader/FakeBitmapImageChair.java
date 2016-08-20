@@ -14,29 +14,44 @@
  * limitations under the License.
  */
 
-package dev.nick.imageloader.ui;
+package dev.nick.imageloader;
 
-import android.graphics.Movie;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
+import android.view.animation.Animation;
 
-import dev.nick.imageloader.ui.animator.ImageAnimator;
+import dev.nick.imageloader.ui.ImageChair;
 
-public class MovieImageSettings extends ImageSettings<Movie> {
+class FakeBitmapImageChair implements ImageChair<Bitmap> {
 
-    Movie mMovie;
+    String url;
 
-    public MovieImageSettings(ImageAnimator<Movie> animator, @NonNull ImageChair<Movie> imageChair, Movie movie) {
-        super(animator, imageChair);
-        this.mMovie = movie;
+    public FakeBitmapImageChair(String url) {
+        this.url = url;
     }
 
     @Override
-    protected void apply() {
-        if (mMovie != null) {
-            mSeat.seat(mMovie);
-            if (mAnimator != null) {
-                mAnimator.animate(mSeat);
-            }
-        }
+    public void seat(@NonNull Bitmap bitmap) {
+        // Nothing.
+    }
+
+    @Override
+    public int getWidth() {
+        return 0;
+    }
+
+    @Override
+    public int getHeight() {
+        return 0;
+    }
+
+    @Override
+    public void startAnimation(Animation animation) {
+        // Nothing.
+    }
+
+    @Override
+    public int hashCode() {
+        return url.hashCode();
     }
 }

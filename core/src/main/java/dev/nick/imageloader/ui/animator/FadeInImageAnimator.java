@@ -21,11 +21,11 @@ import android.support.annotation.NonNull;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.DecelerateInterpolator;
 
-import dev.nick.imageloader.ui.ImageSeat;
+import dev.nick.imageloader.ui.ImageChair;
 
 public class FadeInImageAnimator implements ImageAnimator<Bitmap> {
     @Override
-    public void animate(@NonNull ImageSeat<Bitmap> settable) {
+    public void animate(@NonNull ImageChair<Bitmap> settable) {
         AlphaAnimation fadeImage = new AlphaAnimation(0, 1);
         fadeImage.setDuration(getDuration());
         fadeImage.setInterpolator(new DecelerateInterpolator());

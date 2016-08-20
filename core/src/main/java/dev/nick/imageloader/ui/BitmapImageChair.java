@@ -22,5 +22,5 @@ import android.graphics.Bitmap;
  * Interface that indicate this is a view that can be set with a image.
  * like the {@link android.widget.ImageView}
  */
-public interface BitmapImageSeat extends ImageSeat<Bitmap> {
+public interface BitmapImageChair extends ImageChair<Bitmap> {
 }

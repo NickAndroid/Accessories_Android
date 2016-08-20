@@ -25,8 +25,8 @@ public class ResImageSettings extends ImageSettings<Bitmap> {
 
     int mResId;
 
-    public ResImageSettings(ImageAnimator<Bitmap> animator, @NonNull ImageSeat<Bitmap> imageSeat, int resId) {
-        super(animator, imageSeat);
+    public ResImageSettings(ImageAnimator<Bitmap> animator, @NonNull ImageChair<Bitmap> imageChair, int resId) {
+        super(animator, imageChair);
         this.mResId = resId;
     }
 

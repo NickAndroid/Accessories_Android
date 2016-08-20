@@ -54,8 +54,8 @@ import dev.nick.imageloader.queue.RequestHandler;
 import dev.nick.imageloader.queue.RequestQueueManager;
 import dev.nick.imageloader.ui.BitmapImageViewDelegate;
 import dev.nick.imageloader.ui.DisplayOption;
+import dev.nick.imageloader.ui.ImageChair;
 import dev.nick.imageloader.ui.ImageQuality;
-import dev.nick.imageloader.ui.ImageSeat;
 import dev.nick.imageloader.ui.ImageSettableIdCreator;
 import dev.nick.imageloader.ui.ImageSettableIdCreatorImpl;
 import dev.nick.imageloader.utils.Preconditions;
@@ -268,12 +268,12 @@ public class ImageLoader implements
      * Display image from the from to the view.
      *
      * @param data             Image data from, one of {@link ImageData}
-     * @param settable         Target {@link ImageSeat} to display the image.
+     * @param settable         Target {@link ImageChair} to display the image.
      * @param option           {@link DisplayOption} is options using when display the image.
      * @param progressListener The progress progressListener using to watch the progress of the loading.
      */
     Future<Bitmap> displayBitmap(@NonNull ImageData<Bitmap> data,
-                                 @NonNull ImageSeat<Bitmap> settable,
+                                 @NonNull ImageChair<Bitmap> settable,
                                  @Nullable DisplayOption<Bitmap> option,
                                  @Nullable ProgressListener<Bitmap> progressListener,
                                  @Nullable ErrorListener errorListener,
@@ -341,7 +341,7 @@ public class ImageLoader implements
     }
 
     Future<Movie> displayMovie(@NonNull ImageData<Movie> source,
-                               @NonNull ImageSeat<Movie> settable,
+                               @NonNull ImageChair<Movie> settable,
                                @Nullable DisplayOption<Movie> option,
                                @Nullable ProgressListener<Movie> progressListener,
                                @Nullable ErrorListener errorListener,
@@ -418,7 +418,7 @@ public class ImageLoader implements
         return mMovieCacheManager;
     }
 
-    private DisplayTaskRecord createTaskRecord(ImageSeat settable) {
+    private DisplayTaskRecord createTaskRecord(ImageChair settable) {
         long settableId = mSettableIdCreator.createSettableId(settable);
         int taskId = mTaskManager.nextTaskId();
         DisplayTaskRecord displayTaskRecord = new DisplayTaskRecord(settableId, taskId);
@@ -426,17 +426,17 @@ public class ImageLoader implements
         return displayTaskRecord;
     }
 
-    private void showOnLoadingBm(ImageSeat<Bitmap> settable, DisplayOption<Bitmap> option) {
+    private void showOnLoadingBm(ImageChair<Bitmap> settable, DisplayOption<Bitmap> option) {
         Bitmap showWhenLoading = option.getLoadingImg();
         mImageSettingApplier.applyImageSettings(showWhenLoading, null, settable, null);
     }
 
-    private void showOnLoadingMov(ImageSeat<Movie> settable, DisplayOption option) {
+    private void showOnLoadingMov(ImageChair<Movie> settable, DisplayOption option) {
         //FIXME
     }
 
     private Future<Bitmap> loadAndDisplayBitmap(ImageData<Bitmap> source,
-                                                ImageSeat<Bitmap> imageSeat,
+                                                ImageChair<Bitmap> imageChair,
                                                 DisplayOption<Bitmap> option,
                                                 ProgressListener<Bitmap> progressListener,
                                                 ErrorListener errorListener,
@@ -445,7 +445,7 @@ public class ImageLoader implements
 
         ImageQuality imageQuality = option.getQuality();
 
-        DimenSpec dimenSpec = new DimenSpec(imageSeat.getWidth(), imageSeat.getHeight());
+        DimenSpec dimenSpec = new DimenSpec(imageChair.getWidth(), imageChair.getHeight());
 
         ProgressListenerDelegate<Bitmap> progressListenerDelegate = new BitmapProgressListenerDelegate(
                 mBitmapCacheManager,
@@ -453,14 +453,14 @@ public class ImageLoader implements
                 progressListener,
                 dimenSpec,
                 option,
-                imageSeat,
+                imageChair,
                 record,
                 source.getUrl());
 
         ErrorListenerDelegate<Bitmap> errorListenerDelegate = null;
 
         if (progressListener != null) {
-            errorListenerDelegate = new BitmapErrorListenerDelegate(errorListener, option.getFailureImg(), imageSeat);
+            errorListenerDelegate = new BitmapErrorListenerDelegate(errorListener, option.getFailureImg(), imageChair);
         }
 
         BitmapDisplayTask imageTask = new BitmapDisplayTask(
@@ -482,7 +482,7 @@ public class ImageLoader implements
     }
 
     private Future<Movie> loadAndDisplayMovie(ImageData<Movie> source,
-                                              ImageSeat<Movie> imageSeat,
+                                              ImageChair<Movie> imageChair,
                                               DisplayOption<Movie> option,
                                               ProgressListener<Movie> progressListener,
                                               ErrorListener errorListener,
@@ -491,7 +491,7 @@ public class ImageLoader implements
 
         ImageQuality imageQuality = option.getQuality();
 
-        DimenSpec dimenSpec = new DimenSpec(imageSeat.getWidth(), imageSeat.getHeight());
+        DimenSpec dimenSpec = new DimenSpec(imageChair.getWidth(), imageChair.getHeight());
 
         ProgressListenerDelegate<Movie> progressListenerDelegate = new MovieProgressListenerDelegate(
                 mMovieCacheManager,
@@ -499,14 +499,14 @@ public class ImageLoader implements
                 progressListener,
                 dimenSpec,
                 option,
-                imageSeat,
+                imageChair,
                 record,
                 source.getUrl());
 
         ErrorListenerDelegate errorListenerDelegate = null;
 
         if (progressListener != null) {
-            errorListenerDelegate = new MovieErrorListenerDelegate(errorListener, option.getFailureImg(), imageSeat);
+            errorListenerDelegate = new MovieErrorListenerDelegate(errorListener, option.getFailureImg(), imageChair);
         }
 
         MovieDisplayTask imageTask = new MovieDisplayTask(
@@ -720,7 +720,7 @@ public class ImageLoader implements
      * @param settable The settable of the loader request.
      */
     @LoaderApi
-    public ImageLoader cancel(@NonNull ImageSeat settable) {
+    public ImageLoader cancel(@NonNull ImageChair settable) {
         return cancel(mSettableIdCreator.createSettableId(settable));
     }
 
