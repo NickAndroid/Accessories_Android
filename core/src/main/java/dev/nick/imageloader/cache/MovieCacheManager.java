@@ -60,4 +60,9 @@ public class MovieCacheManager implements CacheManager<Movie> {
     public void evictMem() {
 
     }
+
+    @Override
+    public CacheManager<Movie> fork(CachePolicy param) {
+        return this;
+    }
 }

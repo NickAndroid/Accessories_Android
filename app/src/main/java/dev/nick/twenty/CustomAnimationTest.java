@@ -21,6 +21,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,12 +43,13 @@ import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.ProgressListenerStub;
 import dev.nick.imageloader.cache.CachePolicy;
 import dev.nick.imageloader.ui.DisplayOption;
+import dev.nick.imageloader.ui.ImageChair;
 import dev.nick.imageloader.ui.ImageQuality;
-import dev.nick.imageloader.ui.animator.FadeInImageAnimator;
+import dev.nick.imageloader.ui.animator.ResAnimator;
 import dev.nick.imageloader.worker.bitmap.BitmapImageSource;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
-public class ScrollStateTest extends BaseTest {
+public class CustomAnimationTest extends BaseTest {
 
     @FindView(id = R.id.list)
     ListView listView;
@@ -120,7 +122,17 @@ public class ScrollStateTest extends BaseTest {
                                 .viewMaybeReused()
                                 .animateOnlyNewLoaded()
                                 .showOnLoading(null)
-                                .imageAnimator(new FadeInImageAnimator())
+                                .imageAnimator(new ResAnimator<Bitmap>(getApplicationContext()) {
+                                    @Override
+                                    public void animate(@NonNull ImageChair<Bitmap> settable) {
+                                        super.animate(settable);
+                                    }
+
+                                    @Override
+                                    public int getAnimResId() {
+                                        return R.anim.grow_fade_in;
+                                    }
+                                })
                                 .build())
                         .progressListener(new ProgressListenerStub<Bitmap>())
                         .into(holder.imageView)

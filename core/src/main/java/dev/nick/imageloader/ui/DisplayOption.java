@@ -31,6 +31,9 @@ public class DisplayOption<T> {
     private T failureImg;
     private T loadingImg;
 
+    private boolean failureImgDefined;
+    private boolean loadingImgDefined;
+
     private ImageQuality quality;
 
     private ArrayList<ImageArt<T>> handlers;
@@ -42,6 +45,8 @@ public class DisplayOption<T> {
 
     private DisplayOption(T failureImg,
                           T loadingImg,
+                          boolean failureImgDefined,
+                          boolean loadingImgDefined,
                           ImageQuality quality,
                           ArrayList<ImageArt<T>> handlers,
                           ImageAnimator<T> animator,
@@ -49,6 +54,8 @@ public class DisplayOption<T> {
                           boolean animateOnlyNewLoaded) {
         this.failureImg = failureImg;
         this.loadingImg = loadingImg;
+        this.loadingImgDefined = loadingImgDefined;
+        this.failureImgDefined = failureImgDefined;
         this.quality = quality;
         this.handlers = handlers;
         this.animator = animator;
@@ -70,6 +77,14 @@ public class DisplayOption<T> {
 
     public T getLoadingImg() {
         return loadingImg;
+    }
+
+    public boolean isFailureImgDefined() {
+        return failureImgDefined;
+    }
+
+    public boolean isLoadingImgDefined() {
+        return loadingImgDefined;
     }
 
     public ImageQuality getQuality() {
@@ -97,6 +112,9 @@ public class DisplayOption<T> {
         private T failureImg;
         private T loadingImg;
 
+        private boolean failureImgDefined;
+        private boolean loadingImgDefined;
+
         private ImageQuality quality = ImageQuality.OPT;
 
         private ArrayList<ImageArt<T>> artList;
@@ -115,6 +133,7 @@ public class DisplayOption<T> {
          */
         public Builder<T> showOnFailure(T failureImage) {
             this.failureImg = failureImage;
+            this.failureImgDefined = true;
             return this;
         }
 
@@ -124,6 +143,7 @@ public class DisplayOption<T> {
          */
         public Builder<T> showOnLoading(T loadingImg) {
             this.loadingImg = loadingImg;
+            this.loadingImgDefined = true;
             return this;
         }
 
@@ -185,6 +205,8 @@ public class DisplayOption<T> {
             return new DisplayOption<>(
                     failureImg,
                     loadingImg,
+                    failureImgDefined,
+                    loadingImgDefined,
                     quality,
                     artList,
                     animator,

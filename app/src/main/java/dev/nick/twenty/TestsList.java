@@ -53,6 +53,7 @@ public class TestsList extends AppCompatActivity {
                 showTestResult();
             }
         });
+        Scalpel.getInstance().wire(this);
     }
 
     protected List<Test> onStartTest() {
@@ -67,6 +68,7 @@ public class TestsList extends AppCompatActivity {
         tests.add(new Test(AssetMovieTest.class));
         tests.add(new Test(Usage.class));
         tests.add(new Test(ScrollStateTest.class));
+        tests.add(new Test(CustomAnimationTest.class));
         return tests;
     }
 

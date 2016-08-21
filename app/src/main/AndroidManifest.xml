@@ -61,6 +61,9 @@
             android:name=".ScrollStateTest"
             android:label="ScrollStateTest" />
 
+        <activity
+            android:name=".CustomAnimationTest"
+            android:label="CustomAnimationTest" />
     </application>
 
 </manifest>

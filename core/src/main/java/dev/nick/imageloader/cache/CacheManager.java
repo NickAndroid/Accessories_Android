@@ -18,7 +18,9 @@ package dev.nick.imageloader.cache;
 
 import android.support.annotation.NonNull;
 
-public interface CacheManager<T> {
+import dev.nick.imageloader.control.Forkable;
+
+public interface CacheManager<T> extends Forkable<CacheManager<T>, CachePolicy> {
     T get(String url);
 
     String getCachePath(String url);

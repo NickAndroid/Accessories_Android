@@ -24,9 +24,8 @@ import dev.nick.imageloader.ui.ImageChair;
 
 /**
  * Abs class for a animator that load animation from resource.
- * use {@link #from(Context, int)} construct an animator quickly.
  */
-public abstract class ResAnimator implements ImageAnimator {
+public abstract class ResAnimator<T> implements ImageAnimator<T> {
 
     protected Context context;
 
@@ -34,20 +33,12 @@ public abstract class ResAnimator implements ImageAnimator {
         this.context = context;
     }
 
-    public static ResAnimator from(Context context, final int animResId) {
-        return new ResAnimator(context) {
-            int getAnimResId() {
-                return animResId;
-            }
-        };
-    }
-
     @Override
-    public void animate(@NonNull ImageChair settable) {
+    public void animate(@NonNull ImageChair<T> settable) {
         settable.startAnimation(AnimationUtils.loadAnimation(context, getAnimResId()));
     }
 
-    abstract int getAnimResId();
+    public abstract int getAnimResId();
 
     @Override
     public long getDuration() {

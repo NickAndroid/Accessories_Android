@@ -162,7 +162,6 @@ public class ImageLoader implements
         this.mLogger.verbose(String.format("Create loader-%d with config %s", loaderId, config));
     }
 
-
     @SuppressLint("DefaultLocale")
     private ImageLoader(ImageLoader from, LoaderConfig config) {
         Preconditions.checkNotNull(from);
@@ -174,8 +173,8 @@ public class ImageLoader implements
         this.mSettableIdCreator = from.mSettableIdCreator;
         this.mUiThreadRouter = UIThreadRouter.getSharedRouter();
         this.mImageSettingApplier = ImageSettingApplier.getSharedApplier();
-        this.mBitmapCacheManager = from.lazyGetBitmapCacheManager();
-        this.mMovieCacheManager = from.lazyGetMovieCacheManager();
+        this.mBitmapCacheManager = from.lazyGetBitmapCacheManager().fork(config.getCachePolicy());
+        this.mMovieCacheManager = from.lazyGetMovieCacheManager().fork(config.getCachePolicy());
         //noinspection deprecation
         this.mLoadingService = new ThreadPoolExecutor(
                 config.getLoadingThreads(),
@@ -349,12 +348,14 @@ public class ImageLoader implements
             }
         }
 
-        if (source.getType().maybeSlow()) showOnLoadingBm(imageChair, option);
+        showOnLoadingBm(imageChair, option);
 
         ErrorListenerDelegate<Bitmap> errorListenerDelegate = null;
 
         if (errorListener != null) {
-            errorListenerDelegate = new BitmapErrorListenerDelegate(errorListener, option.getFailureImg(), imageChair);
+            errorListenerDelegate = new BitmapErrorListenerDelegate(errorListener,
+                    option.isFailureImgDefined() ? option.getFailureImg() : null,
+                    imageChair);
         }
 
         if (usingDiskCacheUrl) {
@@ -459,12 +460,13 @@ public class ImageLoader implements
             mLogger.verbose("No cache found, perform loading: " + loadingUrl);
         }
 
-        if (source.getType().maybeSlow()) showOnLoadingMov(imageChair, option);
+        showOnLoadingMov(imageChair, option);
 
         ErrorListenerDelegate errorListenerDelegate = null;
 
         if (errorListener != null) {
-            errorListenerDelegate = new MovieErrorListenerDelegate(errorListener, option.getFailureImg(), imageChair);
+            errorListenerDelegate = new MovieErrorListenerDelegate(errorListener,
+                    option.isFailureImgDefined() ? option.getFailureImg() : null, imageChair);
         }
 
         MovieDisplayTask imageTask = new MovieDisplayTask(
@@ -507,12 +509,16 @@ public class ImageLoader implements
     }
 
     private void showOnLoadingBm(ImageChair<Bitmap> settable, DisplayOption<Bitmap> option) {
-        Bitmap showWhenLoading = option.getLoadingImg();
-        mImageSettingApplier.applyImageSettings(showWhenLoading, null, settable, null);
+        if (option.isLoadingImgDefined()) {
+            Bitmap showWhenLoading = option.getLoadingImg();
+            mImageSettingApplier.applyImageSettings(showWhenLoading, null, settable, null);
+        }
     }
 
     private void showOnLoadingMov(ImageChair<Movie> settable, DisplayOption option) {
-        //FIXME
+        if (option.isLoadingImgDefined()) {
+            // TODO: 16-8-21 Impl
+        }
     }
 
     private DisplayOption<Bitmap> assignBitmapOption(DisplayOption<Bitmap> option) {
