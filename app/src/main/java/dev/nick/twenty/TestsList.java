@@ -65,7 +65,8 @@ public class TestsList extends AppCompatActivity {
         tests.add(new Test(DrawableImageTest.class));
         tests.add(new Test(LoadImageTest.class));
         tests.add(new Test(SyncLoadTest.class));
-        tests.add(new Test(AssetMovieTest.class));
+        tests.add(new Test(AssetGifTest.class));
+        tests.add(new Test(AssetVideoTest.class));
         tests.add(new Test(NetworkMovieTest.class));
         tests.add(new Test(Usage.class));
         tests.add(new Test(ScrollStateTest.class));

@@ -79,17 +79,17 @@ public class FileImageFetcher extends BaseImageFetcher<Bitmap> {
                 break;
         }
 
-        Bitmap tempBitmap;
+        Bitmap bitmap;
 
         try {
-            tempBitmap = BitmapFactory.decodeFile(path, decodeOptions);
+            bitmap = BitmapFactory.decodeFile(path, decodeOptions);
         } catch (OutOfMemoryError error) {
             callOnError(errorListener, new Cause(error));
             return null;
         }
 
-        callOnComplete(progressListener, tempBitmap);
-        return tempBitmap;
+        callOnComplete(progressListener, bitmap);
+        return bitmap;
     }
 
     @Override

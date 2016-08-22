@@ -54,6 +54,8 @@ class BitmapProgressListenerDelegate extends ProgressListenerDelegate<Bitmap> {
     @Override
     public void onComplete(Bitmap result) {
 
+        callOnComplete(result);
+
         if (result == null) {
             mLogger.warn("onComplete call with null result");
             return;
@@ -64,8 +66,6 @@ class BitmapProgressListenerDelegate extends ProgressListenerDelegate<Bitmap> {
             mLogger.verbose("Skip calling back, canceled");
             return;
         }
-
-        UIThreadRouter.getSharedRouter().callOnComplete(listener, result);
 
         final boolean isViewMaybeReused = option.isViewMaybeReused();
 

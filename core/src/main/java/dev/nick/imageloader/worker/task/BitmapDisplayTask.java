@@ -82,7 +82,7 @@ public class BitmapDisplayTask extends BaseDisplayTask<Bitmap> {
 
         if (mDisplayTaskMonitor.interruptExecute(mTaskRecord)) return;
 
-        ImageSource<Bitmap> source = mImageData.getType();
+        ImageSource<Bitmap> source = mImageData.getSource();
 
         ImageFetcher<Bitmap> fetcher = source.getFetcher(mContext, mLoaderConfig);
 

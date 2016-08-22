@@ -32,7 +32,7 @@ import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.result.Cause;
 import dev.nick.imageloader.worker.result.ErrorListener;
 
-public class AssetMovieTest extends BaseTest {
+public class AssetGifTest extends BaseTest {
 
     final String urlAssets = "assets://test_movie.gif";
 

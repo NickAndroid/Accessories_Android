@@ -53,6 +53,9 @@ class MovieProgressListenerDelegate extends ProgressListenerDelegate<Movie> {
 
     @Override
     public void onComplete(Movie result) {
+
+        callOnComplete(result);
+
         if (result == null) {
             return;
         }
@@ -61,8 +64,6 @@ class MovieProgressListenerDelegate extends ProgressListenerDelegate<Movie> {
             cacheManager.cache(url, result);
             return;
         }
-
-        UIThreadRouter.getSharedRouter().callOnComplete(listener, result);
 
         final boolean isViewMaybeReused = option.isViewMaybeReused();
 

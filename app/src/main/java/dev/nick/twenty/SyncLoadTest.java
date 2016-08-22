@@ -25,11 +25,10 @@ import com.nick.scalpel.Scalpel;
 import com.nick.scalpel.annotation.binding.FindView;
 
 import dev.nick.imageloader.ImageLoader;
-import dev.nick.imageloader.utils.Preconditions;
 
 public class SyncLoadTest extends BaseTest {
 
-    final String urlDrawable = "drawable://tree";
+    final String urlDrawable = "drawable://bot";
 
     @FindView(id = R.id.image)
     ImageView imageView;
@@ -49,7 +48,6 @@ public class SyncLoadTest extends BaseTest {
                 .loadBitmap()
                 .from(urlDrawable)
                 .startSynchronously();
-        Preconditions.checkNotNull(result);
         imageView.setImageBitmap(result);
     }
 }

@@ -66,6 +66,7 @@ import dev.nick.imageloader.worker.ImageData;
 import dev.nick.imageloader.worker.ImageSource;
 import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.bitmap.BitmapImageSource;
+import dev.nick.imageloader.worker.movie.MovieImageSource;
 import dev.nick.imageloader.worker.result.ErrorListener;
 import dev.nick.imageloader.worker.task.BaseFutureTask;
 import dev.nick.imageloader.worker.task.BitmapDisplayTask;
@@ -268,12 +269,12 @@ public class ImageLoader implements
     /**
      * Display image from the from to the view.
      *
-     * @param source           Image source from, one of {@link ImageData}
+     * @param imageData        Image imageData from, one of {@link ImageData}
      * @param imageChair       Target {@link ImageChair} to display the image.
      * @param option           {@link DisplayOption} is options using when display the image.
      * @param progressListener The progress progressListener using to watch the progress of the loading.
      */
-    Future<Bitmap> displayBitmap(@NonNull ImageData<Bitmap> source,
+    Future<Bitmap> displayBitmap(@NonNull ImageData<Bitmap> imageData,
                                  @NonNull ImageChair<Bitmap> imageChair,
                                  @Nullable DisplayOption<Bitmap> option,
                                  @Nullable ProgressListener<Bitmap> progressListener,
@@ -282,7 +283,7 @@ public class ImageLoader implements
 
         ensureNotTerminated();
 
-        Preconditions.checkNotNull(source.getUrl(), "imageData is null");
+        Preconditions.checkNotNull(imageData.getUrl(), "imageData is null");
 
         DisplayTaskRecord record = createTaskRecord(Preconditions.checkNotNull(imageChair));
 
@@ -306,12 +307,12 @@ public class ImageLoader implements
                 option,
                 imageChair,
                 record,
-                source.getUrl());
+                imageData.getUrl());
 
         if (mBitmapCacheManager.isMemCacheEnabled()) {
             Bitmap cached;
-            if ((cached = mBitmapCacheManager.get(source.getUrl())) != null) {
-                mLogger.verbose("Using mem cached bitmap for:" + source.getUrl());
+            if ((cached = mBitmapCacheManager.get(imageData.getUrl())) != null) {
+                mLogger.verbose("Using mem cached bitmap for:" + imageData.getUrl());
                 mImageSettingApplier.applyImageSettings(
                         cached,
                         option.getArtist(),
@@ -322,7 +323,7 @@ public class ImageLoader implements
             }
         }
 
-        String loadingUrl = source.getUrl();
+        String loadingUrl = imageData.getUrl();
         boolean usingDiskCacheUrl = false;
 
         if (mBitmapCacheManager.isDiskCacheEnabled()) {
@@ -333,7 +334,7 @@ public class ImageLoader implements
                 if (mBitmapCacheManager.isMemCacheEnabled()) {
                     Bitmap cached;
                     if ((cached = mBitmapCacheManager.get(loadingUrl)) != null) {
-                        mLogger.verbose("Using mem cached bitmap for:" + source.getUrl());
+                        mLogger.verbose("Using mem cached bitmap for:" + imageData.getUrl());
                         mImageSettingApplier.applyImageSettings(
                                 cached,
                                 option.getArtist(),
@@ -343,20 +344,18 @@ public class ImageLoader implements
                         return new MokeFutureImageTask<>(cached);
                     }
                 }
-                source.setUrl(loadingUrl);
+                imageData.setUrl(loadingUrl);
+                imageData.setSource(BitmapImageSource.FILE);
                 usingDiskCacheUrl = true;
             }
         }
 
         showOnLoadingBm(imageChair, option);
 
-        ErrorListenerDelegate<Bitmap> errorListenerDelegate = null;
-
-        if (errorListener != null) {
-            errorListenerDelegate = new BitmapErrorListenerDelegate(errorListener,
-                    option.isFailureImgDefined() ? option.getFailureImg() : null,
-                    imageChair);
-        }
+        ErrorListenerDelegate<Bitmap> errorListenerDelegate = new BitmapErrorListenerDelegate(
+                errorListener,
+                option.isFailureImgDefined() ? option.getFailureImg() : null,
+                imageChair);
 
         if (usingDiskCacheUrl) {
             mLogger.verbose("Using disk cache url for loading:" + loadingUrl);
@@ -368,7 +367,7 @@ public class ImageLoader implements
                 mContext,
                 mConfig,
                 mTaskManager,
-                source,
+                imageData,
                 dimenSpec,
                 imageQuality,
                 progressListenerDelegate,
@@ -450,6 +449,7 @@ public class ImageLoader implements
                     }
                 }
                 source.setUrl(loadingUrl);
+                source.setSource(MovieImageSource.FILE);
                 usingDiskCacheUrl = true;
             }
         }
@@ -462,12 +462,10 @@ public class ImageLoader implements
 
         showOnLoadingMov(imageChair, option);
 
-        ErrorListenerDelegate errorListenerDelegate = null;
-
-        if (errorListener != null) {
-            errorListenerDelegate = new MovieErrorListenerDelegate(errorListener,
-                    option.isFailureImgDefined() ? option.getFailureImg() : null, imageChair);
-        }
+        ErrorListenerDelegate errorListenerDelegate = new MovieErrorListenerDelegate(
+                errorListener,
+                option.isFailureImgDefined() ? option.getFailureImg() : null,
+                imageChair);
 
         MovieDisplayTask imageTask = new MovieDisplayTask(
                 mContext,
@@ -885,7 +883,7 @@ public class ImageLoader implements
         public boolean handleRequest(BaseFutureTask request) {
             freezeIfRequested();
             if (!onFutureSubmit(request)) return false;
-            getExecutor(request.getListenableTask().getImageData().getType()).submit(request);
+            getExecutor(request.getListenableTask().getImageData().getSource()).submit(request);
             return true;
         }
     }

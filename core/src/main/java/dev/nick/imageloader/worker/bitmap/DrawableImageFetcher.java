@@ -52,7 +52,7 @@ public class DrawableImageFetcher extends BaseImageFetcher<Bitmap> {
                 this.mContext.getPackageName());
 
         if (resId <= 0) {
-            callOnError(errorListener, new Cause(new Resources.NotFoundException(String.format("Res of id-%s not found.", resId))));
+            callOnError(errorListener, new Cause(new Resources.NotFoundException(String.format("Res of id-%s not found for url-%s.", resId, url))));
             return null;
         }
 
@@ -80,16 +80,16 @@ public class DrawableImageFetcher extends BaseImageFetcher<Bitmap> {
                 break;
         }
 
-        Bitmap tempBitmap;
+        Bitmap bitmap;
 
         try {
-            tempBitmap = BitmapFactory.decodeResource(resources, resId, decodeOptions);
+            bitmap = BitmapFactory.decodeResource(resources, resId, decodeOptions);
         } catch (OutOfMemoryError error) {
             callOnError(errorListener, new Cause(error));
             return null;
         }
 
-        callOnComplete(progressListener, tempBitmap);
-        return tempBitmap;
+        callOnComplete(progressListener, bitmap);
+        return bitmap;
     }
 }

@@ -18,6 +18,7 @@ package dev.nick.twenty;
 
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.widget.ImageView;
 
@@ -25,14 +26,17 @@ import com.nick.scalpel.Scalpel;
 import com.nick.scalpel.annotation.binding.FindView;
 
 import dev.nick.imageloader.ImageLoader;
+import dev.nick.imageloader.debug.LoggerManager;
 import dev.nick.imageloader.ui.DisplayOption;
 import dev.nick.imageloader.ui.ImageQuality;
 import dev.nick.imageloader.ui.art.BlackWhiteImageArt;
 import dev.nick.imageloader.ui.art.BlurImageArt;
+import dev.nick.imageloader.worker.result.Cause;
+import dev.nick.imageloader.worker.result.ErrorListener;
 
 public class DrawableImageTest extends BaseTest {
 
-    final String urlDrawable = "drawable://art";
+    final String urlDrawable = "drawable://tree";
 
     @FindView(id = R.id.image)
     ImageView imageView;
@@ -53,10 +57,15 @@ public class DrawableImageTest extends BaseTest {
                 .from(urlDrawable)
                 .option(DisplayOption.bitmapBuilder()
                         .showOnFailure(BitmapFactory.decodeResource(getResources(), R.drawable.aio_image_fail))
-                        .imageArt(new BlurImageArt(24))
                         .imageArt(new BlackWhiteImageArt())
-                        .imageQuality(ImageQuality.RAW)
+                        .imageQuality(ImageQuality.OPT)
                         .build())
+                .errorListener(new ErrorListener() {
+                    @Override
+                    public void onError(@NonNull Cause cause) {
+                        LoggerManager.getLogger(DrawableImageTest.class).warn(cause);
+                    }
+                })
                 .into(imageView)
                 .start();
     }

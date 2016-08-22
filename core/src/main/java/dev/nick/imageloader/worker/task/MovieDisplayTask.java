@@ -82,7 +82,7 @@ public class MovieDisplayTask extends BaseDisplayTask<Movie> {
 
         if (mDisplayTaskMonitor.interruptExecute(mTaskRecord)) return;
 
-        ImageSource<Movie> source = mImageData.getType();
+        ImageSource<Movie> source = mImageData.getSource();
 
         ImageFetcher<Movie> fetcher = source.getFetcher(mContext, mLoaderConfig);
 

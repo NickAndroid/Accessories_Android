@@ -50,8 +50,12 @@
             android:label="SyncLoadTest" />
 
         <activity
-            android:name=".AssetMovieTest"
+            android:name=".AssetGifTest"
             android:label="AssetMovieTest" />
+
+        <activity
+            android:name=".AssetVideoTest"
+            android:label="AssetVideoTest" />
 
         <activity
             android:name=".NetworkMovieTest"
