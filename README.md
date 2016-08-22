@@ -29,6 +29,8 @@ Android image loader library
 compile 'dev.nick:imageloader:$latest@aar'
 ```
 
+### Change log
+
 ## Samples
 
 ### How to init/get the loader:
@@ -83,7 +85,7 @@ public class Z {
 ### Loading or Display:
 ```java
  ImageLoader.shared()
-                .load()
+                .loadBitmap()
                 .from(urlDrawable)
                 .listener(listener)
                 .option(DisplayOption.builder()...) // Ignore this param if your just want to load a bitmap.
@@ -97,7 +99,7 @@ class CustomView implements ImageSettable {}
 ```
 ```java
 ImageLoader.shared()
-                .load()
+                .loadMovie()
                 .from(urlDrawable)
                 .listener(listener)
                 .option(DisplayOption.builder()...)
@@ -137,7 +139,7 @@ mLoader.cancel(ImageView/ImageSettable/Url);
 ## Supported media format:
 - [x] All image formats android supported.
 - [ ] Video
-- [ ] Gif
+- [x] Gif
 
 
 ## Contact me
