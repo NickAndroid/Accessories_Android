@@ -41,6 +41,8 @@ public class ContentImageFetcher extends BaseImageFetcher<Movie> {
                               @Nullable ErrorListener errorListener) throws Exception {
         super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);
 
+        callOnStart(progressListener);
+
         InputStream inputStream = null;
         try {
             inputStream = mContext.getContentResolver().openInputStream(Uri.parse(url));

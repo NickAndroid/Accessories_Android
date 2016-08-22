@@ -50,8 +50,9 @@ public class FileImageFetcher extends BaseImageFetcher<Movie> {
             return null;
         }
 
+        callOnStart(progressListener);
+
         Movie movie = Movie.decodeFile(path);
-        mLogger.warn(url + ", exi:" + new File(mSplitter.getRealPath(url)).exists());
         callOnComplete(progressListener, movie);
         return movie;
     }
