@@ -92,7 +92,6 @@ abstract class ProgressListenerDelegate<T> implements ProgressListener<T> {
                 isTaskDirty = taskManager.interruptDisplay(taskRecord);
             }
         }
-        mLogger.verbose("isTaskDirty: " + isTaskDirty);
         return isTaskDirty;
     }
 }

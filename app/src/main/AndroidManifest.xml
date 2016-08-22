@@ -54,6 +54,10 @@
             android:label="AssetMovieTest" />
 
         <activity
+            android:name=".NetworkMovieTest"
+            android:label="NetworkMovieTest" />
+
+        <activity
             android:name=".Usage"
             android:label="Usage" />
 

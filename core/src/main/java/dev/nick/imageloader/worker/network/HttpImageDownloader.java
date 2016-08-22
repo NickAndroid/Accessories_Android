@@ -25,7 +25,6 @@ import java.net.URLConnection;
 import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.result.Cause;
 import dev.nick.imageloader.worker.result.ErrorListener;
-import dev.nick.imageloader.debug.LoggerManager;
 
 public class HttpImageDownloader implements ImageDownloader<Boolean> {
 
@@ -39,7 +38,6 @@ public class HttpImageDownloader implements ImageDownloader<Boolean> {
 
     @Override
     public Boolean download(String url, ProgressListener progressListener, ErrorListener errorListener) {
-        LoggerManager.getLogger(getClass()).info("download:" + url);
         try {
             URL u = new URL(url);
             URLConnection conn = u.openConnection();

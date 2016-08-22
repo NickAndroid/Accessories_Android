@@ -21,7 +21,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.animation.Animation;
-import android.widget.ImageView;
 
 import com.nick.scalpel.Scalpel;
 import com.nick.scalpel.annotation.binding.FindView;
@@ -35,15 +34,15 @@ import dev.nick.imageloader.worker.result.ErrorListener;
 
 public class AssetMovieTest extends BaseTest {
 
-    final String urlAssets = "assets://test.gif";
+    final String urlAssets = "assets://test_movie.gif";
 
-    @FindView(id = R.id.image)
-    ImageView imageView;
+    @FindView(id = R.id.movie)
+    SimpleGifView simpleGifView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.single_image_layout);
+        setContentView(R.layout.single_movie_layout);
         setTitle(getClass().getSimpleName());
         Scalpel.getInstance().wire(this);
     }
@@ -85,6 +84,7 @@ public class AssetMovieTest extends BaseTest {
                     @Override
                     public void seat(@NonNull Movie image) {
                         LoggerManager.getLogger(getClass()).debug("seat");
+                        simpleGifView.setMovie(image);
                     }
 
                     @Override

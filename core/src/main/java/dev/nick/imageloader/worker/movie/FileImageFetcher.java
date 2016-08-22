@@ -20,10 +20,14 @@ import android.graphics.Movie;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+
 import dev.nick.imageloader.worker.BaseImageFetcher;
 import dev.nick.imageloader.worker.DecodeSpec;
 import dev.nick.imageloader.worker.PathSplitter;
 import dev.nick.imageloader.worker.ProgressListener;
+import dev.nick.imageloader.worker.result.Cause;
 import dev.nick.imageloader.worker.result.ErrorListener;
 
 public class FileImageFetcher extends BaseImageFetcher<Movie> {
@@ -37,6 +41,18 @@ public class FileImageFetcher extends BaseImageFetcher<Movie> {
                               @Nullable ProgressListener<Movie> progressListener,
                               @Nullable ErrorListener errorListener) throws Exception {
         super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);
-        return Movie.decodeFile(mSplitter.getRealPath(url));
+
+        String path = mSplitter.getRealPath(url);
+
+        File file = new File(path);
+        if (!file.exists()) {
+            callOnError(errorListener, new Cause(new FileNotFoundException(String.format("File %s not found.", url))));
+            return null;
+        }
+
+        Movie movie = Movie.decodeFile(path);
+        mLogger.warn(url + ", exi:" + new File(mSplitter.getRealPath(url)).exists());
+        callOnComplete(progressListener, movie);
+        return movie;
     }
 }

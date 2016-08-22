@@ -44,7 +44,9 @@ public class ContentImageFetcher extends BaseImageFetcher<Movie> {
         InputStream inputStream = null;
         try {
             inputStream = mContext.getContentResolver().openInputStream(Uri.parse(url));
-            return Movie.decodeStream(inputStream);
+            Movie movie =  Movie.decodeStream(inputStream);
+            callOnComplete(progressListener, movie);
+            return movie;
         } finally {
             if (inputStream != null) inputStream.close();
         }
