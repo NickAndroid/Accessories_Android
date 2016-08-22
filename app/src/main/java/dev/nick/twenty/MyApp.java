@@ -29,7 +29,6 @@ import com.nick.scalpel.ScalpelApplication;
 import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.cache.CachePolicy;
-import dev.nick.imageloader.debug.LoggerManager;
 import dev.nick.imageloader.queue.QueuePolicy;
 import dev.nick.imageloader.worker.BaseImageFetcher;
 import dev.nick.imageloader.worker.DecodeSpec;
@@ -39,6 +38,7 @@ import dev.nick.imageloader.worker.bitmap.BitmapImageSource;
 import dev.nick.imageloader.worker.movie.MovieImageSource;
 import dev.nick.imageloader.worker.network.NetworkPolicy;
 import dev.nick.imageloader.worker.result.ErrorListener;
+import dev.nick.logger.LoggerManager;
 
 public class MyApp extends ScalpelApplication {
     @Override

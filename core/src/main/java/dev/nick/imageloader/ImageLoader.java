@@ -44,8 +44,6 @@ import dev.nick.imageloader.control.Freezer;
 import dev.nick.imageloader.control.LoaderState;
 import dev.nick.imageloader.control.StorageStats;
 import dev.nick.imageloader.control.TrafficStats;
-import dev.nick.imageloader.debug.Logger;
-import dev.nick.imageloader.debug.LoggerManager;
 import dev.nick.imageloader.queue.FIFOPriorityBlockingQueue;
 import dev.nick.imageloader.queue.IdleStateMonitor;
 import dev.nick.imageloader.queue.LIFOPriorityBlockingQueue;
@@ -77,6 +75,8 @@ import dev.nick.imageloader.worker.task.MokeFutureImageTask;
 import dev.nick.imageloader.worker.task.MovieDisplayTask;
 import dev.nick.imageloader.worker.task.TaskManager;
 import dev.nick.imageloader.worker.task.TaskManagerImpl;
+import dev.nick.logger.Logger;
+import dev.nick.logger.LoggerManager;
 
 /**
  * Main class of {@link ImageLoader} library.

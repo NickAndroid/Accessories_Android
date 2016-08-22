@@ -20,7 +20,7 @@ import android.content.Context;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-import dev.nick.imageloader.debug.LoggerManager;
+import dev.nick.logger.LoggerManager;
 
 public class TrafficStats extends UsageStats {
 

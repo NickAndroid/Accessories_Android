@@ -20,7 +20,7 @@ import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import dev.nick.imageloader.debug.LoggerManager;
+import dev.nick.logger.LoggerManager;
 
 /**
  * Policy reading when caching images.

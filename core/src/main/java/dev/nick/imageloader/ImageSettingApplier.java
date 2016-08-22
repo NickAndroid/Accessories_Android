@@ -26,8 +26,6 @@ import android.support.annotation.WorkerThread;
 import java.util.List;
 
 import dev.nick.imageloader.annotation.Shared;
-import dev.nick.imageloader.debug.Logger;
-import dev.nick.imageloader.debug.LoggerManager;
 import dev.nick.imageloader.ui.BitmapImageSettings;
 import dev.nick.imageloader.ui.ImageChair;
 import dev.nick.imageloader.ui.ImageSettings;
@@ -35,6 +33,8 @@ import dev.nick.imageloader.ui.MovieImageSettings;
 import dev.nick.imageloader.ui.animator.ImageAnimator;
 import dev.nick.imageloader.ui.art.ImageArt;
 import dev.nick.imageloader.ui.art.ImageArtistCaller;
+import dev.nick.logger.Logger;
+import dev.nick.logger.LoggerManager;
 
 class ImageSettingApplier implements Handler.Callback {
 

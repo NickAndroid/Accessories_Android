@@ -26,13 +26,12 @@ import com.nick.scalpel.Scalpel;
 import com.nick.scalpel.annotation.binding.FindView;
 
 import dev.nick.imageloader.ImageLoader;
-import dev.nick.imageloader.debug.LoggerManager;
 import dev.nick.imageloader.ui.DisplayOption;
 import dev.nick.imageloader.ui.ImageQuality;
 import dev.nick.imageloader.ui.art.BlackWhiteImageArt;
-import dev.nick.imageloader.ui.art.BlurImageArt;
 import dev.nick.imageloader.worker.result.Cause;
 import dev.nick.imageloader.worker.result.ErrorListener;
+import dev.nick.logger.LoggerManager;
 
 public class DrawableImageTest extends BaseTest {
 

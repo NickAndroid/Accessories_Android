@@ -21,8 +21,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import dev.nick.imageloader.control.LoaderState;
-import dev.nick.imageloader.debug.Logger;
-import dev.nick.imageloader.debug.LoggerManager;
+import dev.nick.logger.Logger;
+import dev.nick.logger.LoggerManager;
 
 public class TaskManagerImpl implements TaskManager {
 

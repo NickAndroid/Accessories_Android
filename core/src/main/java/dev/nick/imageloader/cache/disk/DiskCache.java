@@ -37,25 +37,20 @@ import dev.nick.imageloader.cache.Cache;
 import dev.nick.imageloader.cache.CachePolicy;
 import dev.nick.imageloader.cache.FileNameGenerator;
 import dev.nick.imageloader.control.StorageStats;
-import dev.nick.imageloader.debug.Logger;
-import dev.nick.imageloader.debug.LoggerManager;
 import dev.nick.imageloader.utils.FileUtils;
+import dev.nick.logger.Logger;
+import dev.nick.logger.LoggerManager;
 
 public class DiskCache implements Cache<String, Bitmap> {
 
+    private final List<FileOperator> mRunningOps;
     private String mExternalCacheDir;
     private String mInternalCacheDir;
-
     private boolean mPreferToExternal;
     private boolean mStorageStatsEnabled;
-
     private StorageStats mStorageStats;
-
     private Bitmap.CompressFormat mFormat;
     private int mQuality;
-
-    private final List<FileOperator> mRunningOps;
-
     private FileNameGenerator mFileNameGenerator;
 
     private Logger mLogger;
@@ -77,6 +72,15 @@ public class DiskCache implements Cache<String, Bitmap> {
         mFormat = cachePolicy.getCompressFormat();
         mQuality = cachePolicy.getQuality();
         mLogger = LoggerManager.getLogger(getClass());
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private static void deleteFilesByDirectory(File directory) {
+        if (directory != null && directory.exists() && directory.isDirectory()) {
+            for (File item : directory.listFiles()) {
+                item.delete();
+            }
+        }
     }
 
     @Override
@@ -133,12 +137,29 @@ public class DiskCache implements Cache<String, Bitmap> {
         deleteFilesByDirectory(new File(mInternalCacheDir));
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    private static void deleteFilesByDirectory(File directory) {
-        if (directory != null && directory.exists() && directory.isDirectory()) {
-            for (File item : directory.listFiles()) {
-                item.delete();
-            }
+    void updateUsage(long fileSize, boolean external) {
+        if (external) {
+            mStorageStats.onExternalStorageUsage(fileSize);
+        } else {
+            mStorageStats.onInternalStorageUsage(fileSize);
+        }
+    }
+
+    void addOp(FileOperator op) {
+        synchronized (mRunningOps) {
+            mRunningOps.add(op);
+        }
+    }
+
+    void removeOp(FileOperator op) {
+        synchronized (mRunningOps) {
+            mRunningOps.remove(op);
+        }
+    }
+
+    boolean hasOp(FileOperator op) {
+        synchronized (mRunningOps) {
+            return mRunningOps.contains(op);
         }
     }
 
@@ -270,32 +291,6 @@ public class DiskCache implements Cache<String, Bitmap> {
             mLogger.info("Success write bitmap to:" + out.getAbsolutePath());
             removeOp(this);
             return true;
-        }
-    }
-
-    void updateUsage(long fileSize, boolean external) {
-        if (external) {
-            mStorageStats.onExternalStorageUsage(fileSize);
-        } else {
-            mStorageStats.onInternalStorageUsage(fileSize);
-        }
-    }
-
-    void addOp(FileOperator op) {
-        synchronized (mRunningOps) {
-            mRunningOps.add(op);
-        }
-    }
-
-    void removeOp(FileOperator op) {
-        synchronized (mRunningOps) {
-            mRunningOps.remove(op);
-        }
-    }
-
-    boolean hasOp(FileOperator op) {
-        synchronized (mRunningOps) {
-            return mRunningOps.contains(op);
         }
     }
 }

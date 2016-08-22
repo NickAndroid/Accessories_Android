@@ -17,7 +17,7 @@
 package dev.nick.imageloader.queue;
 
 import dev.nick.imageloader.Terminable;
-import dev.nick.imageloader.debug.LoggerManager;
+import dev.nick.logger.LoggerManager;
 
 public final class RequestQueueManager<T> implements RequestHandler<T>, Terminable {
 

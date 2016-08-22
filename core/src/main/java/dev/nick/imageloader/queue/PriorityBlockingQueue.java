@@ -22,7 +22,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 
-import dev.nick.imageloader.debug.LoggerManager;
+import dev.nick.logger.LoggerManager;
 
 public class PriorityBlockingQueue<E> extends LinkedBlockingDeque<E> implements BlockingQueue<E> {
 

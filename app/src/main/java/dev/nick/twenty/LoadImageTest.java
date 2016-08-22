@@ -40,10 +40,10 @@ import java.util.List;
 
 import dev.nick.imageloader.ImageLoader;
 import dev.nick.imageloader.ProgressListenerStub;
-import dev.nick.imageloader.debug.LoggerManager;
 import dev.nick.imageloader.queue.Priority;
 import dev.nick.imageloader.worker.result.Cause;
 import dev.nick.imageloader.worker.result.ErrorListener;
+import dev.nick.logger.LoggerManager;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
 public class LoadImageTest extends BaseTest {

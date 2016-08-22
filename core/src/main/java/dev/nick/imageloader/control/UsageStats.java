@@ -18,8 +18,8 @@ package dev.nick.imageloader.control;
 
 import android.content.Context;
 
-import dev.nick.imageloader.debug.Logger;
-import dev.nick.imageloader.debug.LoggerManager;
+import dev.nick.logger.Logger;
+import dev.nick.logger.LoggerManager;
 
 public class UsageStats {
 

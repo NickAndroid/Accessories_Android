@@ -23,7 +23,7 @@ import android.support.annotation.NonNull;
 public class MovieCacheManager implements CacheManager<Movie> {
 
     public MovieCacheManager(CachePolicy cachePolicy, Context context) {
-
+        // Nothing
     }
 
     @Override
@@ -53,12 +53,12 @@ public class MovieCacheManager implements CacheManager<Movie> {
 
     @Override
     public void evictDisk() {
-
+        // Nothing
     }
 
     @Override
     public void evictMem() {
-
+        // Nothing
     }
 
     @Override

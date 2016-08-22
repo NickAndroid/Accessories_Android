@@ -24,10 +24,10 @@ import android.support.annotation.Nullable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import dev.nick.imageloader.LoaderConfig;
-import dev.nick.imageloader.debug.Logger;
-import dev.nick.imageloader.debug.LoggerManager;
 import dev.nick.imageloader.worker.result.Cause;
 import dev.nick.imageloader.worker.result.ErrorListener;
+import dev.nick.logger.Logger;
+import dev.nick.logger.LoggerManager;
 
 public class BaseImageFetcher<T> implements ImageFetcher<T> {
 

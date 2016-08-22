@@ -16,7 +16,7 @@
 
 package dev.nick.imageloader.queue;
 
-import dev.nick.imageloader.debug.LoggerManager;
+import dev.nick.logger.LoggerManager;
 
 class Looper<T> implements Runnable {
 

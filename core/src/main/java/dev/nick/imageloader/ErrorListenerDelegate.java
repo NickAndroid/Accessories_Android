@@ -21,10 +21,10 @@ import android.util.Log;
 
 import java.io.InterruptedIOException;
 
-import dev.nick.imageloader.debug.LoggerManager;
 import dev.nick.imageloader.ui.ImageChair;
 import dev.nick.imageloader.worker.result.Cause;
 import dev.nick.imageloader.worker.result.ErrorListener;
+import dev.nick.logger.LoggerManager;
 
 abstract class ErrorListenerDelegate<T> implements ErrorListener {
 

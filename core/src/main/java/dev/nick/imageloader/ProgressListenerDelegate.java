@@ -17,14 +17,14 @@
 package dev.nick.imageloader;
 
 import dev.nick.imageloader.cache.CacheManager;
-import dev.nick.imageloader.debug.Logger;
-import dev.nick.imageloader.debug.LoggerManager;
 import dev.nick.imageloader.ui.DisplayOption;
 import dev.nick.imageloader.ui.ImageChair;
 import dev.nick.imageloader.worker.DimenSpec;
 import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.task.DisplayTaskRecord;
 import dev.nick.imageloader.worker.task.TaskManager;
+import dev.nick.logger.Logger;
+import dev.nick.logger.LoggerManager;
 
 abstract class ProgressListenerDelegate<T> implements ProgressListener<T> {
 

@@ -27,8 +27,8 @@ import java.util.concurrent.Executors;
 
 import dev.nick.imageloader.cache.disk.DiskCache;
 import dev.nick.imageloader.cache.mem.MemCache;
-import dev.nick.imageloader.debug.Logger;
-import dev.nick.imageloader.debug.LoggerManager;
+import dev.nick.logger.Logger;
+import dev.nick.logger.LoggerManager;
 
 public class BitmapCacheManager implements CacheManager<Bitmap> {
 
