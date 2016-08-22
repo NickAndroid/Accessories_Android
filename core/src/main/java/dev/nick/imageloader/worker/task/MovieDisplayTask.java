@@ -25,6 +25,7 @@ import android.support.annotation.Nullable;
 import java.io.InterruptedIOException;
 
 import dev.nick.imageloader.LoaderConfig;
+import dev.nick.imageloader.debug.LoggerManager;
 import dev.nick.imageloader.ui.ImageQuality;
 import dev.nick.imageloader.worker.DecodeSpec;
 import dev.nick.imageloader.worker.DimenSpec;
@@ -78,6 +79,8 @@ public class MovieDisplayTask extends BaseDisplayTask<Movie> {
     @Override
     public void run() {
 
+        LoggerManager.getLogger(getClass()).funcEnter();
+
         Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
 
         if (!mDisplayTaskMonitor.interruptExecute(mTaskRecord)) return;
@@ -92,7 +95,8 @@ public class MovieDisplayTask extends BaseDisplayTask<Movie> {
         } catch (InterruptedIOException | InterruptedException ignored) {
 
         } catch (Exception e) {
-            mErrorListener.onError(new Cause(e));
+            if (mErrorListener != null)
+                mErrorListener.onError(new Cause(e));
         }
     }
 

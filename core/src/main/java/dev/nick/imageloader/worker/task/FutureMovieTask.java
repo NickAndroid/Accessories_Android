@@ -20,7 +20,8 @@ import android.graphics.Movie;
 import android.support.annotation.Nullable;
 
 public class FutureMovieTask extends BaseFutureTask<Movie> {
-    public FutureMovieTask(BaseDisplayTask<Movie> task, @Nullable TaskActionListener listener, boolean cancelOthersBeforeRun) {
+    public FutureMovieTask(BaseDisplayTask<Movie> task, @Nullable TaskActionListener listener,
+                           boolean cancelOthersBeforeRun) {
         super(task, listener, cancelOthersBeforeRun);
     }
 }

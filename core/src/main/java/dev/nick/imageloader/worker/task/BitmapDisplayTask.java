@@ -92,7 +92,8 @@ public class BitmapDisplayTask extends BaseDisplayTask<Bitmap> {
         } catch (InterruptedIOException | InterruptedException ignored) {
 
         } catch (Exception e) {
-            mErrorListener.onError(new Cause(e));
+            if (mErrorListener != null)
+                mErrorListener.onError(new Cause(e));
         }
     }
 
