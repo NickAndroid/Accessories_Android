@@ -1,38 +1,40 @@
     20 core/src/main/java/dev/nick/imageloader/annotation/CallingOnUIThread.java
-     4 core/src/main/java/dev/nick/imageloader/annotation/LoaderApi.java
-    51 core/src/main/java/dev/nick/imageloader/BitmapProgressListenerDelegate.java
-   100 core/src/main/java/dev/nick/imageloader/BitmapTransaction.java
-    82 core/src/main/java/dev/nick/imageloader/cache/BitmapCacheManager.java
+    20 core/src/main/java/dev/nick/imageloader/annotation/Lazy.java
+    20 core/src/main/java/dev/nick/imageloader/annotation/LoaderApi.java
+    20 core/src/main/java/dev/nick/imageloader/annotation/Shared.java
+    34 core/src/main/java/dev/nick/imageloader/BitmapErrorListenerDelegate.java
+    81 core/src/main/java/dev/nick/imageloader/BitmapProgressListenerDelegate.java
+   130 core/src/main/java/dev/nick/imageloader/BitmapTransaction.java
+   124 core/src/main/java/dev/nick/imageloader/cache/BitmapCacheManager.java
     30 core/src/main/java/dev/nick/imageloader/cache/Cache.java
-    17 core/src/main/java/dev/nick/imageloader/cache/CacheManager.java
+    37 core/src/main/java/dev/nick/imageloader/cache/CacheManager.java
    309 core/src/main/java/dev/nick/imageloader/cache/CachePolicy.java
    240 core/src/main/java/dev/nick/imageloader/cache/disk/AtomicFileCompat.java
-   301 core/src/main/java/dev/nick/imageloader/cache/disk/DiskCache.java
+   296 core/src/main/java/dev/nick/imageloader/cache/disk/DiskCache.java
     28 core/src/main/java/dev/nick/imageloader/cache/FileNameGenerator.java
     27 core/src/main/java/dev/nick/imageloader/cache/HashcodeKeyGenerator.java
     27 core/src/main/java/dev/nick/imageloader/cache/HeadlessFileNameGenerator.java
     28 core/src/main/java/dev/nick/imageloader/cache/KeyGenerator.java
     46 core/src/main/java/dev/nick/imageloader/cache/mem/MemCache.java
+    68 core/src/main/java/dev/nick/imageloader/cache/MovieCacheManager.java
     26 core/src/main/java/dev/nick/imageloader/control/Forkable.java
     40 core/src/main/java/dev/nick/imageloader/control/Freezer.java
     21 core/src/main/java/dev/nick/imageloader/control/LoaderState.java
     77 core/src/main/java/dev/nick/imageloader/control/StorageStats.java
     77 core/src/main/java/dev/nick/imageloader/control/TrafficStats.java
     60 core/src/main/java/dev/nick/imageloader/control/UsageStats.java
-    21 core/src/main/java/dev/nick/imageloader/debug/CallingInfoBuilder.java
-    32 core/src/main/java/dev/nick/imageloader/debug/CallingInfoBuilderImpl.java
-    40 core/src/main/java/dev/nick/imageloader/debug/Logger.java
-   106 core/src/main/java/dev/nick/imageloader/debug/LoggerImpl.java
-    61 core/src/main/java/dev/nick/imageloader/debug/LoggerManager.java
-    21 core/src/main/java/dev/nick/imageloader/debug/LogTagBuilder.java
-    26 core/src/main/java/dev/nick/imageloader/ErrorListenerDelegate.java
-    41 core/src/main/java/dev/nick/imageloader/FakeBitmapImageSeat.java
-   692 core/src/main/java/dev/nick/imageloader/ImageLoader.java
-    68 core/src/main/java/dev/nick/imageloader/ImageSettingApplier.java
+    59 core/src/main/java/dev/nick/imageloader/ErrorListenerDelegate.java
+    57 core/src/main/java/dev/nick/imageloader/FakeBitmapImageChair.java
+    57 core/src/main/java/dev/nick/imageloader/FakeMovieImageChair.java
+   900 core/src/main/java/dev/nick/imageloader/ImageLoader.java
+   102 core/src/main/java/dev/nick/imageloader/ImageSettingApplier.java
    191 core/src/main/java/dev/nick/imageloader/LoaderConfig.java
-    11 core/src/main/java/dev/nick/imageloader/LoaderFactory.java
-    73 core/src/main/java/dev/nick/imageloader/LoadingListener.java
-    77 core/src/main/java/dev/nick/imageloader/ProgressListenerDelegate.java
+    27 core/src/main/java/dev/nick/imageloader/LoaderFactory.java
+    34 core/src/main/java/dev/nick/imageloader/MovieErrorListenerDelegate.java
+    77 core/src/main/java/dev/nick/imageloader/MovieProgressListenerDelegate.java
+   117 core/src/main/java/dev/nick/imageloader/MovieTransaction.java
+    97 core/src/main/java/dev/nick/imageloader/ProgressListenerDelegate.java
+    44 core/src/main/java/dev/nick/imageloader/ProgressListenerStub.java
     21 core/src/main/java/dev/nick/imageloader/queue/FIFOPriorityBlockingQueue.java
     20 core/src/main/java/dev/nick/imageloader/queue/IdleStateMonitor.java
     28 core/src/main/java/dev/nick/imageloader/queue/LIFOPriorityBlockingQueue.java
@@ -44,59 +46,72 @@
     21 core/src/main/java/dev/nick/imageloader/queue/Remarkable.java
     21 core/src/main/java/dev/nick/imageloader/queue/RequestHandler.java
     90 core/src/main/java/dev/nick/imageloader/queue/RequestQueue.java
-    66 core/src/main/java/dev/nick/imageloader/queue/RequestQueueManager.java
-     5 core/src/main/java/dev/nick/imageloader/Terminable.java
-   102 core/src/main/java/dev/nick/imageloader/Transaction.java
+    67 core/src/main/java/dev/nick/imageloader/queue/RequestQueueManager.java
+   113 core/src/main/java/dev/nick/imageloader/scrollable/AbsListViewScrollDetector.java
+    21 core/src/main/java/dev/nick/imageloader/Terminable.java
+   130 core/src/main/java/dev/nick/imageloader/Transaction.java
     39 core/src/main/java/dev/nick/imageloader/ui/animator/FadeInImageAnimator.java
     30 core/src/main/java/dev/nick/imageloader/ui/animator/ImageAnimator.java
-    56 core/src/main/java/dev/nick/imageloader/ui/animator/ResAnimator.java
-    34 core/src/main/java/dev/nick/imageloader/ui/art/BitmapHandlerCaller.java
+    47 core/src/main/java/dev/nick/imageloader/ui/animator/ResAnimator.java
     31 core/src/main/java/dev/nick/imageloader/ui/art/BlackWhiteImageArt.java
     46 core/src/main/java/dev/nick/imageloader/ui/art/BlurImageArt.java
     26 core/src/main/java/dev/nick/imageloader/ui/art/ImageArt.java
-    25 core/src/main/java/dev/nick/imageloader/ui/BitmapImageSeat.java
-    42 core/src/main/java/dev/nick/imageloader/ui/BitmapImageSettings.java
+    36 core/src/main/java/dev/nick/imageloader/ui/art/ImageArtistCaller.java
+    25 core/src/main/java/dev/nick/imageloader/ui/BitmapImageChair.java
+    47 core/src/main/java/dev/nick/imageloader/ui/BitmapImageSettings.java
     62 core/src/main/java/dev/nick/imageloader/ui/BitmapImageViewDelegate.java
-   190 core/src/main/java/dev/nick/imageloader/ui/DisplayOption.java
-    13 core/src/main/java/dev/nick/imageloader/ui/ImageQuality.java
-    18 core/src/main/java/dev/nick/imageloader/ui/ImageSeat.java
+   216 core/src/main/java/dev/nick/imageloader/ui/DisplayOption.java
+    34 core/src/main/java/dev/nick/imageloader/ui/ImageChair.java
+    29 core/src/main/java/dev/nick/imageloader/ui/ImageQuality.java
     23 core/src/main/java/dev/nick/imageloader/ui/ImageSettableIdCreator.java
     29 core/src/main/java/dev/nick/imageloader/ui/ImageSettableIdCreatorImpl.java
-    41 core/src/main/java/dev/nick/imageloader/ui/ImageSettings.java
+    49 core/src/main/java/dev/nick/imageloader/ui/ImageSettings.java
+    42 core/src/main/java/dev/nick/imageloader/ui/MovieImageSettings.java
     38 core/src/main/java/dev/nick/imageloader/ui/ResImageSettings.java
-   127 core/src/main/java/dev/nick/imageloader/UIThreadRouter.java
-   322 core/src/main/java/dev/nick/imageloader/utils/BitmapUtils.java
+   145 core/src/main/java/dev/nick/imageloader/UIThreadRouter.java
+   299 core/src/main/java/dev/nick/imageloader/utils/BitmapUtils.java
     41 core/src/main/java/dev/nick/imageloader/utils/FileUtils.java
    315 core/src/main/java/dev/nick/imageloader/utils/Preconditions.java
-    96 core/src/main/java/dev/nick/imageloader/worker/AssetsImageFetcher.java
-   152 core/src/main/java/dev/nick/imageloader/worker/BaseImageFetcher.java
-    92 core/src/main/java/dev/nick/imageloader/worker/ContentImageFetcher.java
+   153 core/src/main/java/dev/nick/imageloader/worker/BaseImageFetcher.java
+   226 core/src/main/java/dev/nick/imageloader/worker/BaseNetworkImageFetcher.java
+   101 core/src/main/java/dev/nick/imageloader/worker/bitmap/AssetsImageFetcher.java
+   189 core/src/main/java/dev/nick/imageloader/worker/bitmap/BitmapImageSource.java
+    98 core/src/main/java/dev/nick/imageloader/worker/bitmap/ContentImageFetcher.java
+    95 core/src/main/java/dev/nick/imageloader/worker/bitmap/DrawableImageFetcher.java
+    99 core/src/main/java/dev/nick/imageloader/worker/bitmap/FileImageFetcher.java
+    29 core/src/main/java/dev/nick/imageloader/worker/bitmap/NetworkImageFetcher.java
     38 core/src/main/java/dev/nick/imageloader/worker/DecodeSpec.java
-    90 core/src/main/java/dev/nick/imageloader/worker/DrawableImageFetcher.java
-    93 core/src/main/java/dev/nick/imageloader/worker/FileImageFetcher.java
+    54 core/src/main/java/dev/nick/imageloader/worker/DimenSpec.java
+    47 core/src/main/java/dev/nick/imageloader/worker/ImageData.java
     33 core/src/main/java/dev/nick/imageloader/worker/ImageFetcher.java
-    31 core/src/main/java/dev/nick/imageloader/worker/ImageSource.java
-   184 core/src/main/java/dev/nick/imageloader/worker/ImageSourceType.java
-    86 core/src/main/java/dev/nick/imageloader/worker/network/HttpImageDownloader.java
+    75 core/src/main/java/dev/nick/imageloader/worker/ImageSource.java
+    70 core/src/main/java/dev/nick/imageloader/worker/movie/AssetsImageFetcher.java
+    56 core/src/main/java/dev/nick/imageloader/worker/movie/ContentImageFetcher.java
+    68 core/src/main/java/dev/nick/imageloader/worker/movie/DrawableImageFetcher.java
+    59 core/src/main/java/dev/nick/imageloader/worker/movie/FileImageFetcher.java
+   179 core/src/main/java/dev/nick/imageloader/worker/movie/MovieImageSource.java
+    29 core/src/main/java/dev/nick/imageloader/worker/movie/NetworkImageFetcher.java
+    84 core/src/main/java/dev/nick/imageloader/worker/network/HttpImageDownloader.java
     24 core/src/main/java/dev/nick/imageloader/worker/network/ImageDownloader.java
     82 core/src/main/java/dev/nick/imageloader/worker/network/NetworkPolicy.java
     84 core/src/main/java/dev/nick/imageloader/worker/network/NetworkUtils.java
-   211 core/src/main/java/dev/nick/imageloader/worker/NetworkImageFetcher.java
     23 core/src/main/java/dev/nick/imageloader/worker/PathSplitter.java
     25 core/src/main/java/dev/nick/imageloader/worker/ProgressListener.java
     49 core/src/main/java/dev/nick/imageloader/worker/result/Cause.java
     23 core/src/main/java/dev/nick/imageloader/worker/result/ErrorListener.java
-   124 core/src/main/java/dev/nick/imageloader/worker/task/BitmapDisplayTask.java
+    24 core/src/main/java/dev/nick/imageloader/worker/task/BaseDisplayTask.java
+    87 core/src/main/java/dev/nick/imageloader/worker/task/BaseFutureTask.java
+   125 core/src/main/java/dev/nick/imageloader/worker/task/BitmapDisplayTask.java
     20 core/src/main/java/dev/nick/imageloader/worker/task/DisplayTask.java
-    23 core/src/main/java/dev/nick/imageloader/worker/task/DisplayTaskMonitor.java
     38 core/src/main/java/dev/nick/imageloader/worker/task/DisplayTaskRecord.java
-    88 core/src/main/java/dev/nick/imageloader/worker/task/FutureImageTask.java
-    32 core/src/main/java/dev/nick/imageloader/worker/task/ListenableTask.java
+    27 core/src/main/java/dev/nick/imageloader/worker/task/FutureBitmapTask.java
+    27 core/src/main/java/dev/nick/imageloader/worker/task/FutureMovieTask.java
+    33 core/src/main/java/dev/nick/imageloader/worker/task/ListenableTask.java
     34 core/src/main/java/dev/nick/imageloader/worker/task/MokeFutureImageTask.java
+   125 core/src/main/java/dev/nick/imageloader/worker/task/MovieDisplayTask.java
      7 core/src/main/java/dev/nick/imageloader/worker/task/Task.java
-     7 core/src/main/java/dev/nick/imageloader/worker/task/TaskInterrupter.java
+    23 core/src/main/java/dev/nick/imageloader/worker/task/TaskInterrupter.java
     27 core/src/main/java/dev/nick/imageloader/worker/task/TaskManager.java
-    96 core/src/main/java/dev/nick/imageloader/worker/task/TaskManagerImpl.java
+   113 core/src/main/java/dev/nick/imageloader/worker/task/TaskManagerImpl.java
     48 core/src/main/java/dev/nick/imageloader/worker/task/TaskRecord.java
-    54 core/src/main/java/dev/nick/imageloader/worker/ViewSpec.java
-  7288 总用量
+  8960 总用量

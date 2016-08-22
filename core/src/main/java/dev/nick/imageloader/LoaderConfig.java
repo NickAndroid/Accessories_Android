@@ -147,7 +147,7 @@ public class LoaderConfig {
         }
 
         /**
-         * @param debugLevel Debug level of {@link dev.nick.logger.Logger}
+         * @param debugLevel Debug level of Loader.
          * @return Builder instance.
          */
         public Builder debugLevel(int debugLevel) {
