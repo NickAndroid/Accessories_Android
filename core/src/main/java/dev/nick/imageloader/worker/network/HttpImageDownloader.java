@@ -16,6 +16,7 @@
 
 package dev.nick.imageloader.worker.network;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
@@ -25,19 +26,20 @@ import java.net.URLConnection;
 import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.result.Cause;
 import dev.nick.imageloader.worker.result.ErrorListener;
+import dev.nick.logger.LoggerManager;
 
-public class HttpImageDownloader implements ImageDownloader<Boolean> {
+public class HttpImageDownloader implements ImageDownloader<String> {
 
-    String mTmpFilePath;
+    File mTmpDir;
     ByteReadingListener mByteReadingListener;
 
-    public HttpImageDownloader(String tmpFilePath, ByteReadingListener listener) {
-        this.mTmpFilePath = tmpFilePath;
+    public HttpImageDownloader(File tmpDir, ByteReadingListener listener) {
+        this.mTmpDir = tmpDir;
         this.mByteReadingListener = listener;
     }
 
     @Override
-    public Boolean download(String url, ProgressListener progressListener, ErrorListener errorListener) {
+    public String download(String url, ProgressListener progressListener, ErrorListener errorListener) {
         try {
             URL u = new URL(url);
             URLConnection conn = u.openConnection();
@@ -50,7 +52,9 @@ public class HttpImageDownloader implements ImageDownloader<Boolean> {
                     errorListener.onError(new Cause(new Error(String.format("Content for from %s length is 0.", url))));
                 }
             } else {
-                FileOutputStream fos = new FileOutputStream(mTmpFilePath);
+                File tmpFile = new File(mTmpDir, String.valueOf(url.hashCode()));
+                LoggerManager.getLogger(getClass()).verbose("Using tmp path:" + tmpFile.getPath());
+                FileOutputStream fos = new FileOutputStream(tmpFile);
                 byte[] bytes = new byte[1024];
                 int len = -1;
                 float downloadSize = 0f;
@@ -67,7 +71,7 @@ public class HttpImageDownloader implements ImageDownloader<Boolean> {
                 }
                 is.close();
                 fos.close();
-                return Boolean.TRUE;
+                return tmpFile.getPath();
             }
         } catch (InterruptedIOException ignored) {
         } catch (Exception e) {
@@ -75,7 +79,7 @@ public class HttpImageDownloader implements ImageDownloader<Boolean> {
                 errorListener.onError(new Cause(e));
             }
         }
-        return Boolean.FALSE;
+        return null;
     }
 
     public interface ByteReadingListener {

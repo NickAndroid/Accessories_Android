@@ -19,6 +19,7 @@ package dev.nick.imageloader.worker;
 public class ImageData<X> {
 
     private ImageSource<X> source;
+    private ImageSink sink;
     private String url;
 
     public ImageData() {
@@ -31,6 +32,14 @@ public class ImageData<X> {
 
     public ImageSource<X> getSource() {
         return source;
+    }
+
+    public void setSink(ImageSink sink) {
+        this.sink = sink;
+    }
+
+    public ImageSink getSink() {
+        return sink;
     }
 
     public String getUrl() {

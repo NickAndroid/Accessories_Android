@@ -71,6 +71,7 @@ public class TestsList extends AppCompatActivity {
         tests.add(new Test(Usage.class));
         tests.add(new Test(ScrollStateTest.class));
         tests.add(new Test(CustomAnimationTest.class));
+        tests.add(new Test(DownloadMachine.class));
         return tests;
     }
 

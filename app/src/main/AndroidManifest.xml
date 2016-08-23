@@ -72,6 +72,10 @@
         <activity
             android:name=".CustomAnimationTest"
             android:label="CustomAnimationTest" />
+
+        <activity
+            android:name=".DownloadMachine"
+            android:label="DownloadMachine" />
     </application>
 
 </manifest>

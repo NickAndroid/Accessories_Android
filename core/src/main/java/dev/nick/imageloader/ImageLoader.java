@@ -23,6 +23,7 @@ import android.graphics.Movie;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
+import android.support.v7.widget.RecyclerView;
 import android.widget.AbsListView;
 import android.widget.ImageView;
 
@@ -95,6 +96,11 @@ public class ImageLoader implements
             .imageQuality(ImageQuality.OPT)
             .viewMaybeReused()
             .build();
+
+    @Lazy
+    private static RecyclerView.OnScrollListener sRecyclerViewListener;
+    @Lazy
+    private static AbsListViewScrollDetector sListViewScrollDetector;
 
     @Shared
     private static ImageLoader sLoader;
@@ -592,31 +598,66 @@ public class ImageLoader implements
     @NonNull
     AbsListViewScrollDetector linkScrollStateTo(@NonNull AbsListView view) {
         mLogger.verbose(view);
-        AbsListViewScrollDetector detector = new AbsListViewScrollDetector() {
-            @Override
-            public void onScrollUp() {
-                pause();
-            }
+        synchronized (this) {
+            if (sListViewScrollDetector == null) {
+                sListViewScrollDetector = new AbsListViewScrollDetector() {
+                    @Override
+                    public void onScrollUp() {
+                        pause();
+                        cancelAllTasks();
+                    }
 
-            @Override
-            public void onScrollDown() {
-                pause();
-            }
+                    @Override
+                    public void onScrollDown() {
+                        pause();
+                        cancelAllTasks();
+                    }
 
-            @Override
-            public void onIdle() {
-                resume();
+                    @Override
+                    public void onIdle() {
+                        resume();
+                    }
+                };
             }
-        };
-        Preconditions.checkNotNull(view).setOnScrollListener(detector);
-        detector.setListView(view);
-        return detector;
+        }
+        Preconditions.checkNotNull(view).setOnScrollListener(sListViewScrollDetector);
+        sListViewScrollDetector.setListView(view);
+        return sListViewScrollDetector;
     }
 
     @LoaderApi
     public void unLinkScrollStateTo(@NonNull AbsListView view) {
         mLogger.verbose(view);
         view.setOnScrollListener(null);
+    }
+
+    public
+    @LoaderApi
+    void linkScrollStateTo(@NonNull RecyclerView view) {
+        mLogger.verbose(view);
+        synchronized (this) {
+            if (sRecyclerViewListener == null) {
+                sRecyclerViewListener = new RecyclerView.OnScrollListener() {
+                    @Override
+                    public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                        super.onScrollStateChanged(recyclerView, newState);
+                        if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                            resume();
+                        } else {
+                            pause();
+                            cancelAllTasks();
+                        }
+                    }
+                };
+            }
+        }
+        view.addOnScrollListener(sRecyclerViewListener);
+    }
+
+    @LoaderApi
+    public void unLinkScrollStateTo(@NonNull RecyclerView view) {
+        mLogger.verbose(view);
+        view.removeOnScrollListener(sRecyclerViewListener);
     }
 
     /**
@@ -780,7 +821,7 @@ public class ImageLoader implements
             for (BaseFutureTask futureTask : mFutures) {
                 if (!futureTask.isCancelled()
                         && !futureTask.isDone()
-                        && url.equals(futureTask.getListenableTask().getImageData())) {
+                        && url.equals(futureTask.getListenableTask().getImageData().getUrl())) {
                     pendingCancels.add(futureTask);
                 }
             }
