@@ -26,77 +26,77 @@ import android.support.annotation.WorkerThread;
 import java.util.List;
 
 import dev.nick.imageloader.annotation.Shared;
-import dev.nick.imageloader.ui.BitmapImageSettings;
-import dev.nick.imageloader.ui.ImageChair;
-import dev.nick.imageloader.ui.ImageSettings;
-import dev.nick.imageloader.ui.MovieImageSettings;
-import dev.nick.imageloader.ui.animator.ImageAnimator;
+import dev.nick.imageloader.ui.BitmapViewSettings;
+import dev.nick.imageloader.ui.MediaChair;
+import dev.nick.imageloader.ui.MovieViewSettings;
+import dev.nick.imageloader.ui.ViewSettings;
+import dev.nick.imageloader.ui.animator.ViewAnimator;
 import dev.nick.imageloader.ui.art.ImageArt;
 import dev.nick.imageloader.ui.art.ImageArtistCaller;
 import dev.nick.logger.Logger;
 import dev.nick.logger.LoggerManager;
 
-class ImageSettingApplier implements Handler.Callback {
+class UISettingApplier implements Handler.Callback {
 
-    private static final int MSG_APPLY_IMAGE_SETTINGS = 0x1;
+    private static final int MSG_APPLY_SETTINGS = 0x1;
     @Shared
-    private static ImageSettingApplier sharedApplier;
+    private static UISettingApplier sharedApplier;
     private Handler mUIThreadHandler;
 
     private Logger mLogger;
 
-    private ImageSettingApplier() {
+    private UISettingApplier() {
         mUIThreadHandler = new Handler(Looper.getMainLooper(), this);
         mLogger = LoggerManager.getLogger(getClass());
     }
 
-    public synchronized static ImageSettingApplier getSharedApplier() {
-        if (sharedApplier == null) sharedApplier = new ImageSettingApplier();
+    public synchronized static UISettingApplier getSharedApplier() {
+        if (sharedApplier == null) sharedApplier = new UISettingApplier();
         return sharedApplier;
     }
 
     @Override
     public boolean handleMessage(Message message) {
         switch (message.what) {
-            case MSG_APPLY_IMAGE_SETTINGS:
-                onApplyImageSettings((ImageSettings) message.obj);
+            case MSG_APPLY_SETTINGS:
+                onApplyImageSettings((ViewSettings) message.obj);
                 break;
         }
         return true;
     }
 
-    private void onApplyImageSettings(ImageSettings settings) {
+    private void onApplyImageSettings(ViewSettings settings) {
         mLogger.verbose(settings);
         settings.run();
     }
 
     @WorkerThread
-    void applyImageSettings(Bitmap bitmap, List<ImageArt<Bitmap>> arts, ImageChair<Bitmap> imageChair,
-                            ImageAnimator<Bitmap> animator) {
+    void applySettings(Bitmap bitmap, List<ImageArt<Bitmap>> arts, MediaChair<Bitmap> mediaChair,
+                       ViewAnimator<Bitmap> animator) {
 
-        mLogger.verbose("imageChair: " + imageChair + ", bitmap: " + bitmap + ", animator:" + animator);
+        mLogger.verbose("mediaChair: " + mediaChair + ", bitmap: " + bitmap + ", animator:" + animator);
 
-        if (imageChair != null) {
-            BitmapImageSettings settings = new BitmapImageSettings(
+        if (mediaChair != null) {
+            BitmapViewSettings settings = new BitmapViewSettings(
                     animator,
-                    imageChair,
+                    mediaChair,
                     (arts == null || arts.size() == 0
                             ? bitmap
-                            : ImageArtistCaller.call(arts, bitmap, imageChair)));
-            mUIThreadHandler.obtainMessage(MSG_APPLY_IMAGE_SETTINGS, settings).sendToTarget();
+                            : ImageArtistCaller.call(arts, bitmap, mediaChair)));
+            mUIThreadHandler.obtainMessage(MSG_APPLY_SETTINGS, settings).sendToTarget();
         }
     }
 
-    void applyImageSettings(Movie movie, List<ImageArt<Movie>> arts, ImageChair<Movie> imageChair,
-                            ImageAnimator<Movie> animator) {
-        if (imageChair != null) {
-            MovieImageSettings settings = new MovieImageSettings(
+    void applySettings(Movie movie, List<ImageArt<Movie>> arts, MediaChair<Movie> mediaChair,
+                       ViewAnimator<Movie> animator) {
+        if (mediaChair != null) {
+            MovieViewSettings settings = new MovieViewSettings(
                     animator,
-                    imageChair,
+                    mediaChair,
                     (arts == null || arts.size() == 0
                             ? movie
-                            : ImageArtistCaller.call(arts, movie, imageChair)));
-            mUIThreadHandler.obtainMessage(MSG_APPLY_IMAGE_SETTINGS, settings).sendToTarget();
+                            : ImageArtistCaller.call(arts, movie, mediaChair)));
+            mUIThreadHandler.obtainMessage(MSG_APPLY_SETTINGS, settings).sendToTarget();
         }
     }
 }

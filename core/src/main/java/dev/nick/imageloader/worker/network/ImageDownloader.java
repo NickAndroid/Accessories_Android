@@ -21,4 +21,5 @@ import dev.nick.imageloader.worker.result.ErrorListener;
 
 public interface ImageDownloader<T> {
     T download(String url, ProgressListener progressListener, ErrorListener errorListener);
+    long size(String url);
 }

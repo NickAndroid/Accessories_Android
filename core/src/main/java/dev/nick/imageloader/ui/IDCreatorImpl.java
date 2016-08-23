@@ -20,9 +20,9 @@ import android.support.annotation.NonNull;
 
 import dev.nick.imageloader.utils.Preconditions;
 
-public class ImageSettableIdCreatorImpl implements ImageSettableIdCreator {
+public class IDCreatorImpl implements IDCreator {
     @Override
-    public long createSettableId(@NonNull ImageChair settable) {
+    public long createSettableId(@NonNull MediaChair settable) {
         Preconditions.checkNotNull(settable);
         return settable.hashCode();
     }

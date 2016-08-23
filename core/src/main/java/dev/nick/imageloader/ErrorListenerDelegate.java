@@ -21,7 +21,7 @@ import android.util.Log;
 
 import java.io.InterruptedIOException;
 
-import dev.nick.imageloader.ui.ImageChair;
+import dev.nick.imageloader.ui.MediaChair;
 import dev.nick.imageloader.worker.result.Cause;
 import dev.nick.imageloader.worker.result.ErrorListener;
 import dev.nick.logger.LoggerManager;
@@ -32,12 +32,12 @@ abstract class ErrorListenerDelegate<T> implements ErrorListener {
 
     T failureImg;
 
-    ImageChair<T> imageChair;
+    MediaChair<T> mediaChair;
 
-    public ErrorListenerDelegate(ErrorListener listener, T failureImg, ImageChair<T> seat) {
+    public ErrorListenerDelegate(ErrorListener listener, T failureImg, MediaChair<T> seat) {
         this.listener = listener;
         this.failureImg = failureImg;
-        this.imageChair = seat;
+        this.mediaChair = seat;
     }
 
     @Override

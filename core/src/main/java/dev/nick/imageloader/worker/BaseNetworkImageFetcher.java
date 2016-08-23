@@ -70,4 +70,10 @@ public class BaseNetworkImageFetcher<T> extends BaseImageFetcher<T> {
 
         return null;
     }
+
+    @Override
+    public void terminate() {
+        super.terminate();
+        mDownloadManager.terminate();
+    }
 }

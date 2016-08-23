@@ -19,13 +19,13 @@ package dev.nick.imageloader.ui.art;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
-import dev.nick.imageloader.ui.ImageChair;
+import dev.nick.imageloader.ui.MediaChair;
 import dev.nick.imageloader.utils.BitmapUtils;
 
 public class BlackWhiteImageArt implements ImageArt<Bitmap> {
     @NonNull
     @Override
-    public Bitmap process(@NonNull Bitmap in, @NonNull ImageChair<Bitmap> settable) {
+    public Bitmap process(@NonNull Bitmap in, @NonNull MediaChair<Bitmap> settable) {
         return BitmapUtils.blackAndWhited(in);
     }
 }

@@ -22,8 +22,8 @@ import java.util.ArrayList;
 
 import dev.nick.imageloader.cache.CacheManager;
 import dev.nick.imageloader.ui.DisplayOption;
-import dev.nick.imageloader.ui.ImageChair;
-import dev.nick.imageloader.ui.animator.ImageAnimator;
+import dev.nick.imageloader.ui.MediaChair;
+import dev.nick.imageloader.ui.animator.ViewAnimator;
 import dev.nick.imageloader.ui.art.ImageArt;
 import dev.nick.imageloader.worker.DimenSpec;
 import dev.nick.imageloader.worker.ProgressListener;
@@ -38,10 +38,10 @@ class MovieProgressListenerDelegate extends ProgressListenerDelegate<Movie> {
                                   ProgressListener<Movie> listener,
                                   DimenSpec dimenSpec,
                                   DisplayOption<Movie> option,
-                                  ImageChair<Movie> imageChair,
+                                  MediaChair<Movie> mediaChair,
                                   DisplayTaskRecord taskRecord,
                                   String url) {
-        super(cacheManager, taskManager, listener, dimenSpec, option, imageChair, taskRecord, url);
+        super(cacheManager, taskManager, listener, dimenSpec, option, mediaChair, taskRecord, url);
     }
 
     @Override
@@ -68,9 +68,9 @@ class MovieProgressListenerDelegate extends ProgressListenerDelegate<Movie> {
         final boolean isViewMaybeReused = option.isViewMaybeReused();
 
         if (!isViewMaybeReused || !checkTaskDirty()) {
-            ImageAnimator<Movie> animator = (option == null ? null : option.getAnimator());
+            ViewAnimator<Movie> animator = (option == null ? null : option.getAnimator());
             ArrayList<ImageArt<Movie>> handlers = (option == null ? null : option.getArtist());
-            ImageSettingApplier.getSharedApplier().applyImageSettings(result, handlers, settable, animator);
+            UISettingApplier.getSharedApplier().applySettings(result, handlers, settable, animator);
         }
         cacheManager.cache(url, result);
     }

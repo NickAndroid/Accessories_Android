@@ -38,11 +38,11 @@ import com.nick.scalpel.annotation.request.RequirePermission;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.nick.imageloader.ImageLoader;
+import dev.nick.imageloader.MediaLoader;
 import dev.nick.imageloader.queue.Priority;
 import dev.nick.imageloader.ui.DisplayOption;
-import dev.nick.imageloader.ui.ImageQuality;
-import dev.nick.imageloader.ui.animator.FadeInImageAnimator;
+import dev.nick.imageloader.ui.MediaQuality;
+import dev.nick.imageloader.ui.animator.FadeInViewAnimator;
 import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.result.Cause;
 import dev.nick.imageloader.worker.result.ErrorListener;
@@ -213,15 +213,15 @@ public class NetworkImageTest extends BaseTest {
                 holder.progressBar.setProgress(0);
                 holder.textView.setText("---");
 
-                ImageLoader.shared()
+                MediaLoader.shared()
                         .cancel(holder.imageView)
                         .loadBitmap()
                         .from(uri)
                         .option(DisplayOption.bitmapBuilder()
-                                .imageQuality(ImageQuality.OPT)
+                                .imageQuality(MediaQuality.OPT)
                                 .viewMaybeReused()
                                 .animateOnlyNewLoaded()
-                                .imageAnimator(new FadeInImageAnimator())
+                                .imageAnimator(new FadeInViewAnimator())
                                 .build())
                         .errorListener(new ErrorListener() {
                             @Override
@@ -268,7 +268,7 @@ public class NetworkImageTest extends BaseTest {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Track track = (Track) adapter.getItem(i);
-                ImageLoader.shared().cancel(track.getUrl());
+                MediaLoader.shared().cancel(track.getUrl());
             }
         });
     }

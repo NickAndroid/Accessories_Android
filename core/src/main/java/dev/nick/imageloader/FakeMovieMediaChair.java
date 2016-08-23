@@ -20,13 +20,13 @@ import android.graphics.Movie;
 import android.support.annotation.NonNull;
 import android.view.animation.Animation;
 
-import dev.nick.imageloader.ui.ImageChair;
+import dev.nick.imageloader.ui.MediaChair;
 
-class FakeMovieImageChair implements ImageChair<Movie> {
+class FakeMovieMediaChair implements MediaChair<Movie> {
 
     String url;
 
-    public FakeMovieImageChair(String url) {
+    public FakeMovieMediaChair(String url) {
         this.url = url;
     }
 

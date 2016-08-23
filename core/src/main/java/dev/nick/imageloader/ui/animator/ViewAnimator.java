@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
-package dev.nick.imageloader.worker;
+package dev.nick.imageloader.ui.animator;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
-import dev.nick.imageloader.LoaderConfig;
-import dev.nick.imageloader.Terminable;
-import dev.nick.imageloader.worker.result.ErrorListener;
+import dev.nick.imageloader.ui.MediaChair;
 
-public interface ImageFetcher<T> extends Terminable{
-    T fetchFromUrl(@NonNull String url,
-                   @NonNull DecodeSpec decodeSpec,
-                   @Nullable ProgressListener<T> progressListener,
-                   @Nullable ErrorListener errorListener) throws Exception;
+public interface ViewAnimator<T> {
 
-    ImageFetcher<T> prepare(Context context, LoaderConfig config);
+    long DEFAULT_DURATION = 800;
+
+    void animate(@NonNull MediaChair<T> mediaChair);
+
+    long getDuration();
 }

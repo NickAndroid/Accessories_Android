@@ -25,9 +25,9 @@ import android.widget.ImageView;
 import com.nick.scalpel.Scalpel;
 import com.nick.scalpel.annotation.binding.FindView;
 
-import dev.nick.imageloader.ImageLoader;
+import dev.nick.imageloader.MediaLoader;
 import dev.nick.imageloader.ui.DisplayOption;
-import dev.nick.imageloader.ui.ImageQuality;
+import dev.nick.imageloader.ui.MediaQuality;
 import dev.nick.imageloader.ui.art.BlackWhiteImageArt;
 import dev.nick.imageloader.worker.result.Cause;
 import dev.nick.imageloader.worker.result.ErrorListener;
@@ -51,13 +51,13 @@ public class DrawableImageTest extends BaseTest {
     @Override
     protected void onStart() {
         super.onStart();
-        ImageLoader.shared()
+        MediaLoader.shared()
                 .loadBitmap()
                 .from(urlDrawable)
                 .option(DisplayOption.bitmapBuilder()
                         .showOnFailure(BitmapFactory.decodeResource(getResources(), R.drawable.aio_image_fail))
                         .imageArt(new BlackWhiteImageArt())
-                        .imageQuality(ImageQuality.OPT)
+                        .imageQuality(MediaQuality.OPT)
                         .build())
                 .errorListener(new ErrorListener() {
                     @Override

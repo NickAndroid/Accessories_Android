@@ -25,8 +25,9 @@ import android.view.animation.Animation;
 import com.nick.scalpel.Scalpel;
 import com.nick.scalpel.annotation.binding.FindView;
 
-import dev.nick.imageloader.ImageLoader;
-import dev.nick.imageloader.ui.ImageChair;
+import dev.nick.imageloader.MediaLoader;
+import dev.nick.imageloader.queue.Priority;
+import dev.nick.imageloader.ui.MediaChair;
 import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.result.Cause;
 import dev.nick.imageloader.worker.result.ErrorListener;
@@ -50,7 +51,7 @@ public class NetworkMovieTest extends BaseTest {
     @Override
     protected void onStart() {
         super.onStart();
-        ImageLoader.shared()
+        MediaLoader.shared()
                 .loadMovie()
                 .from(urlHttps)
                 .errorListener(new ErrorListener() {
@@ -81,7 +82,7 @@ public class NetworkMovieTest extends BaseTest {
                         LoggerManager.getLogger(getClass()).debug("onComplete:" + result);
                     }
                 })
-                .into(new ImageChair<Movie>() {
+                .into(new MediaChair<Movie>() {
                     @Override
                     public void seat(@NonNull Movie image) {
                         LoggerManager.getLogger(getClass()).debug("seat");
@@ -103,6 +104,13 @@ public class NetworkMovieTest extends BaseTest {
                         LoggerManager.getLogger(getClass()).debug("startAnimation");
                     }
                 })
+                .priority(Priority.HIGH)
                 .start();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        MediaLoader.shared().cancel(urlHttps);
     }
 }

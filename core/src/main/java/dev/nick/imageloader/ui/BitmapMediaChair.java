@@ -16,14 +16,11 @@
 
 package dev.nick.imageloader.ui;
 
-public enum ImageQuality {
-    /**
-     * Using raw image when decode and display the image.
-     */
-    RAW,
+import android.graphics.Bitmap;
 
-    /**
-     * Decrease the size of the image to fit the view dimen.
-     */
-    OPT
+/**
+ * Interface that indicate this is a view that can be set with a image.
+ * like the {@link android.widget.ImageView}
+ */
+public interface BitmapMediaChair extends MediaChair<Bitmap> {
 }

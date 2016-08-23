@@ -22,7 +22,7 @@ import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 
-import dev.nick.imageloader.ui.animator.ImageAnimator;
+import dev.nick.imageloader.ui.animator.ViewAnimator;
 import dev.nick.imageloader.ui.art.ImageArt;
 import dev.nick.imageloader.utils.Preconditions;
 
@@ -34,10 +34,10 @@ public class DisplayOption<T> {
     private boolean failureImgDefined;
     private boolean loadingImgDefined;
 
-    private ImageQuality quality;
+    private MediaQuality quality;
 
     private ArrayList<ImageArt<T>> handlers;
-    private ImageAnimator<T> animator;
+    private ViewAnimator<T> animator;
 
     private boolean viewMaybeReused;
 
@@ -47,9 +47,9 @@ public class DisplayOption<T> {
                           T loadingImg,
                           boolean failureImgDefined,
                           boolean loadingImgDefined,
-                          ImageQuality quality,
+                          MediaQuality quality,
                           ArrayList<ImageArt<T>> handlers,
-                          ImageAnimator<T> animator,
+                          ViewAnimator<T> animator,
                           boolean viewMaybeReused,
                           boolean animateOnlyNewLoaded) {
         this.failureImg = failureImg;
@@ -87,7 +87,7 @@ public class DisplayOption<T> {
         return loadingImgDefined;
     }
 
-    public ImageQuality getQuality() {
+    public MediaQuality getQuality() {
         return quality;
     }
 
@@ -95,7 +95,7 @@ public class DisplayOption<T> {
         return handlers;
     }
 
-    public ImageAnimator<T> getAnimator() {
+    public ViewAnimator<T> getAnimator() {
         return animator;
     }
 
@@ -115,10 +115,10 @@ public class DisplayOption<T> {
         private boolean failureImgDefined;
         private boolean loadingImgDefined;
 
-        private ImageQuality quality = ImageQuality.OPT;
+        private MediaQuality quality = MediaQuality.OPT;
 
         private ArrayList<ImageArt<T>> artList;
-        private ImageAnimator<T> animator;
+        private ViewAnimator<T> animator;
 
         private boolean viewMaybeReused;
 
@@ -163,7 +163,7 @@ public class DisplayOption<T> {
          * @param animator The animator you want to set.
          * @return @return Instance of this builder.
          */
-        public Builder<T> imageAnimator(ImageAnimator<T> animator) {
+        public Builder<T> imageAnimator(ViewAnimator<T> animator) {
             this.animator = animator;
             return this;
         }
@@ -175,7 +175,7 @@ public class DisplayOption<T> {
          * @param quality Image quality when displaying.
          * @return Instance of this builder.
          */
-        public Builder<T> imageQuality(ImageQuality quality) {
+        public Builder<T> imageQuality(MediaQuality quality) {
             this.quality = quality;
             return this;
         }

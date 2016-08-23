@@ -16,8 +16,14 @@
 
 package dev.nick.imageloader.ui;
 
-import android.support.annotation.NonNull;
+public enum MediaQuality {
+    /**
+     * Using raw image when decode and display the image.
+     */
+    RAW,
 
-public interface ImageSettableIdCreator {
-    long createSettableId(@NonNull ImageChair settable);
+    /**
+     * Decrease the size of the image to fit the view dimen.
+     */
+    OPT
 }

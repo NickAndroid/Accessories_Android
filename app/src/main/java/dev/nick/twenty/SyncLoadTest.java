@@ -24,7 +24,7 @@ import android.widget.ImageView;
 import com.nick.scalpel.Scalpel;
 import com.nick.scalpel.annotation.binding.FindView;
 
-import dev.nick.imageloader.ImageLoader;
+import dev.nick.imageloader.MediaLoader;
 
 public class SyncLoadTest extends BaseTest {
 
@@ -44,7 +44,7 @@ public class SyncLoadTest extends BaseTest {
     @Override
     protected void onStart() {
         super.onStart();
-        Bitmap result = ImageLoader.shared()
+        Bitmap result = MediaLoader.shared()
                 .loadBitmap()
                 .from(urlDrawable)
                 .startSynchronously();

@@ -38,7 +38,7 @@ import com.nick.scalpel.annotation.request.RequirePermission;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.nick.imageloader.ImageLoader;
+import dev.nick.imageloader.MediaLoader;
 import dev.nick.imageloader.ProgressListenerStub;
 import dev.nick.imageloader.queue.Priority;
 import dev.nick.imageloader.worker.result.Cause;
@@ -241,7 +241,7 @@ public class LoadImageTest extends BaseTest {
                     }
                 };
 
-                ImageLoader.shared().loadBitmap()
+                MediaLoader.shared().loadBitmap()
                         .from(uri)
                         .priority(Priority.HIGH)
                         .progressListener(progressListenerStub)
@@ -263,7 +263,7 @@ public class LoadImageTest extends BaseTest {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Track track = (Track) adapter.getItem(i);
-                ImageLoader.shared().cancel(track.getUrl());
+                MediaLoader.shared().cancel(track.getUrl());
             }
         });
     }

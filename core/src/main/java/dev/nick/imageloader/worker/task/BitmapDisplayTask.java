@@ -25,7 +25,7 @@ import android.support.annotation.Nullable;
 import java.io.InterruptedIOException;
 
 import dev.nick.imageloader.LoaderConfig;
-import dev.nick.imageloader.ui.ImageQuality;
+import dev.nick.imageloader.ui.MediaQuality;
 import dev.nick.imageloader.worker.DecodeSpec;
 import dev.nick.imageloader.worker.DimenSpec;
 import dev.nick.imageloader.worker.ImageData;
@@ -41,7 +41,7 @@ public class BitmapDisplayTask extends BaseDisplayTask<Bitmap> {
     private ImageData<Bitmap> mImageData;
 
     private DimenSpec mDimenSpec;
-    private ImageQuality mQuality;
+    private MediaQuality mQuality;
 
     private LoaderConfig mLoaderConfig;
 
@@ -61,7 +61,7 @@ public class BitmapDisplayTask extends BaseDisplayTask<Bitmap> {
                              TaskInterrupter displayTaskMonitor,
                              ImageData<Bitmap> url,
                              DimenSpec spec,
-                             ImageQuality quality,
+                             MediaQuality quality,
                              ProgressListener<Bitmap> progressListener,
                              ErrorListener errorListener,
                              DisplayTaskRecord taskRecord) {

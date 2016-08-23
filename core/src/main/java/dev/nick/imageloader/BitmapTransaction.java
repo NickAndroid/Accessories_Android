@@ -26,9 +26,9 @@ import java.util.concurrent.ExecutionException;
 
 import dev.nick.imageloader.annotation.LoaderApi;
 import dev.nick.imageloader.queue.Priority;
-import dev.nick.imageloader.ui.BitmapImageViewDelegate;
+import dev.nick.imageloader.ui.BitmapMediaViewDelegate;
 import dev.nick.imageloader.ui.DisplayOption;
-import dev.nick.imageloader.ui.ImageChair;
+import dev.nick.imageloader.ui.MediaChair;
 import dev.nick.imageloader.worker.ImageSource;
 import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.bitmap.BitmapImageSource;
@@ -36,7 +36,7 @@ import dev.nick.imageloader.worker.result.ErrorListener;
 
 public class BitmapTransaction extends Transaction<Bitmap> {
 
-    BitmapTransaction(@NonNull ImageLoader loader) {
+    BitmapTransaction(@NonNull MediaLoader loader) {
         super(loader);
     }
 
@@ -76,7 +76,7 @@ public class BitmapTransaction extends Transaction<Bitmap> {
     }
 
     @Override
-    public BitmapTransaction into(@NonNull ImageChair<Bitmap> settable) {
+    public BitmapTransaction into(@NonNull MediaChair<Bitmap> settable) {
         super.into(settable);
         return this;
     }
@@ -87,7 +87,7 @@ public class BitmapTransaction extends Transaction<Bitmap> {
      */
     @LoaderApi
     public BitmapTransaction into(@NonNull ImageView view) {
-        this.settable = new BitmapImageViewDelegate(view);
+        this.settable = new BitmapMediaViewDelegate(view);
         return BitmapTransaction.this;
     }
 
@@ -124,7 +124,7 @@ public class BitmapTransaction extends Transaction<Bitmap> {
     }
 
 
-    protected ImageChair<Bitmap> noneNullSettable() {
-        return settable == null ? new FakeBitmapImageChair(imageData.getUrl()) : settable;
+    protected MediaChair<Bitmap> noneNullSettable() {
+        return settable == null ? new FakeBitmapMediaChair(imageData.getUrl()) : settable;
     }
 }

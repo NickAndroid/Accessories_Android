@@ -26,7 +26,7 @@ import android.util.Log;
 
 import com.nick.scalpel.ScalpelApplication;
 
-import dev.nick.imageloader.ImageLoader;
+import dev.nick.imageloader.MediaLoader;
 import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.cache.CachePolicy;
 import dev.nick.imageloader.queue.QueuePolicy;
@@ -48,7 +48,7 @@ public class MyApp extends ScalpelApplication {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             Trace.beginSection("ImageLoader_init");
         }
-        ImageLoader.createShared(getApplicationContext(), LoaderConfig.builder()
+        MediaLoader.createShared(getApplicationContext(), LoaderConfig.builder()
                 .queuePolicy(QueuePolicy.LIFO)
                 .cachePolicy(CachePolicy.builder()
                         .enableMemCache()

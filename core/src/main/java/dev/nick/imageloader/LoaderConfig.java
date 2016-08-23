@@ -26,7 +26,7 @@ import dev.nick.imageloader.worker.network.NetworkPolicy;
 import dev.nick.logger.LoggerManager;
 
 /**
- * Configuration for {@link ImageLoader}, use a {@link Builder}
+ * Configuration for {@link MediaLoader}, use a {@link Builder}
  * to build one, or using {@link #DEFAULT_CONFIG} as a default config.
  */
 @LoaderApi
@@ -168,23 +168,23 @@ public class LoaderConfig {
         void invalidate() {
             if (cachePolicy == null) {
                 cachePolicy = CachePolicy.DEFAULT_CACHE_POLICY;
-                LoggerManager.getLogger(ImageLoader.class).warn("Using default cache policy:" + cachePolicy);
+                LoggerManager.getLogger(MediaLoader.class).warn("Using default cache policy:" + cachePolicy);
             }
             if (networkPolicy == null) {
                 networkPolicy = NetworkPolicy.DEFAULT_NETWORK_POLICY;
-                LoggerManager.getLogger(ImageLoader.class).warn("Using default network policy:" + networkPolicy);
+                LoggerManager.getLogger(MediaLoader.class).warn("Using default network policy:" + networkPolicy);
             }
             if (nLoadingThreads <= 0) {
-                LoggerManager.getLogger(ImageLoader.class).warn("Using [Runtime.availableProcessors] as nLoadingThreads");
+                LoggerManager.getLogger(MediaLoader.class).warn("Using [Runtime.availableProcessors] as nLoadingThreads");
                 nLoadingThreads = Runtime.getRuntime().availableProcessors();
             }
             if (queuePolicy == null) {
-                LoggerManager.getLogger(ImageLoader.class).warn("Using FIFO as queuePolicy");
+                LoggerManager.getLogger(MediaLoader.class).warn("Using FIFO as queuePolicy");
                 queuePolicy = QueuePolicy.FIFO;
             }
             if (debugLevel < Log.VERBOSE) {
                 debugLevel = Log.VERBOSE;
-                LoggerManager.getLogger(ImageLoader.class).warn("Using debug level:" + debugLevel);
+                LoggerManager.getLogger(MediaLoader.class).warn("Using debug level:" + debugLevel);
             }
         }
     }

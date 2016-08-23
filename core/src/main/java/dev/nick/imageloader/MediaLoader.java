@@ -53,12 +53,12 @@ import dev.nick.imageloader.queue.QueuePolicy;
 import dev.nick.imageloader.queue.RequestHandler;
 import dev.nick.imageloader.queue.RequestQueueManager;
 import dev.nick.imageloader.scrollable.AbsListViewScrollDetector;
-import dev.nick.imageloader.ui.BitmapImageViewDelegate;
+import dev.nick.imageloader.ui.BitmapMediaViewDelegate;
 import dev.nick.imageloader.ui.DisplayOption;
-import dev.nick.imageloader.ui.ImageChair;
-import dev.nick.imageloader.ui.ImageQuality;
-import dev.nick.imageloader.ui.ImageSettableIdCreator;
-import dev.nick.imageloader.ui.ImageSettableIdCreatorImpl;
+import dev.nick.imageloader.ui.IDCreator;
+import dev.nick.imageloader.ui.IDCreatorImpl;
+import dev.nick.imageloader.ui.MediaChair;
+import dev.nick.imageloader.ui.MediaQuality;
 import dev.nick.imageloader.utils.Preconditions;
 import dev.nick.imageloader.worker.DimenSpec;
 import dev.nick.imageloader.worker.ImageData;
@@ -80,20 +80,20 @@ import dev.nick.logger.Logger;
 import dev.nick.logger.LoggerManager;
 
 /**
- * Main class of {@link ImageLoader} library.
+ * Main class of {@link MediaLoader} library.
  */
-public class ImageLoader implements
+public class MediaLoader implements
         BaseFutureTask.TaskActionListener,
-        Forkable<ImageLoader, LoaderConfig>,
+        Forkable<MediaLoader, LoaderConfig>,
         Terminable {
 
     private static final DisplayOption<Bitmap> sDefDisplayOption = DisplayOption.bitmapBuilder()
-            .imageQuality(ImageQuality.OPT)
+            .imageQuality(MediaQuality.OPT)
             .viewMaybeReused()
             .build();
 
     private static final DisplayOption<Movie> sDefDisplayOptionMovie = DisplayOption.movieBuilder()
-            .imageQuality(ImageQuality.OPT)
+            .imageQuality(MediaQuality.OPT)
             .viewMaybeReused()
             .build();
 
@@ -103,14 +103,14 @@ public class ImageLoader implements
     private static AbsListViewScrollDetector sListViewScrollDetector;
 
     @Shared
-    private static ImageLoader sLoader;
+    private static MediaLoader sLoader;
 
     private final List<BaseFutureTask> mFutures;
 
     private Context mContext;
 
     private UIThreadRouter mUiThreadRouter;
-    private ImageSettingApplier mImageSettingApplier;
+    private UISettingApplier mUISettingApplier;
 
     @Lazy
     private CacheManager<Bitmap> mBitmapCacheManager;
@@ -131,19 +131,19 @@ public class ImageLoader implements
     private LoaderState mState;
 
     private TaskManager mTaskManager;
-    private ImageSettableIdCreator mSettableIdCreator;
+    private IDCreator mSettableIdCreator;
 
     @SuppressLint("DefaultLocale")
-    private ImageLoader(Context context, LoaderConfig config) {
+    private MediaLoader(Context context, LoaderConfig config) {
         Preconditions.checkNotNull(context);
         if (config == null) config = LoaderConfig.DEFAULT_CONFIG;
         LoggerManager.setDebugLevel(config.getDebugLevel());
         this.mContext = context;
         this.mConfig = config;
         this.mTaskManager = new TaskManagerImpl();
-        this.mSettableIdCreator = new ImageSettableIdCreatorImpl();
+        this.mSettableIdCreator = new IDCreatorImpl();
         this.mUiThreadRouter = UIThreadRouter.getSharedRouter();
-        this.mImageSettingApplier = ImageSettingApplier.getSharedApplier();
+        this.mUISettingApplier = UISettingApplier.getSharedApplier();
         //noinspection deprecation
         this.mLoadingService = new ThreadPoolExecutor(
                 config.getLoadingThreads(),
@@ -170,7 +170,7 @@ public class ImageLoader implements
     }
 
     @SuppressLint("DefaultLocale")
-    private ImageLoader(ImageLoader from, LoaderConfig config) {
+    private MediaLoader(MediaLoader from, LoaderConfig config) {
         Preconditions.checkNotNull(from);
         if (config == null) config = LoaderConfig.DEFAULT_CONFIG;
         LoggerManager.setDebugLevel(config.getDebugLevel());
@@ -179,7 +179,7 @@ public class ImageLoader implements
         this.mTaskManager = new TaskManagerImpl();
         this.mSettableIdCreator = from.mSettableIdCreator;
         this.mUiThreadRouter = UIThreadRouter.getSharedRouter();
-        this.mImageSettingApplier = ImageSettingApplier.getSharedApplier();
+        this.mUISettingApplier = UISettingApplier.getSharedApplier();
         this.mBitmapCacheManager = from.lazyGetBitmapCacheManager().fork(config.getCachePolicy());
         this.mMovieCacheManager = from.lazyGetMovieCacheManager().fork(config.getCachePolicy());
         //noinspection deprecation
@@ -208,12 +208,12 @@ public class ImageLoader implements
     }
 
     @LoaderApi
-    private static ImageLoader clone(ImageLoader from, LoaderConfig config) {
-        return new ImageLoader(from, config);
+    private static MediaLoader clone(MediaLoader from, LoaderConfig config) {
+        return new MediaLoader(from, config);
     }
 
     /**
-     * Create the shared instance of ImageLoader
+     * Create the shared instance of MediaLoader
      *
      * @param context An application {@link Context} is preferred.
      * @since 1.0.1
@@ -224,7 +224,7 @@ public class ImageLoader implements
     }
 
     /**
-     * Create the shared instance of ImageLoader
+     * Create the shared instance of MediaLoader
      *
      * @param context An application {@link Context} is preferred.
      * @param config  Configuration of this loader.
@@ -233,19 +233,19 @@ public class ImageLoader implements
     @LoaderApi
     public static void createShared(Context context, LoaderConfig config) {
         if (sLoader == null || sLoader.isTerminated()) {
-            sLoader = new ImageLoader(context, config);
+            sLoader = new MediaLoader(context, config);
         }
     }
 
     /**
-     * Get the createShared instance of ImageLoader
+     * Get the createShared instance of MediaLoader
      *
-     * @return Single instance of {@link ImageLoader}
+     * @return Single instance of {@link MediaLoader}
      * @since 1.0.1
      */
     @LoaderApi
-    public static ImageLoader shared() {
-        return Preconditions.checkNotNull(sLoader, "Call ImageLoader#createShared first");
+    public static MediaLoader shared() {
+        return Preconditions.checkNotNull(sLoader, "Call MediaLoader#createShared first");
     }
 
     /**
@@ -276,12 +276,12 @@ public class ImageLoader implements
      * Display image from the from to the view.
      *
      * @param imageData        Image imageData from, one of {@link ImageData}
-     * @param imageChair       Target {@link ImageChair} to display the image.
+     * @param mediaChair       Target {@link MediaChair} to display the image.
      * @param option           {@link DisplayOption} is options using when display the image.
      * @param progressListener The progress progressListener using to watch the progress of the loading.
      */
     Future<Bitmap> displayBitmap(@NonNull ImageData<Bitmap> imageData,
-                                 @NonNull ImageChair<Bitmap> imageChair,
+                                 @NonNull MediaChair<Bitmap> mediaChair,
                                  @Nullable DisplayOption<Bitmap> option,
                                  @Nullable ProgressListener<Bitmap> progressListener,
                                  @Nullable ErrorListener errorListener,
@@ -291,7 +291,7 @@ public class ImageLoader implements
 
         Preconditions.checkNotNull(imageData.getUrl(), "imageData is null");
 
-        DisplayTaskRecord record = createTaskRecord(Preconditions.checkNotNull(imageChair));
+        DisplayTaskRecord record = createTaskRecord(Preconditions.checkNotNull(mediaChair));
 
         option = assignBitmapOption(option);
 
@@ -301,9 +301,9 @@ public class ImageLoader implements
 
         lazyGetBitmapCacheManager();
 
-        ImageQuality imageQuality = option.getQuality();
+        MediaQuality mediaQuality = option.getQuality();
 
-        DimenSpec dimenSpec = new DimenSpec(imageChair.getWidth(), imageChair.getHeight());
+        DimenSpec dimenSpec = new DimenSpec(mediaChair.getWidth(), mediaChair.getHeight());
 
         ProgressListenerDelegate<Bitmap> progressListenerDelegate = new BitmapProgressListenerDelegate(
                 mBitmapCacheManager,
@@ -311,7 +311,7 @@ public class ImageLoader implements
                 progressListener,
                 dimenSpec,
                 option,
-                imageChair,
+                mediaChair,
                 record,
                 imageData.getUrl());
 
@@ -319,10 +319,10 @@ public class ImageLoader implements
             Bitmap cached;
             if ((cached = mBitmapCacheManager.get(imageData.getUrl())) != null) {
                 mLogger.verbose("Using mem cached bitmap for:" + imageData.getUrl());
-                mImageSettingApplier.applyImageSettings(
+                mUISettingApplier.applySettings(
                         cached,
                         option.getArtist(),
-                        imageChair,
+                        mediaChair,
                         option.isAnimateOnlyNewLoaded() ? null : option.getAnimator());
                 progressListenerDelegate.callOnComplete(cached);
                 return new MokeFutureImageTask<>(cached);
@@ -341,10 +341,10 @@ public class ImageLoader implements
                     Bitmap cached;
                     if ((cached = mBitmapCacheManager.get(loadingUrl)) != null) {
                         mLogger.verbose("Using mem cached bitmap for:" + imageData.getUrl());
-                        mImageSettingApplier.applyImageSettings(
+                        mUISettingApplier.applySettings(
                                 cached,
                                 option.getArtist(),
-                                imageChair,
+                                mediaChair,
                                 option.isAnimateOnlyNewLoaded() ? null : option.getAnimator());
                         progressListenerDelegate.callOnComplete(cached);
                         return new MokeFutureImageTask<>(cached);
@@ -356,12 +356,12 @@ public class ImageLoader implements
             }
         }
 
-        showOnLoadingBm(imageChair, option);
+        showOnLoadingBm(mediaChair, option);
 
         ErrorListenerDelegate<Bitmap> errorListenerDelegate = new BitmapErrorListenerDelegate(
                 errorListener,
                 option.isFailureImgDefined() ? option.getFailureImg() : null,
-                imageChair);
+                mediaChair);
 
         if (usingDiskCacheUrl) {
             mLogger.verbose("Using disk cache url for loading:" + loadingUrl);
@@ -375,7 +375,7 @@ public class ImageLoader implements
                 mTaskManager,
                 imageData,
                 dimenSpec,
-                imageQuality,
+                mediaQuality,
                 progressListenerDelegate,
                 errorListenerDelegate,
                 record);
@@ -389,7 +389,7 @@ public class ImageLoader implements
     }
 
     Future<Movie> displayMovie(@NonNull ImageData<Movie> source,
-                               @NonNull ImageChair<Movie> imageChair,
+                               @NonNull MediaChair<Movie> mediaChair,
                                @Nullable DisplayOption<Movie> option,
                                @Nullable ProgressListener<Movie> progressListener,
                                @Nullable ErrorListener errorListener,
@@ -398,7 +398,7 @@ public class ImageLoader implements
 
         Preconditions.checkNotNull(source.getUrl(), "imageData is null");
 
-        DisplayTaskRecord record = createTaskRecord(Preconditions.checkNotNull(imageChair));
+        DisplayTaskRecord record = createTaskRecord(Preconditions.checkNotNull(mediaChair));
 
         option = assignMovieOption(option);
 
@@ -408,8 +408,8 @@ public class ImageLoader implements
 
         lazyGetMovieCacheManager();
 
-        ImageQuality imageQuality = option.getQuality();
-        DimenSpec dimenSpec = new DimenSpec(imageChair.getWidth(), imageChair.getHeight());
+        MediaQuality mediaQuality = option.getQuality();
+        DimenSpec dimenSpec = new DimenSpec(mediaChair.getWidth(), mediaChair.getHeight());
 
         ProgressListenerDelegate<Movie> progressListenerDelegate = new MovieProgressListenerDelegate(
                 mMovieCacheManager,
@@ -417,17 +417,17 @@ public class ImageLoader implements
                 progressListener,
                 dimenSpec,
                 option,
-                imageChair,
+                mediaChair,
                 record,
                 source.getUrl());
 
         if (mMovieCacheManager.isMemCacheEnabled()) {
             Movie cached;
             if ((cached = mMovieCacheManager.get(source.getUrl())) != null) {
-                mImageSettingApplier.applyImageSettings(
+                mUISettingApplier.applySettings(
                         cached,
                         option.getArtist(),
-                        imageChair,
+                        mediaChair,
                         option.isAnimateOnlyNewLoaded() ? null : option.getAnimator());
                 progressListenerDelegate.callOnComplete(cached);
                 return new MokeFutureImageTask<>(cached);
@@ -445,10 +445,10 @@ public class ImageLoader implements
                 if (mMovieCacheManager.isMemCacheEnabled()) {
                     Movie cached;
                     if ((cached = mMovieCacheManager.get(loadingUrl)) != null) {
-                        mImageSettingApplier.applyImageSettings(
+                        mUISettingApplier.applySettings(
                                 cached,
                                 option.getArtist(),
-                                imageChair,
+                                mediaChair,
                                 option.isAnimateOnlyNewLoaded() ? null : option.getAnimator());
                         progressListenerDelegate.callOnComplete(cached);
                         return new MokeFutureImageTask<>(cached);
@@ -466,12 +466,12 @@ public class ImageLoader implements
             mLogger.verbose("No cache found, perform loading: " + loadingUrl);
         }
 
-        showOnLoadingMov(imageChair, option);
+        showOnLoadingMov(mediaChair, option);
 
         ErrorListenerDelegate errorListenerDelegate = new MovieErrorListenerDelegate(
                 errorListener,
                 option.isFailureImgDefined() ? option.getFailureImg() : null,
-                imageChair);
+                mediaChair);
 
         MovieDisplayTask imageTask = new MovieDisplayTask(
                 mContext,
@@ -479,7 +479,7 @@ public class ImageLoader implements
                 mTaskManager,
                 source,
                 dimenSpec,
-                imageQuality,
+                mediaQuality,
                 progressListenerDelegate,
                 errorListenerDelegate,
                 record);
@@ -504,7 +504,7 @@ public class ImageLoader implements
         return mMovieCacheManager;
     }
 
-    private DisplayTaskRecord createTaskRecord(ImageChair settable) {
+    private DisplayTaskRecord createTaskRecord(MediaChair settable) {
         long settableId = mSettableIdCreator.createSettableId(settable);
         int taskId = mTaskManager.nextTaskId();
         DisplayTaskRecord displayTaskRecord = new DisplayTaskRecord(settableId, taskId);
@@ -512,14 +512,14 @@ public class ImageLoader implements
         return displayTaskRecord;
     }
 
-    private void showOnLoadingBm(ImageChair<Bitmap> settable, DisplayOption<Bitmap> option) {
+    private void showOnLoadingBm(MediaChair<Bitmap> settable, DisplayOption<Bitmap> option) {
         if (option.isLoadingImgDefined()) {
             Bitmap showWhenLoading = option.getLoadingImg();
-            mImageSettingApplier.applyImageSettings(showWhenLoading, null, settable, null);
+            mUISettingApplier.applySettings(showWhenLoading, null, settable, null);
         }
     }
 
-    private void showOnLoadingMov(ImageChair<Movie> settable, DisplayOption option) {
+    private void showOnLoadingMov(MediaChair<Movie> settable, DisplayOption option) {
         if (option.isLoadingImgDefined()) {
             // TODO: 16-8-21 Impl
         }
@@ -663,7 +663,7 @@ public class ImageLoader implements
     }
 
     /**
-     * Call this to pause the {@link ImageLoader}
+     * Call this to pause the {@link MediaLoader}
      */
     @LoaderApi
     public void pause() {
@@ -697,7 +697,7 @@ public class ImageLoader implements
     }
 
     /**
-     * Call this to resume the {@link ImageLoader} from pause state.
+     * Call this to resume the {@link MediaLoader} from pause state.
      *
      * @see #pause()
      * @see LoaderState
@@ -763,7 +763,7 @@ public class ImageLoader implements
      * @param url The from of the loader request.
      */
     @LoaderApi
-    public ImageLoader cancel(@NonNull String url) {
+    public MediaLoader cancel(@NonNull String url) {
         Preconditions.checkNotNull(url);
         List<BaseFutureTask> pendingCancels = findTasks(url);
         if (pendingCancels.size() > 0) {
@@ -783,8 +783,8 @@ public class ImageLoader implements
      * @param view The view of the loader request.
      */
     @LoaderApi
-    public ImageLoader cancel(@NonNull ImageView view) {
-        return cancel(new BitmapImageViewDelegate(view));
+    public MediaLoader cancel(@NonNull ImageView view) {
+        return cancel(new BitmapMediaViewDelegate(view));
     }
 
     /**
@@ -793,7 +793,7 @@ public class ImageLoader implements
      * @param settable The settable of the loader request.
      */
     @LoaderApi
-    public ImageLoader cancel(@NonNull ImageChair settable) {
+    public MediaLoader cancel(@NonNull MediaChair settable) {
         return cancel(mSettableIdCreator.createSettableId(settable));
     }
 
@@ -803,7 +803,7 @@ public class ImageLoader implements
      * @param settableId The settableId of the loader request.
      */
     @LoaderApi
-    public ImageLoader cancel(long settableId) {
+    public MediaLoader cancel(long settableId) {
         Preconditions.checkState(settableId != 0, "Invalid settable with id:0");
         List<BaseFutureTask> pendingCancels = findTasks(settableId);
         if (pendingCancels.size() > 0) {
@@ -887,7 +887,7 @@ public class ImageLoader implements
     }
 
     @Override
-    public ImageLoader fork(LoaderConfig param) {
+    public MediaLoader fork(LoaderConfig param) {
         return clone(this, param);
     }
 

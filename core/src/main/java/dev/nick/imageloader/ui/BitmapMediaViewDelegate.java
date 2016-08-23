@@ -26,11 +26,11 @@ import dev.nick.imageloader.utils.Preconditions;
 /**
  * Wrapper class for a {@link ImageView}
  */
-public class BitmapImageViewDelegate implements ImageChair<Bitmap> {
+public class BitmapMediaViewDelegate implements MediaChair<Bitmap> {
 
     private ImageView mImageView;
 
-    public BitmapImageViewDelegate(ImageView imageView) {
+    public BitmapMediaViewDelegate(ImageView imageView) {
         this.mImageView = Preconditions.checkNotNull(imageView);
     }
 

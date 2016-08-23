@@ -19,15 +19,18 @@ package dev.nick.imageloader.worker.network;
 import android.net.ConnectivityManager;
 import android.support.annotation.NonNull;
 
+import dev.nick.imageloader.Terminable;
 import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.result.ErrorListener;
 
-public interface DownloadManager {
+public interface DownloadManager extends Terminable{
 
     @NonNull
     Transaction<String> beginTransaction();
 
     String endTransaction(Transaction<String> transaction);
+
+    String getDownloadDirPath();
 
     class Transaction<T> {
 

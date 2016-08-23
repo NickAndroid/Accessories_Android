@@ -25,12 +25,12 @@ import android.widget.ImageView;
 import com.nick.scalpel.Scalpel;
 import com.nick.scalpel.annotation.binding.FindView;
 
-import dev.nick.imageloader.ImageLoader;
+import dev.nick.imageloader.MediaLoader;
 import dev.nick.imageloader.ProgressListenerStub;
 import dev.nick.imageloader.queue.Priority;
 import dev.nick.imageloader.ui.DisplayOption;
-import dev.nick.imageloader.ui.ImageQuality;
-import dev.nick.imageloader.ui.animator.FadeInImageAnimator;
+import dev.nick.imageloader.ui.MediaQuality;
+import dev.nick.imageloader.ui.animator.FadeInViewAnimator;
 import dev.nick.imageloader.ui.art.BlackWhiteImageArt;
 
 public class AssetsImageTest extends BaseTest {
@@ -51,7 +51,7 @@ public class AssetsImageTest extends BaseTest {
     @Override
     protected void onStart() {
         super.onStart();
-        ImageLoader.shared()
+        MediaLoader.shared()
                 .loadBitmap()
                 .from(urlAssets)
                 .progressListener(new ProgressListenerStub<Bitmap>() {
@@ -63,8 +63,8 @@ public class AssetsImageTest extends BaseTest {
                 .option(DisplayOption.bitmapBuilder()
                         .showOnFailure(BitmapFactory.decodeResource(getResources(), R.drawable.aio_image_fail))
                         .imageArt(new BlackWhiteImageArt())
-                        .imageQuality(ImageQuality.RAW)
-                        .imageAnimator(new FadeInImageAnimator())
+                        .imageQuality(MediaQuality.RAW)
+                        .imageAnimator(new FadeInViewAnimator())
                         .build())
                 .priority(Priority.HIGH)
                 .into(imageView)

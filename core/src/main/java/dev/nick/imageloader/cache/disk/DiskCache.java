@@ -249,7 +249,7 @@ public class DiskCache implements Cache<String, Bitmap> {
 
             addOp(this);
 
-            File out = new File(dir + File.separator + fileName);
+            File out = new File(dir, fileName);
 
             if (out.exists()) {
                 mLogger.debug("Skip cache exists file:" + out.getAbsolutePath());

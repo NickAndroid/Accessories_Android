@@ -37,13 +37,13 @@ import com.nick.scalpel.annotation.request.RequirePermission;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.nick.imageloader.ImageLoader;
+import dev.nick.imageloader.MediaLoader;
 import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.ProgressListenerStub;
 import dev.nick.imageloader.cache.CachePolicy;
 import dev.nick.imageloader.ui.DisplayOption;
-import dev.nick.imageloader.ui.ImageQuality;
-import dev.nick.imageloader.ui.animator.FadeInImageAnimator;
+import dev.nick.imageloader.ui.MediaQuality;
+import dev.nick.imageloader.ui.animator.FadeInViewAnimator;
 import dev.nick.imageloader.worker.bitmap.BitmapImageSource;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
@@ -52,22 +52,22 @@ public class ScrollStateTest extends BaseTest {
     @FindView(id = R.id.list)
     ListView listView;
 
-    ImageLoader imageLoader;
+    MediaLoader mediaLoader;
 
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.file_image_layout);
         setTitle(getClass().getSimpleName());
         Scalpel.getInstance().wire(this);
-        imageLoader = ImageLoader.shared().fork(LoaderConfig.builder()
+        mediaLoader = MediaLoader.shared().fork(LoaderConfig.builder()
                 .cachePolicy(CachePolicy.builder().build()).build());
-        imageLoader.linkScrollStateTo(listView);
+        mediaLoader.linkScrollStateTo(listView);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        imageLoader.unLinkScrollStateTo(listView);
+        mediaLoader.unLinkScrollStateTo(listView);
     }
 
     @Override
@@ -113,14 +113,14 @@ public class ScrollStateTest extends BaseTest {
                 // String uri = mArtworkUri + File.separator + tracks.get(position).getAlbumId();
                 String uri = BitmapImageSource.FILE.getPrefix() + tracks.get(position).getUrl();
 
-                imageLoader.loadBitmap()
+                mediaLoader.loadBitmap()
                         .from(uri)
                         .option(DisplayOption.bitmapBuilder()
-                                .imageQuality(ImageQuality.OPT)
+                                .imageQuality(MediaQuality.OPT)
                                 .viewMaybeReused()
                                 .animateOnlyNewLoaded()
                                 .showOnLoading(null)
-                                .imageAnimator(new FadeInImageAnimator())
+                                .imageAnimator(new FadeInViewAnimator())
                                 .build())
                         .progressListener(new ProgressListenerStub<Bitmap>())
                         .into(holder.imageView)

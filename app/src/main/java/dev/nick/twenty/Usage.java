@@ -23,7 +23,7 @@ import android.widget.TextView;
 import com.nick.scalpel.ScalpelAutoActivity;
 import com.nick.scalpel.annotation.binding.FindView;
 
-import dev.nick.imageloader.ImageLoader;
+import dev.nick.imageloader.MediaLoader;
 import dev.nick.imageloader.control.StorageStats;
 
 public class Usage extends ScalpelAutoActivity {
@@ -38,13 +38,13 @@ public class Usage extends ScalpelAutoActivity {
 
         String string =
                 "getExternalStorageUsage" +
-                        MiscUtils.formatedFileSize(ImageLoader.shared().getExternalStorageUsage())
+                        MiscUtils.formatedFileSize(MediaLoader.shared().getExternalStorageUsage())
                         + "\n getInternalStorageUsage"
-                        + MiscUtils.formatedFileSize(ImageLoader.shared().getInternalStorageUsage())
+                        + MiscUtils.formatedFileSize(MediaLoader.shared().getInternalStorageUsage())
                         + "\n getMobileTrafficUsage"
-                        + MiscUtils.formatedFileSize(ImageLoader.shared().getMobileTrafficUsage())
+                        + MiscUtils.formatedFileSize(MediaLoader.shared().getMobileTrafficUsage())
                         + "\n getWifiTrafficUsage"
-                        + MiscUtils.formatedFileSize(ImageLoader.shared().getWifiTrafficUsage());
+                        + MiscUtils.formatedFileSize(MediaLoader.shared().getWifiTrafficUsage());
 
         textView.setText(string);
 

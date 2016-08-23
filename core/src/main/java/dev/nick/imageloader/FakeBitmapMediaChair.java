@@ -20,13 +20,13 @@ import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.view.animation.Animation;
 
-import dev.nick.imageloader.ui.ImageChair;
+import dev.nick.imageloader.ui.MediaChair;
 
-class FakeBitmapImageChair implements ImageChair<Bitmap> {
+class FakeBitmapMediaChair implements MediaChair<Bitmap> {
 
     String url;
 
-    public FakeBitmapImageChair(String url) {
+    public FakeBitmapMediaChair(String url) {
         this.url = url;
     }
 

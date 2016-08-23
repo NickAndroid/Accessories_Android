@@ -37,11 +37,11 @@ import com.nick.scalpel.annotation.request.RequirePermission;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.nick.imageloader.ImageLoader;
+import dev.nick.imageloader.MediaLoader;
 import dev.nick.imageloader.ProgressListenerStub;
 import dev.nick.imageloader.ui.DisplayOption;
-import dev.nick.imageloader.ui.ImageQuality;
-import dev.nick.imageloader.ui.animator.FadeInImageAnimator;
+import dev.nick.imageloader.ui.MediaQuality;
+import dev.nick.imageloader.ui.animator.FadeInViewAnimator;
 import dev.nick.imageloader.worker.bitmap.BitmapImageSource;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
@@ -100,13 +100,13 @@ public class FileImageTest extends BaseTest {
                 // String uri = mArtworkUri + File.separator + tracks.get(position).getAlbumId();
                 String uri = BitmapImageSource.FILE.getPrefix() + tracks.get(position).getUrl();
 
-                ImageLoader.shared().loadBitmap()
+                MediaLoader.shared().loadBitmap()
                         .from(uri)
                         .option(DisplayOption.bitmapBuilder()
-                                .imageQuality(ImageQuality.OPT)
+                                .imageQuality(MediaQuality.OPT)
                                 .viewMaybeReused()
                                 .animateOnlyNewLoaded()
-                                .imageAnimator(new FadeInImageAnimator())
+                                .imageAnimator(new FadeInViewAnimator())
                                 .build())
                         .progressListener(new ProgressListenerStub<Bitmap>())
                         .into(holder.imageView)

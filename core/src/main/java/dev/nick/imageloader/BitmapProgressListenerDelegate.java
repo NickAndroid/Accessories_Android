@@ -22,8 +22,8 @@ import java.util.ArrayList;
 
 import dev.nick.imageloader.cache.CacheManager;
 import dev.nick.imageloader.ui.DisplayOption;
-import dev.nick.imageloader.ui.ImageChair;
-import dev.nick.imageloader.ui.animator.ImageAnimator;
+import dev.nick.imageloader.ui.MediaChair;
+import dev.nick.imageloader.ui.animator.ViewAnimator;
 import dev.nick.imageloader.ui.art.ImageArt;
 import dev.nick.imageloader.worker.DimenSpec;
 import dev.nick.imageloader.worker.ProgressListener;
@@ -38,10 +38,10 @@ class BitmapProgressListenerDelegate extends ProgressListenerDelegate<Bitmap> {
                                    ProgressListener<Bitmap> listener,
                                    DimenSpec dimenSpec,
                                    DisplayOption<Bitmap> option,
-                                   ImageChair<Bitmap> imageChair,
+                                   MediaChair<Bitmap> mediaChair,
                                    DisplayTaskRecord taskRecord,
                                    String url) {
-        super(cacheManager, taskManager, listener, dimenSpec, option, imageChair, taskRecord, url);
+        super(cacheManager, taskManager, listener, dimenSpec, option, mediaChair, taskRecord, url);
     }
 
     @Override
@@ -72,9 +72,9 @@ class BitmapProgressListenerDelegate extends ProgressListenerDelegate<Bitmap> {
         mLogger.verbose("isViewMaybeReused: " + isViewMaybeReused);
 
         if (!isViewMaybeReused || !checkTaskDirty()) {
-            ImageAnimator<Bitmap> animator = (option == null ? null : option.getAnimator());
+            ViewAnimator<Bitmap> animator = (option == null ? null : option.getAnimator());
             ArrayList<ImageArt<Bitmap>> imageArts = (option == null ? null : option.getArtist());
-            ImageSettingApplier.getSharedApplier().applyImageSettings(result, imageArts, settable, animator);
+            UISettingApplier.getSharedApplier().applySettings(result, imageArts, settable, animator);
         }
         cacheManager.cache(url, result);
     }

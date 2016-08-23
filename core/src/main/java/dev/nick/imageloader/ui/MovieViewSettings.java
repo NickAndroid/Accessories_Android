@@ -16,19 +16,27 @@
 
 package dev.nick.imageloader.ui;
 
+import android.graphics.Movie;
 import android.support.annotation.NonNull;
-import android.support.annotation.UiThread;
-import android.view.animation.Animation;
 
-public interface ImageChair<T> {
+import dev.nick.imageloader.ui.animator.ViewAnimator;
 
-    @UiThread
-    void seat(@NonNull T image);
+public class MovieViewSettings extends ViewSettings<Movie> {
 
-    int getWidth();
+    Movie mMovie;
 
-    int getHeight();
+    public MovieViewSettings(ViewAnimator<Movie> animator, @NonNull MediaChair<Movie> mediaChair, Movie movie) {
+        super(animator, mediaChair);
+        this.mMovie = movie;
+    }
 
-    @UiThread
-    void startAnimation(Animation animation);
+    @Override
+    protected void apply() {
+        if (mMovie != null) {
+            mSeat.seat(mMovie);
+            if (mAnimator != null) {
+                mAnimator.animate(mSeat);
+            }
+        }
+    }
 }

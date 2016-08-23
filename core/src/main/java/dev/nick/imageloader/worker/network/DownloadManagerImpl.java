@@ -38,10 +38,10 @@ public class DownloadManagerImpl implements DownloadManager {
 
     private static final String DOWNLOAD_DIR_NAME = "download";
 
-    Context mContext;
+    private Context mContext;
 
-    boolean mOnlyOnWifi;
-    Logger mLogger;
+    private boolean mOnlyOnWifi;
+    private Logger mLogger;
 
     private TrafficStats mTrafficStats;
 
@@ -123,24 +123,53 @@ public class DownloadManagerImpl implements DownloadManager {
     @Override
     public String endTransaction(final Transaction<String> transaction) {
         mLogger.funcEnter();
-        ImageDownloader<String> downloader = new HttpImageDownloader(Files.createTempDir(), new HttpImageDownloader.ByteReadingListener() {
-            @Override
-            public void onBytesRead(byte[] bytes) {
-                if (mTrafficStatsEnabled) {
-                    switch (transaction.usingNetworkType) {
-                        case ConnectivityManager.TYPE_MOBILE:
-                            mTrafficStats.onMobileTrafficUsage(bytes.length);
-                            break;
-                        case ConnectivityManager.TYPE_WIFI: //fall
-                        default:
-                            mTrafficStats.onWifiTrafficUsage(bytes.length);
-                            break;
-                    }
-                }
-            }
-        });
-        String received = downloader.download(transaction.url, transaction.progressListener, transaction.errorListener);
+
         String result = buildDownloadFilePath(transaction.url);
+
+        ImageDownloader<String> downloader = new HttpImageDownloader(Files.createTempDir(),
+                new HttpImageDownloader.ByteReadingListener() {
+                    @Override
+                    public void onBytesRead(byte[] bytes) {
+                        if (mTrafficStatsEnabled) {
+                            switch (transaction.usingNetworkType) {
+                                case ConnectivityManager.TYPE_MOBILE:
+                                    mTrafficStats.onMobileTrafficUsage(bytes.length);
+                                    break;
+                                case ConnectivityManager.TYPE_WIFI: //fall
+                                default:
+                                    mTrafficStats.onWifiTrafficUsage(bytes.length);
+                                    break;
+                            }
+                        }
+                    }
+                });
+
+        // Check if already download this one.
+        boolean exist = new File(result).exists();
+
+        boolean willUseExistsOne = false;
+
+        if (exist) {
+            // Check file size.
+            try {
+                long size = Files.asByteSource(new File(result)).size();
+                willUseExistsOne = size == downloader.size(transaction.url);
+            } catch (IOException ignored) {
+                willUseExistsOne = false;
+            }
+        }
+
+        if (willUseExistsOne) {
+            mLogger.verbose("willUseExistsOne instead of download");
+            return result;
+        }
+
+        String received = downloader.download(transaction.url, transaction.progressListener, transaction.errorListener);
+
+        if (received == null) {
+            return null;
+        }
+
         try {
             Files.move(new File(received), new File(result));
         } catch (IOException e) {
@@ -150,6 +179,11 @@ public class DownloadManagerImpl implements DownloadManager {
         return result;
     }
 
+    @Override
+    public String getDownloadDirPath() {
+        return mDownloadDir;
+    }
+
     String decodeNetworkType(int type) {
         switch (type) {
             case ConnectivityManager.TYPE_MOBILE:
@@ -157,5 +191,10 @@ public class DownloadManagerImpl implements DownloadManager {
             default:
                 return "WIFI-ETC";
         }
+    }
+
+    @Override
+    public void terminate() {
+        // Nothing.
     }
 }

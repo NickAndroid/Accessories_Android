@@ -28,7 +28,7 @@ import com.nick.scalpel.annotation.binding.FindView;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
-import dev.nick.imageloader.ImageLoader;
+import dev.nick.imageloader.MediaLoader;
 import dev.nick.imageloader.ProgressListenerStub;
 import dev.nick.imageloader.queue.Priority;
 import dev.nick.imageloader.worker.result.Cause;
@@ -67,7 +67,7 @@ public class DownloadMachine extends BaseTest {
 
     void startMachine(String url) {
         latch = new CountDownLatch(1);
-        ImageLoader.shared()
+        MediaLoader.shared()
                 .loadBitmap()
                 .from(url)
                 .progressListener(new ProgressListenerStub<Bitmap>() {

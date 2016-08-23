@@ -22,7 +22,7 @@ import android.support.annotation.Nullable;
 import dev.nick.imageloader.annotation.LoaderApi;
 import dev.nick.imageloader.queue.Priority;
 import dev.nick.imageloader.ui.DisplayOption;
-import dev.nick.imageloader.ui.ImageChair;
+import dev.nick.imageloader.ui.MediaChair;
 import dev.nick.imageloader.utils.Preconditions;
 import dev.nick.imageloader.worker.ImageData;
 import dev.nick.imageloader.worker.ImageSource;
@@ -36,11 +36,11 @@ public abstract class Transaction<T> {
     protected ProgressListener<T> progressListener;
     protected ErrorListener errorListener;
     protected Priority priority;
-    protected ImageChair<T> settable;
+    protected MediaChair<T> settable;
 
-    protected ImageLoader loader;
+    protected MediaLoader loader;
 
-    Transaction(@NonNull ImageLoader loader) {
+    Transaction(@NonNull MediaLoader loader) {
         this.loader = loader;
     }
 
@@ -59,7 +59,7 @@ public abstract class Transaction<T> {
 
     /**
      * @param option {@link DisplayOption} is options using when display the image.
-     *               * @param settable Target {@link ImageChair} to display the image.
+     *               * @param settable Target {@link MediaChair} to display the image.
      * @return Instance of Transaction.
      */
     @LoaderApi
@@ -103,7 +103,7 @@ public abstract class Transaction<T> {
      * @return Instance of Transaction.
      */
     @LoaderApi
-    public Transaction<T> into(@NonNull ImageChair<T> settable) {
+    public Transaction<T> into(@NonNull MediaChair<T> settable) {
         this.settable = Preconditions.checkNotNull(settable);
         return Transaction.this;
     }

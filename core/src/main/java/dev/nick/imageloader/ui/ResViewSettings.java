@@ -14,17 +14,26 @@
  * limitations under the License.
  */
 
-package dev.nick.imageloader.ui.animator;
+package dev.nick.imageloader.ui;
 
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
-import dev.nick.imageloader.ui.ImageChair;
+import dev.nick.imageloader.ui.animator.ViewAnimator;
 
-public interface ImageAnimator<T> {
+public class ResViewSettings extends ViewSettings<Bitmap> {
 
-    long DEFAULT_DURATION = 800;
+    int mResId;
 
-    void animate(@NonNull ImageChair<T> imageChair);
+    public ResViewSettings(ViewAnimator<Bitmap> animator, @NonNull MediaChair<Bitmap> mediaChair, int resId) {
+        super(animator, mediaChair);
+        this.mResId = resId;
+    }
 
-    long getDuration();
+    protected void apply() {
+        if (mAnimator != null) {
+            mAnimator.animate(mSeat);
+        }
+        throw new UnsupportedOperationException();
+    }
 }

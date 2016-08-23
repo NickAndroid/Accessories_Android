@@ -16,11 +16,8 @@
 
 package dev.nick.imageloader.ui;
 
-import android.graphics.Bitmap;
+import android.support.annotation.NonNull;
 
-/**
- * Interface that indicate this is a view that can be set with a image.
- * like the {@link android.widget.ImageView}
- */
-public interface BitmapImageChair extends ImageChair<Bitmap> {
+public interface IDCreator {
+    long createSettableId(@NonNull MediaChair settable);
 }

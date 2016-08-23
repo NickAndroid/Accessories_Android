@@ -150,4 +150,9 @@ public class BaseImageFetcher<T> implements ImageFetcher<T> {
             return upperBound;
         }
     }
+
+    @Override
+    public void terminate() {
+        // PlaceHolder
+    }
 }

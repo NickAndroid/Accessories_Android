@@ -21,15 +21,15 @@ import android.support.annotation.WorkerThread;
 
 import java.util.List;
 
-import dev.nick.imageloader.ui.ImageChair;
+import dev.nick.imageloader.ui.MediaChair;
 
 public abstract class ImageArtistCaller {
 
     @WorkerThread
     public static <T> T call(@NonNull List<ImageArt<T>> arts, @NonNull T in,
-                             @NonNull ImageChair<T> imageChair) {
+                             @NonNull MediaChair<T> mediaChair) {
         for (ImageArt<T> art : arts) {
-            in = art.process(in, imageChair);
+            in = art.process(in, mediaChair);
         }
         return in;
     }

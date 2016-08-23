@@ -26,7 +26,7 @@ import java.util.concurrent.ExecutionException;
 import dev.nick.imageloader.annotation.LoaderApi;
 import dev.nick.imageloader.queue.Priority;
 import dev.nick.imageloader.ui.DisplayOption;
-import dev.nick.imageloader.ui.ImageChair;
+import dev.nick.imageloader.ui.MediaChair;
 import dev.nick.imageloader.worker.ImageSource;
 import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.movie.MovieImageSource;
@@ -34,7 +34,7 @@ import dev.nick.imageloader.worker.result.ErrorListener;
 
 public class MovieTransaction extends Transaction<Movie> {
 
-    MovieTransaction(@NonNull ImageLoader loader) {
+    MovieTransaction(@NonNull MediaLoader loader) {
         super(loader);
     }
 
@@ -74,7 +74,7 @@ public class MovieTransaction extends Transaction<Movie> {
     }
 
     @Override
-    public MovieTransaction into(@NonNull ImageChair<Movie> settable) {
+    public MovieTransaction into(@NonNull MediaChair<Movie> settable) {
         super.into(settable);
         return this;
     }
@@ -111,7 +111,7 @@ public class MovieTransaction extends Transaction<Movie> {
     }
 
 
-    protected ImageChair<Movie> noneNullSettable() {
-        return settable == null ? new FakeMovieImageChair(imageData.getUrl()) : settable;
+    protected MediaChair<Movie> noneNullSettable() {
+        return settable == null ? new FakeMovieMediaChair(imageData.getUrl()) : settable;
     }
 }

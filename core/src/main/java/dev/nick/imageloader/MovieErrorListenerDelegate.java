@@ -18,17 +18,17 @@ package dev.nick.imageloader;
 
 import android.graphics.Movie;
 
-import dev.nick.imageloader.ui.ImageChair;
+import dev.nick.imageloader.ui.MediaChair;
 import dev.nick.imageloader.worker.result.ErrorListener;
 
 class MovieErrorListenerDelegate extends ErrorListenerDelegate<Movie> {
 
-    MovieErrorListenerDelegate(ErrorListener listener, Movie failureImg, ImageChair<Movie> seat) {
+    MovieErrorListenerDelegate(ErrorListener listener, Movie failureImg, MediaChair<Movie> seat) {
         super(listener, failureImg, seat);
     }
 
     @Override
     void onApplyFailureImage(Movie image) {
-        ImageSettingApplier.getSharedApplier().applyImageSettings(image, null, imageChair, null);
+        UISettingApplier.getSharedApplier().applySettings(image, null, mediaChair, null);
     }
 }

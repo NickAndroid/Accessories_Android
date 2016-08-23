@@ -18,18 +18,18 @@ package dev.nick.imageloader.ui;
 
 import android.support.annotation.NonNull;
 
-import dev.nick.imageloader.ui.animator.ImageAnimator;
+import dev.nick.imageloader.ui.animator.ViewAnimator;
 
-public abstract class ImageSettings<T> implements Runnable {
+public abstract class ViewSettings<T> implements Runnable {
 
-    protected ImageAnimator<T> mAnimator;
+    protected ViewAnimator<T> mAnimator;
     @NonNull
-    protected ImageChair<T> mSeat;
+    protected MediaChair<T> mSeat;
 
-    public ImageSettings(ImageAnimator<T> animator,
-                         @NonNull ImageChair<T> imageChair) {
+    public ViewSettings(ViewAnimator<T> animator,
+                        @NonNull MediaChair<T> mediaChair) {
         this.mAnimator = animator;
-        this.mSeat = imageChair;
+        this.mSeat = mediaChair;
     }
 
     protected abstract void apply();
@@ -41,7 +41,7 @@ public abstract class ImageSettings<T> implements Runnable {
 
     @Override
     public String toString() {
-        return "ImageSettings{" +
+        return "ViewSettings{" +
                 "mAnimator=" + mAnimator +
                 ", mSeat=" + mSeat +
                 '}';

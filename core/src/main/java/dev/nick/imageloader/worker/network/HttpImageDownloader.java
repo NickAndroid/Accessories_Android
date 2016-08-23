@@ -82,6 +82,21 @@ public class HttpImageDownloader implements ImageDownloader<String> {
         return null;
     }
 
+    @Override
+    public long size(String url) {
+        try {
+            URL u = new URL(url);
+            URLConnection conn = u.openConnection();
+            conn.setConnectTimeout(6 * 1000);
+            conn.connect();
+            InputStream is = conn.getInputStream();
+            return conn.getContentLength();
+        } catch (Exception ignored) {
+
+        }
+        return -1;
+    }
+
     public interface ByteReadingListener {
         void onBytesRead(byte[] bytes);
     }

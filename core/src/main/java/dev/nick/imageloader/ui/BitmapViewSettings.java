@@ -19,21 +19,29 @@ package dev.nick.imageloader.ui;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
-import dev.nick.imageloader.ui.animator.ImageAnimator;
+import dev.nick.imageloader.ui.animator.ViewAnimator;
 
-public class ResImageSettings extends ImageSettings<Bitmap> {
+public class BitmapViewSettings extends ViewSettings<Bitmap> {
 
-    int mResId;
+    Bitmap mBitmap;
 
-    public ResImageSettings(ImageAnimator<Bitmap> animator, @NonNull ImageChair<Bitmap> imageChair, int resId) {
-        super(animator, imageChair);
-        this.mResId = resId;
+    public BitmapViewSettings(ViewAnimator<Bitmap> animator, @NonNull MediaChair<Bitmap> settable, Bitmap bitmap) {
+        super(animator, settable);
+        this.mBitmap = bitmap;
     }
 
+    @Override
     protected void apply() {
-        if (mAnimator != null) {
+        mSeat.seat(mBitmap);
+        if (mBitmap != null && mAnimator != null) {
             mAnimator.animate(mSeat);
         }
-        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + " BitmapViewSettings{" +
+                "mBitmap=" + mBitmap +
+                '}';
     }
 }

@@ -16,19 +16,19 @@
 
 package dev.nick.imageloader.worker;
 
-import dev.nick.imageloader.ui.ImageQuality;
+import dev.nick.imageloader.ui.MediaQuality;
 
 public class DecodeSpec {
 
-    ImageQuality quality;
+    MediaQuality quality;
     DimenSpec dimenSpec;
 
-    public DecodeSpec(ImageQuality quality, DimenSpec dimenSpec) {
+    public DecodeSpec(MediaQuality quality, DimenSpec dimenSpec) {
         this.quality = quality;
         this.dimenSpec = dimenSpec;
     }
 
-    public ImageQuality getQuality() {
+    public MediaQuality getQuality() {
         return quality;
     }
 
