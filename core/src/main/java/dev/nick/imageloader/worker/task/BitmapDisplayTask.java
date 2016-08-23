@@ -34,6 +34,7 @@ import dev.nick.imageloader.worker.ImageSource;
 import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.result.Cause;
 import dev.nick.imageloader.worker.result.ErrorListener;
+import dev.nick.logger.LoggerManager;
 
 public class BitmapDisplayTask extends BaseDisplayTask<Bitmap> {
 
@@ -80,17 +81,18 @@ public class BitmapDisplayTask extends BaseDisplayTask<Bitmap> {
 
         Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
 
-        if (mDisplayTaskMonitor.interruptExecute(mTaskRecord)) return;
+        if (mDisplayTaskMonitor.interruptExecute(mTaskRecord)) {
+            LoggerManager.getLogger(getClass()).verbose("interruptExecute!");
+            return;
+        }
 
-        ImageSource<Bitmap> source = mImageData.getSource();
-
-        ImageFetcher<Bitmap> fetcher = source.getFetcher(mContext, mLoaderConfig);
-
-        DecodeSpec decodeSpec = new DecodeSpec(mQuality, mDimenSpec);
         try {
+            ImageSource<Bitmap> source = mImageData.getSource();
+            ImageFetcher<Bitmap> fetcher = source.getFetcher(mContext, mLoaderConfig);
+            DecodeSpec decodeSpec = new DecodeSpec(mQuality, mDimenSpec);
             mResult = fetcher.fetchFromUrl(mImageData.getUrl(), decodeSpec, mProgressListener, mErrorListener);
         } catch (InterruptedIOException | InterruptedException ignored) {
-
+            LoggerManager.getLogger(getClass()).debug("Ignored error:" + ignored.getLocalizedMessage());
         } catch (Exception e) {
             if (mErrorListener != null)
                 mErrorListener.onError(new Cause(e));

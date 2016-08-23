@@ -34,6 +34,7 @@ import dev.nick.imageloader.worker.ImageSource;
 import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.result.Cause;
 import dev.nick.imageloader.worker.result.ErrorListener;
+import dev.nick.logger.LoggerManager;
 
 public class MovieDisplayTask extends BaseDisplayTask<Movie> {
 
@@ -80,17 +81,17 @@ public class MovieDisplayTask extends BaseDisplayTask<Movie> {
 
         Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
 
-        if (mDisplayTaskMonitor.interruptExecute(mTaskRecord)) return;
-
-        ImageSource<Movie> source = mImageData.getSource();
-
-        ImageFetcher<Movie> fetcher = source.getFetcher(mContext, mLoaderConfig);
-
-        DecodeSpec decodeSpec = new DecodeSpec(mQuality, mDimenSpec);
+        if (mDisplayTaskMonitor.interruptExecute(mTaskRecord)) {
+            LoggerManager.getLogger(getClass()).verbose("interruptExecute!");
+            return;
+        }
         try {
+            ImageSource<Movie> source = mImageData.getSource();
+            ImageFetcher<Movie> fetcher = source.getFetcher(mContext, mLoaderConfig);
+            DecodeSpec decodeSpec = new DecodeSpec(mQuality, mDimenSpec);
             mResult = fetcher.fetchFromUrl(mImageData.getUrl(), decodeSpec, mProgressListener, mErrorListener);
         } catch (InterruptedIOException | InterruptedException ignored) {
-
+            LoggerManager.getLogger(getClass()).debug("Ignored error:" + ignored.getLocalizedMessage());
         } catch (Exception e) {
             if (mErrorListener != null)
                 mErrorListener.onError(new Cause(e));

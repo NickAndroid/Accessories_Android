@@ -559,6 +559,7 @@ public class ImageLoader implements
 
     private ExecutorService getExecutor(ImageSource type) {
         if (type.maybeSlow()) {
+            mLogger.verbose("Using default loading service for slower task.");
             return mLoadingService;
         } else {
             int activeThreads = mLoadingService.getActiveCount();
@@ -569,6 +570,7 @@ public class ImageLoader implements
                 return mFallbackService;
             }
         }
+        mLogger.verbose("Using default loading service.");
         return mLoadingService;
     }
 
@@ -924,6 +926,7 @@ public class ImageLoader implements
         public boolean handleRequest(BaseFutureTask request) {
             freezeIfRequested();
             if (!onFutureSubmit(request)) return false;
+            mLogger.funcEnter();
             getExecutor(request.getListenableTask().getImageData().getSource()).submit(request);
             return true;
         }

@@ -44,6 +44,7 @@ public class MyApp extends ScalpelApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+        LoggerManager.setTagPrefix(getClass().getSimpleName());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             Trace.beginSection("ImageLoader_init");
         }

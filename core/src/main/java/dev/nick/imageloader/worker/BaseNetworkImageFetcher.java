@@ -53,6 +53,8 @@ public class BaseNetworkImageFetcher<T> extends BaseImageFetcher<T> {
 
         super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);
 
+        mLogger.funcEnter();
+
         DownloadManager.Transaction<String> transaction = mDownloadManager.beginTransaction().url(url)
                 .errorListener(errorListener).progressListener(progressListener);
 

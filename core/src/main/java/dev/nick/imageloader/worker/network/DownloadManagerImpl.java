@@ -32,6 +32,7 @@ import dev.nick.imageloader.cache.FileNameGenerator;
 import dev.nick.imageloader.cache.KeyGenerator;
 import dev.nick.imageloader.control.TrafficStats;
 import dev.nick.logger.Logger;
+import dev.nick.logger.LoggerManager;
 
 public class DownloadManagerImpl implements DownloadManager {
 
@@ -52,6 +53,7 @@ public class DownloadManagerImpl implements DownloadManager {
     private String mDownloadDir;
 
     public DownloadManagerImpl(Context context, LoaderConfig config) {
+        mLogger = LoggerManager.getLogger(getClass());
         mContext = context;
 
         NetworkPolicy networkPolicy = config.getNetworkPolicy();
@@ -88,6 +90,7 @@ public class DownloadManagerImpl implements DownloadManager {
     @NonNull
     @Override
     public Transaction<String> beginTransaction() {
+        mLogger.funcEnter();
 
         int usingNetworkType = ConnectivityManager.TYPE_WIFI;
 
@@ -119,6 +122,7 @@ public class DownloadManagerImpl implements DownloadManager {
 
     @Override
     public String endTransaction(final Transaction<String> transaction) {
+        mLogger.funcEnter();
         ImageDownloader<String> downloader = new HttpImageDownloader(Files.createTempDir(), new HttpImageDownloader.ByteReadingListener() {
             @Override
             public void onBytesRead(byte[] bytes) {

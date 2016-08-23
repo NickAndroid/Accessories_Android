@@ -42,7 +42,7 @@ abstract class ErrorListenerDelegate<T> implements ErrorListener {
 
     @Override
     public void onError(@NonNull Cause cause) {
-        if (LoggerManager.getDebugLevel() <= Log.ASSERT) {
+        if (LoggerManager.getDebugLevel() <= Log.VERBOSE) {
             LoggerManager.getLogger(getClass()).warn(cause);
         }
         if (cause.exception instanceof InterruptedIOException) {
