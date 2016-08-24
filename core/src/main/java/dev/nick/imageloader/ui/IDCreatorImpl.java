@@ -22,7 +22,7 @@ import dev.nick.imageloader.utils.Preconditions;
 
 public class IDCreatorImpl implements IDCreator {
     @Override
-    public long createSettableId(@NonNull MediaChair settable) {
+    public long createSettableId(@NonNull MediaHolder settable) {
         Preconditions.checkNotNull(settable);
         return settable.hashCode();
     }

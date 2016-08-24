@@ -25,7 +25,7 @@ public class BitmapViewSettings extends ViewSettings<Bitmap> {
 
     Bitmap mBitmap;
 
-    public BitmapViewSettings(ViewAnimator<Bitmap> animator, @NonNull MediaChair<Bitmap> settable, Bitmap bitmap) {
+    public BitmapViewSettings(ViewAnimator<Bitmap> animator, @NonNull MediaHolder<Bitmap> settable, Bitmap bitmap) {
         super(animator, settable);
         this.mBitmap = bitmap;
     }

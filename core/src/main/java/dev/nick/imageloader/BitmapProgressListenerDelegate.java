@@ -22,9 +22,9 @@ import java.util.ArrayList;
 
 import dev.nick.imageloader.cache.CacheManager;
 import dev.nick.imageloader.ui.DisplayOption;
-import dev.nick.imageloader.ui.MediaChair;
+import dev.nick.imageloader.ui.MediaHolder;
 import dev.nick.imageloader.ui.animator.ViewAnimator;
-import dev.nick.imageloader.ui.art.ImageArt;
+import dev.nick.imageloader.ui.art.MediaArt;
 import dev.nick.imageloader.worker.DimenSpec;
 import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.task.DisplayTaskRecord;
@@ -38,10 +38,10 @@ class BitmapProgressListenerDelegate extends ProgressListenerDelegate<Bitmap> {
                                    ProgressListener<Bitmap> listener,
                                    DimenSpec dimenSpec,
                                    DisplayOption<Bitmap> option,
-                                   MediaChair<Bitmap> mediaChair,
+                                   MediaHolder<Bitmap> mediaHolder,
                                    DisplayTaskRecord taskRecord,
                                    String url) {
-        super(cacheManager, taskManager, listener, dimenSpec, option, mediaChair, taskRecord, url);
+        super(cacheManager, taskManager, listener, dimenSpec, option, mediaHolder, taskRecord, url);
     }
 
     @Override
@@ -73,8 +73,8 @@ class BitmapProgressListenerDelegate extends ProgressListenerDelegate<Bitmap> {
 
         if (!isViewMaybeReused || !checkTaskDirty()) {
             ViewAnimator<Bitmap> animator = (option == null ? null : option.getAnimator());
-            ArrayList<ImageArt<Bitmap>> imageArts = (option == null ? null : option.getArtist());
-            UISettingApplier.getSharedApplier().applySettings(result, imageArts, settable, animator);
+            ArrayList<MediaArt<Bitmap>> mediaArts = (option == null ? null : option.getArtist());
+            UISettingApplier.getSharedApplier().applySettings(result, mediaArts, settable, animator);
         }
         cacheManager.cache(url, result);
     }

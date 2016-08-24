@@ -30,12 +30,12 @@ import dev.nick.imageloader.MediaLoader;
 import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.cache.CachePolicy;
 import dev.nick.imageloader.queue.QueuePolicy;
-import dev.nick.imageloader.worker.BaseImageFetcher;
+import dev.nick.imageloader.worker.BaseMediaFetcher;
 import dev.nick.imageloader.worker.DecodeSpec;
 import dev.nick.imageloader.worker.PathSplitter;
 import dev.nick.imageloader.worker.ProgressListener;
-import dev.nick.imageloader.worker.bitmap.BitmapImageSource;
-import dev.nick.imageloader.worker.movie.MovieImageSource;
+import dev.nick.imageloader.worker.bitmap.BitmapMediaSource;
+import dev.nick.imageloader.worker.movie.MovieMediaSource;
 import dev.nick.imageloader.worker.network.NetworkPolicy;
 import dev.nick.imageloader.worker.result.ErrorListener;
 import dev.nick.logger.LoggerManager;
@@ -53,7 +53,7 @@ public class MyApp extends ScalpelApplication {
                 .cachePolicy(CachePolicy.builder()
                         .enableMemCache()
                         .enableDiskCache()
-                        .enableStorgeStats()
+                        .enableStorageStats()
                         .cacheDirName("dis.cache.tests")
                         .preferredLocation(CachePolicy.Location.EXTERNAL)
                         .compressFormat(Bitmap.CompressFormat.PNG)
@@ -68,7 +68,7 @@ public class MyApp extends ScalpelApplication {
         }
 
         // Add custom sources.
-        BitmapImageSource.addBitmapSource(new BitmapImageSource(new BaseImageFetcher<Bitmap>(new PathSplitter<String>() {
+        BitmapMediaSource.addBitmapSource(new BitmapMediaSource(new BaseMediaFetcher<Bitmap>(new PathSplitter<String>() {
             @Override
             public String getRealPath(@NonNull String fullPath) {
                 return null;
@@ -84,7 +84,7 @@ public class MyApp extends ScalpelApplication {
         }, "test_bitmap://"));
 
 
-        MovieImageSource.addMovieSource(new MovieImageSource(new BaseImageFetcher<Movie>(new PathSplitter<String>() {
+        MovieMediaSource.addMovieSource(new MovieMediaSource(new BaseMediaFetcher<Movie>(new PathSplitter<String>() {
             @Override
             public String getRealPath(@NonNull String fullPath) {
                 return null;

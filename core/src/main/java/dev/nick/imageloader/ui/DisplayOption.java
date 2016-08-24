@@ -19,11 +19,12 @@ package dev.nick.imageloader.ui;
 import android.graphics.Bitmap;
 import android.graphics.Movie;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 
 import dev.nick.imageloader.ui.animator.ViewAnimator;
-import dev.nick.imageloader.ui.art.ImageArt;
+import dev.nick.imageloader.ui.art.MediaArt;
 import dev.nick.imageloader.utils.Preconditions;
 
 public class DisplayOption<T> {
@@ -36,7 +37,7 @@ public class DisplayOption<T> {
 
     private MediaQuality quality;
 
-    private ArrayList<ImageArt<T>> handlers;
+    private ArrayList<MediaArt<T>> handlers;
     private ViewAnimator<T> animator;
 
     private boolean viewMaybeReused;
@@ -48,7 +49,7 @@ public class DisplayOption<T> {
                           boolean failureImgDefined,
                           boolean loadingImgDefined,
                           MediaQuality quality,
-                          ArrayList<ImageArt<T>> handlers,
+                          ArrayList<MediaArt<T>> handlers,
                           ViewAnimator<T> animator,
                           boolean viewMaybeReused,
                           boolean animateOnlyNewLoaded) {
@@ -91,7 +92,7 @@ public class DisplayOption<T> {
         return quality;
     }
 
-    public ArrayList<ImageArt<T>> getArtist() {
+    public ArrayList<MediaArt<T>> getArtist() {
         return handlers;
     }
 
@@ -117,7 +118,7 @@ public class DisplayOption<T> {
 
         private MediaQuality quality = MediaQuality.OPT;
 
-        private ArrayList<ImageArt<T>> artList;
+        private ArrayList<MediaArt<T>> artList;
         private ViewAnimator<T> animator;
 
         private boolean viewMaybeReused;
@@ -131,7 +132,7 @@ public class DisplayOption<T> {
          * @param failureImage Image res showing when load failure.
          * @return Instance of this builder.
          */
-        public Builder<T> showOnFailure(T failureImage) {
+        public Builder<T> showOnFailure(@Nullable T failureImage) {
             this.failureImg = failureImage;
             this.failureImgDefined = true;
             return this;
@@ -141,19 +142,19 @@ public class DisplayOption<T> {
          * @param loadingImg Image res showing when loading.
          * @return Instance of this builder.
          */
-        public Builder<T> showOnLoading(T loadingImg) {
+        public Builder<T> showOnLoading(@Nullable T loadingImg) {
             this.loadingImg = loadingImg;
             this.loadingImgDefined = true;
             return this;
         }
 
         /**
-         * @param imageArt {@link ImageArt} instances using to process the bitmap before display.
+         * @param mediaArt {@link MediaArt} instances using to process the bitmap before display.
          * @return Instance of this builder.
          */
-        public synchronized Builder<T> imageArt(@NonNull ImageArt<T> imageArt) {
+        public synchronized Builder<T> imageArt(@NonNull MediaArt<T> mediaArt) {
             if (artList == null) artList = new ArrayList<>();
-            this.artList.add(Preconditions.checkNotNull(imageArt));
+            this.artList.add(Preconditions.checkNotNull(mediaArt));
             return this;
         }
 
@@ -201,7 +202,6 @@ public class DisplayOption<T> {
         }
 
         public DisplayOption<T> build() {
-            //noinspection unchecked
             return new DisplayOption<>(
                     failureImg,
                     loadingImg,

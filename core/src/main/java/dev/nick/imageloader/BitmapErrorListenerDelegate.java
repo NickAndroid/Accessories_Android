@@ -18,17 +18,17 @@ package dev.nick.imageloader;
 
 import android.graphics.Bitmap;
 
-import dev.nick.imageloader.ui.MediaChair;
+import dev.nick.imageloader.ui.MediaHolder;
 import dev.nick.imageloader.worker.result.ErrorListener;
 
 class BitmapErrorListenerDelegate extends ErrorListenerDelegate<Bitmap> {
 
-    BitmapErrorListenerDelegate(ErrorListener listener, Bitmap failureImg, MediaChair<Bitmap> seat) {
+    BitmapErrorListenerDelegate(ErrorListener listener, Bitmap failureImg, MediaHolder<Bitmap> seat) {
         super(listener, failureImg, seat);
     }
 
     @Override
     void onApplyFailureImage(Bitmap image) {
-        UISettingApplier.getSharedApplier().applySettings(image, null, mediaChair, null);
+        UISettingApplier.getSharedApplier().applySettings(image, null, mediaHolder, null);
     }
 }

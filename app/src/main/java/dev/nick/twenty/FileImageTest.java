@@ -42,7 +42,7 @@ import dev.nick.imageloader.ProgressListenerStub;
 import dev.nick.imageloader.ui.DisplayOption;
 import dev.nick.imageloader.ui.MediaQuality;
 import dev.nick.imageloader.ui.animator.FadeInViewAnimator;
-import dev.nick.imageloader.worker.bitmap.BitmapImageSource;
+import dev.nick.imageloader.worker.bitmap.BitmapMediaSource;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
 public class FileImageTest extends BaseTest {
@@ -98,7 +98,7 @@ public class FileImageTest extends BaseTest {
                 holder.textView.setText(tracks.get(position).getTitle());
 
                 // String uri = mArtworkUri + File.separator + tracks.get(position).getAlbumId();
-                String uri = BitmapImageSource.FILE.getPrefix() + tracks.get(position).getUrl();
+                String uri = BitmapMediaSource.FILE.getPrefix() + tracks.get(position).getUrl();
 
                 MediaLoader.shared().loadBitmap()
                         .from(uri)

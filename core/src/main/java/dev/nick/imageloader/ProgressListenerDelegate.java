@@ -18,7 +18,7 @@ package dev.nick.imageloader;
 
 import dev.nick.imageloader.cache.CacheManager;
 import dev.nick.imageloader.ui.DisplayOption;
-import dev.nick.imageloader.ui.MediaChair;
+import dev.nick.imageloader.ui.MediaHolder;
 import dev.nick.imageloader.worker.DimenSpec;
 import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.task.DisplayTaskRecord;
@@ -33,7 +33,7 @@ abstract class ProgressListenerDelegate<T> implements ProgressListener<T> {
 
     protected ProgressListener<T> listener;
 
-    protected MediaChair<T> settable;
+    protected MediaHolder<T> settable;
     protected String url;
     protected DisplayOption<T> option;
     protected DimenSpec dimenSpec;
@@ -48,7 +48,7 @@ abstract class ProgressListenerDelegate<T> implements ProgressListener<T> {
             ProgressListener<T> listener,
             DimenSpec dimenSpec,
             DisplayOption<T> option,
-            MediaChair<T> mediaChair,
+            MediaHolder<T> mediaHolder,
             DisplayTaskRecord taskRecord,
             String url) {
         this.cacheManager = cacheManager;
@@ -56,7 +56,7 @@ abstract class ProgressListenerDelegate<T> implements ProgressListener<T> {
         this.dimenSpec = dimenSpec;
         this.listener = listener;
         this.option = option;
-        this.settable = mediaChair;
+        this.settable = mediaHolder;
         this.taskRecord = taskRecord;
         this.url = url;
         this.mLogger = LoggerManager.getLogger(getClass());

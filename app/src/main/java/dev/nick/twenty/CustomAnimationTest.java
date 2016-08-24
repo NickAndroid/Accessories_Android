@@ -43,10 +43,10 @@ import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.ProgressListenerStub;
 import dev.nick.imageloader.cache.CachePolicy;
 import dev.nick.imageloader.ui.DisplayOption;
-import dev.nick.imageloader.ui.MediaChair;
+import dev.nick.imageloader.ui.MediaHolder;
 import dev.nick.imageloader.ui.MediaQuality;
 import dev.nick.imageloader.ui.animator.ResAnimator;
-import dev.nick.imageloader.worker.bitmap.BitmapImageSource;
+import dev.nick.imageloader.worker.bitmap.BitmapMediaSource;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
 public class CustomAnimationTest extends BaseTest {
@@ -113,7 +113,7 @@ public class CustomAnimationTest extends BaseTest {
                 holder.textView.setText(tracks.get(position).getTitle());
 
                 // String uri = mArtworkUri + File.separator + tracks.get(position).getAlbumId();
-                String uri = BitmapImageSource.FILE.getPrefix() + tracks.get(position).getUrl();
+                String uri = BitmapMediaSource.FILE.getPrefix() + tracks.get(position).getUrl();
 
                 mediaLoader.loadBitmap()
                         .from(uri)
@@ -124,7 +124,7 @@ public class CustomAnimationTest extends BaseTest {
                                 .showOnLoading(null)
                                 .imageAnimator(new ResAnimator<Bitmap>(getApplicationContext()) {
                                     @Override
-                                    public void animate(@NonNull MediaChair<Bitmap> settable) {
+                                    public void animate(@NonNull MediaHolder<Bitmap> settable) {
                                         super.animate(settable);
                                     }
 

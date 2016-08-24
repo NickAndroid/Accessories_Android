@@ -20,7 +20,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.animation.AnimationUtils;
 
-import dev.nick.imageloader.ui.MediaChair;
+import dev.nick.imageloader.ui.MediaHolder;
 
 /**
  * Abs class for a animator that load animation from resource.
@@ -34,7 +34,7 @@ public abstract class ResAnimator<T> implements ViewAnimator<T> {
     }
 
     @Override
-    public void animate(@NonNull MediaChair<T> settable) {
+    public void animate(@NonNull MediaHolder<T> settable) {
         settable.startAnimation(AnimationUtils.loadAnimation(context, getAnimResId()));
     }
 

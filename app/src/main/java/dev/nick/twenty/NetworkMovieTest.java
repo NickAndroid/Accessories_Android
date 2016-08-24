@@ -27,7 +27,7 @@ import com.nick.scalpel.annotation.binding.FindView;
 
 import dev.nick.imageloader.MediaLoader;
 import dev.nick.imageloader.queue.Priority;
-import dev.nick.imageloader.ui.MediaChair;
+import dev.nick.imageloader.ui.MediaHolder;
 import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.result.Cause;
 import dev.nick.imageloader.worker.result.ErrorListener;
@@ -82,7 +82,7 @@ public class NetworkMovieTest extends BaseTest {
                         LoggerManager.getLogger(getClass()).debug("onComplete:" + result);
                     }
                 })
-                .into(new MediaChair<Movie>() {
+                .into(new MediaHolder<Movie>() {
                     @Override
                     public void seat(@NonNull Movie image) {
                         LoggerManager.getLogger(getClass()).debug("seat");

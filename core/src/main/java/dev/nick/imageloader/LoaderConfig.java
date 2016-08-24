@@ -19,11 +19,14 @@ package dev.nick.imageloader;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.google.common.base.Optional;
+
 import dev.nick.imageloader.annotation.LoaderApi;
+import dev.nick.imageloader.annotation.MinSize;
 import dev.nick.imageloader.cache.CachePolicy;
 import dev.nick.imageloader.queue.QueuePolicy;
+import dev.nick.imageloader.utils.Preconditions;
 import dev.nick.imageloader.worker.network.NetworkPolicy;
-import dev.nick.logger.LoggerManager;
 
 /**
  * Configuration for {@link MediaLoader}, use a {@link Builder}
@@ -40,12 +43,14 @@ public class LoaderConfig {
             .debugLevel(Log.WARN)
             .build();
 
+    @MinSize(1)
     private int nLoadingThreads;
 
     private CachePolicy cachePolicy;
     private NetworkPolicy networkPolicy;
     private QueuePolicy queuePolicy;
 
+    @MinSize(0)
     private int debugLevel;
 
     private LoaderConfig(CachePolicy cachePolicy,
@@ -80,10 +85,12 @@ public class LoaderConfig {
         return cachePolicy;
     }
 
+    @NonNull
     public NetworkPolicy getNetworkPolicy() {
         return networkPolicy;
     }
 
+    @NonNull
     public QueuePolicy getQueuePolicy() {
         return queuePolicy;
     }
@@ -98,11 +105,13 @@ public class LoaderConfig {
 
     public static class Builder {
 
-        private int nLoadingThreads;
-        private CachePolicy cachePolicy;
-        private NetworkPolicy networkPolicy;
-        private QueuePolicy queuePolicy;
-        private int debugLevel;
+        private Optional<Integer> nLoadingThreads = Optional.absent();
+
+        private Optional<CachePolicy> cachePolicy = Optional.absent();
+        private Optional<NetworkPolicy> networkPolicy = Optional.absent();
+        private Optional<QueuePolicy> queuePolicy = Optional.absent();
+
+        private Optional<Integer> debugLevel = Optional.absent();
 
         private Builder() {
         }
@@ -112,8 +121,8 @@ public class LoaderConfig {
          * @return Builder instance.
          * @see CachePolicy
          */
-        public Builder cachePolicy(CachePolicy cachePolicy) {
-            this.cachePolicy = cachePolicy;
+        public Builder cachePolicy(@NonNull CachePolicy cachePolicy) {
+            this.cachePolicy = Optional.of(cachePolicy);
             return Builder.this;
         }
 
@@ -122,8 +131,8 @@ public class LoaderConfig {
          * @return Builder instance.
          * @see CachePolicy
          */
-        public Builder networkPolicy(NetworkPolicy networkPolicy) {
-            this.networkPolicy = networkPolicy;
+        public Builder networkPolicy(@NonNull NetworkPolicy networkPolicy) {
+            this.networkPolicy = Optional.of(networkPolicy);
             return Builder.this;
         }
 
@@ -133,7 +142,8 @@ public class LoaderConfig {
          * @see QueuePolicy
          * @deprecated Do not call anymore, FIFO is preferred by force.
          */
-        public Builder queuePolicy(QueuePolicy queuePolicy) {
+        public Builder queuePolicy(@NonNull QueuePolicy queuePolicy) {
+            this.queuePolicy = Optional.of(queuePolicy);
             return Builder.this;
         }
 
@@ -141,8 +151,9 @@ public class LoaderConfig {
          * @param nLoadingThreads Number of threads when loading.
          * @return Builder instance.
          */
-        public Builder loadingThreads(int nLoadingThreads) {
-            this.nLoadingThreads = nLoadingThreads;
+        public Builder loadingThreads(@MinSize(1) int nLoadingThreads) {
+            Preconditions.checkState(nLoadingThreads > 0, "Loading thread count should be positive");
+            this.nLoadingThreads = Optional.of(nLoadingThreads);
             return Builder.this;
         }
 
@@ -150,42 +161,19 @@ public class LoaderConfig {
          * @param debugLevel Debug level of Loader.
          * @return Builder instance.
          */
-        public Builder debugLevel(int debugLevel) {
-            this.debugLevel = debugLevel;
+        public Builder debugLevel(@MinSize(0) int debugLevel) {
+            Preconditions.checkState(debugLevel > 0, "Debug level should be positive");
+            this.debugLevel = Optional.of(debugLevel);
             return Builder.this;
         }
 
         public LoaderConfig build() {
-            invalidate();
             return new LoaderConfig(
-                    cachePolicy,
-                    networkPolicy,
-                    queuePolicy,
-                    nLoadingThreads,
-                    debugLevel);
-        }
-
-        void invalidate() {
-            if (cachePolicy == null) {
-                cachePolicy = CachePolicy.DEFAULT_CACHE_POLICY;
-                LoggerManager.getLogger(MediaLoader.class).warn("Using default cache policy:" + cachePolicy);
-            }
-            if (networkPolicy == null) {
-                networkPolicy = NetworkPolicy.DEFAULT_NETWORK_POLICY;
-                LoggerManager.getLogger(MediaLoader.class).warn("Using default network policy:" + networkPolicy);
-            }
-            if (nLoadingThreads <= 0) {
-                LoggerManager.getLogger(MediaLoader.class).warn("Using [Runtime.availableProcessors] as nLoadingThreads");
-                nLoadingThreads = Runtime.getRuntime().availableProcessors();
-            }
-            if (queuePolicy == null) {
-                LoggerManager.getLogger(MediaLoader.class).warn("Using FIFO as queuePolicy");
-                queuePolicy = QueuePolicy.FIFO;
-            }
-            if (debugLevel < Log.VERBOSE) {
-                debugLevel = Log.VERBOSE;
-                LoggerManager.getLogger(MediaLoader.class).warn("Using debug level:" + debugLevel);
-            }
+                    cachePolicy.or(CachePolicy.DEFAULT_CACHE_POLICY),
+                    networkPolicy.or(NetworkPolicy.DEFAULT_NETWORK_POLICY),
+                    queuePolicy.or(QueuePolicy.FIFO),
+                    nLoadingThreads.or(Runtime.getRuntime().availableProcessors()),
+                    debugLevel.or(Log.WARN));
         }
     }
 }

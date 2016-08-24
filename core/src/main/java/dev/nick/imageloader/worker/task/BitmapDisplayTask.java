@@ -28,9 +28,9 @@ import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.ui.MediaQuality;
 import dev.nick.imageloader.worker.DecodeSpec;
 import dev.nick.imageloader.worker.DimenSpec;
-import dev.nick.imageloader.worker.ImageData;
-import dev.nick.imageloader.worker.ImageFetcher;
-import dev.nick.imageloader.worker.ImageSource;
+import dev.nick.imageloader.worker.MediaData;
+import dev.nick.imageloader.worker.MediaFetcher;
+import dev.nick.imageloader.worker.MediaSource;
 import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.result.Cause;
 import dev.nick.imageloader.worker.result.ErrorListener;
@@ -38,7 +38,7 @@ import dev.nick.logger.LoggerManager;
 
 public class BitmapDisplayTask extends BaseDisplayTask<Bitmap> {
 
-    private ImageData<Bitmap> mImageData;
+    private MediaData<Bitmap> mMediaData;
 
     private DimenSpec mDimenSpec;
     private MediaQuality mQuality;
@@ -59,7 +59,7 @@ public class BitmapDisplayTask extends BaseDisplayTask<Bitmap> {
     public BitmapDisplayTask(Context context,
                              LoaderConfig loaderConfig,
                              TaskInterrupter displayTaskMonitor,
-                             ImageData<Bitmap> url,
+                             MediaData<Bitmap> url,
                              DimenSpec spec,
                              MediaQuality quality,
                              ProgressListener<Bitmap> progressListener,
@@ -68,7 +68,7 @@ public class BitmapDisplayTask extends BaseDisplayTask<Bitmap> {
         this.mContext = context;
         this.mLoaderConfig = loaderConfig;
         this.mDisplayTaskMonitor = displayTaskMonitor;
-        this.mImageData = url;
+        this.mMediaData = url;
         this.mDimenSpec = spec;
         this.mQuality = quality;
         this.mProgressListener = progressListener;
@@ -87,10 +87,10 @@ public class BitmapDisplayTask extends BaseDisplayTask<Bitmap> {
         }
 
         try {
-            ImageSource<Bitmap> source = mImageData.getSource();
-            ImageFetcher<Bitmap> fetcher = source.getFetcher(mContext, mLoaderConfig);
+            MediaSource<Bitmap> source = mMediaData.getSource();
+            MediaFetcher<Bitmap> fetcher = source.getFetcher(mContext, mLoaderConfig);
             DecodeSpec decodeSpec = new DecodeSpec(mQuality, mDimenSpec);
-            mResult = fetcher.fetchFromUrl(mImageData.getUrl(), decodeSpec, mProgressListener, mErrorListener);
+            mResult = fetcher.fetchFromUrl(mMediaData.getUrl(), decodeSpec, mProgressListener, mErrorListener);
         } catch (InterruptedIOException | InterruptedException ignored) {
             LoggerManager.getLogger(getClass()).debug("Ignored error:" + ignored.getLocalizedMessage());
         } catch (Exception e) {
@@ -112,8 +112,8 @@ public class BitmapDisplayTask extends BaseDisplayTask<Bitmap> {
 
     @NonNull
     @Override
-    public ImageData<Bitmap> getImageData() {
-        return mImageData;
+    public MediaData<Bitmap> getImageData() {
+        return mMediaData;
     }
 
     @Override

@@ -24,12 +24,12 @@ public abstract class ViewSettings<T> implements Runnable {
 
     protected ViewAnimator<T> mAnimator;
     @NonNull
-    protected MediaChair<T> mSeat;
+    protected MediaHolder<T> mSeat;
 
     public ViewSettings(ViewAnimator<T> animator,
-                        @NonNull MediaChair<T> mediaChair) {
+                        @NonNull MediaHolder<T> mediaHolder) {
         this.mAnimator = animator;
-        this.mSeat = mediaChair;
+        this.mSeat = mediaHolder;
     }
 
     protected abstract void apply();

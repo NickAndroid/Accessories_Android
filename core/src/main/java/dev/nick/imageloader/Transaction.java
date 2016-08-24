@@ -19,24 +19,26 @@ package dev.nick.imageloader;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.google.common.base.Optional;
+
 import dev.nick.imageloader.annotation.LoaderApi;
 import dev.nick.imageloader.queue.Priority;
 import dev.nick.imageloader.ui.DisplayOption;
-import dev.nick.imageloader.ui.MediaChair;
+import dev.nick.imageloader.ui.MediaHolder;
 import dev.nick.imageloader.utils.Preconditions;
-import dev.nick.imageloader.worker.ImageData;
-import dev.nick.imageloader.worker.ImageSource;
+import dev.nick.imageloader.worker.MediaData;
+import dev.nick.imageloader.worker.MediaSource;
 import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.result.ErrorListener;
 
 public abstract class Transaction<T> {
 
-    protected ImageData<T> imageData;
-    protected DisplayOption<T> option;
+    protected MediaData<T> mediaData;
+    protected Optional<DisplayOption<T>> option = Optional.absent();
     protected ProgressListener<T> progressListener;
     protected ErrorListener errorListener;
     protected Priority priority;
-    protected MediaChair<T> settable;
+    protected MediaHolder<T> settable;
 
     protected MediaLoader loader;
 
@@ -45,26 +47,26 @@ public abstract class Transaction<T> {
     }
 
     /**
-     * @param url Image source from, one of {@link ImageSource}
+     * @param url Image source from, one of {@link MediaSource}
      * @return Instance of Transaction.
      */
     @LoaderApi
     public Transaction<T> from(@NonNull String url) {
-        ImageSource<T> type = onCreateSource(url);
-        this.imageData = new ImageData<>(Preconditions.checkNotNull(type, "Unknown image source"), url);
+        MediaSource<T> type = onCreateSource(url);
+        this.mediaData = new MediaData<>(Preconditions.checkNotNull(type, "Unknown image source"), url);
         return Transaction.this;
     }
 
-    abstract ImageSource<T> onCreateSource(String url);
+    abstract MediaSource<T> onCreateSource(String url);
 
     /**
      * @param option {@link DisplayOption} is options using when display the image.
-     *               * @param settable Target {@link MediaChair} to display the image.
+     *               * @param settable Target {@link MediaHolder} to display the image.
      * @return Instance of Transaction.
      */
     @LoaderApi
     public Transaction<T> option(@NonNull DisplayOption<T> option) {
-        this.option = Preconditions.checkNotNull(option);
+        this.option = Optional.of(option);
         return Transaction.this;
     }
 
@@ -103,7 +105,7 @@ public abstract class Transaction<T> {
      * @return Instance of Transaction.
      */
     @LoaderApi
-    public Transaction<T> into(@NonNull MediaChair<T> settable) {
+    public Transaction<T> into(@NonNull MediaHolder<T> settable) {
         this.settable = Preconditions.checkNotNull(settable);
         return Transaction.this;
     }

@@ -27,6 +27,8 @@ import android.support.v7.widget.RecyclerView;
 import android.widget.AbsListView;
 import android.widget.ImageView;
 
+import com.google.common.collect.Lists;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -53,19 +55,19 @@ import dev.nick.imageloader.queue.QueuePolicy;
 import dev.nick.imageloader.queue.RequestHandler;
 import dev.nick.imageloader.queue.RequestQueueManager;
 import dev.nick.imageloader.scrollable.AbsListViewScrollDetector;
-import dev.nick.imageloader.ui.BitmapMediaViewDelegate;
 import dev.nick.imageloader.ui.DisplayOption;
 import dev.nick.imageloader.ui.IDCreator;
 import dev.nick.imageloader.ui.IDCreatorImpl;
-import dev.nick.imageloader.ui.MediaChair;
+import dev.nick.imageloader.ui.ImageViewDelegate;
+import dev.nick.imageloader.ui.MediaHolder;
 import dev.nick.imageloader.ui.MediaQuality;
 import dev.nick.imageloader.utils.Preconditions;
 import dev.nick.imageloader.worker.DimenSpec;
-import dev.nick.imageloader.worker.ImageData;
-import dev.nick.imageloader.worker.ImageSource;
+import dev.nick.imageloader.worker.MediaData;
+import dev.nick.imageloader.worker.MediaSource;
 import dev.nick.imageloader.worker.ProgressListener;
-import dev.nick.imageloader.worker.bitmap.BitmapImageSource;
-import dev.nick.imageloader.worker.movie.MovieImageSource;
+import dev.nick.imageloader.worker.bitmap.BitmapMediaSource;
+import dev.nick.imageloader.worker.movie.MovieMediaSource;
 import dev.nick.imageloader.worker.result.ErrorListener;
 import dev.nick.imageloader.worker.task.BaseFutureTask;
 import dev.nick.imageloader.worker.task.BitmapDisplayTask;
@@ -86,16 +88,6 @@ public class MediaLoader implements
         BaseFutureTask.TaskActionListener,
         Forkable<MediaLoader, LoaderConfig>,
         Terminable {
-
-    private static final DisplayOption<Bitmap> sDefDisplayOption = DisplayOption.bitmapBuilder()
-            .imageQuality(MediaQuality.OPT)
-            .viewMaybeReused()
-            .build();
-
-    private static final DisplayOption<Movie> sDefDisplayOptionMovie = DisplayOption.movieBuilder()
-            .imageQuality(MediaQuality.OPT)
-            .viewMaybeReused()
-            .build();
 
     @Lazy
     private static RecyclerView.OnScrollListener sRecyclerViewListener;
@@ -275,25 +267,23 @@ public class MediaLoader implements
     /**
      * Display image from the from to the view.
      *
-     * @param imageData        Image imageData from, one of {@link ImageData}
-     * @param mediaChair       Target {@link MediaChair} to display the image.
+     * @param mediaData        Image mediaData from, one of {@link MediaData}
+     * @param mediaHolder      Target {@link MediaHolder} to display the image.
      * @param option           {@link DisplayOption} is options using when display the image.
      * @param progressListener The progress progressListener using to watch the progress of the loading.
      */
-    Future<Bitmap> displayBitmap(@NonNull ImageData<Bitmap> imageData,
-                                 @NonNull MediaChair<Bitmap> mediaChair,
-                                 @Nullable DisplayOption<Bitmap> option,
+    Future<Bitmap> displayBitmap(@NonNull MediaData<Bitmap> mediaData,
+                                 @NonNull MediaHolder<Bitmap> mediaHolder,
+                                 @NonNull DisplayOption<Bitmap> option,
                                  @Nullable ProgressListener<Bitmap> progressListener,
                                  @Nullable ErrorListener errorListener,
                                  @Nullable Priority priority) {
 
         ensureNotTerminated();
 
-        Preconditions.checkNotNull(imageData.getUrl(), "imageData is null");
+        Preconditions.checkNotNull(mediaData.getUrl(), "mediaData is null");
 
-        DisplayTaskRecord record = createTaskRecord(Preconditions.checkNotNull(mediaChair));
-
-        option = assignBitmapOption(option);
+        DisplayTaskRecord record = createTaskRecord(Preconditions.checkNotNull(mediaHolder));
 
         // 1. Get from cache.
         // 2. If no mem cache, start a loading task from disk cache file or perform first loading.
@@ -303,7 +293,7 @@ public class MediaLoader implements
 
         MediaQuality mediaQuality = option.getQuality();
 
-        DimenSpec dimenSpec = new DimenSpec(mediaChair.getWidth(), mediaChair.getHeight());
+        DimenSpec dimenSpec = new DimenSpec(mediaHolder.getWidth(), mediaHolder.getHeight());
 
         ProgressListenerDelegate<Bitmap> progressListenerDelegate = new BitmapProgressListenerDelegate(
                 mBitmapCacheManager,
@@ -311,57 +301,57 @@ public class MediaLoader implements
                 progressListener,
                 dimenSpec,
                 option,
-                mediaChair,
+                mediaHolder,
                 record,
-                imageData.getUrl());
+                mediaData.getUrl());
 
         if (mBitmapCacheManager.isMemCacheEnabled()) {
             Bitmap cached;
-            if ((cached = mBitmapCacheManager.get(imageData.getUrl())) != null) {
-                mLogger.verbose("Using mem cached bitmap for:" + imageData.getUrl());
+            if ((cached = mBitmapCacheManager.get(mediaData.getUrl())) != null) {
+                mLogger.verbose("Using mem cached bitmap for:" + mediaData.getUrl());
                 mUISettingApplier.applySettings(
                         cached,
                         option.getArtist(),
-                        mediaChair,
+                        mediaHolder,
                         option.isAnimateOnlyNewLoaded() ? null : option.getAnimator());
                 progressListenerDelegate.callOnComplete(cached);
                 return new MokeFutureImageTask<>(cached);
             }
         }
 
-        String loadingUrl = imageData.getUrl();
+        String loadingUrl = mediaData.getUrl();
         boolean usingDiskCacheUrl = false;
 
         if (mBitmapCacheManager.isDiskCacheEnabled()) {
             String cachePath;
             if ((cachePath = mBitmapCacheManager.getCachePath(loadingUrl)) != null) {
-                loadingUrl = BitmapImageSource.FILE.getPrefix() + cachePath;
+                loadingUrl = BitmapMediaSource.FILE.getPrefix() + cachePath;
                 // Check mem cache again.
                 if (mBitmapCacheManager.isMemCacheEnabled()) {
                     Bitmap cached;
                     if ((cached = mBitmapCacheManager.get(loadingUrl)) != null) {
-                        mLogger.verbose("Using mem cached bitmap for:" + imageData.getUrl());
+                        mLogger.verbose("Using mem cached bitmap for:" + mediaData.getUrl());
                         mUISettingApplier.applySettings(
                                 cached,
                                 option.getArtist(),
-                                mediaChair,
+                                mediaHolder,
                                 option.isAnimateOnlyNewLoaded() ? null : option.getAnimator());
                         progressListenerDelegate.callOnComplete(cached);
                         return new MokeFutureImageTask<>(cached);
                     }
                 }
-                imageData.setUrl(loadingUrl);
-                imageData.setSource(BitmapImageSource.FILE);
+                mediaData.setUrl(loadingUrl);
+                mediaData.setSource(BitmapMediaSource.FILE);
                 usingDiskCacheUrl = true;
             }
         }
 
-        showOnLoadingBm(mediaChair, option);
+        showOnLoadingBm(mediaHolder, option);
 
         ErrorListenerDelegate<Bitmap> errorListenerDelegate = new BitmapErrorListenerDelegate(
                 errorListener,
                 option.isFailureImgDefined() ? option.getFailureImg() : null,
-                mediaChair);
+                mediaHolder);
 
         if (usingDiskCacheUrl) {
             mLogger.verbose("Using disk cache url for loading:" + loadingUrl);
@@ -373,7 +363,7 @@ public class MediaLoader implements
                 mContext,
                 mConfig,
                 mTaskManager,
-                imageData,
+                mediaData,
                 dimenSpec,
                 mediaQuality,
                 progressListenerDelegate,
@@ -388,19 +378,17 @@ public class MediaLoader implements
         return future;
     }
 
-    Future<Movie> displayMovie(@NonNull ImageData<Movie> source,
-                               @NonNull MediaChair<Movie> mediaChair,
-                               @Nullable DisplayOption<Movie> option,
+    Future<Movie> displayMovie(@NonNull MediaData<Movie> source,
+                               @NonNull MediaHolder<Movie> mediaHolder,
+                               @NonNull DisplayOption<Movie> option,
                                @Nullable ProgressListener<Movie> progressListener,
                                @Nullable ErrorListener errorListener,
                                @Nullable Priority priority) {
         ensureNotTerminated();
 
-        Preconditions.checkNotNull(source.getUrl(), "imageData is null");
+        Preconditions.checkNotNull(source.getUrl(), "mediaData is null");
 
-        DisplayTaskRecord record = createTaskRecord(Preconditions.checkNotNull(mediaChair));
-
-        option = assignMovieOption(option);
+        DisplayTaskRecord record = createTaskRecord(Preconditions.checkNotNull(mediaHolder));
 
         // 1. Get from cache.
         // 2. If no mem cache, start a loading task from disk cache file or perform first loading.
@@ -409,7 +397,7 @@ public class MediaLoader implements
         lazyGetMovieCacheManager();
 
         MediaQuality mediaQuality = option.getQuality();
-        DimenSpec dimenSpec = new DimenSpec(mediaChair.getWidth(), mediaChair.getHeight());
+        DimenSpec dimenSpec = new DimenSpec(mediaHolder.getWidth(), mediaHolder.getHeight());
 
         ProgressListenerDelegate<Movie> progressListenerDelegate = new MovieProgressListenerDelegate(
                 mMovieCacheManager,
@@ -417,7 +405,7 @@ public class MediaLoader implements
                 progressListener,
                 dimenSpec,
                 option,
-                mediaChair,
+                mediaHolder,
                 record,
                 source.getUrl());
 
@@ -427,7 +415,7 @@ public class MediaLoader implements
                 mUISettingApplier.applySettings(
                         cached,
                         option.getArtist(),
-                        mediaChair,
+                        mediaHolder,
                         option.isAnimateOnlyNewLoaded() ? null : option.getAnimator());
                 progressListenerDelegate.callOnComplete(cached);
                 return new MokeFutureImageTask<>(cached);
@@ -440,7 +428,7 @@ public class MediaLoader implements
         if (mMovieCacheManager.isDiskCacheEnabled()) {
             String cachePath;
             if ((cachePath = mMovieCacheManager.getCachePath(loadingUrl)) != null) {
-                loadingUrl = BitmapImageSource.FILE.getPrefix() + cachePath;
+                loadingUrl = BitmapMediaSource.FILE.getPrefix() + cachePath;
                 // Check mem cache again.
                 if (mMovieCacheManager.isMemCacheEnabled()) {
                     Movie cached;
@@ -448,14 +436,14 @@ public class MediaLoader implements
                         mUISettingApplier.applySettings(
                                 cached,
                                 option.getArtist(),
-                                mediaChair,
+                                mediaHolder,
                                 option.isAnimateOnlyNewLoaded() ? null : option.getAnimator());
                         progressListenerDelegate.callOnComplete(cached);
                         return new MokeFutureImageTask<>(cached);
                     }
                 }
                 source.setUrl(loadingUrl);
-                source.setSource(MovieImageSource.FILE);
+                source.setSource(MovieMediaSource.FILE);
                 usingDiskCacheUrl = true;
             }
         }
@@ -466,12 +454,12 @@ public class MediaLoader implements
             mLogger.verbose("No cache found, perform loading: " + loadingUrl);
         }
 
-        showOnLoadingMov(mediaChair, option);
+        showOnLoadingMov(mediaHolder, option);
 
         ErrorListenerDelegate errorListenerDelegate = new MovieErrorListenerDelegate(
                 errorListener,
                 option.isFailureImgDefined() ? option.getFailureImg() : null,
-                mediaChair);
+                mediaHolder);
 
         MovieDisplayTask imageTask = new MovieDisplayTask(
                 mContext,
@@ -504,7 +492,7 @@ public class MediaLoader implements
         return mMovieCacheManager;
     }
 
-    private DisplayTaskRecord createTaskRecord(MediaChair settable) {
+    private DisplayTaskRecord createTaskRecord(MediaHolder settable) {
         long settableId = mSettableIdCreator.createSettableId(settable);
         int taskId = mTaskManager.nextTaskId();
         DisplayTaskRecord displayTaskRecord = new DisplayTaskRecord(settableId, taskId);
@@ -512,27 +500,17 @@ public class MediaLoader implements
         return displayTaskRecord;
     }
 
-    private void showOnLoadingBm(MediaChair<Bitmap> settable, DisplayOption<Bitmap> option) {
+    private void showOnLoadingBm(MediaHolder<Bitmap> settable, DisplayOption<Bitmap> option) {
         if (option.isLoadingImgDefined()) {
             Bitmap showWhenLoading = option.getLoadingImg();
             mUISettingApplier.applySettings(showWhenLoading, null, settable, null);
         }
     }
 
-    private void showOnLoadingMov(MediaChair<Movie> settable, DisplayOption option) {
+    private void showOnLoadingMov(MediaHolder<Movie> settable, DisplayOption option) {
         if (option.isLoadingImgDefined()) {
             // TODO: 16-8-21 Impl
         }
-    }
-
-    private DisplayOption<Bitmap> assignBitmapOption(DisplayOption<Bitmap> option) {
-        if (option != null) return option;
-        return sDefDisplayOption;
-    }
-
-    private DisplayOption<Movie> assignMovieOption(DisplayOption<Movie> option) {
-        if (option != null) return option;
-        return sDefDisplayOptionMovie;
     }
 
     private boolean onFutureSubmit(BaseFutureTask futureTask) {
@@ -555,9 +533,10 @@ public class MediaLoader implements
         synchronized (mFutures) {
             mFutures.remove(task);
         }
+        mUiThreadRouter.callOnCancel(task.getListenableTask().getProgressListener());
     }
 
-    private ExecutorService getExecutor(ImageSource type) {
+    private ExecutorService getExecutor(MediaSource type) {
         if (type.maybeSlow()) {
             mLogger.verbose("Using default loading service for slower task.");
             return mLoadingService;
@@ -749,11 +728,9 @@ public class MediaLoader implements
      */
     @LoaderApi
     public void cancelAllTasks() {
-        synchronized (mFutures) {
-            for (BaseFutureTask futureTask : mFutures) {
-                futureTask.cancel(true);
-            }
-            mFutures.clear();
+        List<BaseFutureTask> tasks = Lists.newArrayList(mFutures);
+        for (BaseFutureTask task : tasks) {
+            task.cancel(true);
         }
     }
 
@@ -769,7 +746,6 @@ public class MediaLoader implements
         if (pendingCancels.size() > 0) {
             for (BaseFutureTask toBeCanceled : pendingCancels) {
                 toBeCanceled.cancel(true);
-                mUiThreadRouter.callOnCancel(toBeCanceled.getListenableTask().getProgressListener());
                 mLogger.info("Cancel task for from:" + url);
             }
             pendingCancels.clear();
@@ -784,7 +760,7 @@ public class MediaLoader implements
      */
     @LoaderApi
     public MediaLoader cancel(@NonNull ImageView view) {
-        return cancel(new BitmapMediaViewDelegate(view));
+        return cancel(new ImageViewDelegate(view));
     }
 
     /**
@@ -793,7 +769,7 @@ public class MediaLoader implements
      * @param settable The settable of the loader request.
      */
     @LoaderApi
-    public MediaLoader cancel(@NonNull MediaChair settable) {
+    public MediaLoader cancel(@NonNull MediaHolder settable) {
         return cancel(mSettableIdCreator.createSettableId(settable));
     }
 
@@ -809,7 +785,6 @@ public class MediaLoader implements
         if (pendingCancels.size() > 0) {
             for (BaseFutureTask toBeCanceled : pendingCancels) {
                 toBeCanceled.cancel(true);
-                mUiThreadRouter.callOnCancel(toBeCanceled.getListenableTask().getProgressListener());
                 mLogger.verbose("Cancel task for settable:" + settableId);
             }
             pendingCancels.clear();

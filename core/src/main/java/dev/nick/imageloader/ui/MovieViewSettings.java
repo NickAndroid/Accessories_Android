@@ -25,8 +25,8 @@ public class MovieViewSettings extends ViewSettings<Movie> {
 
     Movie mMovie;
 
-    public MovieViewSettings(ViewAnimator<Movie> animator, @NonNull MediaChair<Movie> mediaChair, Movie movie) {
-        super(animator, mediaChair);
+    public MovieViewSettings(ViewAnimator<Movie> animator, @NonNull MediaHolder<Movie> mediaHolder, Movie movie) {
+        super(animator, mediaHolder);
         this.mMovie = movie;
     }
 

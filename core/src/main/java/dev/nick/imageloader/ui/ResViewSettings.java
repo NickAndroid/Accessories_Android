@@ -25,8 +25,8 @@ public class ResViewSettings extends ViewSettings<Bitmap> {
 
     int mResId;
 
-    public ResViewSettings(ViewAnimator<Bitmap> animator, @NonNull MediaChair<Bitmap> mediaChair, int resId) {
-        super(animator, mediaChair);
+    public ResViewSettings(ViewAnimator<Bitmap> animator, @NonNull MediaHolder<Bitmap> mediaHolder, int resId) {
+        super(animator, mediaHolder);
         this.mResId = resId;
     }
 

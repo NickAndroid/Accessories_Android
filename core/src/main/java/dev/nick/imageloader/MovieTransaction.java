@@ -26,13 +26,19 @@ import java.util.concurrent.ExecutionException;
 import dev.nick.imageloader.annotation.LoaderApi;
 import dev.nick.imageloader.queue.Priority;
 import dev.nick.imageloader.ui.DisplayOption;
-import dev.nick.imageloader.ui.MediaChair;
-import dev.nick.imageloader.worker.ImageSource;
+import dev.nick.imageloader.ui.MediaHolder;
+import dev.nick.imageloader.ui.MediaQuality;
+import dev.nick.imageloader.worker.MediaSource;
 import dev.nick.imageloader.worker.ProgressListener;
-import dev.nick.imageloader.worker.movie.MovieImageSource;
+import dev.nick.imageloader.worker.movie.MovieMediaSource;
 import dev.nick.imageloader.worker.result.ErrorListener;
 
 public class MovieTransaction extends Transaction<Movie> {
+
+    private static final DisplayOption<Movie> sDefDisplayOption = DisplayOption.movieBuilder()
+            .imageQuality(MediaQuality.OPT)
+            .viewMaybeReused()
+            .build();
 
     MovieTransaction(@NonNull MediaLoader loader) {
         super(loader);
@@ -45,8 +51,8 @@ public class MovieTransaction extends Transaction<Movie> {
     }
 
     @Override
-    ImageSource<Movie> onCreateSource(String url) {
-        return MovieImageSource.from(url);
+    MediaSource<Movie> onCreateSource(String url) {
+        return MovieMediaSource.from(url);
     }
 
     @Override
@@ -74,7 +80,7 @@ public class MovieTransaction extends Transaction<Movie> {
     }
 
     @Override
-    public MovieTransaction into(@NonNull MediaChair<Movie> settable) {
+    public MovieTransaction into(@NonNull MediaHolder<Movie> settable) {
         super.into(settable);
         return this;
     }
@@ -85,9 +91,9 @@ public class MovieTransaction extends Transaction<Movie> {
     public Movie startSynchronously() {
         try {
             return loader.displayMovie(
-                    imageData,
+                    mediaData,
                     noneNullSettable(),
-                    option,
+                    option.or(sDefDisplayOption),
                     progressListener,
                     errorListener,
                     priority)
@@ -102,16 +108,16 @@ public class MovieTransaction extends Transaction<Movie> {
     @LoaderApi
     void startAsync() {
         loader.displayMovie(
-                imageData,
+                mediaData,
                 noneNullSettable(),
-                option,
+                option.or(sDefDisplayOption),
                 progressListener,
                 errorListener,
                 priority);
     }
 
 
-    protected MediaChair<Movie> noneNullSettable() {
-        return settable == null ? new FakeMovieMediaChair(imageData.getUrl()) : settable;
+    protected MediaHolder<Movie> noneNullSettable() {
+        return settable == null ? new FakeMovieMediaHolder(mediaData.getUrl()) : settable;
     }
 }

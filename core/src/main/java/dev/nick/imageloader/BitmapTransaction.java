@@ -26,15 +26,21 @@ import java.util.concurrent.ExecutionException;
 
 import dev.nick.imageloader.annotation.LoaderApi;
 import dev.nick.imageloader.queue.Priority;
-import dev.nick.imageloader.ui.BitmapMediaViewDelegate;
 import dev.nick.imageloader.ui.DisplayOption;
-import dev.nick.imageloader.ui.MediaChair;
-import dev.nick.imageloader.worker.ImageSource;
+import dev.nick.imageloader.ui.ImageViewDelegate;
+import dev.nick.imageloader.ui.MediaHolder;
+import dev.nick.imageloader.ui.MediaQuality;
+import dev.nick.imageloader.worker.MediaSource;
 import dev.nick.imageloader.worker.ProgressListener;
-import dev.nick.imageloader.worker.bitmap.BitmapImageSource;
+import dev.nick.imageloader.worker.bitmap.BitmapMediaSource;
 import dev.nick.imageloader.worker.result.ErrorListener;
 
 public class BitmapTransaction extends Transaction<Bitmap> {
+
+    private static final DisplayOption<Bitmap> sDefDisplayOption = DisplayOption.bitmapBuilder()
+            .imageQuality(MediaQuality.OPT)
+            .viewMaybeReused()
+            .build();
 
     BitmapTransaction(@NonNull MediaLoader loader) {
         super(loader);
@@ -47,8 +53,8 @@ public class BitmapTransaction extends Transaction<Bitmap> {
     }
 
     @Override
-    ImageSource<Bitmap> onCreateSource(String url) {
-        return BitmapImageSource.from(url);
+    MediaSource<Bitmap> onCreateSource(String url) {
+        return BitmapMediaSource.from(url);
     }
 
     @Override
@@ -76,7 +82,7 @@ public class BitmapTransaction extends Transaction<Bitmap> {
     }
 
     @Override
-    public BitmapTransaction into(@NonNull MediaChair<Bitmap> settable) {
+    public BitmapTransaction into(@NonNull MediaHolder<Bitmap> settable) {
         super.into(settable);
         return this;
     }
@@ -87,7 +93,7 @@ public class BitmapTransaction extends Transaction<Bitmap> {
      */
     @LoaderApi
     public BitmapTransaction into(@NonNull ImageView view) {
-        this.settable = new BitmapMediaViewDelegate(view);
+        this.settable = new ImageViewDelegate(view);
         return BitmapTransaction.this;
     }
 
@@ -98,9 +104,9 @@ public class BitmapTransaction extends Transaction<Bitmap> {
     public Bitmap startSynchronously() {
         try {
             return loader.displayBitmap(
-                    imageData,
+                    mediaData,
                     noneNullSettable(),
-                    option,
+                    option.or(sDefDisplayOption),
                     progressListener,
                     errorListener,
                     priority)
@@ -115,16 +121,16 @@ public class BitmapTransaction extends Transaction<Bitmap> {
     @LoaderApi
     void startAsync() {
         loader.displayBitmap(
-                imageData,
+                mediaData,
                 noneNullSettable(),
-                option,
+                option.or(sDefDisplayOption),
                 progressListener,
                 errorListener,
                 priority);
     }
 
 
-    protected MediaChair<Bitmap> noneNullSettable() {
-        return settable == null ? new FakeBitmapMediaChair(imageData.getUrl()) : settable;
+    protected MediaHolder<Bitmap> noneNullSettable() {
+        return settable == null ? new FakeBitmapMediaHolder(mediaData.getUrl()) : settable;
     }
 }

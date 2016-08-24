@@ -19,12 +19,12 @@ package dev.nick.imageloader.worker.task;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import dev.nick.imageloader.worker.ImageData;
+import dev.nick.imageloader.worker.MediaData;
 import dev.nick.imageloader.worker.ProgressListener;
 
 public interface ListenableTask<X extends TaskRecord, T> extends Task<X, T> {
     @NonNull
-    ImageData getImageData();
+    MediaData getImageData();
 
     @Nullable
     ProgressListener<T> getProgressListener();

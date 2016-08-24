@@ -31,7 +31,7 @@ import dev.nick.imageloader.queue.Priority;
 import dev.nick.imageloader.ui.DisplayOption;
 import dev.nick.imageloader.ui.MediaQuality;
 import dev.nick.imageloader.ui.animator.FadeInViewAnimator;
-import dev.nick.imageloader.ui.art.BlackWhiteImageArt;
+import dev.nick.imageloader.ui.art.BlackWhiteMediaArt;
 
 public class AssetsImageTest extends BaseTest {
 
@@ -62,7 +62,7 @@ public class AssetsImageTest extends BaseTest {
                 })
                 .option(DisplayOption.bitmapBuilder()
                         .showOnFailure(BitmapFactory.decodeResource(getResources(), R.drawable.aio_image_fail))
-                        .imageArt(new BlackWhiteImageArt())
+                        .imageArt(new BlackWhiteMediaArt())
                         .imageQuality(MediaQuality.RAW)
                         .imageAnimator(new FadeInViewAnimator())
                         .build())

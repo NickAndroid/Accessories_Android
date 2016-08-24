@@ -28,9 +28,9 @@ import dev.nick.imageloader.LoaderConfig;
 import dev.nick.imageloader.ui.MediaQuality;
 import dev.nick.imageloader.worker.DecodeSpec;
 import dev.nick.imageloader.worker.DimenSpec;
-import dev.nick.imageloader.worker.ImageData;
-import dev.nick.imageloader.worker.ImageFetcher;
-import dev.nick.imageloader.worker.ImageSource;
+import dev.nick.imageloader.worker.MediaData;
+import dev.nick.imageloader.worker.MediaFetcher;
+import dev.nick.imageloader.worker.MediaSource;
 import dev.nick.imageloader.worker.ProgressListener;
 import dev.nick.imageloader.worker.result.Cause;
 import dev.nick.imageloader.worker.result.ErrorListener;
@@ -38,7 +38,7 @@ import dev.nick.logger.LoggerManager;
 
 public class MovieDisplayTask extends BaseDisplayTask<Movie> {
 
-    private ImageData<Movie> mImageData;
+    private MediaData<Movie> mMediaData;
 
     private DimenSpec mDimenSpec;
     private MediaQuality mQuality;
@@ -59,7 +59,7 @@ public class MovieDisplayTask extends BaseDisplayTask<Movie> {
     public MovieDisplayTask(Context context,
                             LoaderConfig loaderConfig,
                             TaskInterrupter displayTaskMonitor,
-                            ImageData<Movie> url,
+                            MediaData<Movie> url,
                             DimenSpec spec,
                             MediaQuality quality,
                             ProgressListener<Movie> progressListener,
@@ -68,7 +68,7 @@ public class MovieDisplayTask extends BaseDisplayTask<Movie> {
         this.mContext = context;
         this.mLoaderConfig = loaderConfig;
         this.mDisplayTaskMonitor = displayTaskMonitor;
-        this.mImageData = url;
+        this.mMediaData = url;
         this.mDimenSpec = spec;
         this.mQuality = quality;
         this.mProgressListener = progressListener;
@@ -86,10 +86,10 @@ public class MovieDisplayTask extends BaseDisplayTask<Movie> {
             return;
         }
         try {
-            ImageSource<Movie> source = mImageData.getSource();
-            ImageFetcher<Movie> fetcher = source.getFetcher(mContext, mLoaderConfig);
+            MediaSource<Movie> source = mMediaData.getSource();
+            MediaFetcher<Movie> fetcher = source.getFetcher(mContext, mLoaderConfig);
             DecodeSpec decodeSpec = new DecodeSpec(mQuality, mDimenSpec);
-            mResult = fetcher.fetchFromUrl(mImageData.getUrl(), decodeSpec, mProgressListener, mErrorListener);
+            mResult = fetcher.fetchFromUrl(mMediaData.getUrl(), decodeSpec, mProgressListener, mErrorListener);
         } catch (InterruptedIOException | InterruptedException ignored) {
             LoggerManager.getLogger(getClass()).debug("Ignored error:" + ignored.getLocalizedMessage());
         } catch (Exception e) {
@@ -111,8 +111,8 @@ public class MovieDisplayTask extends BaseDisplayTask<Movie> {
 
     @NonNull
     @Override
-    public ImageData<Movie> getImageData() {
-        return mImageData;
+    public MediaData<Movie> getImageData() {
+        return mMediaData;
     }
 
     @Override
