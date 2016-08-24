@@ -73,7 +73,7 @@ public class ContentMovieTest extends BaseTest {
                         .preferredLocation(CachePolicy.Location.INTERNAL)
                         .compressFormat(Bitmap.CompressFormat.JPEG)
                         .build())
-                .networkPolicy(NetworkPolicy.builder().enableTrafficStats().build())
+                .networkPolicy(NetworkPolicy.builder().trafficStatsEnabled(true).build())
                 .build());
 
         BaseAdapter adapter = new BaseAdapter() {

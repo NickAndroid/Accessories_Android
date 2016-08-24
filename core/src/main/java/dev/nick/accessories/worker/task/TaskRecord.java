@@ -16,33 +16,21 @@
 
 package dev.nick.accessories.worker.task;
 
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@ToString
 public class TaskRecord {
 
+    @Getter
     protected long upTime = System.currentTimeMillis();
 
+    @Getter
+    @Setter
     protected int taskId;
 
     public TaskRecord(int taskId) {
         this.taskId = taskId;
-    }
-
-    public int getTaskId() {
-        return taskId;
-    }
-
-    public void setTaskId(int taskId) {
-        this.taskId = taskId;
-    }
-
-    public long upTime() {
-        return upTime;
-    }
-
-    @Override
-    public String toString() {
-        return "TaskRecord{" +
-                "taskId=" + taskId +
-                ", upTime=" + upTime +
-                '}';
     }
 }

@@ -16,7 +16,8 @@
 
 package dev.nick.accessories.worker.task;
 
-import java.util.HashMap;
+import com.google.common.collect.Maps;
+
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -37,7 +38,7 @@ public class TaskManagerImpl implements TaskManager {
     private LoaderState mState = LoaderState.RUNNING;
 
     public TaskManagerImpl() {
-        this.mTaskLockMap = new HashMap<>();
+        this.mTaskLockMap = Maps.newHashMap();
         this.mLogger = LoggerManager.getLogger(getClass());
     }
 
@@ -54,7 +55,7 @@ public class TaskManagerImpl implements TaskManager {
     @Override
     public void onDisplayTaskCreated(DisplayTaskRecord record) {
         int taskId = record.getTaskId();
-        long settableId = record.getSettableId();
+        long settableId = record.getViewId();
         synchronized (mTaskLockMap) {
             DisplayTaskRecord exists = mTaskLockMap.get(settableId);
             if (exists != null) {
@@ -82,7 +83,7 @@ public class TaskManagerImpl implements TaskManager {
             return true;
         }
 
-        boolean outDated = task.upTime() <= mClearTaskRequestedTimeMills;
+        boolean outDated = task.getUpTime() <= mClearTaskRequestedTimeMills;
 
         if (outDated) {
             mLogger.verbose("Mark as dirty when outDated.");
@@ -90,7 +91,7 @@ public class TaskManagerImpl implements TaskManager {
         }
 
         synchronized (mTaskLockMap) {
-            DisplayTaskRecord lock = mTaskLockMap.get(task.getSettableId());
+            DisplayTaskRecord lock = mTaskLockMap.get(task.getViewId());
             if (lock != null) {
                 int taskId = lock.getTaskId();
                 // We have new task to load for this settle.

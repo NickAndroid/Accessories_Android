@@ -26,7 +26,9 @@ import java.util.ArrayList;
 import dev.nick.accessories.ui.animator.ViewAnimator;
 import dev.nick.accessories.ui.art.MediaArt;
 import dev.nick.accessories.utils.Preconditions;
+import lombok.Getter;
 
+@Getter
 public class DisplayOption<T> {
 
     private T failureImg;
@@ -37,7 +39,7 @@ public class DisplayOption<T> {
 
     private MediaQuality quality;
 
-    private ArrayList<MediaArt<T>> handlers;
+    private ArrayList<MediaArt<T>> mediaArts;
     private ViewAnimator<T> animator;
 
     private boolean viewMaybeReused;
@@ -49,7 +51,7 @@ public class DisplayOption<T> {
                           boolean failureImgDefined,
                           boolean loadingImgDefined,
                           MediaQuality quality,
-                          ArrayList<MediaArt<T>> handlers,
+                          ArrayList<MediaArt<T>> mediaArts,
                           ViewAnimator<T> animator,
                           boolean viewMaybeReused,
                           boolean animateOnlyNewLoaded) {
@@ -58,7 +60,7 @@ public class DisplayOption<T> {
         this.loadingImgDefined = loadingImgDefined;
         this.failureImgDefined = failureImgDefined;
         this.quality = quality;
-        this.handlers = handlers;
+        this.mediaArts = mediaArts;
         this.animator = animator;
         this.viewMaybeReused = viewMaybeReused;
         this.animateOnlyNewLoaded = animateOnlyNewLoaded;
@@ -70,42 +72,6 @@ public class DisplayOption<T> {
 
     public static Builder<Movie> movieBuilder() {
         return new Builder<>();
-    }
-
-    public T getFailureImg() {
-        return failureImg;
-    }
-
-    public T getLoadingImg() {
-        return loadingImg;
-    }
-
-    public boolean isFailureImgDefined() {
-        return failureImgDefined;
-    }
-
-    public boolean isLoadingImgDefined() {
-        return loadingImgDefined;
-    }
-
-    public MediaQuality getQuality() {
-        return quality;
-    }
-
-    public ArrayList<MediaArt<T>> getArtist() {
-        return handlers;
-    }
-
-    public ViewAnimator<T> getAnimator() {
-        return animator;
-    }
-
-    public boolean isViewMaybeReused() {
-        return viewMaybeReused;
-    }
-
-    public boolean isAnimateOnlyNewLoaded() {
-        return animateOnlyNewLoaded;
     }
 
     public static class Builder<T> {

@@ -24,11 +24,15 @@ import com.google.common.base.Optional;
 import dev.nick.accessories.annotation.MaxSize;
 import dev.nick.accessories.annotation.MinSize;
 import dev.nick.accessories.utils.Preconditions;
+import lombok.Getter;
+import lombok.ToString;
 
 /**
  * Policy reading when caching images.
  * Using {@link Builder} to build a policy.
  */
+@ToString
+@Getter
 public class CachePolicy {
 
     public static final int DEFAULT_MEM_CACHE_POOL_SIZE = (int) (Runtime.getRuntime().maxMemory() / 8);
@@ -55,7 +59,7 @@ public class CachePolicy {
     private boolean storageStatsEnabled;
 
     @MinSize(1)
-    private int nCachingThreads;
+    private int cachingThreads;
     @MinSize(1)
     private int memCachePoolSize;
     private int preferredLocation;
@@ -70,7 +74,7 @@ public class CachePolicy {
     private CachePolicy(boolean memCacheEnabled,
                         boolean diskCacheEnabled,
                         boolean storageStatsEnabled,
-                        int nCachingThreads,
+                        int cachingThreads,
                         int memCachePoolSize,
                         String cacheDirName,
                         FileNameGenerator fileNameGenerator,
@@ -81,7 +85,7 @@ public class CachePolicy {
         this.memCacheEnabled = memCacheEnabled;
         this.diskCacheEnabled = diskCacheEnabled;
         this.storageStatsEnabled = storageStatsEnabled;
-        this.nCachingThreads = nCachingThreads;
+        this.cachingThreads = cachingThreads;
         this.memCachePoolSize = memCachePoolSize;
         this.cacheDirName = cacheDirName;
         this.fileNameGenerator = fileNameGenerator;
@@ -93,70 +97,6 @@ public class CachePolicy {
 
     public static Builder builder() {
         return new Builder();
-    }
-
-    public boolean isDiskCacheEnabled() {
-        return diskCacheEnabled;
-    }
-
-    public boolean isMemCacheEnabled() {
-        return memCacheEnabled;
-    }
-
-    public boolean isStorageStatsEnabled() {
-        return storageStatsEnabled;
-    }
-
-    public int getMemCachePoolSize() {
-        return memCachePoolSize;
-    }
-
-    public int getPreferredLocation() {
-        return preferredLocation;
-    }
-
-    public int getCachingThreads() {
-        return nCachingThreads;
-    }
-
-    public String getCacheDirName() {
-        return cacheDirName;
-    }
-
-    @NonNull
-    public FileNameGenerator getFileNameGenerator() {
-        return fileNameGenerator;
-    }
-
-    @NonNull
-    public KeyGenerator getKeyGenerator() {
-        return keyGenerator;
-    }
-
-    @NonNull
-    public Bitmap.CompressFormat getCompressFormat() {
-        return compressFormat;
-    }
-
-    public int getQuality() {
-        return quality;
-    }
-
-    @Override
-    public String toString() {
-        return "CachePolicy{" +
-                "cacheDirName='" + cacheDirName + '\'' +
-                ", memCacheEnabled=" + memCacheEnabled +
-                ", diskCacheEnabled=" + diskCacheEnabled +
-                ", storageStatsEnabled=" + storageStatsEnabled +
-                ", nCachingThreads=" + nCachingThreads +
-                ", memCachePoolSize=" + memCachePoolSize +
-                ", preferredLocation=" + preferredLocation +
-                ", keyGenerator=" + keyGenerator +
-                ", fileNameGenerator=" + fileNameGenerator +
-                ", compressFormat=" + compressFormat +
-                ", quality=" + quality +
-                '}';
     }
 
     public interface Location {

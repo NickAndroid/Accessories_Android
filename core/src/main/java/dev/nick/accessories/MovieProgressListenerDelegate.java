@@ -69,7 +69,7 @@ class MovieProgressListenerDelegate extends ProgressListenerDelegate<Movie> {
 
         if (!isViewMaybeReused || !checkTaskDirty()) {
             ViewAnimator<Movie> animator = (option == null ? null : option.getAnimator());
-            ArrayList<MediaArt<Movie>> handlers = (option == null ? null : option.getArtist());
+            ArrayList<MediaArt<Movie>> handlers = (option == null ? null : option.getMediaArts());
             UISettingApplier.getSharedApplier().applySettings(result, handlers, settable, animator);
         }
         cacheManager.cache(url, result);

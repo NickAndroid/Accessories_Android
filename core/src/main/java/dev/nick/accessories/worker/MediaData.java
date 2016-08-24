@@ -16,6 +16,11 @@
 
 package dev.nick.accessories.worker;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class MediaData<X> {
 
     private MediaSource<X> source;
@@ -26,22 +31,6 @@ public class MediaData<X> {
 
     public MediaData(MediaSource<X> source, String url) {
         this.source = source;
-        this.url = url;
-    }
-
-    public MediaSource<X> getSource() {
-        return source;
-    }
-
-    public void setSource(MediaSource<X> source) {
-        this.source = source;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
         this.url = url;
     }
 }

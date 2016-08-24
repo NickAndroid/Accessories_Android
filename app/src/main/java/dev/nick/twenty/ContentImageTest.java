@@ -35,13 +35,13 @@ import com.nick.scalpel.annotation.request.RequirePermission;
 import java.io.File;
 import java.util.List;
 
-import dev.nick.accessories.MediaAccessory;
 import dev.nick.accessories.AccessoryConfig;
+import dev.nick.accessories.MediaAccessory;
 import dev.nick.accessories.cache.CachePolicy;
+import dev.nick.accessories.ui.DisplayOption;
 import dev.nick.accessories.ui.MediaQuality;
 import dev.nick.accessories.ui.animator.FadeInViewAnimator;
 import dev.nick.accessories.worker.network.NetworkPolicy;
-import dev.nick.accessories.ui.DisplayOption;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
 public class ContentImageTest extends BaseTest {
@@ -73,7 +73,7 @@ public class ContentImageTest extends BaseTest {
                         .preferredLocation(CachePolicy.Location.INTERNAL)
                         .compressFormat(Bitmap.CompressFormat.JPEG)
                         .build())
-                .networkPolicy(NetworkPolicy.builder().enableTrafficStats().build())
+                .networkPolicy(NetworkPolicy.builder().trafficStatsEnabled(true).build())
                 .build());
 
         BaseAdapter adapter = new BaseAdapter() {

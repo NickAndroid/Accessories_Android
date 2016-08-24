@@ -55,8 +55,10 @@ public class BaseNetworkMediaFetcher<T> extends BaseMediaFetcher<T> {
 
         mLogger.funcEnter();
 
-        DownloadManager.Transaction<String> transaction = mDownloadManager.beginTransaction().url(url)
-                .errorListener(errorListener).progressListener(progressListener);
+        DownloadManager.Transaction transaction = mDownloadManager.beginTransaction();
+        transaction.setUrl(url);
+        transaction.setErrorListener(errorListener);
+        transaction.setProgressListener(progressListener);
 
         callOnStart(progressListener);
 

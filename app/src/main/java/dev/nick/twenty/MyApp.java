@@ -59,8 +59,9 @@ public class MyApp extends ScalpelApplication {
                         .compressFormat(Bitmap.CompressFormat.PNG)
                         .build())
                 .networkPolicy(NetworkPolicy.builder()
-                        .onlyOnWifi()
-                        .enableTrafficStats().build())
+                        .onlyOnWifi(true)
+                        .trafficStatsEnabled(true)
+                        .build())
                 .debugLevel(Log.VERBOSE)
                 .build());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {

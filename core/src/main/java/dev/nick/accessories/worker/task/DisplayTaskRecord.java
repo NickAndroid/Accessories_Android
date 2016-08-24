@@ -16,23 +16,22 @@
 
 package dev.nick.accessories.worker.task;
 
+import lombok.Getter;
+
 public class DisplayTaskRecord extends TaskRecord {
 
-    private long settableId;
+    @Getter
+    private long viewId;
 
-    public DisplayTaskRecord(long settableId, int taskId) {
+    public DisplayTaskRecord(long viewId, int taskId) {
         super(taskId);
-        this.settableId = settableId;
-    }
-
-    public long getSettableId() {
-        return settableId;
+        this.viewId = viewId;
     }
 
     @Override
     public String toString() {
         return "DisplayTaskRecord{" +
-                "settableId=" + settableId +
+                "viewId=" + viewId +
                 "} " + super.toString();
     }
 }

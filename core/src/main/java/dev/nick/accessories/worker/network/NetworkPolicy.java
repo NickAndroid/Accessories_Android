@@ -16,67 +16,20 @@
 
 package dev.nick.accessories.worker.network;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
+import lombok.experimental.Builder;
+
+@Getter
+@ToString
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class NetworkPolicy {
 
     public static final NetworkPolicy DEFAULT_NETWORK_POLICY = NetworkPolicy.builder().build();
 
-    boolean onlyOnWifi;
-    boolean trafficStatsEnabled;
-
-    private NetworkPolicy(boolean onlyOnWifi, boolean trafficStatsEnabled) {
-        this.onlyOnWifi = onlyOnWifi;
-        this.trafficStatsEnabled = trafficStatsEnabled;
-    }
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public boolean isOnlyOnWifi() {
-        return onlyOnWifi;
-    }
-
-    public boolean isTrafficStatsEnabled() {
-        return trafficStatsEnabled;
-    }
-
-    @Override
-    public String toString() {
-        return "NetworkPolicy{" +
-                "onlyOnWifi=" + onlyOnWifi +
-                '}';
-    }
-
-    public static class Builder {
-
-        boolean onlyOnWifi;
-        boolean trafficStatsEnbaled;
-
-        private Builder() {
-        }
-
-        /**
-         * To load image only under WIFI connection.
-         *
-         * @return Builder instance.
-         */
-        public Builder onlyOnWifi() {
-            this.onlyOnWifi = true;
-            return Builder.this;
-        }
-
-        /**
-         * To enable the traffic stats.
-         *
-         * @return Builder instance.
-         */
-        public Builder enableTrafficStats() {
-            this.trafficStatsEnbaled = true;
-            return Builder.this;
-        }
-
-        public NetworkPolicy build() {
-            return new NetworkPolicy(onlyOnWifi, trafficStatsEnbaled);
-        }
-    }
+    private boolean onlyOnWifi;
+    private boolean trafficStatsEnabled;
 }

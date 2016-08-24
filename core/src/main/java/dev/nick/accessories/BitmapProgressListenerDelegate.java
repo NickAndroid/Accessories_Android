@@ -73,7 +73,7 @@ class BitmapProgressListenerDelegate extends ProgressListenerDelegate<Bitmap> {
 
         if (!isViewMaybeReused || !checkTaskDirty()) {
             ViewAnimator<Bitmap> animator = (option == null ? null : option.getAnimator());
-            ArrayList<MediaArt<Bitmap>> mediaArts = (option == null ? null : option.getArtist());
+            ArrayList<MediaArt<Bitmap>> mediaArts = (option == null ? null : option.getMediaArts());
             UISettingApplier.getSharedApplier().applySettings(result, mediaArts, settable, animator);
         }
         cacheManager.cache(url, result);

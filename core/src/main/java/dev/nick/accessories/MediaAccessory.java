@@ -80,6 +80,8 @@ import dev.nick.accessories.worker.task.TaskManager;
 import dev.nick.accessories.worker.task.TaskManagerImpl;
 import dev.nick.logger.Logger;
 import dev.nick.logger.LoggerManager;
+import lombok.Getter;
+import lombok.Synchronized;
 
 /**
  * Main class of {@link MediaAccessory} library.
@@ -120,6 +122,8 @@ public class MediaAccessory implements
     private ThreadPoolExecutor mFallbackService;
 
     private Freezer mFreezer;
+
+    @Getter
     private LoaderState mState;
 
     private TaskManager mTaskManager;
@@ -155,7 +159,7 @@ public class MediaAccessory implements
                 StorageStats.from(mContext).flush();
             }
         }, QueuePolicy.FIFO, "TransactionService#" + loaderId);
-        this.mFutures = new ArrayList<>();
+        this.mFutures = Lists.newArrayList();
         this.mState = LoaderState.RUNNING;
         this.mLogger = LoggerManager.getLogger(getClass().getSimpleName() + "#" + loaderId);
         this.mLogger.verbose(String.format("Create accessory-%d with config %s", loaderId, config));
@@ -305,7 +309,7 @@ public class MediaAccessory implements
                 mLogger.verbose("Using mem cached bitmap for:" + mediaData.getUrl());
                 mUISettingApplier.applySettings(
                         cached,
-                        option.getArtist(),
+                        option.getMediaArts(),
                         mediaHolder,
                         option.isAnimateOnlyNewLoaded() ? null : option.getAnimator());
                 progressListenerDelegate.callOnComplete(cached);
@@ -327,7 +331,7 @@ public class MediaAccessory implements
                         mLogger.verbose("Using mem cached bitmap for:" + mediaData.getUrl());
                         mUISettingApplier.applySettings(
                                 cached,
-                                option.getArtist(),
+                                option.getMediaArts(),
                                 mediaHolder,
                                 option.isAnimateOnlyNewLoaded() ? null : option.getAnimator());
                         progressListenerDelegate.callOnComplete(cached);
@@ -410,7 +414,7 @@ public class MediaAccessory implements
             if ((cached = mMovieCacheManager.get(source.getUrl())) != null) {
                 mUISettingApplier.applySettings(
                         cached,
-                        option.getArtist(),
+                        option.getMediaArts(),
                         mediaHolder,
                         option.isAnimateOnlyNewLoaded() ? null : option.getAnimator());
                 progressListenerDelegate.callOnComplete(cached);
@@ -431,7 +435,7 @@ public class MediaAccessory implements
                     if ((cached = mMovieCacheManager.get(loadingUrl)) != null) {
                         mUISettingApplier.applySettings(
                                 cached,
-                                option.getArtist(),
+                                option.getMediaArts(),
                                 mediaHolder,
                                 option.isAnimateOnlyNewLoaded() ? null : option.getAnimator());
                         progressListenerDelegate.callOnComplete(cached);
@@ -511,7 +515,7 @@ public class MediaAccessory implements
 
     private boolean onFutureSubmit(BaseFutureTask futureTask) {
         if (futureTask.shouldCancelOthersBeforeRun()) {
-            cancel(futureTask.getListenableTask().getTaskRecord().getSettableId());
+            cancel(futureTask.getListenableTask().getTaskRecord().getViewId());
         }
         synchronized (mFutures) {
             mFutures.add(futureTask);
@@ -705,7 +709,8 @@ public class MediaAccessory implements
      */
     @AccessoryApi
     @Override
-    public synchronized void terminate() {
+    @Synchronized
+    public void terminate() {
         ensureNotTerminated();
         mState = LoaderState.TERMINATED;
         mTaskHandleService.terminate();
@@ -808,7 +813,7 @@ public class MediaAccessory implements
             for (BaseFutureTask futureTask : mFutures) {
                 if (!futureTask.isCancelled()
                         && !futureTask.isDone()
-                        && settableId == futureTask.getListenableTask().getTaskRecord().getSettableId()) {
+                        && settableId == futureTask.getListenableTask().getTaskRecord().getViewId()) {
                     pendingCancels.add(futureTask);
                 }
             }

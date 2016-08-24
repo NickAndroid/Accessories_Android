@@ -27,12 +27,20 @@ import dev.nick.accessories.cache.CachePolicy;
 import dev.nick.accessories.queue.QueuePolicy;
 import dev.nick.accessories.utils.Preconditions;
 import dev.nick.accessories.worker.network.NetworkPolicy;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
  * Configuration for {@link MediaAccessory}, use a {@link Builder}
  * to build one, or using {@link #DEFAULT_CONFIG} as a default config.
  */
 @AccessoryApi
+@Getter
+@ToString
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class AccessoryConfig {
 
     public static final AccessoryConfig DEFAULT_CONFIG = AccessoryConfig.builder()
@@ -43,66 +51,21 @@ public class AccessoryConfig {
             .debugLevel(Log.DEBUG)
             .build();
 
-    @MinSize(1)
-    private int nLoadingThreads;
-
     private CachePolicy cachePolicy;
     private NetworkPolicy networkPolicy;
     private QueuePolicy queuePolicy;
 
+    @MinSize(1)
+    private int loadingThreads;
+
     @MinSize(0)
     private int debugLevel;
-
-    private AccessoryConfig(CachePolicy cachePolicy,
-                            NetworkPolicy networkPolicy,
-                            QueuePolicy queuePolicy,
-                            int nLoadingThreads,
-                            int debugLevel) {
-        this.cachePolicy = cachePolicy;
-        this.networkPolicy = networkPolicy;
-        this.queuePolicy = queuePolicy;
-        this.nLoadingThreads = nLoadingThreads;
-        this.debugLevel = debugLevel;
-    }
 
     public static Builder builder() {
         return new Builder();
     }
 
-    @Override
-    public String toString() {
-        return "AccessoryConfig{" +
-                "nLoadingThreads=" + nLoadingThreads +
-                ", cachePolicy=" + cachePolicy +
-                ", networkPolicy=" + networkPolicy +
-                ", queuePolicy=" + queuePolicy +
-                ", debugLevel=" + debugLevel +
-                '}';
-    }
-
-    @NonNull
-    public CachePolicy getCachePolicy() {
-        return cachePolicy;
-    }
-
-    @NonNull
-    public NetworkPolicy getNetworkPolicy() {
-        return networkPolicy;
-    }
-
-    @NonNull
-    public QueuePolicy getQueuePolicy() {
-        return queuePolicy;
-    }
-
-    public int getLoadingThreads() {
-        return nLoadingThreads;
-    }
-
-    public int getDebugLevel() {
-        return debugLevel;
-    }
-
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Builder {
 
         private Optional<Integer> nLoadingThreads = Optional.absent();
@@ -112,9 +75,6 @@ public class AccessoryConfig {
         private Optional<QueuePolicy> queuePolicy = Optional.absent();
 
         private Optional<Integer> debugLevel = Optional.absent();
-
-        private Builder() {
-        }
 
         /**
          * @param cachePolicy The {@link CachePolicy} using to cache.

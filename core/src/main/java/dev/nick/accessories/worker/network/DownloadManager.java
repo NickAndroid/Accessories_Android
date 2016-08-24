@@ -22,45 +22,28 @@ import android.support.annotation.NonNull;
 import dev.nick.accessories.Terminable;
 import dev.nick.accessories.worker.ProgressListener;
 import dev.nick.accessories.worker.result.ErrorListener;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Builder;
 
-public interface DownloadManager extends Terminable{
+public interface DownloadManager extends Terminable {
 
     @NonNull
-    Transaction<String> beginTransaction();
+    Transaction beginTransaction();
 
-    String endTransaction(Transaction<String> transaction);
+    String endTransaction(Transaction transaction);
 
     String getDownloadDirPath();
 
-    class Transaction<T> {
+    @Builder
+    @Getter
+    @Setter
+    class Transaction {
 
-        String url;
-        ProgressListener progressListener;
-        ErrorListener errorListener;
+        private String url;
+        private ProgressListener progressListener;
+        private ErrorListener errorListener;
 
-        int usingNetworkType = ConnectivityManager.TYPE_WIFI;
-
-        Transaction() {
-        }
-
-        public Transaction<T> url(String url) {
-            this.url = url;
-            return this;
-        }
-
-        public Transaction<T> progressListener(ProgressListener progressListener) {
-            this.progressListener = progressListener;
-            return this;
-        }
-
-        public Transaction<T> errorListener(ErrorListener errorListener) {
-            this.errorListener = errorListener;
-            return this;
-        }
-
-        Transaction<T> usingNetworkType(int usingNetworkType) {
-            this.usingNetworkType = usingNetworkType;
-            return this;
-        }
+        private int usingNetworkType = ConnectivityManager.TYPE_WIFI;
     }
 }

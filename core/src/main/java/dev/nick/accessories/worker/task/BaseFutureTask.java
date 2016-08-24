@@ -26,6 +26,7 @@ import dev.nick.accessories.queue.PriorityRemarkable;
 public class BaseFutureTask<T> extends FutureTask<T> implements PriorityRemarkable {
 
     private TaskActionListener mListener;
+
     private BaseDisplayTask<T> mTask;
 
     private Priority mPriority;

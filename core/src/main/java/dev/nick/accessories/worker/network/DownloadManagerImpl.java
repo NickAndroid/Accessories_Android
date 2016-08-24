@@ -89,7 +89,7 @@ public class DownloadManagerImpl implements DownloadManager {
 
     @NonNull
     @Override
-    public Transaction<String> beginTransaction() {
+    public Transaction beginTransaction() {
         mLogger.funcEnter();
 
         int usingNetworkType = ConnectivityManager.TYPE_WIFI;
@@ -117,21 +117,21 @@ public class DownloadManagerImpl implements DownloadManager {
 
         mLogger.verbose(String.format("Using %s for this transaction", decodeNetworkType(usingNetworkType)));
 
-        return new Transaction<String>().usingNetworkType(usingNetworkType);
+        return Transaction.builder().usingNetworkType(usingNetworkType).build();
     }
 
     @Override
-    public String endTransaction(final Transaction<String> transaction) {
+    public String endTransaction(final Transaction transaction) {
         mLogger.funcEnter();
 
-        String result = buildDownloadFilePath(transaction.url);
+        String result = buildDownloadFilePath(transaction.getUrl());
 
         ImageDownloader<String> downloader = new HttpImageDownloader(Files.createTempDir(),
                 new HttpImageDownloader.ByteReadingListener() {
                     @Override
                     public void onBytesRead(byte[] bytes) {
                         if (mTrafficStatsEnabled) {
-                            switch (transaction.usingNetworkType) {
+                            switch (transaction.getUsingNetworkType()) {
                                 case ConnectivityManager.TYPE_MOBILE:
                                     mTrafficStats.onMobileTrafficUsage(bytes.length);
                                     break;
@@ -153,7 +153,7 @@ public class DownloadManagerImpl implements DownloadManager {
             // Check file size.
             try {
                 long size = Files.asByteSource(new File(result)).size();
-                willUseExistsOne = size == downloader.size(transaction.url);
+                willUseExistsOne = size == downloader.size(transaction.getUrl());
             } catch (IOException ignored) {
                 willUseExistsOne = false;
             }
@@ -164,7 +164,7 @@ public class DownloadManagerImpl implements DownloadManager {
             return result;
         }
 
-        String received = downloader.download(transaction.url, transaction.progressListener, transaction.errorListener);
+        String received = downloader.download(transaction.getUrl(), transaction.getProgressListener(), transaction.getErrorListener());
 
         if (received == null) {
             return null;
