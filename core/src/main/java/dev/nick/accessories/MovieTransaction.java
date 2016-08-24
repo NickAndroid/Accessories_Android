@@ -90,7 +90,7 @@ public class MovieTransaction extends Transaction<Movie> {
     @AccessoryApi
     public Movie startSynchronously() {
         try {
-            return loader.displayMovie(
+            return accessory.displayMovie(
                     mediaData,
                     noneNullSettable(),
                     option.or(sDefDisplayOption),
@@ -107,7 +107,7 @@ public class MovieTransaction extends Transaction<Movie> {
     @Override
     @AccessoryApi
     void startAsync() {
-        loader.displayMovie(
+        accessory.displayMovie(
                 mediaData,
                 noneNullSettable(),
                 option.or(sDefDisplayOption),

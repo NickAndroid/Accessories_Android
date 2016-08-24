@@ -31,7 +31,7 @@ compile 'dev.nick:imageloader:$latest@aar'
 
 ## Samples
 
-### How to init/get the loader:
+### How to init/get the accessory:
 *  Use the shared(single) instance
 ```java
 public class MyApp {
@@ -56,7 +56,7 @@ public class MyApp {
     }
 }
 ```
-*  Create a new loader with new config
+*  Create a new accessory with new config
 ```java
 public class Z {
     @Override
@@ -75,7 +75,7 @@ public class Z {
                         .networkPolicy(NetworkPolicy.builder().enableTrafficStats().build())
                         .build());
         // Some works
-        loader.works...
+        accessory.works...
     }
 }
 ```

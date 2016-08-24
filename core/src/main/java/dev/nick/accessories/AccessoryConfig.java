@@ -40,7 +40,7 @@ public class AccessoryConfig {
             .networkPolicy(NetworkPolicy.DEFAULT_NETWORK_POLICY)
             .queuePolicy(QueuePolicy.FIFO)
             .loadingThreads((Runtime.getRuntime().availableProcessors() + 1) / 2)
-            .debugLevel(Log.WARN)
+            .debugLevel(BuildConfig.BUILD_TYPE.equals("debug") ? Log.VERBOSE : Log.WARN)
             .build();
 
     @MinSize(1)
@@ -173,7 +173,7 @@ public class AccessoryConfig {
                     networkPolicy.or(NetworkPolicy.DEFAULT_NETWORK_POLICY),
                     queuePolicy.or(QueuePolicy.FIFO),
                     nLoadingThreads.or(Runtime.getRuntime().availableProcessors()),
-                    debugLevel.or(Log.WARN));
+                    debugLevel.or(BuildConfig.BUILD_TYPE.equals("debug") ? Log.VERBOSE : Log.DEBUG));
         }
     }
 }

@@ -39,10 +39,6 @@ public class BitmapMediaSource extends MediaSource<Bitmap> {
 
     private static final List<BitmapMediaSource> BITMAP_IMAGE_SOURCES = new ArrayList<>();
 
-    public BitmapMediaSource(MediaFetcher<Bitmap> fetcher, String prefix) {
-        super(fetcher, prefix);
-    }
-
     static {
         addBitmapSource(FILE);
         addBitmapSource(ASSETS);
@@ -50,6 +46,10 @@ public class BitmapMediaSource extends MediaSource<Bitmap> {
         addBitmapSource(CONTENT);
         addBitmapSource(HTTP);
         addBitmapSource(HTTPS);
+    }
+
+    public BitmapMediaSource(MediaFetcher<Bitmap> fetcher, String prefix) {
+        super(fetcher, prefix);
     }
 
     public static void addBitmapSource(@NonNull BitmapMediaSource source) {
@@ -120,7 +120,7 @@ public class BitmapMediaSource extends MediaSource<Bitmap> {
             }, new FileMediaFetcher(new PathSplitter<String>() {
                 @Override
                 public String getRealPath(@NonNull String fullPath) {
-                    return fullPath.substring(Prefix.CONTENT.length(), fullPath.length());
+                    return fullPath.substring(Prefix.FILE.length(), fullPath.length());
                 }
             })) {
                 @Override

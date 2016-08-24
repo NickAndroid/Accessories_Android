@@ -40,10 +40,10 @@ public abstract class Transaction<T> {
     protected Priority priority;
     protected MediaHolder<T> settable;
 
-    protected MediaAccessory loader;
+    protected MediaAccessory accessory;
 
-    Transaction(@NonNull MediaAccessory loader) {
-        this.loader = loader;
+    Transaction(@NonNull MediaAccessory accessory) {
+        this.accessory = accessory;
     }
 
     /**
@@ -115,7 +115,7 @@ public abstract class Transaction<T> {
      */
     @AccessoryApi
     public void start() {
-        this.loader.getTransactionService().push(this);
+        this.accessory.getTransactionService().push(this);
     }
 
     /**

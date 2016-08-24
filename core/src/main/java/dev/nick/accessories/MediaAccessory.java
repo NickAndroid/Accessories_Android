@@ -95,7 +95,7 @@ public class MediaAccessory implements
     private static AbsListViewScrollDetector sListViewScrollDetector;
 
     @Shared
-    private static MediaAccessory sLoader;
+    private static MediaAccessory sAccessory;
 
     private final List<BaseFutureTask> mFutures;
 
@@ -145,7 +145,7 @@ public class MediaAccessory implements
                 config.getQueuePolicy() == QueuePolicy.FIFO
                         ? new FIFOPriorityBlockingQueue<Runnable>()
                         : new LIFOPriorityBlockingQueue<Runnable>());
-        int loaderId = AccessoryFactory.assignLoaderId();
+        int loaderId = AccessoryFactory.assignId();
         this.mTaskHandleService = RequestQueueManager.createStarted(new TaskHandler(), null, null, "TaskHandleService#" + loaderId);
         this.mTransactionService = RequestQueueManager.createStarted(new TransactionHandler(), new IdleStateMonitor() {
             @Override
@@ -158,7 +158,7 @@ public class MediaAccessory implements
         this.mFutures = new ArrayList<>();
         this.mState = LoaderState.RUNNING;
         this.mLogger = LoggerManager.getLogger(getClass().getSimpleName() + "#" + loaderId);
-        this.mLogger.verbose(String.format("Create loader-%d with config %s", loaderId, config));
+        this.mLogger.verbose(String.format("Create accessory-%d with config %s", loaderId, config));
     }
 
     @SuppressLint("DefaultLocale")
@@ -183,7 +183,7 @@ public class MediaAccessory implements
                 config.getQueuePolicy() == QueuePolicy.FIFO
                         ? new FIFOPriorityBlockingQueue<Runnable>()
                         : new LIFOPriorityBlockingQueue<Runnable>());
-        int loaderId = AccessoryFactory.assignLoaderId();
+        int loaderId = AccessoryFactory.assignId();
         this.mTaskHandleService = RequestQueueManager.createStarted(new TaskHandler(), null, null, "TaskHandleService#" + loaderId);
         this.mTransactionService = RequestQueueManager.createStarted(new TransactionHandler(), new IdleStateMonitor() {
             @Override
@@ -196,7 +196,7 @@ public class MediaAccessory implements
         this.mFutures = new ArrayList<>();
         this.mState = LoaderState.RUNNING;
         this.mLogger = LoggerManager.getLogger(getClass().getSimpleName() + "#" + loaderId);
-        this.mLogger.verbose(String.format("Create loader-%d with config %s", loaderId, config));
+        this.mLogger.verbose(String.format("Create accessory-%d with config %s", loaderId, config));
     }
 
     @AccessoryApi
@@ -219,13 +219,13 @@ public class MediaAccessory implements
      * Create the shared instance of MediaAccessory
      *
      * @param context An application {@link Context} is preferred.
-     * @param config  Configuration of this loader.
+     * @param config  Configuration of this accessory.
      * @since 1.0.1
      */
     @AccessoryApi
     public static void createShared(Context context, AccessoryConfig config) {
-        if (sLoader == null || sLoader.isTerminated()) {
-            sLoader = new MediaAccessory(context, config);
+        if (sAccessory == null || sAccessory.isTerminated()) {
+            sAccessory = new MediaAccessory(context, config);
         }
     }
 
@@ -237,7 +237,7 @@ public class MediaAccessory implements
      */
     @AccessoryApi
     public static MediaAccessory shared() {
-        return Preconditions.checkNotNull(sLoader, "Call MediaAccessory#createShared first");
+        return Preconditions.checkNotNull(sAccessory, "Call MediaAccessory#createShared first");
     }
 
     /**
@@ -264,14 +264,6 @@ public class MediaAccessory implements
         return new MovieTransaction(this);
     }
 
-    /**
-     * Display image from the from to the view.
-     *
-     * @param mediaData        Image mediaData from, one of {@link MediaData}
-     * @param mediaHolder      Target {@link MediaHolder} to display the image.
-     * @param option           {@link DisplayOption} is options using when display the image.
-     * @param progressListener The progress progressListener using to watch the progress of the loading.
-     */
     Future<Bitmap> displayBitmap(@NonNull MediaData<Bitmap> mediaData,
                                  @NonNull MediaHolder<Bitmap> mediaHolder,
                                  @NonNull DisplayOption<Bitmap> option,
@@ -280,6 +272,8 @@ public class MediaAccessory implements
                                  @Nullable Priority priority) {
 
         ensureNotTerminated();
+
+        if (isPaused()) return null;
 
         Preconditions.checkNotNull(mediaData.getUrl(), "mediaData is null");
 
@@ -385,6 +379,8 @@ public class MediaAccessory implements
                                @Nullable ErrorListener errorListener,
                                @Nullable Priority priority) {
         ensureNotTerminated();
+
+        if (isPaused()) return null;
 
         Preconditions.checkNotNull(source.getUrl(), "mediaData is null");
 
@@ -654,7 +650,7 @@ public class MediaAccessory implements
     }
 
     /**
-     * @return {@code true} if this loader is paused.
+     * @return {@code true} if this accessory is paused.
      * @see #pause()
      */
     @AccessoryApi
@@ -665,7 +661,7 @@ public class MediaAccessory implements
     }
 
     /**
-     * @return {@code true} if this loader is terminated.
+     * @return {@code true} if this accessory is terminated.
      * @see #terminate() ()
      */
     @AccessoryApi
@@ -705,7 +701,7 @@ public class MediaAccessory implements
     }
 
     /**
-     * Terminate the loader.
+     * Terminate the accessory.
      */
     @AccessoryApi
     @Override
@@ -737,7 +733,7 @@ public class MediaAccessory implements
     /**
      * Cancel the load and loading task who's from match given.
      *
-     * @param url The from of the loader request.
+     * @param url The from of the accessory request.
      */
     @AccessoryApi
     public MediaAccessory cancel(@NonNull String url) {
@@ -756,7 +752,7 @@ public class MediaAccessory implements
     /**
      * Cancel the load and loading task who's view match given.
      *
-     * @param view The view of the loader request.
+     * @param view The view of the accessory request.
      */
     @AccessoryApi
     public MediaAccessory cancel(@NonNull ImageView view) {
@@ -766,7 +762,7 @@ public class MediaAccessory implements
     /**
      * Cancel the load and loading task who's settable match given.
      *
-     * @param settable The settable of the loader request.
+     * @param settable The settable of the accessory request.
      */
     @AccessoryApi
     public MediaAccessory cancel(@NonNull MediaHolder settable) {
@@ -776,7 +772,7 @@ public class MediaAccessory implements
     /**
      * Cancel the load and loading task who's settableId match given.
      *
-     * @param settableId The settableId of the loader request.
+     * @param settableId The settableId of the accessory request.
      */
     @AccessoryApi
     public MediaAccessory cancel(long settableId) {
@@ -844,7 +840,7 @@ public class MediaAccessory implements
         if (mState == LoaderState.PAUSE_REQUESTED) {
             mState = LoaderState.PAUSED;
             if (mFreezer == null) mFreezer = new Freezer();
-            mLogger.debug("Freezing the loader...");
+            mLogger.debug("Freezing the accessory...");
             mFreezer.freeze();
         }
     }

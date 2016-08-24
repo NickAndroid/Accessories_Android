@@ -19,9 +19,9 @@ package dev.nick.accessories;
 import java.util.concurrent.atomic.AtomicInteger;
 
 class AccessoryFactory {
-    private static AtomicInteger sLoaderId = new AtomicInteger(0);
+    private static AtomicInteger sId = new AtomicInteger(0);
 
-    static int assignLoaderId() {
-        return sLoaderId.getAndIncrement();
+    static int assignId() {
+        return sId.getAndIncrement();
     }
 }

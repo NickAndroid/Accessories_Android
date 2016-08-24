@@ -50,7 +50,7 @@ install {
         pom {
             project {
                 packaging 'aar'
-                name 'Image loader lib for android'
+                name 'Image accessory lib for android'
                 url siteUrl
                 licenses {
                     license {

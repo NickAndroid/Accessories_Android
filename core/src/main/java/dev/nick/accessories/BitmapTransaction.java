@@ -103,7 +103,7 @@ public class BitmapTransaction extends Transaction<Bitmap> {
     @AccessoryApi
     public Bitmap startSynchronously() {
         try {
-            return loader.displayBitmap(
+            return accessory.displayBitmap(
                     mediaData,
                     noneNullSettable(),
                     option.or(sDefDisplayOption),
@@ -120,7 +120,7 @@ public class BitmapTransaction extends Transaction<Bitmap> {
     @Override
     @AccessoryApi
     void startAsync() {
-        loader.displayBitmap(
+        accessory.displayBitmap(
                 mediaData,
                 noneNullSettable(),
                 option.or(sDefDisplayOption),
