@@ -29,6 +29,7 @@ import dev.nick.accessories.worker.PathSplitter;
 import dev.nick.accessories.worker.ProgressListener;
 import dev.nick.accessories.worker.result.Cause;
 import dev.nick.accessories.worker.result.ErrorListener;
+import lombok.Cleanup;
 
 public class DrawableMediaFetcher extends BaseMediaFetcher<Movie> {
 
@@ -55,14 +56,10 @@ public class DrawableMediaFetcher extends BaseMediaFetcher<Movie> {
 
         callOnStart(progressListener);
 
-        InputStream inputStream = null;
-        try {
-            inputStream = resources.openRawResource(0);
-            Movie movie = Movie.decodeStream(inputStream);
-            callOnComplete(progressListener, movie);
-            return movie;
-        } finally {
-            if (inputStream != null) inputStream.close();
-        }
+        @Cleanup
+        InputStream inputStream = resources.openRawResource(0);
+        Movie movie = Movie.decodeStream(inputStream);
+        callOnComplete(progressListener, movie);
+        return movie;
     }
 }

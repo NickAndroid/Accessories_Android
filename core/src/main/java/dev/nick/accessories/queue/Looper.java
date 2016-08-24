@@ -16,8 +16,6 @@
 
 package dev.nick.accessories.queue;
 
-import dev.nick.logger.LoggerManager;
-
 class Looper<T> implements Runnable {
 
     RequestQueue<T> stack;
@@ -40,7 +38,6 @@ class Looper<T> implements Runnable {
             if (t == null) break;
             requestHandler.handleRequest(t);
         }
-        LoggerManager.getLogger(getClass()).debug("Looper has quit");
     }
 
     @Override

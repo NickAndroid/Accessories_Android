@@ -115,7 +115,7 @@ public abstract class Transaction<T> {
      */
     @AccessoryApi
     public void start() {
-        this.accessory.getTransactionService().push(this);
+        this.accessory.mTransactionService.push(this);
     }
 
     /**

@@ -54,7 +54,10 @@ public class BitmapMediaSource extends MediaSource<Bitmap> {
 
     public static void addBitmapSource(@NonNull BitmapMediaSource source) {
         synchronized (BITMAP_IMAGE_SOURCES) {
-            BITMAP_IMAGE_SOURCES.add(Preconditions.checkNotNull(source));
+            String prefix = Preconditions.checkNotNull(source).getPrefix();
+            BitmapMediaSource exists = from(prefix);
+            BITMAP_IMAGE_SOURCES.remove(exists);
+            BITMAP_IMAGE_SOURCES.add(source);
         }
     }
 

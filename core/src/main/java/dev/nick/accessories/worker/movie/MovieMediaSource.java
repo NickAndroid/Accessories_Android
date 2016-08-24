@@ -48,14 +48,17 @@ public class MovieMediaSource extends MediaSource<Movie> {
         addMovieSource(HTTPS);
     }
 
-    public static void addMovieSource(@NonNull MovieMediaSource source) {
-        synchronized (MOVIE_IMAGE_SOURCES) {
-            MOVIE_IMAGE_SOURCES.add(Preconditions.checkNotNull(source));
-        }
-    }
-
     public MovieMediaSource(MediaFetcher<Movie> fetcher, String prefix) {
         super(fetcher, prefix);
+    }
+
+    public static void addMovieSource(@NonNull MovieMediaSource source) {
+        synchronized (MOVIE_IMAGE_SOURCES) {
+            String prefix = Preconditions.checkNotNull(source).getPrefix();
+            MovieMediaSource exists = from(prefix);
+            MOVIE_IMAGE_SOURCES.remove(exists);
+            MOVIE_IMAGE_SOURCES.add(source);
+        }
     }
 
     public static MovieMediaSource from(String url) {

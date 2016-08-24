@@ -17,7 +17,9 @@
 package dev.nick.accessories.worker.task;
 
 import lombok.Getter;
+import lombok.ToString;
 
+@ToString(callSuper = true)
 public class DisplayTaskRecord extends TaskRecord {
 
     @Getter
@@ -26,12 +28,5 @@ public class DisplayTaskRecord extends TaskRecord {
     public DisplayTaskRecord(long viewId, int taskId) {
         super(taskId);
         this.viewId = viewId;
-    }
-
-    @Override
-    public String toString() {
-        return "DisplayTaskRecord{" +
-                "viewId=" + viewId +
-                "} " + super.toString();
     }
 }

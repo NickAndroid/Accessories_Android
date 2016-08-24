@@ -100,21 +100,16 @@ public class MediaAccessory implements
     private static MediaAccessory sAccessory;
 
     private final List<BaseFutureTask> mFutures;
-
+    /*package*/ RequestQueueManager<Transaction> mTransactionService;
     private Context mContext;
-
     private UIThreadRouter mUiThreadRouter;
     private UISettingApplier mUISettingApplier;
-
     @Lazy
     private CacheManager<Bitmap> mBitmapCacheManager;
     @Lazy
     private CacheManager<Movie> mMovieCacheManager;
-
     private AccessoryConfig mConfig;
     private RequestQueueManager<BaseFutureTask> mTaskHandleService;
-    private RequestQueueManager<Transaction> mTransactionService;
-
     private Logger mLogger;
 
     private ThreadPoolExecutor mLoadingService;
@@ -551,10 +546,6 @@ public class MediaAccessory implements
         }
         mLogger.verbose("Using default loading service.");
         return mLoadingService;
-    }
-
-    RequestQueueManager<Transaction> getTransactionService() {
-        return mTransactionService;
     }
 
     @SuppressWarnings("deprecation")

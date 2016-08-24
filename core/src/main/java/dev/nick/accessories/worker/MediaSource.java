@@ -20,10 +20,14 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import dev.nick.accessories.AccessoryConfig;
+import lombok.Getter;
+import lombok.ToString;
 
+@ToString
 public abstract class MediaSource<X> {
 
     private MediaFetcher<X> fetcher;
+    @Getter
     private String prefix;
 
     public MediaSource(MediaFetcher<X> fetcher, String prefix) {
@@ -41,10 +45,6 @@ public abstract class MediaSource<X> {
             if (source.equals(this)) return true;
         }
         return false;
-    }
-
-    public String getPrefix() {
-        return prefix;
     }
 
     public abstract boolean maybeSlow();

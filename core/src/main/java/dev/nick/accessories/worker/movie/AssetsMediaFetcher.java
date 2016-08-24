@@ -30,6 +30,7 @@ import dev.nick.accessories.worker.PathSplitter;
 import dev.nick.accessories.worker.ProgressListener;
 import dev.nick.accessories.worker.result.Cause;
 import dev.nick.accessories.worker.result.ErrorListener;
+import lombok.Cleanup;
 
 public class AssetsMediaFetcher extends BaseMediaFetcher<Movie> {
 
@@ -51,6 +52,7 @@ public class AssetsMediaFetcher extends BaseMediaFetcher<Movie> {
             if (mAssets == null) mAssets = mContext.getAssets();
         }
 
+        @Cleanup
         InputStream in = null;
         try {
             in = mAssets.open(path);
@@ -61,10 +63,6 @@ public class AssetsMediaFetcher extends BaseMediaFetcher<Movie> {
         } catch (IOException e) {
             callOnError(errorListener, new Cause(e));
             return null;
-        } finally {
-            if (in != null) {
-                in.close();
-            }
         }
     }
 }

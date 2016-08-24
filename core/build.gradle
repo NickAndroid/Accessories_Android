@@ -41,7 +41,7 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:24.1.0'
     compile 'com.github.NickAndroid:Logger_Android:2.0'
     compile 'com.google.guava:guava:19.0'
-    provided 'org.projectlombok:lombok:1.12.2'
+    provided 'org.projectlombok:lombok:1.12.6'
 }
 
 install {

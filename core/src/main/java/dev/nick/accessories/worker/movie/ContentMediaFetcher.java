@@ -28,6 +28,7 @@ import dev.nick.accessories.worker.DecodeSpec;
 import dev.nick.accessories.worker.PathSplitter;
 import dev.nick.accessories.worker.ProgressListener;
 import dev.nick.accessories.worker.result.ErrorListener;
+import lombok.Cleanup;
 
 public class ContentMediaFetcher extends BaseMediaFetcher<Movie> {
 
@@ -43,14 +44,10 @@ public class ContentMediaFetcher extends BaseMediaFetcher<Movie> {
 
         callOnStart(progressListener);
 
-        InputStream inputStream = null;
-        try {
-            inputStream = mContext.getContentResolver().openInputStream(Uri.parse(url));
-            Movie movie =  Movie.decodeStream(inputStream);
-            callOnComplete(progressListener, movie);
-            return movie;
-        } finally {
-            if (inputStream != null) inputStream.close();
-        }
+        @Cleanup
+        InputStream inputStream = mContext.getContentResolver().openInputStream(Uri.parse(url));
+        Movie movie = Movie.decodeStream(inputStream);
+        callOnComplete(progressListener, movie);
+        return movie;
     }
 }

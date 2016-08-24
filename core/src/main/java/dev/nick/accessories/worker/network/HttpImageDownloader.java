@@ -89,7 +89,6 @@ public class HttpImageDownloader implements ImageDownloader<String> {
             URLConnection conn = u.openConnection();
             conn.setConnectTimeout(6 * 1000);
             conn.connect();
-            InputStream is = conn.getInputStream();
             return conn.getContentLength();
         } catch (Exception ignored) {
 

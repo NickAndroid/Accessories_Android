@@ -17,17 +17,16 @@
 package dev.nick.accessories.worker;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class MediaData<X> {
 
     private MediaSource<X> source;
     private String url;
-
-    public MediaData() {
-    }
 
     public MediaData(MediaSource<X> source, String url) {
         this.source = source;

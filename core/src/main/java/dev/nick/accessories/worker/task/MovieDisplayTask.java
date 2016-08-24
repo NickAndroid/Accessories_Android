@@ -85,6 +85,10 @@ public class MovieDisplayTask extends BaseDisplayTask<Movie> {
             LoggerManager.getLogger(getClass()).verbose("interruptExecute!");
             return;
         }
+        callFetch();
+    }
+
+    private void callFetch() {
         try {
             MediaSource<Movie> source = mMediaData.getSource();
             MediaFetcher<Movie> fetcher = source.getFetcher(mContext, mAccessoryConfig);

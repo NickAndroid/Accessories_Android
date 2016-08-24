@@ -33,6 +33,7 @@ import dev.nick.accessories.worker.PathSplitter;
 import dev.nick.accessories.worker.ProgressListener;
 import dev.nick.accessories.worker.result.Cause;
 import dev.nick.accessories.worker.result.ErrorListener;
+import lombok.Cleanup;
 
 public class AssetsMediaFetcher extends BaseMediaFetcher<Bitmap> {
 
@@ -54,7 +55,8 @@ public class AssetsMediaFetcher extends BaseMediaFetcher<Bitmap> {
 
         if (mAssets == null) mAssets = mContext.getAssets();
 
-        InputStream in;
+        @Cleanup
+        InputStream in = null;
         try {
             in = mAssets.open(path);
         } catch (IOException e) {
@@ -83,17 +85,13 @@ public class AssetsMediaFetcher extends BaseMediaFetcher<Bitmap> {
                         MAX_NUM_PIXELS_THUMBNAIL
                         : dimenSpec.width * dimenSpec.height));
 
-        Bitmap tempBitmap = null;
+        Bitmap tempBitmap;
 
         try {
             tempBitmap = BitmapFactory.decodeStream(in, rect, decodeOptions);
         } catch (OutOfMemoryError error) {
             callOnError(errorListener, new Cause(error));
             return null;
-        } finally {
-            if (in != null) {
-                in.close();
-            }
         }
         callOnComplete(progressListener, tempBitmap);
         return tempBitmap;
