@@ -6,10 +6,7 @@ a lot of ui effects.
 
 ## Usage
 
-### jitpack.io
 [![](https://jitpack.io/v/NickAndroid/ImageLoader_Android.svg)](https://jitpack.io/#NickAndroid/ImageLoader_Android)
-
-### methodscount
 <a href="http://www.methodscount.com/?lib=dev.nick%3Aimageloader%3A1.4"><img src="https://img.shields.io/badge/Size-223 KB-e91e63.svg"/></a>
 
 ### Change log
