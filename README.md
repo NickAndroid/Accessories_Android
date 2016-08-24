@@ -3,6 +3,7 @@ A more controllable MediaLoader contains Image, Movie that load bitmap, gif from
 a lot of ui effects.
 
 ## Arts
+![Video 1](art/demo.gif)
 
 ## Usage
 
