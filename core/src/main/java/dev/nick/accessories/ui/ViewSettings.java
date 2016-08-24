@@ -19,7 +19,9 @@ package dev.nick.accessories.ui;
 import android.support.annotation.NonNull;
 
 import dev.nick.accessories.ui.animator.ViewAnimator;
+import lombok.ToString;
 
+@ToString
 public abstract class ViewSettings<T> implements Runnable {
 
     protected ViewAnimator<T> mAnimator;
@@ -37,13 +39,5 @@ public abstract class ViewSettings<T> implements Runnable {
     @Override
     public final void run() {
         apply();
-    }
-
-    @Override
-    public String toString() {
-        return "ViewSettings{" +
-                "mAnimator=" + mAnimator +
-                ", mSeat=" + mSeat +
-                '}';
     }
 }

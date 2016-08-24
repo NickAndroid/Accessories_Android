@@ -16,39 +16,12 @@
 
 package dev.nick.accessories.worker;
 
-public class DimenSpec {
+import lombok.AllArgsConstructor;
+import lombok.ToString;
 
+@AllArgsConstructor
+@ToString
+public class DimenSpec {
     public int width;
     public int height;
-
-    public DimenSpec(int width, int height) {
-        this.width = width;
-        this.height = height;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        DimenSpec info = (DimenSpec) o;
-
-        if (width != info.width) return false;
-        return height == info.height;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = width;
-        result = 31 * result + height;
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        return "DimenSpec{" +
-                "height=" + height +
-                ", width=" + width +
-                '}';
-    }
 }

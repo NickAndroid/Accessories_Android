@@ -17,18 +17,14 @@
 package dev.nick.accessories.queue;
 
 import dev.nick.logger.LoggerManager;
+import lombok.AllArgsConstructor;
 
+@AllArgsConstructor
 class Looper<T> implements Runnable {
 
-    RequestQueue<T> stack;
     RequestHandler<T> requestHandler;
+    RequestQueue<T> stack;
     String name;
-
-    public Looper(RequestHandler<T> requestHandler, RequestQueue<T> stack, String name) {
-        this.requestHandler = requestHandler;
-        this.stack = stack;
-        this.name = name;
-    }
 
     void startLoop() {
         new Thread(this, name).start();

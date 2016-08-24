@@ -20,7 +20,9 @@ import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
 import dev.nick.accessories.ui.animator.ViewAnimator;
+import lombok.ToString;
 
+@ToString
 public class BitmapViewSettings extends ViewSettings<Bitmap> {
 
     Bitmap mBitmap;
@@ -36,12 +38,5 @@ public class BitmapViewSettings extends ViewSettings<Bitmap> {
         if (mBitmap != null && mAnimator != null) {
             mAnimator.animate(mSeat);
         }
-    }
-
-    @Override
-    public String toString() {
-        return super.toString() + " BitmapViewSettings{" +
-                "mBitmap=" + mBitmap +
-                '}';
     }
 }

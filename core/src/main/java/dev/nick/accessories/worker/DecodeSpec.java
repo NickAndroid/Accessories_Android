@@ -17,22 +17,14 @@
 package dev.nick.accessories.worker;
 
 import dev.nick.accessories.ui.MediaQuality;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 
+@AllArgsConstructor
+@Getter
+@ToString
 public class DecodeSpec {
-
-    MediaQuality quality;
-    DimenSpec dimenSpec;
-
-    public DecodeSpec(MediaQuality quality, DimenSpec dimenSpec) {
-        this.quality = quality;
-        this.dimenSpec = dimenSpec;
-    }
-
-    public MediaQuality getQuality() {
-        return quality;
-    }
-
-    public DimenSpec getDimenSpec() {
-        return dimenSpec;
-    }
+    private MediaQuality quality;
+    private DimenSpec dimenSpec;
 }

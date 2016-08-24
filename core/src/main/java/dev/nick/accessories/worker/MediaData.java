@@ -16,21 +16,15 @@
 
 package dev.nick.accessories.worker;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@AllArgsConstructor
 public class MediaData<X> {
 
     private MediaSource<X> source;
     private String url;
-
-    public MediaData() {
-    }
-
-    public MediaData(MediaSource<X> source, String url) {
-        this.source = source;
-        this.url = url;
-    }
 }
