@@ -37,14 +37,14 @@ import com.nick.scalpel.annotation.request.RequirePermission;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.nick.imageloader.MediaLoader;
-import dev.nick.imageloader.LoaderConfig;
-import dev.nick.imageloader.ProgressListenerStub;
-import dev.nick.imageloader.cache.CachePolicy;
-import dev.nick.imageloader.ui.DisplayOption;
-import dev.nick.imageloader.ui.MediaQuality;
-import dev.nick.imageloader.ui.animator.FadeInViewAnimator;
-import dev.nick.imageloader.worker.bitmap.BitmapMediaSource;
+import dev.nick.accessories.AccessoryConfig;
+import dev.nick.accessories.MediaAccessory;
+import dev.nick.accessories.ProgressListenerStub;
+import dev.nick.accessories.cache.CachePolicy;
+import dev.nick.accessories.ui.DisplayOption;
+import dev.nick.accessories.ui.MediaQuality;
+import dev.nick.accessories.ui.animator.FadeInViewAnimator;
+import dev.nick.accessories.worker.bitmap.BitmapMediaSource;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
 public class ScrollStateTest extends BaseTest {
@@ -52,22 +52,22 @@ public class ScrollStateTest extends BaseTest {
     @FindView(id = R.id.list)
     ListView listView;
 
-    MediaLoader mediaLoader;
+    MediaAccessory mediaAccessory;
 
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.file_image_layout);
         setTitle(getClass().getSimpleName());
         Scalpel.getInstance().wire(this);
-        mediaLoader = MediaLoader.shared().fork(LoaderConfig.builder()
+        mediaAccessory = MediaAccessory.shared().fork(AccessoryConfig.builder()
                 .cachePolicy(CachePolicy.builder().build()).build());
-        mediaLoader.linkScrollStateTo(listView);
+        mediaAccessory.linkScrollStateTo(listView);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mediaLoader.unLinkScrollStateTo(listView);
+        mediaAccessory.unLinkScrollStateTo(listView);
     }
 
     @Override
@@ -113,7 +113,7 @@ public class ScrollStateTest extends BaseTest {
                 // String uri = mArtworkUri + File.separator + tracks.get(position).getAlbumId();
                 String uri = BitmapMediaSource.FILE.getPrefix() + tracks.get(position).getUrl();
 
-                mediaLoader.loadBitmap()
+                mediaAccessory.loadBitmap()
                         .from(uri)
                         .option(DisplayOption.bitmapBuilder()
                                 .imageQuality(MediaQuality.OPT)

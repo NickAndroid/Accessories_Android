@@ -26,18 +26,18 @@ import android.util.Log;
 
 import com.nick.scalpel.ScalpelApplication;
 
-import dev.nick.imageloader.MediaLoader;
-import dev.nick.imageloader.LoaderConfig;
-import dev.nick.imageloader.cache.CachePolicy;
-import dev.nick.imageloader.queue.QueuePolicy;
-import dev.nick.imageloader.worker.BaseMediaFetcher;
-import dev.nick.imageloader.worker.DecodeSpec;
-import dev.nick.imageloader.worker.PathSplitter;
-import dev.nick.imageloader.worker.ProgressListener;
-import dev.nick.imageloader.worker.bitmap.BitmapMediaSource;
-import dev.nick.imageloader.worker.movie.MovieMediaSource;
-import dev.nick.imageloader.worker.network.NetworkPolicy;
-import dev.nick.imageloader.worker.result.ErrorListener;
+import dev.nick.accessories.AccessoryConfig;
+import dev.nick.accessories.MediaAccessory;
+import dev.nick.accessories.cache.CachePolicy;
+import dev.nick.accessories.queue.QueuePolicy;
+import dev.nick.accessories.worker.BaseMediaFetcher;
+import dev.nick.accessories.worker.DecodeSpec;
+import dev.nick.accessories.worker.PathSplitter;
+import dev.nick.accessories.worker.ProgressListener;
+import dev.nick.accessories.worker.bitmap.BitmapMediaSource;
+import dev.nick.accessories.worker.movie.MovieMediaSource;
+import dev.nick.accessories.worker.network.NetworkPolicy;
+import dev.nick.accessories.worker.result.ErrorListener;
 import dev.nick.logger.LoggerManager;
 
 public class MyApp extends ScalpelApplication {
@@ -48,7 +48,7 @@ public class MyApp extends ScalpelApplication {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             Trace.beginSection("ImageLoader_init");
         }
-        MediaLoader.createShared(getApplicationContext(), LoaderConfig.builder()
+        MediaAccessory.createShared(getApplicationContext(), AccessoryConfig.builder()
                 .queuePolicy(QueuePolicy.LIFO)
                 .cachePolicy(CachePolicy.builder()
                         .enableMemCache()

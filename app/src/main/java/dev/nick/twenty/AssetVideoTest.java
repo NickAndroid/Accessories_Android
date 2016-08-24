@@ -25,11 +25,11 @@ import android.view.animation.Animation;
 import com.nick.scalpel.Scalpel;
 import com.nick.scalpel.annotation.binding.FindView;
 
-import dev.nick.imageloader.MediaLoader;
-import dev.nick.imageloader.ui.MediaHolder;
-import dev.nick.imageloader.worker.ProgressListener;
-import dev.nick.imageloader.worker.result.Cause;
-import dev.nick.imageloader.worker.result.ErrorListener;
+import dev.nick.accessories.MediaAccessory;
+import dev.nick.accessories.ui.MediaHolder;
+import dev.nick.accessories.worker.ProgressListener;
+import dev.nick.accessories.worker.result.Cause;
+import dev.nick.accessories.worker.result.ErrorListener;
 import dev.nick.logger.LoggerManager;
 
 public class AssetVideoTest extends BaseTest {
@@ -50,7 +50,7 @@ public class AssetVideoTest extends BaseTest {
     @Override
     protected void onStart() {
         super.onStart();
-        MediaLoader.shared()
+        MediaAccessory.shared()
                 .loadMovie()
                 .from(urlAssets)
                 .errorListener(new ErrorListener() {

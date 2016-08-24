@@ -38,14 +38,14 @@ import com.nick.scalpel.annotation.request.RequirePermission;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.nick.imageloader.MediaLoader;
-import dev.nick.imageloader.queue.Priority;
-import dev.nick.imageloader.ui.DisplayOption;
-import dev.nick.imageloader.ui.MediaQuality;
-import dev.nick.imageloader.ui.animator.FadeInViewAnimator;
-import dev.nick.imageloader.worker.ProgressListener;
-import dev.nick.imageloader.worker.result.Cause;
-import dev.nick.imageloader.worker.result.ErrorListener;
+import dev.nick.accessories.MediaAccessory;
+import dev.nick.accessories.queue.Priority;
+import dev.nick.accessories.ui.DisplayOption;
+import dev.nick.accessories.ui.MediaQuality;
+import dev.nick.accessories.ui.animator.FadeInViewAnimator;
+import dev.nick.accessories.worker.ProgressListener;
+import dev.nick.accessories.worker.result.Cause;
+import dev.nick.accessories.worker.result.ErrorListener;
 import dev.nick.logger.LoggerManager;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
@@ -213,7 +213,7 @@ public class NetworkImageTest extends BaseTest {
                 holder.progressBar.setProgress(0);
                 holder.textView.setText("---");
 
-                MediaLoader.shared()
+                MediaAccessory.shared()
                         .cancel(holder.imageView)
                         .loadBitmap()
                         .from(uri)
@@ -268,7 +268,7 @@ public class NetworkImageTest extends BaseTest {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Track track = (Track) adapter.getItem(i);
-                MediaLoader.shared().cancel(track.getUrl());
+                MediaAccessory.shared().cancel(track.getUrl());
             }
         });
     }

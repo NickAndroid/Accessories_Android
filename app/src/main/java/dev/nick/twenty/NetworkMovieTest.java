@@ -25,12 +25,12 @@ import android.view.animation.Animation;
 import com.nick.scalpel.Scalpel;
 import com.nick.scalpel.annotation.binding.FindView;
 
-import dev.nick.imageloader.MediaLoader;
-import dev.nick.imageloader.queue.Priority;
-import dev.nick.imageloader.ui.MediaHolder;
-import dev.nick.imageloader.worker.ProgressListener;
-import dev.nick.imageloader.worker.result.Cause;
-import dev.nick.imageloader.worker.result.ErrorListener;
+import dev.nick.accessories.MediaAccessory;
+import dev.nick.accessories.queue.Priority;
+import dev.nick.accessories.ui.MediaHolder;
+import dev.nick.accessories.worker.ProgressListener;
+import dev.nick.accessories.worker.result.Cause;
+import dev.nick.accessories.worker.result.ErrorListener;
 import dev.nick.logger.LoggerManager;
 
 public class NetworkMovieTest extends BaseTest {
@@ -51,7 +51,7 @@ public class NetworkMovieTest extends BaseTest {
     @Override
     protected void onStart() {
         super.onStart();
-        MediaLoader.shared()
+        MediaAccessory.shared()
                 .loadMovie()
                 .from(urlHttps)
                 .errorListener(new ErrorListener() {
@@ -111,6 +111,6 @@ public class NetworkMovieTest extends BaseTest {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        MediaLoader.shared().cancel(urlHttps);
+        MediaAccessory.shared().cancel(urlHttps);
     }
 }

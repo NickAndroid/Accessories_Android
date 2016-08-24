@@ -28,11 +28,11 @@ import com.nick.scalpel.annotation.binding.FindView;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
-import dev.nick.imageloader.MediaLoader;
-import dev.nick.imageloader.ProgressListenerStub;
-import dev.nick.imageloader.queue.Priority;
-import dev.nick.imageloader.worker.result.Cause;
-import dev.nick.imageloader.worker.result.ErrorListener;
+import dev.nick.accessories.MediaAccessory;
+import dev.nick.accessories.ProgressListenerStub;
+import dev.nick.accessories.queue.Priority;
+import dev.nick.accessories.worker.result.Cause;
+import dev.nick.accessories.worker.result.ErrorListener;
 import dev.nick.logger.LoggerManager;
 
 public class DownloadMachine extends BaseTest {
@@ -67,7 +67,7 @@ public class DownloadMachine extends BaseTest {
 
     void startMachine(String url) {
         latch = new CountDownLatch(1);
-        MediaLoader.shared()
+        MediaAccessory.shared()
                 .loadBitmap()
                 .from(url)
                 .progressListener(new ProgressListenerStub<Bitmap>() {

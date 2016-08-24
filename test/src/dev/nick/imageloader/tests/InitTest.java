@@ -1,4 +1,4 @@
-package dev.nick.imageloader.tests;
+package dev.nick.accessories.tests;
 
 import android.test.AndroidTestCase;
 

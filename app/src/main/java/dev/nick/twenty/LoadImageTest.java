@@ -38,11 +38,11 @@ import com.nick.scalpel.annotation.request.RequirePermission;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.nick.imageloader.MediaLoader;
-import dev.nick.imageloader.ProgressListenerStub;
-import dev.nick.imageloader.queue.Priority;
-import dev.nick.imageloader.worker.result.Cause;
-import dev.nick.imageloader.worker.result.ErrorListener;
+import dev.nick.accessories.MediaAccessory;
+import dev.nick.accessories.ProgressListenerStub;
+import dev.nick.accessories.queue.Priority;
+import dev.nick.accessories.worker.result.Cause;
+import dev.nick.accessories.worker.result.ErrorListener;
 import dev.nick.logger.LoggerManager;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
@@ -241,7 +241,7 @@ public class LoadImageTest extends BaseTest {
                     }
                 };
 
-                MediaLoader.shared().loadBitmap()
+                MediaAccessory.shared().loadBitmap()
                         .from(uri)
                         .priority(Priority.HIGH)
                         .progressListener(progressListenerStub)
@@ -263,7 +263,7 @@ public class LoadImageTest extends BaseTest {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Track track = (Track) adapter.getItem(i);
-                MediaLoader.shared().cancel(track.getUrl());
+                MediaAccessory.shared().cancel(track.getUrl());
             }
         });
     }

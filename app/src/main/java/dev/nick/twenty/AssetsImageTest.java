@@ -25,13 +25,13 @@ import android.widget.ImageView;
 import com.nick.scalpel.Scalpel;
 import com.nick.scalpel.annotation.binding.FindView;
 
-import dev.nick.imageloader.MediaLoader;
-import dev.nick.imageloader.ProgressListenerStub;
-import dev.nick.imageloader.queue.Priority;
-import dev.nick.imageloader.ui.DisplayOption;
-import dev.nick.imageloader.ui.MediaQuality;
-import dev.nick.imageloader.ui.animator.FadeInViewAnimator;
-import dev.nick.imageloader.ui.art.BlackWhiteMediaArt;
+import dev.nick.accessories.MediaAccessory;
+import dev.nick.accessories.ProgressListenerStub;
+import dev.nick.accessories.queue.Priority;
+import dev.nick.accessories.ui.DisplayOption;
+import dev.nick.accessories.ui.MediaQuality;
+import dev.nick.accessories.ui.animator.FadeInViewAnimator;
+import dev.nick.accessories.ui.art.BlackWhiteMediaArt;
 
 public class AssetsImageTest extends BaseTest {
 
@@ -51,7 +51,7 @@ public class AssetsImageTest extends BaseTest {
     @Override
     protected void onStart() {
         super.onStart();
-        MediaLoader.shared()
+        MediaAccessory.shared()
                 .loadBitmap()
                 .from(urlAssets)
                 .progressListener(new ProgressListenerStub<Bitmap>() {

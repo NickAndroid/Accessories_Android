@@ -35,13 +35,13 @@ import com.nick.scalpel.annotation.request.RequirePermission;
 import java.io.File;
 import java.util.List;
 
-import dev.nick.imageloader.MediaLoader;
-import dev.nick.imageloader.LoaderConfig;
-import dev.nick.imageloader.cache.CachePolicy;
-import dev.nick.imageloader.ui.MediaQuality;
-import dev.nick.imageloader.ui.animator.FadeInViewAnimator;
-import dev.nick.imageloader.worker.network.NetworkPolicy;
-import dev.nick.imageloader.ui.DisplayOption;
+import dev.nick.accessories.MediaAccessory;
+import dev.nick.accessories.AccessoryConfig;
+import dev.nick.accessories.cache.CachePolicy;
+import dev.nick.accessories.ui.MediaQuality;
+import dev.nick.accessories.ui.animator.FadeInViewAnimator;
+import dev.nick.accessories.worker.network.NetworkPolicy;
+import dev.nick.accessories.ui.DisplayOption;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
 public class ContentImageTest extends BaseTest {
@@ -49,7 +49,7 @@ public class ContentImageTest extends BaseTest {
     static String mArtworkUri = "content://media/external/audio/albumart";
     @FindView(id = R.id.list)
     ListView listView;
-    MediaLoader mLoader;
+    MediaAccessory mLoader;
 
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,7 +64,7 @@ public class ContentImageTest extends BaseTest {
 
         final List<Track> tracks = MediaUtils.getTrackList(this);
 
-        mLoader = MediaLoader.shared().fork(LoaderConfig.builder()
+        mLoader = MediaAccessory.shared().fork(AccessoryConfig.builder()
                 .cachePolicy(CachePolicy.builder()
                         .enableMemCache()
                         .enableDiskCache()

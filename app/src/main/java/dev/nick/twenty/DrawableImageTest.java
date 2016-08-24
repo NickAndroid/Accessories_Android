@@ -25,12 +25,12 @@ import android.widget.ImageView;
 import com.nick.scalpel.Scalpel;
 import com.nick.scalpel.annotation.binding.FindView;
 
-import dev.nick.imageloader.MediaLoader;
-import dev.nick.imageloader.ui.DisplayOption;
-import dev.nick.imageloader.ui.MediaQuality;
-import dev.nick.imageloader.ui.art.BlackWhiteMediaArt;
-import dev.nick.imageloader.worker.result.Cause;
-import dev.nick.imageloader.worker.result.ErrorListener;
+import dev.nick.accessories.MediaAccessory;
+import dev.nick.accessories.ui.DisplayOption;
+import dev.nick.accessories.ui.MediaQuality;
+import dev.nick.accessories.ui.art.BlackWhiteMediaArt;
+import dev.nick.accessories.worker.result.Cause;
+import dev.nick.accessories.worker.result.ErrorListener;
 import dev.nick.logger.LoggerManager;
 
 public class DrawableImageTest extends BaseTest {
@@ -51,7 +51,7 @@ public class DrawableImageTest extends BaseTest {
     @Override
     protected void onStart() {
         super.onStart();
-        MediaLoader.shared()
+        MediaAccessory.shared()
                 .loadBitmap()
                 .from(urlDrawable)
                 .option(DisplayOption.bitmapBuilder()
