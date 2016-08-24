@@ -1,6 +1,4 @@
-# ImageLoader
-Android image loader library
-
+# MediaAccessories
 
 ## Arts
 
