@@ -1,31 +1,16 @@
 # MediaAccessories
+A more controllable MediaLoader contains Image, Movie that load bitmap, gif from anywhere with both disk and mem cache, and
+a lot of ui effects.
 
 ## Arts
 
 ## Usage
 
-### Latest version:
-
-[ ![JCenter](https://api.bintray.com/packages/nickandroid/maven/imageloader/images/download.svg) ](https://bintray.com/nickandroid/maven/imageloader/_latestVersion)
-<a href="http://www.methodscount.com/?lib=dev.nick%3Aimageloader%3A1.4"><img src="https://img.shields.io/badge/Size-223 KB-e91e63.svg"/></a>
+### jitpack.io
 [![](https://jitpack.io/v/NickAndroid/ImageLoader_Android.svg)](https://jitpack.io/#NickAndroid/ImageLoader_Android)
 
-
-
-### mvn:
-```
-<dependency>
-  <groupId>dev.nick</groupId>
-  <artifactId>imageloader</artifactId>
-  <version>$latest</version>
-  <type>pom</type>
-</dependency>
-```
-
-### gradle
-```
-compile 'dev.nick:imageloader:$latest@aar'
-```
+### methodscount
+<a href="http://www.methodscount.com/?lib=dev.nick%3Aimageloader%3A1.4"><img src="https://img.shields.io/badge/Size-223 KB-e91e63.svg"/></a>
 
 ### Change log
 
@@ -39,20 +24,23 @@ public class MyApp {
     public void onCreate() {
         super.onCreate();
         // Create the shared instance
-        ImageLoader.createShared(getApplicationContext(), new LoaderConfig.Builder()
-                .cachePolicy(new CachePolicy.Builder()
-                        .enableMemCache()
-                        .enableDiskCache()
-                        .cachingThreads(Runtime.getRuntime().availableProcessors())
-                        .cacheDirName("tests")
-                        .preferredLocation(CachePolicy.Location.EXTERNAL)
-                        .compressFormat(Bitmap.CompressFormat.PNG)
-                        .build())
-                .debugLevel(Log.VERBOSE)
-                .loadingThreads(Runtime.getRuntime().availableProcessors() * 2)
-                .build());
+         MediaAccessory.createShared(getApplicationContext(), AccessoryConfig.builder()
+                        .queuePolicy(QueuePolicy.LIFO)
+                        .cachePolicy(CachePolicy.builder()
+                                .enableMemCache()
+                                .enableDiskCache()
+                                .enableStorageStats()
+                                .cacheDirName("dis.cache.tests")
+                                .preferredLocation(CachePolicy.Location.EXTERNAL)
+                                .compressFormat(Bitmap.CompressFormat.PNG)
+                                .build())
+                        .networkPolicy(NetworkPolicy.builder()
+                                .onlyOnWifi()
+                                .enableTrafficStats().build())
+                        .debugLevel(Log.VERBOSE)
+                        .build());
         // Some works
-        ImageLoader.shared().works...
+        MediaAccessory.shared().works...
     }
 }
 ```
@@ -63,7 +51,7 @@ public class Z {
     public void onCreate() {
         super.onCreate();
         // Fork a new instance
-        ImageLoader newLoader = ImageLoader.shared().fork(LoaderConfig.builder()
+        MediaAccessory newOne = MediaAccessory.shared().fork(AccessoryConfig.builder()
                         .cachePolicy(CachePolicy.builder()
                                 .enableMemCache()
                                 .enableDiskCache()
@@ -82,7 +70,7 @@ public class Z {
 
 ### Loading or Display:
 ```java
- ImageLoader.shared()
+ MediaAccessory.shared()
                 .loadBitmap()
                 .from(urlDrawable)
                 .listener(listener)
@@ -93,10 +81,10 @@ public class Z {
 
 ### CustomView support:
 ```java
-class CustomView implements ImageSettable {}
+class CustomView implements MediaHolder<X> {}
 ```
 ```java
-ImageLoader.shared()
+MediaAccessory.shared()
                 .loadMovie()
                 .from(urlDrawable)
                 .listener(listener)
@@ -107,7 +95,7 @@ ImageLoader.shared()
 
 ### Cancel tasks:
 ```java
-mLoader.cancel(ImageView/ImageSettable/Url);
+mMediaAccessory.cancel(ImageView/ImageSettable/Url);
 ```
 
 ### Clear cache:
@@ -115,14 +103,14 @@ mLoader.cancel(ImageView/ImageSettable/Url);
  @Override
     public void onTrimMemory(int level) {
         super.onTrimMemory(level);
-        mLoader.clearMemCache();
+        mMediaAccessory.clearMemCache();
     }
 ```
 ```java
 @Override
     protected void onDestroy() {
         super.onDestroy();
-        mLoader.clearAllCache();
+        mMediaAccessory.clearAllCache();
     }
 ```
 
