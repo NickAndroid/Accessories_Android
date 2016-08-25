@@ -23,6 +23,10 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
@@ -34,5 +38,5 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:24.1.0'
     compile 'com.nick.scalpel:scalpel:1.0.6'
     compile 'com.github.Cutta:GifView:1.1'
-    compile project(':core')
+    compile 'com.github.NickAndroid:MediaAccessories_Android:master-SNAPSHOT@aar'
 }
