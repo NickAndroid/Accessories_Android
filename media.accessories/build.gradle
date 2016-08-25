@@ -2,11 +2,11 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
-def siteUrl = 'http://nickandroid.github.io/ImageLoader_Android/'
-def gitUrl = 'https://github.com/NickAndroid/ImageLoader_Android.git'
+def siteUrl = 'https://github.com/NickAndroid/MediaAccessories_Android'
+def gitUrl = 'https://github.com/NickAndroid/MediaAccessories_Android'
 
-group = "dev.nick"
-version = "1.5"
+group = "dev.nick.android"
+version = "1.0"
 
 android {
     compileSdkVersion 24
@@ -114,8 +114,7 @@ bintray {
     configurations = ['archives']
     pkg {
         repo = "maven"
-        name = "imageloader"
-        // #CONFIG# project name in jcenter
+        name = "media.accessories"
         websiteUrl = siteUrl
         vcsUrl = gitUrl
         licenses = ["Apache-2.0"]
