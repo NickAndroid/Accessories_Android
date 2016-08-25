@@ -20,8 +20,8 @@ import dev.nick.accessories.ui.MediaQuality;
 import lombok.Getter;
 import lombok.ToString;
 
-@Getter
 @ToString
+@Getter
 public class DecodeSpec {
 
     MediaQuality quality;
@@ -31,4 +31,5 @@ public class DecodeSpec {
         this.quality = quality;
         this.dimenSpec = dimenSpec;
     }
+
 }
