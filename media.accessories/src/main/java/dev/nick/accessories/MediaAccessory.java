@@ -27,8 +27,6 @@ import android.support.v7.widget.RecyclerView;
 import android.widget.AbsListView;
 import android.widget.ImageView;
 
-import com.google.common.collect.Lists;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -154,7 +152,7 @@ public class MediaAccessory implements
                 StorageStats.from(mContext).flush();
             }
         }, QueuePolicy.FIFO, "TransactionService#" + loaderId);
-        this.mFutures = Lists.newArrayList();
+        this.mFutures = new ArrayList<>();
         this.mState = LoaderState.RUNNING;
         this.mLogger = LoggerManager.getLogger(getClass().getSimpleName() + "#" + loaderId);
         this.mLogger.verbose(String.format("Create accessory-%d with config %s", loaderId, config));
@@ -720,7 +718,7 @@ public class MediaAccessory implements
      */
     @AccessoryApi
     public void cancelAllTasks() {
-        List<BaseFutureTask> tasks = Lists.newArrayList(mFutures);
+        List<BaseFutureTask> tasks = new ArrayList<>(mFutures);
         for (BaseFutureTask task : tasks) {
             task.cancel(true);
         }

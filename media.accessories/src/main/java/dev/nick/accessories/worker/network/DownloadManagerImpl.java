@@ -21,7 +21,7 @@ import android.net.ConnectivityManager;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 
-import com.google.common.io.Files;
+import com.google.porting.io.Files;
 
 import java.io.File;
 import java.io.IOException;
@@ -151,12 +151,8 @@ public class DownloadManagerImpl implements DownloadManager {
 
         if (exist) {
             // Check file size.
-            try {
-                long size = Files.asByteSource(new File(result)).size();
-                willUseExistsOne = size == downloader.size(transaction.getUrl());
-            } catch (IOException ignored) {
-                willUseExistsOne = false;
-            }
+            long size = Files.size(new File(result));
+            willUseExistsOne = size == downloader.size(transaction.getUrl());
         }
 
         if (willUseExistsOne) {

@@ -16,8 +16,7 @@
 
 package dev.nick.accessories.worker.task;
 
-import com.google.common.collect.Maps;
-
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -38,7 +37,7 @@ public class TaskManagerImpl implements TaskManager {
     private LoaderState mState = LoaderState.RUNNING;
 
     public TaskManagerImpl() {
-        this.mTaskLockMap = Maps.newHashMap();
+        this.mTaskLockMap = new HashMap<>();
         this.mLogger = LoggerManager.getLogger(getClass());
     }
 

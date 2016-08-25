@@ -19,7 +19,7 @@ package dev.nick.accessories.cache;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
-import com.google.common.base.Optional;
+import com.google.porting.base.Optional;
 
 import dev.nick.accessories.annotation.MaxSize;
 import dev.nick.accessories.annotation.MinSize;
