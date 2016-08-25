@@ -1,3 +1,5 @@
+# Project STOPPED :(
+
 # MediaAccessories
 A more controllable MediaLoader contains Image, Movie that load bitmap, gif from anywhere with both disk and mem cache, and
 a lot of ui effects.
