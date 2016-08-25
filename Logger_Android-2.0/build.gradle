@@ -1,2 +1,0 @@
-configurations.maybeCreate("default")
-artifacts.add("default", file('Logger_Android-2.0.aar'))

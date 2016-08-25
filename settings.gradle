@@ -1,1 +1,1 @@
-include ':app', ':core', ':Logger_Android-2.0'
+include ':app', ':core'

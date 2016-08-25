@@ -38,5 +38,5 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:24.1.0'
     compile 'com.nick.scalpel:scalpel:1.0.6'
     compile 'com.github.Cutta:GifView:1.1'
-    compile 'com.github.NickAndroid:MediaAccessories_Android:master-SNAPSHOT@aar'
+    compile project(':core')
 }
