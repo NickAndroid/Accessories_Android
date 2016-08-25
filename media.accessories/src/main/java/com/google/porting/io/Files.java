@@ -20,9 +20,6 @@ import com.google.porting.base.Preconditions;
 import java.io.File;
 import java.io.IOException;
 
-import static com.google.porting.base.Preconditions.checkArgument;
-import static com.google.porting.base.Preconditions.checkNotNull;
-
 
 public class Files {
 
@@ -35,17 +32,6 @@ public class Files {
      * Atomically creates a new directory somewhere beneath the system's
      * temporary directory (as defined by the {@code java.io.tmpdir} system
      * property), and returns its name.
-     * <p/>
-     * <p>Use this method instead of {@link File#createTempFile(String, String)}
-     * when you wish to create a directory, not a regular file.  A common pitfall
-     * is to call {@code createTempFile}, delete the file and create a
-     * directory in its place, but this leads a race condition which can be
-     * exploited to create security vulnerabilities, especially when executable
-     * files are to be written into the directory.
-     * <p/>
-     * <p>This method assumes that the temporary volume is writable, has free
-     * inodes and free blocks, and that it will not be called thousands of times
-     * per second.
      *
      * @return the newly-created directory
      * @throws IllegalStateException if the directory could not be created
