@@ -25,11 +25,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import dev.nick.accessories.media.MediaAccessory;
-import lombok.Getter;
 
 public class BaseTest extends AppCompatActivity {
 
-    @Getter
     boolean mPermRequired;
 
     @Override

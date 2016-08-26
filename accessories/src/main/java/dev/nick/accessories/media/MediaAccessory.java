@@ -284,8 +284,6 @@ public class MediaAccessory implements
 
         ensureNotTerminated();
 
-        if (isPaused()) return null;
-
         Preconditions.checkNotNull(mediaData.getUrl(), "mediaData is null");
 
         DisplayTaskRecord record = createTaskRecord(Preconditions.checkNotNull(mediaHolder));
@@ -390,8 +388,6 @@ public class MediaAccessory implements
                                @Nullable ErrorListener errorListener,
                                @Nullable Priority priority) {
         ensureNotTerminated();
-
-        if (isPaused()) return null;
 
         Preconditions.checkNotNull(source.getUrl(), "mediaData is null");
 
