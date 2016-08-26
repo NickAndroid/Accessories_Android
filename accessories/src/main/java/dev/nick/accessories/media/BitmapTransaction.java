@@ -32,7 +32,7 @@ import dev.nick.accessories.media.ui.MediaHolder;
 import dev.nick.accessories.media.ui.MediaQuality;
 import dev.nick.accessories.media.worker.MediaSource;
 import dev.nick.accessories.media.worker.ProgressListener;
-import dev.nick.accessories.media.worker.bitmap.BitmapMediaSource;
+import dev.nick.accessories.media.worker.bitmap.BitmapSource;
 import dev.nick.accessories.media.worker.result.ErrorListener;
 
 public class BitmapTransaction extends Transaction<Bitmap> {
@@ -54,7 +54,7 @@ public class BitmapTransaction extends Transaction<Bitmap> {
 
     @Override
     MediaSource<Bitmap> onCreateSource(String url) {
-        return BitmapMediaSource.from(url);
+        return BitmapSource.from(url);
     }
 
     @Override

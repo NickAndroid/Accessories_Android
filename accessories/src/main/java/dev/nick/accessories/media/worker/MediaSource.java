@@ -26,7 +26,7 @@ import lombok.ToString;
 @ToString
 public abstract class MediaSource<X> {
 
-    private MediaFetcher<X> fetcher;
+    protected MediaFetcher<X> fetcher;
     @Getter
     private String prefix;
 
@@ -40,11 +40,10 @@ public abstract class MediaSource<X> {
         return fetcher.prepare(context, config);
     }
 
-    public boolean isOneOf(@NonNull MediaSource... sources) {
-        for (MediaSource source : sources) {
-            if (source.equals(this)) return true;
-        }
-        return false;
+
+    @NonNull
+    public MediaFetcher<X> getFetcher() {
+        return fetcher;
     }
 
     public abstract boolean maybeSlow();

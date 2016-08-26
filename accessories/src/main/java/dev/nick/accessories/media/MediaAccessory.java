@@ -37,6 +37,8 @@ import java.util.concurrent.TimeUnit;
 import dev.nick.accessories.common.annotation.AccessoryApi;
 import dev.nick.accessories.common.annotation.Lazy;
 import dev.nick.accessories.common.annotation.Shared;
+import dev.nick.accessories.logger.Logger;
+import dev.nick.accessories.logger.LoggerManager;
 import dev.nick.accessories.media.cache.BitmapCacheManager;
 import dev.nick.accessories.media.cache.CacheManager;
 import dev.nick.accessories.media.cache.MovieCacheManager;
@@ -64,8 +66,8 @@ import dev.nick.accessories.media.worker.DimenSpec;
 import dev.nick.accessories.media.worker.MediaData;
 import dev.nick.accessories.media.worker.MediaSource;
 import dev.nick.accessories.media.worker.ProgressListener;
-import dev.nick.accessories.media.worker.bitmap.BitmapMediaSource;
-import dev.nick.accessories.media.worker.movie.MovieMediaSource;
+import dev.nick.accessories.media.worker.bitmap.BitmapSource;
+import dev.nick.accessories.media.worker.movie.MovieSource;
 import dev.nick.accessories.media.worker.result.ErrorListener;
 import dev.nick.accessories.media.worker.task.BaseFutureTask;
 import dev.nick.accessories.media.worker.task.BitmapDisplayTask;
@@ -76,8 +78,6 @@ import dev.nick.accessories.media.worker.task.MokeFutureImageTask;
 import dev.nick.accessories.media.worker.task.MovieDisplayTask;
 import dev.nick.accessories.media.worker.task.TaskManager;
 import dev.nick.accessories.media.worker.task.TaskManagerImpl;
-import dev.nick.accessories.logger.Logger;
-import dev.nick.accessories.logger.LoggerManager;
 import lombok.Getter;
 import lombok.Synchronized;
 
@@ -261,6 +261,20 @@ public class MediaAccessory implements
         return new MovieTransaction(this);
     }
 
+    /**
+     * Start a quick optional transaction builder,
+     * do not forget to call {@link Transaction#start()} to start this task.
+     *
+     * @return An optional params wrapper.
+     * @see Transaction
+     * @deprecated Using {@link #loadBitmap()} instead.
+     */
+    @AccessoryApi
+    @Deprecated
+    public DrawableTransaction loadDrawable() {
+        return new DrawableTransaction(this);
+    }
+
     Future<Bitmap> displayBitmap(@NonNull MediaData<Bitmap> mediaData,
                                  @NonNull MediaHolder<Bitmap> mediaHolder,
                                  @NonNull DisplayOption<Bitmap> option,
@@ -316,7 +330,7 @@ public class MediaAccessory implements
         if (mBitmapCacheManager.isDiskCacheEnabled()) {
             String cachePath;
             if ((cachePath = mBitmapCacheManager.getCachePath(loadingUrl)) != null) {
-                loadingUrl = BitmapMediaSource.FILE.getPrefix() + cachePath;
+                loadingUrl = BitmapSource.FILE.getPrefix() + cachePath;
                 // Check mem cache again.
                 if (mBitmapCacheManager.isMemCacheEnabled()) {
                     Bitmap cached;
@@ -332,7 +346,7 @@ public class MediaAccessory implements
                     }
                 }
                 mediaData.setUrl(loadingUrl);
-                mediaData.setSource(BitmapMediaSource.FILE);
+                mediaData.setSource(BitmapSource.FILE);
                 usingDiskCacheUrl = true;
             }
         }
@@ -421,7 +435,7 @@ public class MediaAccessory implements
         if (mMovieCacheManager.isDiskCacheEnabled()) {
             String cachePath;
             if ((cachePath = mMovieCacheManager.getCachePath(loadingUrl)) != null) {
-                loadingUrl = BitmapMediaSource.FILE.getPrefix() + cachePath;
+                loadingUrl = BitmapSource.FILE.getPrefix() + cachePath;
                 // Check mem cache again.
                 if (mMovieCacheManager.isMemCacheEnabled()) {
                     Movie cached;
@@ -436,7 +450,7 @@ public class MediaAccessory implements
                     }
                 }
                 source.setUrl(loadingUrl);
-                source.setSource(MovieMediaSource.FILE);
+                source.setSource(MovieSource.FILE);
                 usingDiskCacheUrl = true;
             }
         }

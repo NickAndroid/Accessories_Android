@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package dev.nick.accessories.media.worker.bitmap;
+package dev.nick.accessories.media.worker.movie;
 
-import android.graphics.Bitmap;
+import android.graphics.Movie;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
@@ -28,44 +28,42 @@ import dev.nick.accessories.media.worker.MediaSource;
 import dev.nick.accessories.media.worker.PathSplitter;
 import dev.nick.accessories.media.worker.ProgressListener;
 
-public class BitmapMediaSource extends MediaSource<Bitmap> {
+public class MovieSource extends MediaSource<Movie> {
 
-    public static final BitmapMediaSource FILE = new FileSource();
-    public static final BitmapMediaSource ASSETS = new AssetsSource();
-    public static final BitmapMediaSource DRAWABLE = new DrawableSource();
-    public static final BitmapMediaSource MIPMAP = new MipmapSource();
-    public static final BitmapMediaSource CONTENT = new ContentSource();
-    public static final BitmapMediaSource HTTP = new HttpSource();
-    public static final BitmapMediaSource HTTPS = new HttpsSource();
+    public static final MovieSource FILE = new FileSource();
+    public static final MovieSource ASSETS = new AssetsSource();
+    public static final MovieSource DRAWABLE = new DrawableSource();
+    public static final MovieSource CONTENT = new ContentSource();
+    public static final MovieSource HTTP = new HttpSource();
+    public static final MovieSource HTTPS = new HttpsSource();
 
-    private static final List<BitmapMediaSource> BITMAP_IMAGE_SOURCES = new ArrayList<>();
+    private static final List<MovieSource> MOVIE_IMAGE_SOURCES = new ArrayList<>();
 
     static {
-        addBitmapSource(FILE);
-        addBitmapSource(ASSETS);
-        addBitmapSource(DRAWABLE);
-        addBitmapSource(MIPMAP);
-        addBitmapSource(CONTENT);
-        addBitmapSource(HTTP);
-        addBitmapSource(HTTPS);
+        addMovieSource(FILE);
+        addMovieSource(ASSETS);
+        addMovieSource(DRAWABLE);
+        addMovieSource(CONTENT);
+        addMovieSource(HTTP);
+        addMovieSource(HTTPS);
     }
 
-    public BitmapMediaSource(MediaFetcher<Bitmap> fetcher, String prefix) {
+    public MovieSource(MediaFetcher<Movie> fetcher, String prefix) {
         super(fetcher, prefix);
     }
 
-    public static void addBitmapSource(@NonNull BitmapMediaSource source) {
-        synchronized (BITMAP_IMAGE_SOURCES) {
+    public static void addMovieSource(@NonNull MovieSource source) {
+        synchronized (MOVIE_IMAGE_SOURCES) {
             String prefix = Preconditions.checkNotNull(source).getPrefix();
-            BitmapMediaSource exists = from(prefix);
-            BITMAP_IMAGE_SOURCES.remove(exists);
-            BITMAP_IMAGE_SOURCES.add(source);
+            MovieSource exists = from(prefix);
+            MOVIE_IMAGE_SOURCES.remove(exists);
+            MOVIE_IMAGE_SOURCES.add(source);
         }
     }
 
-    public static BitmapMediaSource from(String url) {
-        synchronized (BITMAP_IMAGE_SOURCES) {
-            for (BitmapMediaSource source : BITMAP_IMAGE_SOURCES) {
+    public static MovieSource from(String url) {
+        synchronized (MOVIE_IMAGE_SOURCES) {
+            for (MovieSource source : MOVIE_IMAGE_SOURCES) {
                 if (url.startsWith(source.getPrefix())) {
                     return source;
                 }
@@ -79,7 +77,7 @@ public class BitmapMediaSource extends MediaSource<Bitmap> {
         return false;
     }
 
-    static class FileSource extends BitmapMediaSource {
+    static class FileSource extends MovieSource {
 
         public FileSource() {
             super(new FileMediaFetcher(new PathSplitter<String>() {
@@ -91,7 +89,7 @@ public class BitmapMediaSource extends MediaSource<Bitmap> {
         }
     }
 
-    static class AssetsSource extends BitmapMediaSource {
+    static class AssetsSource extends MovieSource {
 
         public AssetsSource() {
             super(new AssetsMediaFetcher(new PathSplitter<String>() {
@@ -103,7 +101,7 @@ public class BitmapMediaSource extends MediaSource<Bitmap> {
         }
     }
 
-    static class DrawableSource extends BitmapMediaSource {
+    static class DrawableSource extends MovieSource {
 
         public DrawableSource() {
             super(new DrawableMediaFetcher(new PathSplitter<String>() {
@@ -115,40 +113,18 @@ public class BitmapMediaSource extends MediaSource<Bitmap> {
         }
     }
 
-    static class MipmapSource extends BitmapMediaSource {
-
-        public MipmapSource() {
-            super(new MipmapMediaFetcher(new PathSplitter<String>() {
-                @Override
-                public String getRealPath(@NonNull String fullPath) {
-                    return fullPath.substring(Prefix.MIPMAP.length(), fullPath.length());
-                }
-            }), Prefix.MIPMAP);
-        }
-    }
-
-    static class ContentSource extends BitmapMediaSource {
+    static class ContentSource extends MovieSource {
         public ContentSource() {
             super(new ContentMediaFetcher(new PathSplitter<String>() {
                 @Override
                 public String getRealPath(@NonNull String fullPath) {
                     return fullPath;
                 }
-            }, new FileMediaFetcher(new PathSplitter<String>() {
-                @Override
-                public String getRealPath(@NonNull String fullPath) {
-                    return fullPath.substring(Prefix.FILE.length(), fullPath.length());
-                }
-            })) {
-                @Override
-                protected void callOnStart(ProgressListener<Bitmap> listener) {
-                    // Ignored.
-                }
-            }, Prefix.CONTENT);
+            }), Prefix.CONTENT);
         }
     }
 
-    static class HttpSource extends BitmapMediaSource {
+    static class HttpSource extends MovieSource {
 
         public HttpSource() {
             super(new NetworkMediaFetcher(new PathSplitter<String>() {
@@ -170,7 +146,7 @@ public class BitmapMediaSource extends MediaSource<Bitmap> {
         }
     }
 
-    static class HttpsSource extends BitmapMediaSource {
+    static class HttpsSource extends MovieSource {
 
         public HttpsSource() {
             super(new NetworkMediaFetcher(new PathSplitter<String>() {
@@ -199,7 +175,7 @@ public class BitmapMediaSource extends MediaSource<Bitmap> {
         }
 
         @Override
-        protected void callOnStart(ProgressListener<Bitmap> listener) {
+        protected void callOnStart(ProgressListener<Movie> listener) {
             // Hooked, won't call.
         }
     }

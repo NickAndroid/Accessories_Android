@@ -34,8 +34,8 @@ import dev.nick.accessories.media.worker.BaseMediaFetcher;
 import dev.nick.accessories.media.worker.DecodeSpec;
 import dev.nick.accessories.media.worker.PathSplitter;
 import dev.nick.accessories.media.worker.ProgressListener;
-import dev.nick.accessories.media.worker.bitmap.BitmapMediaSource;
-import dev.nick.accessories.media.worker.movie.MovieMediaSource;
+import dev.nick.accessories.media.worker.bitmap.BitmapSource;
+import dev.nick.accessories.media.worker.movie.MovieSource;
 import dev.nick.accessories.media.worker.network.NetworkPolicy;
 import dev.nick.accessories.media.worker.result.ErrorListener;
 import dev.nick.accessories.logger.LoggerManager;
@@ -69,7 +69,7 @@ public class MyApp extends ScalpelApplication {
         }
 
         // Add custom sources.
-        BitmapMediaSource.addBitmapSource(new BitmapMediaSource(new BaseMediaFetcher<Bitmap>(new PathSplitter<String>() {
+        BitmapSource.addBitmapSource(new BitmapSource(new BaseMediaFetcher<Bitmap>(new PathSplitter<String>() {
             @Override
             public String getRealPath(@NonNull String fullPath) {
                 return null;
@@ -85,7 +85,7 @@ public class MyApp extends ScalpelApplication {
         }, "test_bitmap://"));
 
 
-        MovieMediaSource.addMovieSource(new MovieMediaSource(new BaseMediaFetcher<Movie>(new PathSplitter<String>() {
+        MovieSource.addMovieSource(new MovieSource(new BaseMediaFetcher<Movie>(new PathSplitter<String>() {
             @Override
             public String getRealPath(@NonNull String fullPath) {
                 return null;

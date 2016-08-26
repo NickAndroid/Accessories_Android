@@ -30,7 +30,7 @@ import dev.nick.accessories.media.ui.MediaHolder;
 import dev.nick.accessories.media.ui.MediaQuality;
 import dev.nick.accessories.media.worker.MediaSource;
 import dev.nick.accessories.media.worker.ProgressListener;
-import dev.nick.accessories.media.worker.movie.MovieMediaSource;
+import dev.nick.accessories.media.worker.movie.MovieSource;
 import dev.nick.accessories.media.worker.result.ErrorListener;
 
 public class MovieTransaction extends Transaction<Movie> {
@@ -52,7 +52,7 @@ public class MovieTransaction extends Transaction<Movie> {
 
     @Override
     MediaSource<Movie> onCreateSource(String url) {
-        return MovieMediaSource.from(url);
+        return MovieSource.from(url);
     }
 
     @Override

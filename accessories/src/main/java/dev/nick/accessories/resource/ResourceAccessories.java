@@ -61,4 +61,8 @@ public abstract class ResourceAccessories {
             throw new IllegalArgumentException("Unsupported drawable type");
         }
     }
+
+    public static Drawable bitmapToDrawable(@NonNull Bitmap bitmap, @NonNull Resources resources) {
+        return new BitmapDrawable(resources, bitmap);
+    }
 }

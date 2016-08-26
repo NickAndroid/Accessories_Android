@@ -46,7 +46,7 @@ import dev.nick.accessories.media.ui.DisplayOption;
 import dev.nick.accessories.media.ui.MediaHolder;
 import dev.nick.accessories.media.ui.MediaQuality;
 import dev.nick.accessories.media.ui.animator.ResAnimator;
-import dev.nick.accessories.media.worker.bitmap.BitmapMediaSource;
+import dev.nick.accessories.media.worker.bitmap.BitmapSource;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
 public class CustomAnimationTest extends BaseTest {
@@ -113,7 +113,7 @@ public class CustomAnimationTest extends BaseTest {
                 holder.textView.setText(tracks.get(position).getTitle());
 
                 // String uri = mArtworkUri + File.separator + tracks.get(position).getAlbumId();
-                String uri = BitmapMediaSource.FILE.getPrefix() + tracks.get(position).getUrl();
+                String uri = BitmapSource.FILE.getPrefix() + tracks.get(position).getUrl();
 
                 mediaAccessory.loadBitmap()
                         .from(uri)
