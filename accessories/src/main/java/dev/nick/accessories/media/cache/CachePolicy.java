@@ -21,8 +21,8 @@ import android.support.annotation.NonNull;
 
 import com.google.guava.base.Optional;
 
-import dev.nick.accessories.media.annotation.MaxSize;
-import dev.nick.accessories.media.annotation.MinSize;
+import dev.nick.accessories.common.annotation.MaxSize;
+import dev.nick.accessories.common.annotation.MinSize;
 import dev.nick.accessories.media.utils.Preconditions;
 import lombok.Getter;
 import lombok.ToString;

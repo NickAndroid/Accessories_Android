@@ -33,6 +33,7 @@ public class BitmapMediaSource extends MediaSource<Bitmap> {
     public static final BitmapMediaSource FILE = new FileSource();
     public static final BitmapMediaSource ASSETS = new AssetsSource();
     public static final BitmapMediaSource DRAWABLE = new DrawableSource();
+    public static final BitmapMediaSource MIPMAP = new MipmapSource();
     public static final BitmapMediaSource CONTENT = new ContentSource();
     public static final BitmapMediaSource HTTP = new HttpSource();
     public static final BitmapMediaSource HTTPS = new HttpsSource();
@@ -43,6 +44,7 @@ public class BitmapMediaSource extends MediaSource<Bitmap> {
         addBitmapSource(FILE);
         addBitmapSource(ASSETS);
         addBitmapSource(DRAWABLE);
+        addBitmapSource(MIPMAP);
         addBitmapSource(CONTENT);
         addBitmapSource(HTTP);
         addBitmapSource(HTTPS);
@@ -110,6 +112,18 @@ public class BitmapMediaSource extends MediaSource<Bitmap> {
                     return fullPath.substring(Prefix.DRAWABLE.length(), fullPath.length());
                 }
             }), Prefix.DRAWABLE);
+        }
+    }
+
+    static class MipmapSource extends BitmapMediaSource {
+
+        public MipmapSource() {
+            super(new MipmapMediaFetcher(new PathSplitter<String>() {
+                @Override
+                public String getRealPath(@NonNull String fullPath) {
+                    return fullPath.substring(Prefix.MIPMAP.length(), fullPath.length());
+                }
+            }), Prefix.MIPMAP);
         }
     }
 

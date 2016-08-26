@@ -23,7 +23,7 @@ import android.support.annotation.Nullable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
-import dev.nick.accessories.media.annotation.AccessoryApi;
+import dev.nick.accessories.common.annotation.AccessoryApi;
 import dev.nick.accessories.media.queue.Priority;
 import dev.nick.accessories.media.ui.DisplayOption;
 import dev.nick.accessories.media.ui.MediaHolder;

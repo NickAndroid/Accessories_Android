@@ -16,80 +16,19 @@
 
 package dev.nick.accessories.media.worker.bitmap;
 
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
-import dev.nick.accessories.media.worker.BaseMediaFetcher;
-import dev.nick.accessories.media.worker.DecodeSpec;
-import dev.nick.accessories.media.worker.DimenSpec;
 import dev.nick.accessories.media.worker.PathSplitter;
-import dev.nick.accessories.media.worker.ProgressListener;
-import dev.nick.accessories.media.worker.result.Cause;
-import dev.nick.accessories.media.worker.result.ErrorListener;
 
-public class DrawableMediaFetcher extends BaseMediaFetcher<Bitmap> {
+public class DrawableMediaFetcher extends ResourcesMediaFetcher {
 
     public DrawableMediaFetcher(PathSplitter<String> splitter) {
         super(splitter);
     }
 
+    @NonNull
     @Override
-    public Bitmap fetchFromUrl(@NonNull String url,
-                               @NonNull DecodeSpec decodeSpec,
-                               @Nullable ProgressListener<Bitmap> progressListener,
-                               @Nullable ErrorListener errorListener)
-            throws Exception {
-
-        super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);
-
-        Resources resources = this.mContext.getResources();
-
-        int resId = resources.getIdentifier(mSplitter.getRealPath(url),
-                "drawable",
-                this.mContext.getPackageName());
-
-        if (resId <= 0) {
-            callOnError(errorListener, new Cause(new Resources.NotFoundException(String.format("Res of id-%s not found for url-%s.", resId, url))));
-            return null;
-        }
-
-        callOnStart(progressListener);
-
-        BitmapFactory.Options decodeOptions = null;
-        DimenSpec dimenSpec = decodeSpec.getDimenSpec();
-
-        switch (decodeSpec.getQuality()) {
-            case OPT:
-                decodeOptions = new BitmapFactory.Options();
-
-                // If we have to resize this image, first get the natural bounds.
-                decodeOptions.inJustDecodeBounds = true;
-                BitmapFactory.decodeResource(resources, resId, decodeOptions);
-
-                // Decode to the nearest power of two scaling factor.
-                decodeOptions.inJustDecodeBounds = false;
-                decodeOptions.inSampleSize =
-                        computeSampleSize(decodeOptions, UNCONSTRAINED,
-                                (dimenSpec.height * dimenSpec.height == 0 ?
-                                        MAX_NUM_PIXELS_THUMBNAIL
-                                        : dimenSpec.width * dimenSpec.height));
-            default:
-                break;
-        }
-
-        Bitmap bitmap;
-
-        try {
-            bitmap = BitmapFactory.decodeResource(resources, resId, decodeOptions);
-        } catch (OutOfMemoryError error) {
-            callOnError(errorListener, new Cause(error));
-            return null;
-        }
-
-        callOnComplete(progressListener, bitmap);
-        return bitmap;
+    String getDefType() {
+        return "drawable";
     }
 }

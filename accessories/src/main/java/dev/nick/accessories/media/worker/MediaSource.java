@@ -68,6 +68,7 @@ public abstract class MediaSource<X> {
         String FILE = "file://";
         String ASSETS = "assets://";
         String DRAWABLE = "drawable://";
+        String MIPMAP = "mipmap://";
         String CONTENT = "content://";
         String HTTP = "http://";
         String HTTPS = "https://";

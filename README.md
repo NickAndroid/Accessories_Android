@@ -5,6 +5,7 @@ A more controllable MediaLoader contains Image, Movie that load bitmap, gif from
 a lot of ui effects.
 
 ## Arts
+
 ![Video 1](art/demo.gif)
 
 ## Usage
@@ -13,6 +14,9 @@ a lot of ui effects.
 <a href="http://www.methodscount.com/?lib=dev.nick%3Aimageloader%3A1.4"><img src="https://img.shields.io/badge/Size-223 KB-e91e63.svg"/></a>
 
 ### Change log
+
+*  Vector support.
+*  Mipmap support.
 
 ## Samples
 
@@ -120,6 +124,7 @@ mMediaAccessory.cancel(ImageView/ImageSettable/Url);
 - [x] file://
 - [x] content://
 - [x] drawable://
+- [x] mipmap://
 - [x] assets://
 
 ## Supported media format:

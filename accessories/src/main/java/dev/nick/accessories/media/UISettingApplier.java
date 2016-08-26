@@ -25,7 +25,7 @@ import android.support.annotation.WorkerThread;
 
 import java.util.List;
 
-import dev.nick.accessories.media.annotation.Shared;
+import dev.nick.accessories.common.annotation.Shared;
 import dev.nick.accessories.media.ui.BitmapViewSettings;
 import dev.nick.accessories.media.ui.MediaHolder;
 import dev.nick.accessories.media.ui.MovieViewSettings;

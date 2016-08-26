@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="dev.nick.twenty">
+    package="dev.nick.accessoriestest">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -7,14 +7,14 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
-        android:name=".MyApp"
+        android:name="dev.nick.accessoriestest.MyApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".TestsList">
+        <activity android:name="dev.nick.accessoriestest.TestsList">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -22,59 +22,67 @@
         </activity>
 
         <activity
-            android:name=".FileImageTest"
+            android:name="dev.nick.accessoriestest.FileImageTest"
             android:label="FileImageTest" />
 
         <activity
-            android:name=".DrawableImageTest"
+            android:name="dev.nick.accessoriestest.DrawableImageTest"
             android:label="DrawableImageTest" />
 
         <activity
-            android:name=".ContentImageTest"
+            android:name="dev.nick.accessoriestest.VectorImageTest"
+            android:label="VectorImageTest" />
+
+        <activity
+            android:name="dev.nick.accessoriestest.MipMapImageTest"
+            android:label="MipMapImageTest" />
+
+        <activity
+            android:name="dev.nick.accessoriestest.ContentImageTest"
             android:label="ContentImageTest" />
 
         <activity
-            android:name=".AssetsImageTest"
+            android:name="dev.nick.accessoriestest.AssetsImageTest"
             android:label="AssetsImageTest" />
 
         <activity
-            android:name=".NetworkImageTest"
+            android:name="dev.nick.accessoriestest.NetworkImageTest"
             android:label="NetworkImageTest" />
 
         <activity
-            android:name=".LoadImageTest"
+            android:name="dev.nick.accessoriestest.LoadImageTest"
             android:label="LoadImageTest" />
 
         <activity
-            android:name=".SyncLoadTest"
+            android:name="dev.nick.accessoriestest.SyncLoadTest"
             android:label="SyncLoadTest" />
 
         <activity
-            android:name=".AssetGifTest"
+            android:name="dev.nick.accessoriestest.AssetGifTest"
             android:label="AssetMovieTest" />
 
         <activity
-            android:name=".AssetVideoTest"
+            android:name="dev.nick.accessoriestest.AssetVideoTest"
             android:label="AssetVideoTest" />
 
         <activity
-            android:name=".NetworkMovieTest"
+            android:name="dev.nick.accessoriestest.NetworkMovieTest"
             android:label="NetworkMovieTest" />
 
         <activity
-            android:name=".Usage"
+            android:name="dev.nick.accessoriestest.Usage"
             android:label="Usage" />
 
         <activity
-            android:name=".ScrollStateTest"
+            android:name="dev.nick.accessoriestest.ScrollStateTest"
             android:label="ScrollStateTest" />
 
         <activity
-            android:name=".CustomAnimationTest"
+            android:name="dev.nick.accessoriestest.CustomAnimationTest"
             android:label="CustomAnimationTest" />
 
         <activity
-            android:name=".DownloadMachine"
+            android:name="dev.nick.accessoriestest.DownloadMachine"
             android:label="DownloadMachine" />
     </application>
 

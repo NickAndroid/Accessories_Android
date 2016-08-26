@@ -2,7 +2,7 @@ com.google.guava.base
 com.google.guava.io
 dev.nick.accessories.logger
 dev.nick.accessories.media
-dev.nick.accessories.media.annotation
+dev.nick.accessories.common.annotation
 dev.nick.accessories.media.cache
 dev.nick.accessories.media.cache.disk
 dev.nick.accessories.media.cache.mem

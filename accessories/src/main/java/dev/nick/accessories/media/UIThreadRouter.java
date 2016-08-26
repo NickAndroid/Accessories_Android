@@ -20,7 +20,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
-import dev.nick.accessories.media.annotation.Shared;
+import dev.nick.accessories.common.annotation.Shared;
 import dev.nick.accessories.media.worker.ProgressListener;
 import dev.nick.accessories.media.worker.result.Cause;
 import dev.nick.accessories.media.worker.result.ErrorListener;

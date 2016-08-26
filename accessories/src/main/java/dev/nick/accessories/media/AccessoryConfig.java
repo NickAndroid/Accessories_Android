@@ -21,8 +21,8 @@ import android.util.Log;
 
 import com.google.guava.base.Optional;
 
-import dev.nick.accessories.media.annotation.AccessoryApi;
-import dev.nick.accessories.media.annotation.MinSize;
+import dev.nick.accessories.common.annotation.AccessoryApi;
+import dev.nick.accessories.common.annotation.MinSize;
 import dev.nick.accessories.media.cache.CachePolicy;
 import dev.nick.accessories.media.queue.QueuePolicy;
 import dev.nick.accessories.media.utils.Preconditions;

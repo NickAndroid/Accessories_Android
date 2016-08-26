@@ -34,9 +34,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import dev.nick.accessories.media.annotation.AccessoryApi;
-import dev.nick.accessories.media.annotation.Lazy;
-import dev.nick.accessories.media.annotation.Shared;
+import dev.nick.accessories.common.annotation.AccessoryApi;
+import dev.nick.accessories.common.annotation.Lazy;
+import dev.nick.accessories.common.annotation.Shared;
 import dev.nick.accessories.media.cache.BitmapCacheManager;
 import dev.nick.accessories.media.cache.CacheManager;
 import dev.nick.accessories.media.cache.MovieCacheManager;
