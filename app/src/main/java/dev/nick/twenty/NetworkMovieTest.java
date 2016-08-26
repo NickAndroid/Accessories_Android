@@ -25,13 +25,13 @@ import android.view.animation.Animation;
 import com.nick.scalpel.Scalpel;
 import com.nick.scalpel.annotation.binding.FindView;
 
-import dev.nick.accessories.MediaAccessory;
-import dev.nick.accessories.queue.Priority;
-import dev.nick.accessories.ui.MediaHolder;
-import dev.nick.accessories.worker.ProgressListener;
-import dev.nick.accessories.worker.result.Cause;
-import dev.nick.accessories.worker.result.ErrorListener;
-import dev.nick.logger.LoggerManager;
+import dev.nick.accessories.media.MediaAccessory;
+import dev.nick.accessories.media.queue.Priority;
+import dev.nick.accessories.media.ui.MediaHolder;
+import dev.nick.accessories.media.worker.ProgressListener;
+import dev.nick.accessories.media.worker.result.Cause;
+import dev.nick.accessories.media.worker.result.ErrorListener;
+import dev.nick.accessories.logger.LoggerManager;
 
 public class NetworkMovieTest extends BaseTest {
 

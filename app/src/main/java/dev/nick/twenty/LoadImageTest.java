@@ -38,12 +38,12 @@ import com.nick.scalpel.annotation.request.RequirePermission;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.nick.accessories.MediaAccessory;
-import dev.nick.accessories.ProgressListenerStub;
-import dev.nick.accessories.queue.Priority;
-import dev.nick.accessories.worker.result.Cause;
-import dev.nick.accessories.worker.result.ErrorListener;
-import dev.nick.logger.LoggerManager;
+import dev.nick.accessories.media.MediaAccessory;
+import dev.nick.accessories.media.ProgressListenerStub;
+import dev.nick.accessories.media.queue.Priority;
+import dev.nick.accessories.media.worker.result.Cause;
+import dev.nick.accessories.media.worker.result.ErrorListener;
+import dev.nick.accessories.logger.LoggerManager;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
 public class LoadImageTest extends BaseTest {

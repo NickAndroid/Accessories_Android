@@ -26,19 +26,19 @@ import android.util.Log;
 
 import com.nick.scalpel.ScalpelApplication;
 
-import dev.nick.accessories.AccessoryConfig;
-import dev.nick.accessories.MediaAccessory;
-import dev.nick.accessories.cache.CachePolicy;
-import dev.nick.accessories.queue.QueuePolicy;
-import dev.nick.accessories.worker.BaseMediaFetcher;
-import dev.nick.accessories.worker.DecodeSpec;
-import dev.nick.accessories.worker.PathSplitter;
-import dev.nick.accessories.worker.ProgressListener;
-import dev.nick.accessories.worker.bitmap.BitmapMediaSource;
-import dev.nick.accessories.worker.movie.MovieMediaSource;
-import dev.nick.accessories.worker.network.NetworkPolicy;
-import dev.nick.accessories.worker.result.ErrorListener;
-import dev.nick.logger.LoggerManager;
+import dev.nick.accessories.media.AccessoryConfig;
+import dev.nick.accessories.media.MediaAccessory;
+import dev.nick.accessories.media.cache.CachePolicy;
+import dev.nick.accessories.media.queue.QueuePolicy;
+import dev.nick.accessories.media.worker.BaseMediaFetcher;
+import dev.nick.accessories.media.worker.DecodeSpec;
+import dev.nick.accessories.media.worker.PathSplitter;
+import dev.nick.accessories.media.worker.ProgressListener;
+import dev.nick.accessories.media.worker.bitmap.BitmapMediaSource;
+import dev.nick.accessories.media.worker.movie.MovieMediaSource;
+import dev.nick.accessories.media.worker.network.NetworkPolicy;
+import dev.nick.accessories.media.worker.result.ErrorListener;
+import dev.nick.accessories.logger.LoggerManager;
 
 public class MyApp extends ScalpelApplication {
     @Override

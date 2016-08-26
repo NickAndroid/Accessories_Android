@@ -23,8 +23,8 @@ import android.widget.TextView;
 import com.nick.scalpel.ScalpelAutoActivity;
 import com.nick.scalpel.annotation.binding.FindView;
 
-import dev.nick.accessories.MediaAccessory;
-import dev.nick.accessories.control.StorageStats;
+import dev.nick.accessories.media.MediaAccessory;
+import dev.nick.accessories.media.control.StorageStats;
 
 public class Usage extends ScalpelAutoActivity {
 

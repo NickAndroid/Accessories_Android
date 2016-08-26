@@ -28,12 +28,12 @@ import com.nick.scalpel.annotation.binding.FindView;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
-import dev.nick.accessories.MediaAccessory;
-import dev.nick.accessories.ProgressListenerStub;
-import dev.nick.accessories.queue.Priority;
-import dev.nick.accessories.worker.result.Cause;
-import dev.nick.accessories.worker.result.ErrorListener;
-import dev.nick.logger.LoggerManager;
+import dev.nick.accessories.media.MediaAccessory;
+import dev.nick.accessories.media.ProgressListenerStub;
+import dev.nick.accessories.media.queue.Priority;
+import dev.nick.accessories.media.worker.result.Cause;
+import dev.nick.accessories.media.worker.result.ErrorListener;
+import dev.nick.accessories.logger.LoggerManager;
 
 public class DownloadMachine extends BaseTest {
 

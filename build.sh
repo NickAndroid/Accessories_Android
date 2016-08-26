@@ -1,4 +1,5 @@
 ./code_stats.sh
+./gradlew clean
 ./gradlew jarRelease
-./gradlew bintrayUpload | tee build/upload.log
- cp -r media.accessories/build/libs/ ./download/
+rm -rf ./downloads
+cp -r accessories/build/libs/* ./downloads/

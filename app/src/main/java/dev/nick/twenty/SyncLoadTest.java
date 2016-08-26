@@ -24,7 +24,7 @@ import android.widget.ImageView;
 import com.nick.scalpel.Scalpel;
 import com.nick.scalpel.annotation.binding.FindView;
 
-import dev.nick.accessories.MediaAccessory;
+import dev.nick.accessories.media.MediaAccessory;
 
 public class SyncLoadTest extends BaseTest {
 

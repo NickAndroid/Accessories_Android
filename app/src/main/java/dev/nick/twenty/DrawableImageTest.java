@@ -25,13 +25,13 @@ import android.widget.ImageView;
 import com.nick.scalpel.Scalpel;
 import com.nick.scalpel.annotation.binding.FindView;
 
-import dev.nick.accessories.MediaAccessory;
-import dev.nick.accessories.ui.DisplayOption;
-import dev.nick.accessories.ui.MediaQuality;
-import dev.nick.accessories.ui.art.BlackWhiteMediaArt;
-import dev.nick.accessories.worker.result.Cause;
-import dev.nick.accessories.worker.result.ErrorListener;
-import dev.nick.logger.LoggerManager;
+import dev.nick.accessories.media.MediaAccessory;
+import dev.nick.accessories.media.ui.DisplayOption;
+import dev.nick.accessories.media.ui.MediaQuality;
+import dev.nick.accessories.media.ui.art.BlackWhiteMediaArt;
+import dev.nick.accessories.media.worker.result.Cause;
+import dev.nick.accessories.media.worker.result.ErrorListener;
+import dev.nick.accessories.logger.LoggerManager;
 
 public class DrawableImageTest extends BaseTest {
 

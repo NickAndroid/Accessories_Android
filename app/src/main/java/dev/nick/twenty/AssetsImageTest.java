@@ -25,13 +25,13 @@ import android.widget.ImageView;
 import com.nick.scalpel.Scalpel;
 import com.nick.scalpel.annotation.binding.FindView;
 
-import dev.nick.accessories.MediaAccessory;
-import dev.nick.accessories.ProgressListenerStub;
-import dev.nick.accessories.queue.Priority;
-import dev.nick.accessories.ui.DisplayOption;
-import dev.nick.accessories.ui.MediaQuality;
-import dev.nick.accessories.ui.animator.FadeInViewAnimator;
-import dev.nick.accessories.ui.art.BlackWhiteMediaArt;
+import dev.nick.accessories.media.MediaAccessory;
+import dev.nick.accessories.media.ProgressListenerStub;
+import dev.nick.accessories.media.queue.Priority;
+import dev.nick.accessories.media.ui.DisplayOption;
+import dev.nick.accessories.media.ui.MediaQuality;
+import dev.nick.accessories.media.ui.animator.FadeInViewAnimator;
+import dev.nick.accessories.media.ui.art.BlackWhiteMediaArt;
 
 public class AssetsImageTest extends BaseTest {
 

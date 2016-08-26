@@ -24,7 +24,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import dev.nick.accessories.MediaAccessory;
+import dev.nick.accessories.media.MediaAccessory;
 
 public class BaseTest extends AppCompatActivity {
 

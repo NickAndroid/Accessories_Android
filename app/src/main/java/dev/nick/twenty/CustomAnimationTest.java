@@ -38,15 +38,15 @@ import com.nick.scalpel.annotation.request.RequirePermission;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.nick.accessories.MediaAccessory;
-import dev.nick.accessories.AccessoryConfig;
-import dev.nick.accessories.ProgressListenerStub;
-import dev.nick.accessories.cache.CachePolicy;
-import dev.nick.accessories.ui.DisplayOption;
-import dev.nick.accessories.ui.MediaHolder;
-import dev.nick.accessories.ui.MediaQuality;
-import dev.nick.accessories.ui.animator.ResAnimator;
-import dev.nick.accessories.worker.bitmap.BitmapMediaSource;
+import dev.nick.accessories.media.MediaAccessory;
+import dev.nick.accessories.media.AccessoryConfig;
+import dev.nick.accessories.media.ProgressListenerStub;
+import dev.nick.accessories.media.cache.CachePolicy;
+import dev.nick.accessories.media.ui.DisplayOption;
+import dev.nick.accessories.media.ui.MediaHolder;
+import dev.nick.accessories.media.ui.MediaQuality;
+import dev.nick.accessories.media.ui.animator.ResAnimator;
+import dev.nick.accessories.media.worker.bitmap.BitmapMediaSource;
 
 @RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
 public class CustomAnimationTest extends BaseTest {
