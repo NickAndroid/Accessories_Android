@@ -14,7 +14,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name="dev.nick.accessoriestest.TestsList">
+        <service android:name=".service.MediaPlayerService"/>
+
+        <activity android:name=".media.TestsList">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -22,67 +24,67 @@
         </activity>
 
         <activity
-            android:name="dev.nick.accessoriestest.FileImageTest"
+            android:name=".media.FileImageTest"
             android:label="FileImageTest" />
 
         <activity
-            android:name="dev.nick.accessoriestest.DrawableImageTest"
+            android:name=".media.DrawableImageTest"
             android:label="DrawableImageTest" />
 
         <activity
-            android:name="dev.nick.accessoriestest.VectorImageTest"
+            android:name=".media.VectorImageTest"
             android:label="VectorImageTest" />
 
         <activity
-            android:name="dev.nick.accessoriestest.MipMapImageTest"
+            android:name=".media.MipMapImageTest"
             android:label="MipMapImageTest" />
 
         <activity
-            android:name="dev.nick.accessoriestest.ContentImageTest"
+            android:name=".media.ContentImageTest"
             android:label="ContentImageTest" />
 
         <activity
-            android:name="dev.nick.accessoriestest.AssetsImageTest"
+            android:name=".media.AssetsImageTest"
             android:label="AssetsImageTest" />
 
         <activity
-            android:name="dev.nick.accessoriestest.NetworkImageTest"
+            android:name=".media.NetworkImageTest"
             android:label="NetworkImageTest" />
 
         <activity
-            android:name="dev.nick.accessoriestest.LoadImageTest"
+            android:name=".media.LoadImageTest"
             android:label="LoadImageTest" />
 
         <activity
-            android:name="dev.nick.accessoriestest.SyncLoadTest"
+            android:name=".media.SyncLoadTest"
             android:label="SyncLoadTest" />
 
         <activity
-            android:name="dev.nick.accessoriestest.AssetGifTest"
+            android:name=".media.AssetGifTest"
             android:label="AssetMovieTest" />
 
         <activity
-            android:name="dev.nick.accessoriestest.AssetVideoTest"
+            android:name=".media.AssetVideoTest"
             android:label="AssetVideoTest" />
 
         <activity
-            android:name="dev.nick.accessoriestest.NetworkMovieTest"
+            android:name=".media.NetworkMovieTest"
             android:label="NetworkMovieTest" />
 
         <activity
-            android:name="dev.nick.accessoriestest.Usage"
+            android:name=".media.Usage"
             android:label="Usage" />
 
         <activity
-            android:name="dev.nick.accessoriestest.ScrollStateTest"
+            android:name=".media.ScrollStateTest"
             android:label="ScrollStateTest" />
 
         <activity
-            android:name="dev.nick.accessoriestest.CustomAnimationTest"
+            android:name=".media.CustomAnimationTest"
             android:label="CustomAnimationTest" />
 
         <activity
-            android:name="dev.nick.accessoriestest.DownloadMachine"
+            android:name=".media.DownloadMachine"
             android:label="DownloadMachine" />
     </application>
 

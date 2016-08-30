@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
   ~ Copyright (c) 2016 Nick Guo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,13 +15,6 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <dev.nick.accessoriestest.media.SimpleGifView
-        android:id="@+id/movie"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-</LinearLayout>
+<resources>
+    <bool name="bool_test">true</bool>
+</resources>

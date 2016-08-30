@@ -26,6 +26,8 @@ import android.util.Log;
 
 import com.nick.scalpel.ScalpelApplication;
 
+import dev.nick.accessories.binding.BindingAccessories;
+import dev.nick.accessories.logger.LoggerManager;
 import dev.nick.accessories.media.AccessoryConfig;
 import dev.nick.accessories.media.MediaAccessory;
 import dev.nick.accessories.media.cache.CachePolicy;
@@ -38,7 +40,6 @@ import dev.nick.accessories.media.worker.bitmap.BitmapSource;
 import dev.nick.accessories.media.worker.movie.MovieSource;
 import dev.nick.accessories.media.worker.network.NetworkPolicy;
 import dev.nick.accessories.media.worker.result.ErrorListener;
-import dev.nick.accessories.logger.LoggerManager;
 
 public class MyApp extends ScalpelApplication {
     @Override
@@ -99,5 +100,7 @@ public class MyApp extends ScalpelApplication {
                 return super.fetchFromUrl(url, decodeSpec, progressListener, errorListener);
             }
         }, "test_movie://"));
+
+        BindingAccessories.createShared(getApplicationContext());
     }
 }
