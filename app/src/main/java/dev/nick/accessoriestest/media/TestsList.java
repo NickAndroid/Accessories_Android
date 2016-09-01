@@ -19,6 +19,7 @@ package dev.nick.accessoriestest.media;
 import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -28,17 +29,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.nick.scalpel.Scalpel;
-import com.nick.scalpel.annotation.binding.FindView;
-import com.nick.scalpel.annotation.request.RequirePermission;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import dev.nick.accessories.injection.InjectionAccessory;
+import dev.nick.accessories.injection.annotation.binding.BindView;
+import dev.nick.accessories.injection.annotation.permission.RequestPermissions;
 import dev.nick.accessoriestest.R;
 
 @SuppressWarnings("ConstantConditions")
-@RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
+@RequestPermissions(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
 public class TestsList extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
@@ -55,7 +55,7 @@ public class TestsList extends AppCompatActivity {
                 showTestResult();
             }
         });
-        Scalpel.getInstance().wire(this);
+        InjectionAccessory.shared().process(this);
     }
 
     protected List<Test> onStartTest() {
@@ -75,7 +75,6 @@ public class TestsList extends AppCompatActivity {
         tests.add(new Test(Usage.class));
         tests.add(new Test(ScrollStateTest.class));
         tests.add(new Test(CustomAnimationTest.class));
-        tests.add(new Test(DownloadMachine.class));
         return tests;
     }
 
@@ -86,16 +85,22 @@ public class TestsList extends AppCompatActivity {
         mRecyclerView.setAdapter(new Adapter(onStartTest()));
     }
 
-    static class TwoLinesViewHolder extends RecyclerView.ViewHolder {
+    static class TwoLinesViewHolder extends RecyclerView.ViewHolder implements BindView.RootViewProvider {
 
-        @FindView(id = android.R.id.title)
+        @BindView(android.R.id.title)
         TextView title;
-        @FindView(id = android.R.id.text1)
+        @BindView(android.R.id.text1)
         TextView description;
 
         public TwoLinesViewHolder(final View itemView) {
             super(itemView);
-            Scalpel.getInstance().wire(itemView, this);
+            InjectionAccessory.shared().process(this);
+        }
+
+        @NonNull
+        @Override
+        public View getRootView() {
+            return itemView;
         }
     }
 

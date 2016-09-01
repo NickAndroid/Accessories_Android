@@ -22,22 +22,21 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.animation.Animation;
 
-import com.nick.scalpel.Scalpel;
-import com.nick.scalpel.annotation.binding.FindView;
-
+import dev.nick.accessories.injection.InjectionAccessory;
+import dev.nick.accessories.injection.annotation.binding.BindView;
+import dev.nick.accessories.logger.LoggerManager;
 import dev.nick.accessories.media.MediaAccessory;
 import dev.nick.accessories.media.ui.MediaHolder;
 import dev.nick.accessories.media.worker.ProgressListener;
 import dev.nick.accessories.media.worker.result.Cause;
 import dev.nick.accessories.media.worker.result.ErrorListener;
-import dev.nick.accessories.logger.LoggerManager;
 import dev.nick.accessoriestest.R;
 
 public class AssetVideoTest extends BaseTest {
 
     final String urlAssets = "assets://test_video.mp4";
 
-    @FindView(id = R.id.movie)
+    @BindView(R.id.movie)
     SimpleGifView simpleGifView;
 
     @Override
@@ -45,7 +44,7 @@ public class AssetVideoTest extends BaseTest {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.single_movie_layout);
         setTitle(getClass().getSimpleName());
-        Scalpel.getInstance().wire(this);
+        InjectionAccessory.shared().process(this);
     }
 
     @Override

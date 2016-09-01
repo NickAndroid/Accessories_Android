@@ -16,10 +16,12 @@
 
 package dev.nick.accessoriestest.media;
 
-import android.Manifest;
+import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.os.RemoteException;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -31,15 +33,16 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.nick.scalpel.Scalpel;
-import com.nick.scalpel.annotation.binding.FindView;
-import com.nick.scalpel.annotation.request.RequirePermission;
-
 import java.io.File;
 import java.util.List;
 
-import dev.nick.accessories.binding.BindingAccessories;
-import dev.nick.accessories.binding.annotation.permission.RequestPermissions;
+import dev.nick.accessories.injection.InjectionAccessory;
+import dev.nick.accessories.injection.annotation.binding.BindService;
+import dev.nick.accessories.injection.annotation.binding.BindView;
+import dev.nick.accessories.injection.annotation.binding.CallMethod;
+import dev.nick.accessories.injection.annotation.binding.ServiceConnectionStub;
+import dev.nick.accessories.injection.annotation.permission.RequestPermissions;
+import dev.nick.accessories.logger.LoggerManager;
 import dev.nick.accessories.media.AccessoryConfig;
 import dev.nick.accessories.media.MediaAccessory;
 import dev.nick.accessories.media.cache.CachePolicy;
@@ -50,39 +53,61 @@ import dev.nick.accessories.media.worker.network.NetworkPolicy;
 import dev.nick.accessoriestest.R;
 import dev.nick.accessoriestest.model.IMediaTrack;
 import dev.nick.accessoriestest.player.repository.TrackLoader;
+import dev.nick.accessoriestest.service.IMusicPlayerService;
 import dev.nick.accessoriestest.service.MediaPlayerService;
 import dev.nick.accessoriestest.service.UserCategory;
 
-@RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
 @RequestPermissions
 public class ContentImageTest extends BaseTest {
 
     static String mArtworkUri = "content://media/external/audio/albumart";
-    @FindView(id = R.id.list)
+    @BindView(R.id.list)
     ListView listView;
     MediaAccessory mLoader;
+
+    @BindService(clazz = MediaPlayerService.class, connectionStub = @ServiceConnectionStub("mConnection")
+            , boundCallback = @CallMethod("onBind"), unBoundCallback = @CallMethod("onUnBind"))
+    IMusicPlayerService mService;
+
+    ServiceConnection mConnection;
 
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.file_image_layout);
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         setTitle(getClass().getSimpleName());
-        Scalpel.getInstance().wire(this);
-        BindingAccessories.shared().process(this);
+        InjectionAccessory.shared().process(this);
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
+    void onBind() {
+        LoggerManager.getLogger(getClass()).funcEnter();
+        LoggerManager.getLogger(getClass()).debug(mService);
+        LoggerManager.getLogger(getClass()).debug(mConnection);
+        onStartL();
+    }
+
+    void onUnBind() {
+        LoggerManager.getLogger(getClass()).funcEnter();
+    }
+
+    protected void onStartL() {
 
         final List<IMediaTrack> tracks = TrackLoader.get().load(UserCategory.ALL, getApplicationContext());
 
-        MediaPlayerService.Proxy.assumePendingList(tracks, getApplicationContext());
+        try {
+            mService.assumePendingList(tracks);
+        } catch (RemoteException e) {
+
+        }
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                MediaPlayerService.Proxy.play(tracks.get(i), getApplicationContext());
+                try {
+                    mService.play(tracks.get(i));
+                } catch (RemoteException e) {
+
+                }
             }
         });
 
@@ -158,17 +183,31 @@ public class ContentImageTest extends BaseTest {
         super.onDestroy();
         mLoader.clearMemCache();
         mLoader.terminate();
-        MediaPlayerService.Proxy.stop(getApplicationContext());
+        try {
+            mService.stop();
+        } catch (RemoteException e) {
+
+        }
+        unbindService(mConnection);
     }
 
-    class ViewHolder {
-        @FindView(id = R.id.image)
+    class ViewHolder implements BindView.RootViewProvider {
+        @BindView(R.id.image)
         ImageView imageView;
-        @FindView(id = R.id.textView)
+        @BindView(R.id.textView)
         TextView textView;
 
+        View mRoot;
+
         public ViewHolder(View convert) {
-            Scalpel.getInstance().wire(convert, this);
+            mRoot = convert;
+            InjectionAccessory.shared().process(this);
+        }
+
+        @NonNull
+        @Override
+        public View getRootView() {
+            return mRoot;
         }
     }
 }

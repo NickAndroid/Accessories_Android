@@ -16,6 +16,7 @@
 
 package dev.nick.accessoriestest;
 
+import android.app.Application;
 import android.graphics.Bitmap;
 import android.graphics.Movie;
 import android.os.Build;
@@ -24,9 +25,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.nick.scalpel.ScalpelApplication;
-
-import dev.nick.accessories.binding.BindingAccessories;
+import dev.nick.accessories.injection.InjectionAccessory;
 import dev.nick.accessories.logger.LoggerManager;
 import dev.nick.accessories.media.AccessoryConfig;
 import dev.nick.accessories.media.MediaAccessory;
@@ -41,7 +40,7 @@ import dev.nick.accessories.media.worker.movie.MovieSource;
 import dev.nick.accessories.media.worker.network.NetworkPolicy;
 import dev.nick.accessories.media.worker.result.ErrorListener;
 
-public class MyApp extends ScalpelApplication {
+public class MyApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
@@ -101,6 +100,6 @@ public class MyApp extends ScalpelApplication {
             }
         }, "test_movie://"));
 
-        BindingAccessories.createShared(getApplicationContext());
+        InjectionAccessory.createShared(getApplicationContext());
     }
 }

@@ -19,6 +19,7 @@ package dev.nick.accessoriestest.media;
 import android.Manifest;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,13 +29,12 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.nick.scalpel.Scalpel;
-import com.nick.scalpel.annotation.binding.FindView;
-import com.nick.scalpel.annotation.request.RequirePermission;
-
 import java.io.File;
 import java.util.List;
 
+import dev.nick.accessories.injection.InjectionAccessory;
+import dev.nick.accessories.injection.annotation.binding.BindView;
+import dev.nick.accessories.injection.annotation.permission.RequestPermissions;
 import dev.nick.accessories.media.AccessoryConfig;
 import dev.nick.accessories.media.MediaAccessory;
 import dev.nick.accessories.media.cache.CachePolicy;
@@ -44,11 +44,11 @@ import dev.nick.accessories.media.ui.animator.FadeInViewAnimator;
 import dev.nick.accessories.media.worker.network.NetworkPolicy;
 import dev.nick.accessoriestest.R;
 
-@RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
+@RequestPermissions(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
 public class ContentMovieTest extends BaseTest {
 
     static String mArtworkUri = "content://media/external/audio/albumart";
-    @FindView(id = R.id.list)
+    @BindView(R.id.list)
     ListView listView;
     MediaAccessory mLoader;
 
@@ -56,7 +56,7 @@ public class ContentMovieTest extends BaseTest {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.file_image_layout);
         setTitle(getClass().getSimpleName());
-        Scalpel.getInstance().wire(this);
+        InjectionAccessory.shared().process(this);
     }
 
     @Override
@@ -134,14 +134,23 @@ public class ContentMovieTest extends BaseTest {
         mLoader.terminate();
     }
 
-    class ViewHolder {
-        @FindView(id = R.id.image)
+    class ViewHolder implements BindView.RootViewProvider {
+        @BindView(R.id.image)
         ImageView imageView;
-        @FindView(id = R.id.textView)
+        @BindView(R.id.textView)
         TextView textView;
 
+        View mRoot;
+
         public ViewHolder(View convert) {
-            Scalpel.getInstance().wire(convert, this);
+            mRoot = convert;
+            InjectionAccessory.shared().process(this);
+        }
+
+        @NonNull
+        @Override
+        public View getRootView() {
+            return mRoot;
         }
     }
 }

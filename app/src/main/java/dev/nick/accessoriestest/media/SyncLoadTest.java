@@ -21,9 +21,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.widget.ImageView;
 
-import com.nick.scalpel.Scalpel;
-import com.nick.scalpel.annotation.binding.FindView;
-
+import dev.nick.accessories.injection.InjectionAccessory;
+import dev.nick.accessories.injection.annotation.binding.BindView;
 import dev.nick.accessories.media.MediaAccessory;
 import dev.nick.accessoriestest.R;
 
@@ -31,7 +30,7 @@ public class SyncLoadTest extends BaseTest {
 
     final String urlDrawable = "drawable://bot";
 
-    @FindView(id = R.id.image)
+    @BindView(R.id.image)
     ImageView imageView;
 
     @Override
@@ -39,7 +38,7 @@ public class SyncLoadTest extends BaseTest {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.single_image_layout);
         setTitle(getClass().getSimpleName());
-        Scalpel.getInstance().wire(this);
+        InjectionAccessory.shared().process(this);
     }
 
     @Override

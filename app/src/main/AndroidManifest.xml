@@ -83,9 +83,6 @@
             android:name=".media.CustomAnimationTest"
             android:label="CustomAnimationTest" />
 
-        <activity
-            android:name=".media.DownloadMachine"
-            android:label="DownloadMachine" />
     </application>
 
 </manifest>

@@ -22,23 +22,22 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.animation.Animation;
 
-import com.nick.scalpel.Scalpel;
-import com.nick.scalpel.annotation.binding.FindView;
-
+import dev.nick.accessories.injection.InjectionAccessory;
+import dev.nick.accessories.injection.annotation.binding.BindView;
+import dev.nick.accessories.logger.LoggerManager;
 import dev.nick.accessories.media.MediaAccessory;
 import dev.nick.accessories.media.queue.Priority;
 import dev.nick.accessories.media.ui.MediaHolder;
 import dev.nick.accessories.media.worker.ProgressListener;
 import dev.nick.accessories.media.worker.result.Cause;
 import dev.nick.accessories.media.worker.result.ErrorListener;
-import dev.nick.accessories.logger.LoggerManager;
 import dev.nick.accessoriestest.R;
 
 public class NetworkMovieTest extends BaseTest {
 
     final String urlHttps = "https://camo.githubusercontent.com/0be34709e630f7cbb96012fb1a48139bc5d45f07/68747470733a2f2f7777772e676f6f676c652e636f6d2f6c6f676f732f646f6f646c65732f323031362f74656163686572732d6461792d323031362d75732d363239363632363234343039313930342e322d687032782e676966";
 
-    @FindView(id = R.id.movie)
+    @BindView(R.id.movie)
     SimpleGifView simpleGifView;
 
     @Override
@@ -46,7 +45,7 @@ public class NetworkMovieTest extends BaseTest {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.single_movie_layout);
         setTitle(getClass().getSimpleName());
-        Scalpel.getInstance().wire(this);
+        InjectionAccessory.shared().process(this);
     }
 
     @Override

@@ -23,9 +23,10 @@ import java.util.concurrent.Executors;
  * Created by nick on 16-2-7.
  * Email: nick.guo.dev@icloud.com
  * Github: https://github.com/NickAndroid
+ * <p>
+ * FIXME: Do not use this executor to do tasks that takes a lot of time.
  */
 public class SharedExecutor {
-
 
     private static SharedExecutor sInstance;
 

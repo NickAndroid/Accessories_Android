@@ -31,22 +31,21 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.nick.scalpel.Scalpel;
-import com.nick.scalpel.annotation.binding.FindView;
-import com.nick.scalpel.annotation.request.RequirePermission;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import dev.nick.accessories.injection.InjectionAccessory;
+import dev.nick.accessories.injection.annotation.binding.BindView;
+import dev.nick.accessories.injection.annotation.permission.RequestPermissions;
+import dev.nick.accessories.logger.LoggerManager;
 import dev.nick.accessories.media.MediaAccessory;
 import dev.nick.accessories.media.ProgressListenerStub;
 import dev.nick.accessories.media.queue.Priority;
 import dev.nick.accessories.media.worker.result.Cause;
 import dev.nick.accessories.media.worker.result.ErrorListener;
-import dev.nick.accessories.logger.LoggerManager;
 import dev.nick.accessoriestest.R;
 
-@RequirePermission(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
+@RequestPermissions(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})
 public class LoadImageTest extends BaseTest {
 
     final String[] urls = new String[]{
@@ -161,14 +160,14 @@ public class LoadImageTest extends BaseTest {
             "http://i.imgur.com/moer0PI.jpg",
             "http://i.imgur.com/vRUz3TD.jpg"
     };
-    @FindView(id = R.id.list)
+    @BindView(R.id.list)
     ListView listView;
 
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.file_image_layout);
         setTitle(getClass().getSimpleName());
-        Scalpel.getInstance().wire(this);
+        InjectionAccessory.shared().process(this);
     }
 
     @Override
@@ -280,16 +279,25 @@ public class LoadImageTest extends BaseTest {
         return out;
     }
 
-    class ViewHolder {
-        @FindView(id = R.id.image)
+    class ViewHolder implements BindView.RootViewProvider {
+        @BindView(R.id.image)
         ImageView imageView;
-        @FindView(id = R.id.progressBar)
+        @BindView(R.id.progressBar)
         ProgressBar progressBar;
-        @FindView(id = R.id.textView)
+        @BindView(R.id.textView)
         TextView textView;
 
+        View mRoot;
+
         public ViewHolder(View convert) {
-            Scalpel.getInstance().wire(convert, this);
+            mRoot = convert;
+            InjectionAccessory.shared().process(this);
+        }
+
+        @NonNull
+        @Override
+        public View getRootView() {
+            return mRoot;
         }
     }
 }

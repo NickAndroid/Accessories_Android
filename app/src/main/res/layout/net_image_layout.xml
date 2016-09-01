@@ -27,7 +27,7 @@
         android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
         android:scaleType="centerCrop"
-        android:src="@drawable/ic_launcher" />
+        android:src="@drawable/aio_image_default" />
 
     <ProgressBar
         android:id="@+id/progressBar"

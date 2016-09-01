@@ -22,23 +22,22 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.widget.ImageView;
 
-import com.nick.scalpel.Scalpel;
-import com.nick.scalpel.annotation.binding.FindView;
-
+import dev.nick.accessories.injection.InjectionAccessory;
+import dev.nick.accessories.injection.annotation.binding.BindView;
+import dev.nick.accessories.logger.LoggerManager;
 import dev.nick.accessories.media.MediaAccessory;
 import dev.nick.accessories.media.ui.DisplayOption;
 import dev.nick.accessories.media.ui.MediaQuality;
 import dev.nick.accessories.media.ui.art.BlackWhiteMediaArt;
 import dev.nick.accessories.media.worker.result.Cause;
 import dev.nick.accessories.media.worker.result.ErrorListener;
-import dev.nick.accessories.logger.LoggerManager;
 import dev.nick.accessoriestest.R;
 
 public class DrawableImageTest extends BaseTest {
 
     final String urlDrawable = "drawable://tree";
 
-    @FindView(id = R.id.image)
+    @BindView(R.id.image)
     ImageView imageView;
 
     @Override
@@ -46,7 +45,7 @@ public class DrawableImageTest extends BaseTest {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.single_image_layout);
         setTitle(getClass().getSimpleName());
-        Scalpel.getInstance().wire(this);
+        InjectionAccessory.shared().process(this);
     }
 
     @Override

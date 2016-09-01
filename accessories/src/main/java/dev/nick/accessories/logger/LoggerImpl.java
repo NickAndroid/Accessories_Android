@@ -46,13 +46,13 @@ class LoggerImpl implements Logger {
     @Override
     public void funcEnter() {
         if (isDebuggable(Log.VERBOSE))
-            Log.v(mLogTag, mCallingInfoBuilder.getCallingInfo() + "\tENTER");
+            Log.v(mLogTag, mCallingInfoBuilder.getCallingInfo() + "\tenter");
     }
 
     @Override
     public void funcExit() {
         if (isDebuggable(Log.VERBOSE))
-            Log.v(mLogTag, mCallingInfoBuilder.getCallingInfo() + "\tEXIT");
+            Log.v(mLogTag, mCallingInfoBuilder.getCallingInfo() + "\texit");
     }
 
     @Override
@@ -93,6 +93,14 @@ class LoggerImpl implements Logger {
             Log.e(mLogTag, mCallingInfoBuilder.getCallingInfo()
                     + "---"
                     + String.valueOf(o));
+    }
+
+    @Override
+    public void trace(Throwable throwable) {
+        if (isDebuggable(Log.ASSERT))
+            Log.w(mLogTag, mCallingInfoBuilder.getCallingInfo()
+                    + "---"
+                    + Log.getStackTraceString(throwable));
     }
 
     @Override

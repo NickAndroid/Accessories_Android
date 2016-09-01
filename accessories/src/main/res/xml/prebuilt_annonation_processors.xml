@@ -16,42 +16,48 @@
 
 <Processors xmlns:app="http://schemas.android.com/apk/res-auto">
     <Processor
-        app:clazz="dev.nick.accessories.binding.processors.BooleanProcessor"
+        app:clazz="dev.nick.accessories.injection.processors.BooleanProcessor"
         app:scope="field" />
     <Processor
-        app:clazz="dev.nick.accessories.binding.processors.ColorProcessor"
+        app:clazz="dev.nick.accessories.injection.processors.ColorProcessor"
         app:scope="field" />
     <Processor
-        app:clazz="dev.nick.accessories.binding.processors.StringProcessor"
+        app:clazz="dev.nick.accessories.injection.processors.StringProcessor"
         app:scope="field" />
     <Processor
-        app:clazz="dev.nick.accessories.binding.processors.IntegerProcessor"
+        app:clazz="dev.nick.accessories.injection.processors.IntegerProcessor"
         app:scope="field" />
     <Processor
-        app:clazz="dev.nick.accessories.binding.processors.IntArrProcessor"
+        app:clazz="dev.nick.accessories.injection.processors.IntArrProcessor"
         app:scope="field" />
     <Processor
-        app:clazz="dev.nick.accessories.binding.processors.LongArrProcessor"
+        app:clazz="dev.nick.accessories.injection.processors.LongArrProcessor"
         app:scope="field" />
     <Processor
-        app:clazz="dev.nick.accessories.binding.processors.TextProcessor"
+        app:clazz="dev.nick.accessories.injection.processors.ViewProcessor"
         app:scope="field" />
     <Processor
-        app:clazz="dev.nick.accessories.binding.processors.BitmapProcessor"
+        app:clazz="dev.nick.accessories.injection.processors.TextProcessor"
         app:scope="field" />
     <Processor
-        app:clazz="dev.nick.accessories.binding.processors.StringArrProcessor"
+        app:clazz="dev.nick.accessories.injection.processors.BitmapProcessor"
         app:scope="field" />
     <Processor
-        app:clazz="dev.nick.accessories.binding.processors.SharedExecutorProcessor"
+        app:clazz="dev.nick.accessories.injection.processors.StringArrProcessor"
         app:scope="field" />
     <Processor
-        app:clazz="dev.nick.accessories.binding.processors.HandlerProcessor"
+        app:clazz="dev.nick.accessories.injection.processors.SharedExecutorProcessor"
         app:scope="field" />
     <Processor
-        app:clazz="dev.nick.accessories.binding.processors.ActivityPermissionProcessor"
-        app:scope="type" />
+        app:clazz="dev.nick.accessories.injection.processors.HandlerProcessor"
+        app:scope="field" />
     <Processor
-        app:clazz="dev.nick.accessories.binding.processors.FragmentPermissionProcessorCompat"
+        app:clazz="dev.nick.accessories.injection.processors.SystemServiceProcessor"
+        app:scope="field" />
+    <Processor
+        app:clazz="dev.nick.accessories.injection.processors.ServiceProcessor"
+        app:scope="field" />
+    <Processor
+        app:clazz="dev.nick.accessories.injection.processors.PermissionProcessor"
         app:scope="type" />
 </Processors>

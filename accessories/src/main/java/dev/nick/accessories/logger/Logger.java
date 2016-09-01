@@ -36,5 +36,7 @@ public interface Logger {
 
     void error(Object o);
 
+    void trace(Throwable throwable);
+
     void trace(String trackMsg, Throwable throwable);
 }

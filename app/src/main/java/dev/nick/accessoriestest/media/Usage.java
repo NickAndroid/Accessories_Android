@@ -18,24 +18,26 @@ package dev.nick.accessoriestest.media;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
-import com.nick.scalpel.ScalpelAutoActivity;
-import com.nick.scalpel.annotation.binding.FindView;
-
+import dev.nick.accessories.injection.InjectionAccessory;
+import dev.nick.accessories.injection.annotation.binding.BindView;
 import dev.nick.accessories.media.MediaAccessory;
 import dev.nick.accessories.media.control.StorageStats;
 import dev.nick.accessoriestest.R;
 
-public class Usage extends ScalpelAutoActivity {
+public class Usage extends AppCompatActivity {
 
-    @FindView(id = R.id.text)
+    @BindView(R.id.text)
     TextView textView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.usage);
+
+        InjectionAccessory.shared().process(this);
 
         String string =
                 "getExternalStorageUsage" +
