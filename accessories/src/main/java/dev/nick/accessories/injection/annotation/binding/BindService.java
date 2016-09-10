@@ -43,10 +43,10 @@ public @interface BindService {
     Class clazz() default Null.class;
 
     // Optional for all.
-    CallMethod boundCallback() default @CallMethod("");
+    CallMethod bindCallback() default @CallMethod("");
 
     // Optional for all.
-    CallMethod unBoundCallback() default @CallMethod("");
+    CallMethod unBindCallback() default @CallMethod("");
 
     // Optional for Activity/Fragment.
     ServiceConnectionStub connectionStub() default @ServiceConnectionStub("");

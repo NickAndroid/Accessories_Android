@@ -17,6 +17,7 @@
 package dev.nick.accessoriestest.media;
 
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.os.Bundle;
@@ -66,7 +67,7 @@ public class ContentImageTest extends BaseTest {
     MediaAccessory mLoader;
 
     @BindService(clazz = MediaPlayerService.class, connectionStub = @ServiceConnectionStub("mConnection")
-            , boundCallback = @CallMethod("onBind"), unBoundCallback = @CallMethod("onUnBind"))
+            , bindCallback = @CallMethod("onBind"), unBindCallback = @CallMethod("onUnBind"))
     IMusicPlayerService mService;
 
     ServiceConnection mConnection;
@@ -77,7 +78,18 @@ public class ContentImageTest extends BaseTest {
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         setTitle(getClass().getSimpleName());
         InjectionAccessory.shared().process(this);
+
+        LoggerManager.getLogger("HAS? " + getClass()).info(hasLeanback());
     }
+
+    private boolean hasLeanback() {
+        PackageManager packageManager = this.getPackageManager();
+        if (packageManager != null) {
+            return packageManager.hasSystemFeature("android.software.leanback");
+        }
+        return false;
+    }
+
 
     void onBind() {
         LoggerManager.getLogger(getClass()).funcEnter();
@@ -188,7 +200,7 @@ public class ContentImageTest extends BaseTest {
         } catch (RemoteException e) {
 
         }
-        unbindService(mConnection);
+        //unbindService(mConnection);
     }
 
     class ViewHolder implements BindView.RootViewProvider {

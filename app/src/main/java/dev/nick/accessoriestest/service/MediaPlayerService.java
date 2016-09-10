@@ -24,6 +24,7 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
 
+import com.google.android.xts.hostcommon.XtsHostTestBase;
 import com.google.guava.base.Preconditions;
 
 import java.io.IOException;
@@ -62,13 +63,19 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
         SharedExecutor.get().execute(new Runnable() {
             @Override
             public void run() {
+                int po = 0;
                 while (true) {
-                    if (isPlaying())
-                        mLogger.info(mPlayer.getCurrentPosition());
+                    if (isPlaying()) {
+                        int last = po;
+                        po = mPlayer.getCurrentPosition();
+                        mLogger.debug("CurrentPosition:" + po);
+                        if (po < last) {
+                           // mLogger.warn("FAIL");
+                           // return;
+                        }
+                    }
                     try {
                         Thread.sleep(10);
-                        times[0] *= 10;
-                        if (times[0] >= 3 * 1000) return;
                     } catch (InterruptedException e) {
 
                     }

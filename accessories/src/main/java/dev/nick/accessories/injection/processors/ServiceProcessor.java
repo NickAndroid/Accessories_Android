@@ -86,9 +86,9 @@ public class ServiceProcessor extends FieldProcessor {
 
         report(intent);
 
-        CallMethod callMethodOnBound = bindService.boundCallback();
+        CallMethod callMethodOnBound = bindService.bindCallback();
         String callMethodOnBoundMethodName = callMethodOnBound.value();
-        CallMethod callMethod = bindService.unBoundCallback();
+        CallMethod callMethod = bindService.unBindCallback();
         String callMethodOnUnBoundMethodName = callMethod.value();
 
         Method boundCall = null;

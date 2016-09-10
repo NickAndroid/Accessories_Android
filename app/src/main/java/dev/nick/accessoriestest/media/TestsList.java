@@ -60,21 +60,21 @@ public class TestsList extends AppCompatActivity {
 
     protected List<Test> onStartTest() {
         List<Test> tests = new ArrayList<>();
-        tests.add(new Test(FileImageTest.class));
-        tests.add(new Test(NetworkImageTest.class));
+//        tests.add(new Test(FileImageTest.class));
+//        tests.add(new Test(NetworkImageTest.class));
         tests.add(new Test(ContentImageTest.class));
-        tests.add(new Test(AssetsImageTest.class));
-        tests.add(new Test(DrawableImageTest.class));
-        tests.add(new Test(VectorImageTest.class));
-        tests.add(new Test(MipMapImageTest.class));
-        tests.add(new Test(LoadImageTest.class));
-        tests.add(new Test(SyncLoadTest.class));
-        tests.add(new Test(AssetGifTest.class));
-        tests.add(new Test(AssetVideoTest.class));
-        tests.add(new Test(NetworkMovieTest.class));
-        tests.add(new Test(Usage.class));
-        tests.add(new Test(ScrollStateTest.class));
-        tests.add(new Test(CustomAnimationTest.class));
+//        tests.add(new Test(AssetsImageTest.class));
+//        tests.add(new Test(DrawableImageTest.class));
+//        tests.add(new Test(VectorImageTest.class));
+//        tests.add(new Test(MipMapImageTest.class));
+//        tests.add(new Test(LoadImageTest.class));
+//        tests.add(new Test(SyncLoadTest.class));
+//        tests.add(new Test(AssetGifTest.class));
+//        tests.add(new Test(AssetVideoTest.class));
+//        tests.add(new Test(NetworkMovieTest.class));
+//        tests.add(new Test(Usage.class));
+//        tests.add(new Test(ScrollStateTest.class));
+//        tests.add(new Test(CustomAnimationTest.class));
         return tests;
     }
 
