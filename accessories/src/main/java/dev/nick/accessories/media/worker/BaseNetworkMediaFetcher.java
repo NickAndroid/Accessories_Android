@@ -20,7 +20,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import dev.nick.accessories.media.AccessoryConfig;
+import dev.nick.accessories.media.LoaderConfig;
 import dev.nick.accessories.media.worker.network.DownloadManager;
 import dev.nick.accessories.media.worker.network.DownloadManagerImpl;
 import dev.nick.accessories.media.worker.result.ErrorListener;
@@ -37,7 +37,7 @@ public class BaseNetworkMediaFetcher<T> extends BaseMediaFetcher<T> {
     }
 
     @Override
-    public MediaFetcher<T> prepare(Context context, AccessoryConfig config) {
+    public MediaFetcher<T> prepare(Context context, LoaderConfig config) {
         super.prepare(context, config);
         mFileMediaFetcher.prepare(context, config);
         mDownloadManager = new DownloadManagerImpl(context, config);

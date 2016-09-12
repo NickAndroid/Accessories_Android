@@ -23,7 +23,7 @@ import java.util.concurrent.Executors;
  * Created by nick on 16-2-7.
  * Email: nick.guo.dev@icloud.com
  * Github: https://github.com/NickAndroid
- * <p>
+ * <p/>
  * FIXME: Do not use this executor to do tasks that takes a lot of time.
  */
 public class SharedExecutor {
@@ -42,7 +42,16 @@ public class SharedExecutor {
         return sInstance;
     }
 
+    public static void terminate() {
+        SharedExecutor service = get();
+        if (service != null) service.shutdown();
+    }
+
     public void execute(Runnable runnable) {
         mService.execute(runnable);
+    }
+
+    private void shutdown() {
+        mService.shutdownNow();
     }
 }

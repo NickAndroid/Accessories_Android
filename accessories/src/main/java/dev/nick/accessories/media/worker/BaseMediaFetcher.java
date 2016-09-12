@@ -23,7 +23,7 @@ import android.support.annotation.Nullable;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import dev.nick.accessories.media.AccessoryConfig;
+import dev.nick.accessories.media.LoaderConfig;
 import dev.nick.accessories.media.worker.result.Cause;
 import dev.nick.accessories.media.worker.result.ErrorListener;
 import dev.nick.accessories.logger.Logger;
@@ -40,7 +40,7 @@ public class BaseMediaFetcher<T> implements MediaFetcher<T> {
 
     protected Context mContext;
 
-    protected AccessoryConfig mAccessoryConfig;
+    protected LoaderConfig mLoaderConfig;
 
     protected Logger mLogger;
 
@@ -63,10 +63,10 @@ public class BaseMediaFetcher<T> implements MediaFetcher<T> {
     }
 
     @Override
-    public MediaFetcher<T> prepare(Context context, AccessoryConfig config) {
+    public MediaFetcher<T> prepare(Context context, LoaderConfig config) {
         if (mPrepared.compareAndSet(false, true)) {
             this.mContext = context;
-            this.mAccessoryConfig = config;
+            this.mLoaderConfig = config;
             this.mLogger = LoggerManager.getLogger(getClass());
         }
         return this;

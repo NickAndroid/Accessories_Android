@@ -24,7 +24,6 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
 
-import com.google.android.xts.hostcommon.XtsHostTestBase;
 import com.google.guava.base.Preconditions;
 
 import java.io.IOException;
@@ -70,8 +69,8 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
                         po = mPlayer.getCurrentPosition();
                         mLogger.debug("CurrentPosition:" + po);
                         if (po < last) {
-                           // mLogger.warn("FAIL");
-                           // return;
+                            // mLogger.warn("FAIL");
+                            // return;
                         }
                     }
                     try {
@@ -84,10 +83,9 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
         });
     }
 
-    private void play(IMediaTrack track) {
+    private void play(final IMediaTrack track) {
         Preconditions.checkNotNull(track);
         mLogger.debug("play: " + track);
-        setState(State.Playing);
         mPlayer.stop();
         mPlayer.reset();
         mPlayer.setCurrent(track);
@@ -96,7 +94,24 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
             mPlayer.prepare();
             notifyStart(track);
             mPlayer.start();
-            notifyPlaying(track);
+            SharedExecutor.get().execute(new Runnable() {
+                @Override
+                public void run() {
+                  while (true) {
+                      if (mPlayer.isPlaying()) {
+                          setState(State.Playing);
+                          notifyPlaying(track);
+                          break;
+                      }
+                      mLogger.debug("Waiting for playing...");
+                      try {
+                          Thread.sleep(100);
+                      } catch (InterruptedException ignored) {
+
+                      }
+                  }
+                }
+            });
         } catch (IOException e) {
             notifyError(Integer.MIN_VALUE, e.getLocalizedMessage());
         }

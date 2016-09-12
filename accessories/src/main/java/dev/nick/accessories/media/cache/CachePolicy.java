@@ -36,7 +36,8 @@ import lombok.ToString;
 public class CachePolicy {
 
     public static final int DEFAULT_MEM_CACHE_POOL_SIZE = (int) (Runtime.getRuntime().maxMemory() / 8);
-    public static final int DEFAULT_CACHING_THREADS = (Runtime.getRuntime().availableProcessors() + 1) / 2;
+    // +1, FIX for emulators
+    public static final int DEFAULT_CACHING_THREADS = (Runtime.getRuntime().availableProcessors()) / 4 + 1;
 
     public static final FileNameGenerator DEFAULT_FILENAME_GENERATOR = new HeadlessFileNameGenerator();
     public static final KeyGenerator DEFAULT_KEY_GENERATOR = new HashcodeKeyGenerator();

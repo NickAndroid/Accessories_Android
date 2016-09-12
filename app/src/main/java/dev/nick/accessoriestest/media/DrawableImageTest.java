@@ -22,10 +22,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.widget.ImageView;
 
-import dev.nick.accessories.injection.InjectionAccessory;
+import dev.nick.accessories.injection.Injector;
 import dev.nick.accessories.injection.annotation.binding.BindView;
 import dev.nick.accessories.logger.LoggerManager;
-import dev.nick.accessories.media.MediaAccessory;
+import dev.nick.accessories.media.MediaLoader;
 import dev.nick.accessories.media.ui.DisplayOption;
 import dev.nick.accessories.media.ui.MediaQuality;
 import dev.nick.accessories.media.ui.art.BlackWhiteMediaArt;
@@ -45,13 +45,13 @@ public class DrawableImageTest extends BaseTest {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.single_image_layout);
         setTitle(getClass().getSimpleName());
-        InjectionAccessory.shared().process(this);
+        Injector.shared().inject(this);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        MediaAccessory.shared()
+        MediaLoader.shared()
                 .loadBitmap()
                 .from(urlDrawable)
                 .option(DisplayOption.bitmapBuilder()

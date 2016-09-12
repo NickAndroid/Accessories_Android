@@ -34,7 +34,7 @@ import dev.nick.accessories.media.worker.result.ErrorListener;
 @Deprecated
 public class DrawableTransaction extends Transaction<Drawable> {
 
-    DrawableTransaction(@NonNull MediaAccessory loader) {
+    DrawableTransaction(@NonNull MediaLoader loader) {
         super(loader);
     }
 

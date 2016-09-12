@@ -23,7 +23,7 @@ import com.google.guava.base.Preconditions;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
-import dev.nick.accessories.injection.InjectionAccessory;
+import dev.nick.accessories.injection.Injector;
 import dev.nick.accessories.injection.processors.FieldProcessor;
 
 public class CustomProcessorTest {
@@ -32,7 +32,7 @@ public class CustomProcessorTest {
     Me me;
 
     void register() {
-        InjectionAccessory.shared().addFieldProcessor(new FieldProcessor(null) {
+        Injector.shared().addFieldProcessor(new FieldProcessor(null) {
             @Override
             protected Object parseField(Field field) {
                 return new Me();
@@ -52,7 +52,7 @@ public class CustomProcessorTest {
     }
 
     void test() {
-        InjectionAccessory.shared().process(this);
+        Injector.shared().inject(this);
         Preconditions.checkNotNull(me);
     }
 

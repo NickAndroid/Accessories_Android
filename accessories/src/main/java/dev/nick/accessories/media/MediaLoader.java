@@ -82,11 +82,11 @@ import lombok.Getter;
 import lombok.Synchronized;
 
 /**
- * Main class of {@link MediaAccessory} library.
+ * Main class of {@link MediaLoader} library.
  */
-public class MediaAccessory implements
+public class MediaLoader implements
         BaseFutureTask.TaskActionListener,
-        Forkable<MediaAccessory, AccessoryConfig>,
+        Forkable<MediaLoader, LoaderConfig>,
         Terminable {
 
     @Lazy
@@ -95,7 +95,7 @@ public class MediaAccessory implements
     private static AbsListViewScrollDetector sListViewScrollDetector;
 
     @Shared
-    private static MediaAccessory sAccessory;
+    private static MediaLoader sAccessory;
 
     private final List<BaseFutureTask> mFutures;
     /*package*/ RequestQueueManager<Transaction> mTransactionService;
@@ -106,7 +106,7 @@ public class MediaAccessory implements
     private CacheManager<Bitmap> mBitmapCacheManager;
     @Lazy
     private CacheManager<Movie> mMovieCacheManager;
-    private AccessoryConfig mConfig;
+    private LoaderConfig mConfig;
     private RequestQueueManager<BaseFutureTask> mTaskHandleService;
     private Logger mLogger;
 
@@ -123,9 +123,9 @@ public class MediaAccessory implements
     private IDCreator mSettableIdCreator;
 
     @SuppressLint("DefaultLocale")
-    private MediaAccessory(Context context, AccessoryConfig config) {
+    private MediaLoader(Context context, LoaderConfig config) {
         Preconditions.checkNotNull(context);
-        if (config == null) config = AccessoryConfig.DEFAULT_CONFIG;
+        if (config == null) config = LoaderConfig.DEFAULT_CONFIG;
         LoggerManager.setDebugLevel(config.getDebugLevel());
         this.mContext = context;
         this.mConfig = config;
@@ -159,9 +159,9 @@ public class MediaAccessory implements
     }
 
     @SuppressLint("DefaultLocale")
-    private MediaAccessory(MediaAccessory from, AccessoryConfig config) {
+    private MediaLoader(MediaLoader from, LoaderConfig config) {
         Preconditions.checkNotNull(from);
-        if (config == null) config = AccessoryConfig.DEFAULT_CONFIG;
+        if (config == null) config = LoaderConfig.DEFAULT_CONFIG;
         LoggerManager.setDebugLevel(config.getDebugLevel());
         this.mContext = from.mContext;
         this.mConfig = config;
@@ -197,12 +197,12 @@ public class MediaAccessory implements
     }
 
     @AccessoryApi
-    private static MediaAccessory clone(MediaAccessory from, AccessoryConfig config) {
-        return new MediaAccessory(from, config);
+    private static MediaLoader clone(MediaLoader from, LoaderConfig config) {
+        return new MediaLoader(from, config);
     }
 
     /**
-     * Create the shared instance of MediaAccessory
+     * Create the shared instance of MediaLoader
      *
      * @param context An application {@link Context} is preferred.
      * @since 1.0.1
@@ -213,28 +213,28 @@ public class MediaAccessory implements
     }
 
     /**
-     * Create the shared instance of MediaAccessory
+     * Create the shared instance of MediaLoader
      *
      * @param context An application {@link Context} is preferred.
      * @param config  Configuration of this accessory.
      * @since 1.0.1
      */
     @AccessoryApi
-    public static void createShared(Context context, AccessoryConfig config) {
+    public static void createShared(Context context, LoaderConfig config) {
         if (sAccessory == null || sAccessory.isTerminated()) {
-            sAccessory = new MediaAccessory(context, config);
+            sAccessory = new MediaLoader(context, config);
         }
     }
 
     /**
-     * Get the createShared instance of MediaAccessory
+     * Get the createShared instance of MediaLoader
      *
-     * @return Single instance of {@link MediaAccessory}
+     * @return Single instance of {@link MediaLoader}
      * @since 1.0.1
      */
     @AccessoryApi
-    public static MediaAccessory shared() {
-        return Preconditions.checkNotNull(sAccessory, "Call MediaAccessory#createShared first");
+    public static MediaLoader shared() {
+        return Preconditions.checkNotNull(sAccessory, "Call MediaLoader#createShared first");
     }
 
     /**
@@ -641,7 +641,7 @@ public class MediaAccessory implements
     }
 
     /**
-     * Call this to pause the {@link MediaAccessory}
+     * Call this to pause the {@link MediaLoader}
      */
     @AccessoryApi
     public void pause() {
@@ -675,7 +675,7 @@ public class MediaAccessory implements
     }
 
     /**
-     * Call this to resume the {@link MediaAccessory} from pause state.
+     * Call this to resume the {@link MediaLoader} from pause state.
      *
      * @see #pause()
      * @see LoaderState
@@ -740,7 +740,7 @@ public class MediaAccessory implements
      * @param url The from of the accessory request.
      */
     @AccessoryApi
-    public MediaAccessory cancel(@NonNull String url) {
+    public MediaLoader cancel(@NonNull String url) {
         Preconditions.checkNotNull(url);
         List<BaseFutureTask> pendingCancels = findTasks(url);
         if (pendingCancels.size() > 0) {
@@ -759,7 +759,7 @@ public class MediaAccessory implements
      * @param view The view of the accessory request.
      */
     @AccessoryApi
-    public MediaAccessory cancel(@NonNull ImageView view) {
+    public MediaLoader cancel(@NonNull ImageView view) {
         return cancel(new ImageViewDelegate(view));
     }
 
@@ -769,7 +769,7 @@ public class MediaAccessory implements
      * @param settable The settable of the accessory request.
      */
     @AccessoryApi
-    public MediaAccessory cancel(@NonNull MediaHolder settable) {
+    public MediaLoader cancel(@NonNull MediaHolder settable) {
         return cancel(mSettableIdCreator.createSettableId(settable));
     }
 
@@ -779,7 +779,7 @@ public class MediaAccessory implements
      * @param settableId The settableId of the accessory request.
      */
     @AccessoryApi
-    public MediaAccessory cancel(long settableId) {
+    public MediaLoader cancel(long settableId) {
         Preconditions.checkState(settableId != 0, "Invalid settable with id:0");
         List<BaseFutureTask> pendingCancels = findTasks(settableId);
         if (pendingCancels.size() > 0) {
@@ -862,7 +862,7 @@ public class MediaAccessory implements
     }
 
     @Override
-    public MediaAccessory fork(AccessoryConfig param) {
+    public MediaLoader fork(LoaderConfig param) {
         return clone(this, param);
     }
 

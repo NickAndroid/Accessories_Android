@@ -22,10 +22,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.animation.Animation;
 
-import dev.nick.accessories.injection.InjectionAccessory;
+import dev.nick.accessories.injection.Injector;
 import dev.nick.accessories.injection.annotation.binding.BindView;
 import dev.nick.accessories.logger.LoggerManager;
-import dev.nick.accessories.media.MediaAccessory;
+import dev.nick.accessories.media.MediaLoader;
 import dev.nick.accessories.media.ui.MediaHolder;
 import dev.nick.accessories.media.worker.ProgressListener;
 import dev.nick.accessories.media.worker.result.Cause;
@@ -44,13 +44,13 @@ public class AssetGifTest extends BaseTest {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.single_movie_layout);
         setTitle(getClass().getSimpleName());
-        InjectionAccessory.shared().process(this);
+        Injector.shared().inject(this);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        MediaAccessory.shared()
+        MediaLoader.shared()
                 .loadMovie()
                 .from(urlAssets)
                 .errorListener(new ErrorListener() {

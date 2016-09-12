@@ -32,7 +32,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.nick.accessories.injection.InjectionAccessory;
+import dev.nick.accessories.injection.Injector;
 import dev.nick.accessories.injection.annotation.binding.BindView;
 import dev.nick.accessories.injection.annotation.permission.RequestPermissions;
 import dev.nick.accessoriestest.R;
@@ -55,7 +55,7 @@ public class TestsList extends AppCompatActivity {
                 showTestResult();
             }
         });
-        InjectionAccessory.shared().process(this);
+        Injector.shared().inject(this);
     }
 
     protected List<Test> onStartTest() {
@@ -94,7 +94,7 @@ public class TestsList extends AppCompatActivity {
 
         public TwoLinesViewHolder(final View itemView) {
             super(itemView);
-            InjectionAccessory.shared().process(this);
+            Injector.shared().inject(this);
         }
 
         @NonNull

@@ -42,7 +42,7 @@ public class BitmapTransaction extends Transaction<Bitmap> {
             .viewMaybeReused()
             .build();
 
-    BitmapTransaction(@NonNull MediaAccessory loader) {
+    BitmapTransaction(@NonNull MediaLoader loader) {
         super(loader);
     }
 

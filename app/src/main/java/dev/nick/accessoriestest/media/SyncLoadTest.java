@@ -21,9 +21,9 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.widget.ImageView;
 
-import dev.nick.accessories.injection.InjectionAccessory;
+import dev.nick.accessories.injection.Injector;
 import dev.nick.accessories.injection.annotation.binding.BindView;
-import dev.nick.accessories.media.MediaAccessory;
+import dev.nick.accessories.media.MediaLoader;
 import dev.nick.accessoriestest.R;
 
 public class SyncLoadTest extends BaseTest {
@@ -38,13 +38,13 @@ public class SyncLoadTest extends BaseTest {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.single_image_layout);
         setTitle(getClass().getSimpleName());
-        InjectionAccessory.shared().process(this);
+        Injector.shared().inject(this);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        Bitmap result = MediaAccessory.shared()
+        Bitmap result = MediaLoader.shared()
                 .loadBitmap()
                 .from(urlDrawable)
                 .startSynchronously();

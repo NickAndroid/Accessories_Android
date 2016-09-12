@@ -26,7 +26,7 @@ public class OverlayMediaFetcher extends BaseMediaFetcher<Drawable> {
                                  @Nullable ProgressListener<Drawable> progressListener,
                                  @Nullable ErrorListener errorListener) throws Exception {
 
-        Bitmap out = bitmapSource.getFetcher(mContext, mAccessoryConfig).fetchFromUrl(url, decodeSpec,
+        Bitmap out = bitmapSource.getFetcher(mContext, mLoaderConfig).fetchFromUrl(url, decodeSpec,
                 new OverlayProgressListener(progressListener), errorListener);
         if (out == null) return null;
         return ResourceAccessories.bitmapToDrawable(out, mContext.getResources());

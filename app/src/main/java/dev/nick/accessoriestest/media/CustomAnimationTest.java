@@ -34,11 +34,11 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.nick.accessories.injection.InjectionAccessory;
+import dev.nick.accessories.injection.Injector;
 import dev.nick.accessories.injection.annotation.binding.BindView;
 import dev.nick.accessories.injection.annotation.permission.RequestPermissions;
-import dev.nick.accessories.media.AccessoryConfig;
-import dev.nick.accessories.media.MediaAccessory;
+import dev.nick.accessories.media.LoaderConfig;
+import dev.nick.accessories.media.MediaLoader;
 import dev.nick.accessories.media.ProgressListenerStub;
 import dev.nick.accessories.media.cache.CachePolicy;
 import dev.nick.accessories.media.ui.DisplayOption;
@@ -54,22 +54,22 @@ public class CustomAnimationTest extends BaseTest {
     @BindView(R.id.list)
     ListView listView;
 
-    MediaAccessory mediaAccessory;
+    MediaLoader mediaLoader;
 
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.file_image_layout);
         setTitle(getClass().getSimpleName());
-        InjectionAccessory.shared().process(this);
-        mediaAccessory = MediaAccessory.shared().fork(AccessoryConfig.builder()
+        Injector.shared().inject(this);
+        mediaLoader = MediaLoader.shared().fork(LoaderConfig.builder()
                 .cachePolicy(CachePolicy.builder().build()).build());
-        mediaAccessory.linkScrollStateTo(listView);
+        mediaLoader.linkScrollStateTo(listView);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mediaAccessory.unLinkScrollStateTo(listView);
+        mediaLoader.unLinkScrollStateTo(listView);
     }
 
     @Override
@@ -115,7 +115,7 @@ public class CustomAnimationTest extends BaseTest {
                 // String uri = mArtworkUri + File.separator + tracks.get(position).getAlbumId();
                 String uri = BitmapSource.FILE.getPrefix() + tracks.get(position).getUrl();
 
-                mediaAccessory.loadBitmap()
+                mediaLoader.loadBitmap()
                         .from(uri)
                         .option(DisplayOption.bitmapBuilder()
                                 .imageQuality(MediaQuality.OPT)
@@ -182,7 +182,7 @@ public class CustomAnimationTest extends BaseTest {
 
         public ViewHolder(View convert) {
             mRoot = convert;
-            InjectionAccessory.shared().process(this);
+            Injector.shared().inject(this);
         }
 
         @NonNull

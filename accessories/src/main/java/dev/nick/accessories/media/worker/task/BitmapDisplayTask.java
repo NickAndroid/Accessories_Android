@@ -24,7 +24,7 @@ import android.support.annotation.Nullable;
 
 import java.io.InterruptedIOException;
 
-import dev.nick.accessories.media.AccessoryConfig;
+import dev.nick.accessories.media.LoaderConfig;
 import dev.nick.accessories.media.ui.MediaQuality;
 import dev.nick.accessories.media.worker.DecodeSpec;
 import dev.nick.accessories.media.worker.DimenSpec;
@@ -43,7 +43,7 @@ public class BitmapDisplayTask extends BaseDisplayTask<Bitmap> {
     private DimenSpec mDimenSpec;
     private MediaQuality mQuality;
 
-    private AccessoryConfig mAccessoryConfig;
+    private LoaderConfig mLoaderConfig;
 
     private ProgressListener<Bitmap> mProgressListener;
     private ErrorListener mErrorListener;
@@ -57,7 +57,7 @@ public class BitmapDisplayTask extends BaseDisplayTask<Bitmap> {
     private Bitmap mResult;
 
     public BitmapDisplayTask(Context context,
-                             AccessoryConfig accessoryConfig,
+                             LoaderConfig loaderConfig,
                              TaskInterrupter displayTaskMonitor,
                              MediaData<Bitmap> url,
                              DimenSpec spec,
@@ -66,7 +66,7 @@ public class BitmapDisplayTask extends BaseDisplayTask<Bitmap> {
                              ErrorListener errorListener,
                              DisplayTaskRecord taskRecord) {
         this.mContext = context;
-        this.mAccessoryConfig = accessoryConfig;
+        this.mLoaderConfig = loaderConfig;
         this.mDisplayTaskMonitor = displayTaskMonitor;
         this.mMediaData = url;
         this.mDimenSpec = spec;
@@ -88,7 +88,7 @@ public class BitmapDisplayTask extends BaseDisplayTask<Bitmap> {
 
         try {
             MediaSource<Bitmap> source = mMediaData.getSource();
-            MediaFetcher<Bitmap> fetcher = source.getFetcher(mContext, mAccessoryConfig);
+            MediaFetcher<Bitmap> fetcher = source.getFetcher(mContext, mLoaderConfig);
             DecodeSpec decodeSpec = new DecodeSpec(mQuality, mDimenSpec);
             mResult = fetcher.fetchFromUrl(mMediaData.getUrl(), decodeSpec, mProgressListener, mErrorListener);
         } catch (InterruptedIOException | InterruptedException ignored) {

@@ -34,5 +34,4 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:24.1.0'
     compile 'com.github.Cutta:GifView:1.1'
     compile project(':accessories')
-    compile files('libs/XtsCastHostTestCases.jar')
 }

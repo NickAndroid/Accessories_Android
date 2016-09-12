@@ -19,7 +19,7 @@ package dev.nick.accessories.media.worker;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import dev.nick.accessories.media.AccessoryConfig;
+import dev.nick.accessories.media.LoaderConfig;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -36,7 +36,7 @@ public abstract class MediaSource<X> {
     }
 
     @NonNull
-    public MediaFetcher<X> getFetcher(Context context, AccessoryConfig config) {
+    public MediaFetcher<X> getFetcher(Context context, LoaderConfig config) {
         return fetcher.prepare(context, config);
     }
 

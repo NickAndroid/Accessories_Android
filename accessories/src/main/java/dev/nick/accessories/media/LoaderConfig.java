@@ -34,16 +34,16 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
- * Configuration for {@link MediaAccessory}, use a {@link Builder}
+ * Configuration for {@link MediaLoader}, use a {@link Builder}
  * to build one, or using {@link #DEFAULT_CONFIG} as a default config.
  */
 @AccessoryApi
 @Getter
 @ToString
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class AccessoryConfig {
+public class LoaderConfig {
 
-    public static final AccessoryConfig DEFAULT_CONFIG = AccessoryConfig.builder()
+    public static final LoaderConfig DEFAULT_CONFIG = LoaderConfig.builder()
             .cachePolicy(CachePolicy.DEFAULT_CACHE_POLICY)
             .networkPolicy(NetworkPolicy.DEFAULT_NETWORK_POLICY)
             .queuePolicy(QueuePolicy.FIFO)
@@ -127,8 +127,8 @@ public class AccessoryConfig {
             return Builder.this;
         }
 
-        public AccessoryConfig build() {
-            return new AccessoryConfig(
+        public LoaderConfig build() {
+            return new LoaderConfig(
                     cachePolicy.or(CachePolicy.DEFAULT_CACHE_POLICY),
                     networkPolicy.or(NetworkPolicy.DEFAULT_NETWORK_POLICY),
                     queuePolicy.or(QueuePolicy.FIFO),

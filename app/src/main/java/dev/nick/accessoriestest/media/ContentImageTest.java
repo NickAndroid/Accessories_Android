@@ -37,15 +37,15 @@ import android.widget.TextView;
 import java.io.File;
 import java.util.List;
 
-import dev.nick.accessories.injection.InjectionAccessory;
+import dev.nick.accessories.injection.Injector;
 import dev.nick.accessories.injection.annotation.binding.BindService;
 import dev.nick.accessories.injection.annotation.binding.BindView;
 import dev.nick.accessories.injection.annotation.binding.CallMethod;
 import dev.nick.accessories.injection.annotation.binding.ServiceConnectionStub;
 import dev.nick.accessories.injection.annotation.permission.RequestPermissions;
 import dev.nick.accessories.logger.LoggerManager;
-import dev.nick.accessories.media.AccessoryConfig;
-import dev.nick.accessories.media.MediaAccessory;
+import dev.nick.accessories.media.LoaderConfig;
+import dev.nick.accessories.media.MediaLoader;
 import dev.nick.accessories.media.cache.CachePolicy;
 import dev.nick.accessories.media.ui.DisplayOption;
 import dev.nick.accessories.media.ui.MediaQuality;
@@ -64,7 +64,7 @@ public class ContentImageTest extends BaseTest {
     static String mArtworkUri = "content://media/external/audio/albumart";
     @BindView(R.id.list)
     ListView listView;
-    MediaAccessory mLoader;
+    MediaLoader mLoader;
 
     @BindService(clazz = MediaPlayerService.class, connectionStub = @ServiceConnectionStub("mConnection")
             , bindCallback = @CallMethod("onBind"), unBindCallback = @CallMethod("onUnBind"))
@@ -77,7 +77,7 @@ public class ContentImageTest extends BaseTest {
         setContentView(R.layout.file_image_layout);
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         setTitle(getClass().getSimpleName());
-        InjectionAccessory.shared().process(this);
+        Injector.shared().inject(this);
 
         LoggerManager.getLogger("HAS? " + getClass()).info(hasLeanback());
     }
@@ -123,7 +123,7 @@ public class ContentImageTest extends BaseTest {
             }
         });
 
-        mLoader = MediaAccessory.shared().fork(AccessoryConfig.builder()
+        mLoader = MediaLoader.shared().fork(LoaderConfig.builder()
                 .cachePolicy(CachePolicy.builder()
                         .enableMemCache()
                         .enableDiskCache()
@@ -213,7 +213,7 @@ public class ContentImageTest extends BaseTest {
 
         public ViewHolder(View convert) {
             mRoot = convert;
-            InjectionAccessory.shared().process(this);
+            Injector.shared().inject(this);
         }
 
         @NonNull

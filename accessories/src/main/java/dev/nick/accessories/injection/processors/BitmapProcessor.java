@@ -26,7 +26,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
 import dev.nick.accessories.injection.annotation.binding.BindBitmap;
-import dev.nick.accessories.media.MediaAccessory;
+import dev.nick.accessories.media.MediaLoader;
 
 class BitmapProcessor extends FieldProcessor {
 
@@ -39,7 +39,7 @@ class BitmapProcessor extends FieldProcessor {
         BindBitmap bindBitmap = field.getAnnotation(BindBitmap.class);
         String url = bindBitmap.url();
         if (!TextUtils.isEmpty(url)) {
-            MediaAccessory accessory = MediaAccessory.shared();
+            MediaLoader accessory = MediaLoader.shared();
             return accessory.loadBitmap().from(url).startSynchronously();
         }
         int id = checkId(bindBitmap.value());

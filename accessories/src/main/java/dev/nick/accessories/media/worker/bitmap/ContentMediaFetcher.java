@@ -24,7 +24,7 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import dev.nick.accessories.media.AccessoryConfig;
+import dev.nick.accessories.media.LoaderConfig;
 import dev.nick.accessories.media.worker.BaseMediaFetcher;
 import dev.nick.accessories.media.worker.DecodeSpec;
 import dev.nick.accessories.media.worker.MediaFetcher;
@@ -45,7 +45,7 @@ public class ContentMediaFetcher extends BaseMediaFetcher<Bitmap> {
     }
 
     @Override
-    public MediaFetcher<Bitmap> prepare(Context context, AccessoryConfig config) {
+    public MediaFetcher<Bitmap> prepare(Context context, LoaderConfig config) {
         mFileMediaFetcher.prepare(context, config);
         return super.prepare(context, config);
     }

@@ -26,7 +26,7 @@ import com.google.guava.io.Files;
 import java.io.File;
 import java.io.IOException;
 
-import dev.nick.accessories.media.AccessoryConfig;
+import dev.nick.accessories.media.LoaderConfig;
 import dev.nick.accessories.media.cache.CachePolicy;
 import dev.nick.accessories.media.cache.FileNameGenerator;
 import dev.nick.accessories.media.cache.KeyGenerator;
@@ -52,7 +52,7 @@ public class DownloadManagerImpl implements DownloadManager {
 
     private String mDownloadDir;
 
-    public DownloadManagerImpl(Context context, AccessoryConfig config) {
+    public DownloadManagerImpl(Context context, LoaderConfig config) {
         mLogger = LoggerManager.getLogger(getClass());
         mContext = context;
 

@@ -34,11 +34,11 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.nick.accessories.injection.InjectionAccessory;
+import dev.nick.accessories.injection.Injector;
 import dev.nick.accessories.injection.annotation.binding.BindView;
 import dev.nick.accessories.injection.annotation.permission.RequestPermissions;
 import dev.nick.accessories.logger.LoggerManager;
-import dev.nick.accessories.media.MediaAccessory;
+import dev.nick.accessories.media.MediaLoader;
 import dev.nick.accessories.media.ProgressListenerStub;
 import dev.nick.accessories.media.queue.Priority;
 import dev.nick.accessories.media.worker.result.Cause;
@@ -167,7 +167,7 @@ public class LoadImageTest extends BaseTest {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.file_image_layout);
         setTitle(getClass().getSimpleName());
-        InjectionAccessory.shared().process(this);
+        Injector.shared().inject(this);
     }
 
     @Override
@@ -241,7 +241,7 @@ public class LoadImageTest extends BaseTest {
                     }
                 };
 
-                MediaAccessory.shared().loadBitmap()
+                MediaLoader.shared().loadBitmap()
                         .from(uri)
                         .priority(Priority.HIGH)
                         .progressListener(progressListenerStub)
@@ -263,7 +263,7 @@ public class LoadImageTest extends BaseTest {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Track track = (Track) adapter.getItem(i);
-                MediaAccessory.shared().cancel(track.getUrl());
+                MediaLoader.shared().cancel(track.getUrl());
             }
         });
     }
@@ -291,7 +291,7 @@ public class LoadImageTest extends BaseTest {
 
         public ViewHolder(View convert) {
             mRoot = convert;
-            InjectionAccessory.shared().process(this);
+            Injector.shared().inject(this);
         }
 
         @NonNull

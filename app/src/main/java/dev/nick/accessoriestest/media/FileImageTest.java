@@ -34,10 +34,10 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.nick.accessories.injection.InjectionAccessory;
+import dev.nick.accessories.injection.Injector;
 import dev.nick.accessories.injection.annotation.binding.BindView;
 import dev.nick.accessories.injection.annotation.permission.RequestPermissions;
-import dev.nick.accessories.media.MediaAccessory;
+import dev.nick.accessories.media.MediaLoader;
 import dev.nick.accessories.media.ProgressListenerStub;
 import dev.nick.accessories.media.ui.DisplayOption;
 import dev.nick.accessories.media.ui.MediaQuality;
@@ -55,7 +55,7 @@ public class FileImageTest extends BaseTest {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.file_image_layout);
         setTitle(getClass().getSimpleName());
-        InjectionAccessory.shared().process(this);
+        Injector.shared().inject(this);
     }
 
     @Override
@@ -101,7 +101,7 @@ public class FileImageTest extends BaseTest {
                 // String uri = mArtworkUri + File.separator + tracks.get(position).getAlbumId();
                 String uri = BitmapSource.FILE.getPrefix() + tracks.get(position).getUrl();
 
-                MediaAccessory.shared().loadBitmap()
+                MediaLoader.shared().loadBitmap()
                         .from(uri)
                         .option(DisplayOption.bitmapBuilder()
                                 .imageQuality(MediaQuality.OPT)
@@ -157,7 +157,7 @@ public class FileImageTest extends BaseTest {
 
         public ViewHolder(View convert) {
             mRoot = convert;
-            InjectionAccessory.shared().process(this);
+            Injector.shared().inject(this);
         }
 
         @NonNull

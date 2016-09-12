@@ -25,10 +25,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import dev.nick.accessories.injection.InjectionAccessory;
+import dev.nick.accessories.injection.Injector;
 import dev.nick.accessories.logger.LoggerManager;
-import dev.nick.accessories.media.AccessoryConfig;
-import dev.nick.accessories.media.MediaAccessory;
+import dev.nick.accessories.media.LoaderConfig;
+import dev.nick.accessories.media.MediaLoader;
 import dev.nick.accessories.media.cache.CachePolicy;
 import dev.nick.accessories.media.queue.QueuePolicy;
 import dev.nick.accessories.media.worker.BaseMediaFetcher;
@@ -48,7 +48,7 @@ public class MyApp extends Application {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             Trace.beginSection("ImageLoader_init");
         }
-        MediaAccessory.createShared(getApplicationContext(), AccessoryConfig.builder()
+        MediaLoader.createShared(getApplicationContext(), LoaderConfig.builder()
                 .queuePolicy(QueuePolicy.LIFO)
                 .cachePolicy(CachePolicy.builder()
                         .enableMemCache()
@@ -100,6 +100,6 @@ public class MyApp extends Application {
             }
         }, "test_movie://"));
 
-        InjectionAccessory.createShared(getApplicationContext());
+        Injector.createShared(getApplicationContext());
     }
 }

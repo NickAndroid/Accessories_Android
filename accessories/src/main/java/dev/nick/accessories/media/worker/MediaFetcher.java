@@ -20,7 +20,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import dev.nick.accessories.media.AccessoryConfig;
+import dev.nick.accessories.media.LoaderConfig;
 import dev.nick.accessories.media.Terminable;
 import dev.nick.accessories.media.worker.result.ErrorListener;
 
@@ -30,5 +30,5 @@ public interface MediaFetcher<T> extends Terminable{
                    @Nullable ProgressListener<T> progressListener,
                    @Nullable ErrorListener errorListener) throws Exception;
 
-    MediaFetcher<T> prepare(Context context, AccessoryConfig config);
+    MediaFetcher<T> prepare(Context context, LoaderConfig config);
 }

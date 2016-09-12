@@ -18,6 +18,7 @@ package dev.nick.accessories.injection;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.XmlRes;
 
 import com.google.guava.base.Preconditions;
@@ -32,6 +33,7 @@ import java.util.Map;
 import dev.nick.accessories.R;
 import dev.nick.accessories.common.SharedExecutor;
 import dev.nick.accessories.common.annotation.Shared;
+import dev.nick.accessories.common.sync.ActionListener;
 import dev.nick.accessories.injection.processors.FieldProcessor;
 import dev.nick.accessories.injection.processors.TypeProcessor;
 import dev.nick.accessories.logger.Logger;
@@ -40,10 +42,10 @@ import lombok.Getter;
 
 import static dev.nick.accessories.injection.utils.ReflectionUtils.makeAccessible;
 
-public class InjectionAccessory {
+public class Injector {
 
     @Shared
-    private static InjectionAccessory sBindings;
+    private static Injector sBindings;
     // Synchronized leak.
     private final Map<Class<? extends Annotation>, FieldProcessor> mOFs;
     private final Map<Class<? extends Annotation>, TypeProcessor> mOTs;
@@ -55,7 +57,7 @@ public class InjectionAccessory {
     @XmlRes
     private int prebuiltProcessorsXmlRes;
 
-    public InjectionAccessory(Context context) {
+    public Injector(Context context) {
         this.context = context;
         this.mLogger = LoggerManager.getLogger(getClass());
         this.mOFs = new HashMap<>();
@@ -64,10 +66,10 @@ public class InjectionAccessory {
     }
 
     public synchronized static void createShared(Context applicationContext) {
-        if (sBindings == null) sBindings = new InjectionAccessory(applicationContext);
+        if (sBindings == null) sBindings = new Injector(applicationContext);
     }
 
-    public static InjectionAccessory shared() {
+    public static Injector shared() {
         Preconditions.checkNotNull(sBindings, "Call #createShared first.");
         return sBindings;
     }
@@ -160,7 +162,23 @@ public class InjectionAccessory {
         return null;
     }
 
-    public void process(@NonNull final Object target) {
+    public void injectAsync(@NonNull final Object target) {
+        injectAsync(target, null);
+    }
+
+    public void injectAsync(@NonNull final Object target, @Nullable final ActionListener listener) {
+        Runnable injection = new Runnable() {
+            @Override
+            public void run() {
+                if (listener != null) listener.onActionStart();
+                inject(target);
+                if (listener != null) listener.onActionComplete();
+            }
+        };
+        SharedExecutor.get().execute(injection);
+    }
+
+    public void inject(@NonNull final Object target) {
         Class clz = Preconditions.checkNotNull(target).getClass();
         for (final Field field : clz.getDeclaredFields()) {
             Annotation[] annotations = field.getAnnotations();

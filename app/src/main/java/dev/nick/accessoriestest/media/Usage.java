@@ -21,9 +21,9 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
-import dev.nick.accessories.injection.InjectionAccessory;
+import dev.nick.accessories.injection.Injector;
 import dev.nick.accessories.injection.annotation.binding.BindView;
-import dev.nick.accessories.media.MediaAccessory;
+import dev.nick.accessories.media.MediaLoader;
 import dev.nick.accessories.media.control.StorageStats;
 import dev.nick.accessoriestest.R;
 
@@ -37,17 +37,17 @@ public class Usage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.usage);
 
-        InjectionAccessory.shared().process(this);
+        Injector.shared().inject(this);
 
         String string =
                 "getExternalStorageUsage" +
-                        MiscUtils.formatedFileSize(MediaAccessory.shared().getExternalStorageUsage())
+                        MiscUtils.formatedFileSize(MediaLoader.shared().getExternalStorageUsage())
                         + "\n getInternalStorageUsage"
-                        + MiscUtils.formatedFileSize(MediaAccessory.shared().getInternalStorageUsage())
+                        + MiscUtils.formatedFileSize(MediaLoader.shared().getInternalStorageUsage())
                         + "\n getMobileTrafficUsage"
-                        + MiscUtils.formatedFileSize(MediaAccessory.shared().getMobileTrafficUsage())
+                        + MiscUtils.formatedFileSize(MediaLoader.shared().getMobileTrafficUsage())
                         + "\n getWifiTrafficUsage"
-                        + MiscUtils.formatedFileSize(MediaAccessory.shared().getWifiTrafficUsage());
+                        + MiscUtils.formatedFileSize(MediaLoader.shared().getWifiTrafficUsage());
 
         textView.setText(string);
 

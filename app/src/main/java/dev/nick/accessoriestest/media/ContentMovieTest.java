@@ -32,11 +32,11 @@ import android.widget.TextView;
 import java.io.File;
 import java.util.List;
 
-import dev.nick.accessories.injection.InjectionAccessory;
+import dev.nick.accessories.injection.Injector;
 import dev.nick.accessories.injection.annotation.binding.BindView;
 import dev.nick.accessories.injection.annotation.permission.RequestPermissions;
-import dev.nick.accessories.media.AccessoryConfig;
-import dev.nick.accessories.media.MediaAccessory;
+import dev.nick.accessories.media.LoaderConfig;
+import dev.nick.accessories.media.MediaLoader;
 import dev.nick.accessories.media.cache.CachePolicy;
 import dev.nick.accessories.media.ui.DisplayOption;
 import dev.nick.accessories.media.ui.MediaQuality;
@@ -50,13 +50,13 @@ public class ContentMovieTest extends BaseTest {
     static String mArtworkUri = "content://media/external/audio/albumart";
     @BindView(R.id.list)
     ListView listView;
-    MediaAccessory mLoader;
+    MediaLoader mLoader;
 
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.file_image_layout);
         setTitle(getClass().getSimpleName());
-        InjectionAccessory.shared().process(this);
+        Injector.shared().inject(this);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class ContentMovieTest extends BaseTest {
 
         final List<Track> tracks = MediaUtils.getTrackList(this);
 
-        mLoader = MediaAccessory.shared().fork(AccessoryConfig.builder()
+        mLoader = MediaLoader.shared().fork(LoaderConfig.builder()
                 .cachePolicy(CachePolicy.builder()
                         .enableMemCache()
                         .enableDiskCache()
@@ -144,7 +144,7 @@ public class ContentMovieTest extends BaseTest {
 
         public ViewHolder(View convert) {
             mRoot = convert;
-            InjectionAccessory.shared().process(this);
+            Injector.shared().inject(this);
         }
 
         @NonNull

@@ -40,9 +40,9 @@ public abstract class Transaction<T> {
     protected Priority priority;
     protected MediaHolder<T> settable;
 
-    protected MediaAccessory accessory;
+    protected MediaLoader accessory;
 
-    Transaction(@NonNull MediaAccessory accessory) {
+    Transaction(@NonNull MediaLoader accessory) {
         this.accessory = accessory;
     }
 

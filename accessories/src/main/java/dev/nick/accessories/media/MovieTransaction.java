@@ -40,7 +40,7 @@ public class MovieTransaction extends Transaction<Movie> {
             .viewMaybeReused()
             .build();
 
-    MovieTransaction(@NonNull MediaAccessory loader) {
+    MovieTransaction(@NonNull MediaLoader loader) {
         super(loader);
     }
 

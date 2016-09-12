@@ -24,7 +24,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import dev.nick.accessories.media.MediaAccessory;
+import dev.nick.accessories.media.MediaLoader;
 import dev.nick.accessoriestest.R;
 
 public class BaseTest extends AppCompatActivity {
@@ -62,25 +62,25 @@ public class BaseTest extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.pause:
-                MediaAccessory.shared().pause();
+                MediaLoader.shared().pause();
                 break;
             case R.id.resume:
-                MediaAccessory.shared().resume();
+                MediaLoader.shared().resume();
                 break;
             case R.id.terminate:
-                MediaAccessory.shared().terminate();
+                MediaLoader.shared().terminate();
                 break;
             case R.id.cancel:
-                MediaAccessory.shared().cancelAllTasks();
+                MediaLoader.shared().cancelAllTasks();
                 break;
             case R.id.clear:
-                MediaAccessory.shared().clearAllCache();
+                MediaLoader.shared().clearAllCache();
                 break;
             case R.id.clear_disc:
-                MediaAccessory.shared().clearDiskCache();
+                MediaLoader.shared().clearDiskCache();
                 break;
             case R.id.clear_mem:
-                MediaAccessory.shared().clearMemCache();
+                MediaLoader.shared().clearMemCache();
                 break;
             case android.R.id.home:
                 finish();
