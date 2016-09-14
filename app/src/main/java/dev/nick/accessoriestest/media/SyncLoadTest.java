@@ -23,7 +23,7 @@ import android.widget.ImageView;
 
 import dev.nick.accessories.injection.Injector;
 import dev.nick.accessories.injection.annotation.binding.BindView;
-import dev.nick.accessories.media.MediaLoader;
+import dev.nick.accessories.media.loader.MediaLoader;
 import dev.nick.accessoriestest.R;
 
 public class SyncLoadTest extends BaseTest {

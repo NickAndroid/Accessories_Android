@@ -144,17 +144,15 @@ public class TrackLoader {
                 long albumid = cursor.getLong(cursor
                         .getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM_ID));
 
-                if (url.endsWith(".mp3") || url.endsWith(".MP3")) {
-                    IMediaTrack track = new IMediaTrack();
-                    track.setTitle(title);
-                    track.setArtist(singer);
-                    track.setId(id);
-                    track.setUrl(url);
-                    track.setAlbumId(albumid);
-                    track.setAlbum(album);
-                    track.setDuration(time);
-                    list.add(track);
-                }
+                IMediaTrack track = new IMediaTrack();
+                track.setTitle(title);
+                track.setArtist(singer);
+                track.setId(id);
+                track.setUrl(url);
+                track.setAlbumId(albumid);
+                track.setAlbum(album);
+                track.setDuration(time);
+                list.add(track);
             }
         }
         try {

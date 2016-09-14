@@ -91,7 +91,7 @@ var activeTableTab = "activeTableTab";
 <!-- ========= END OF TOP NAVBAR ========= -->
 <!-- ======== START OF CLASS DATA ======== -->
 <div class="header">
-<div class="subTitle">dev.nick.accessories.media.worker</div>
+<div class="subTitle">dev.nick.accessories.media.loader.worker</div>
 <h2 title="�� ContentImageFetcher" class="title">�� ContentImageFetcher</h2>
 </div>
 <div class="contentContainer">
@@ -99,7 +99,7 @@ var activeTableTab = "activeTableTab";
 <li>java.lang.Object</li>
 <li>
 <ul class="inheritance">
-<li>dev.nick.accessories.media.worker.bitmap.ContentMediaFetcher</li>
+<li>dev.nick.accessories.media.loader.worker.bitmap.ContentMediaFetcher</li>
 </ul>
 </li>
 </ul>
@@ -145,7 +145,7 @@ extends java.lang.Object</pre>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../dev/nick/imageloader/accessory/ContentImageFetcher.html#mLogger">mLogger</a></span></code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><code>protected dev.nick.accessories.media.worker.PathSplitter&lt;java.lang.String&gt;</code></td>
+<td class="colFirst"><code>protected dev.nick.accessories.media.loader.worker.PathSplitter&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../dev/nick/imageloader/accessory/ContentImageFetcher.html#mSplitter">mSplitter</a></span></code>&nbsp;</td>
 </tr>
 </table>
@@ -183,22 +183,22 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>protected void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../dev/nick/imageloader/accessory/ContentImageFetcher.html#callOnComplete-dev.nick.imageloader.accessory.ProgressListener-dev.nick.imageloader.accessory.result.BitmapResult-">callOnComplete</a></span>(<a href="../../../../dev/nick/imageloader/accessory/ProgressListener.html" title="dev.nick.accessories.accessory�еĽӿ�">ProgressListener</a>&lt;<a href="../../../../dev/nick/imageloader/accessory/result/BitmapResult.html" title="dev.nick.accessories.media.worker.result�е���">BitmapResult</a>&gt;&nbsp;listener,
-              <a href="../../../../dev/nick/imageloader/accessory/result/BitmapResult.html" title="dev.nick.accessories.media.worker.result�е���">BitmapResult</a>&nbsp;result)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../dev/nick/imageloader/accessory/ContentImageFetcher.html#callOnComplete-dev.nick.imageloader.accessory.ProgressListener-dev.nick.imageloader.accessory.result.BitmapResult-">callOnComplete</a></span>(<a href="../../../../dev/nick/imageloader/accessory/ProgressListener.html" title="dev.nick.accessories.accessory�еĽӿ�">ProgressListener</a>&lt;<a href="../../../../dev/nick/imageloader/accessory/result/BitmapResult.html" title="dev.nick.accessories.media.loader.worker.result�е���">BitmapResult</a>&gt;&nbsp;listener,
+              <a href="../../../../dev/nick/imageloader/accessory/result/BitmapResult.html" title="dev.nick.accessories.media.loader.worker.result�е���">BitmapResult</a>&nbsp;result)</code>&nbsp;</td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>protected void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../dev/nick/imageloader/accessory/ContentImageFetcher.html#callOnError-dev.nick.imageloader.accessory.result.ErrorListener-dev.nick.imageloader.accessory.result.Cause-">callOnError</a></span>(<a href="../../../../dev/nick/imageloader/accessory/result/ErrorListener.html" title="dev.nick.accessories.media.worker.result�еĽӿ�">ErrorListener</a>&nbsp;listener,
-           <a href="../../../../dev/nick/imageloader/accessory/result/Cause.html" title="dev.nick.accessories.media.worker.result�е���">Cause</a>&nbsp;cause)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../dev/nick/imageloader/accessory/ContentImageFetcher.html#callOnError-dev.nick.imageloader.accessory.result.ErrorListener-dev.nick.imageloader.accessory.result.Cause-">callOnError</a></span>(<a href="../../../../dev/nick/imageloader/accessory/result/ErrorListener.html" title="dev.nick.accessories.media.loader.worker.result�еĽӿ�">ErrorListener</a>&nbsp;listener,
+           <a href="../../../../dev/nick/imageloader/accessory/result/Cause.html" title="dev.nick.accessories.media.loader.worker.result�е���">Cause</a>&nbsp;cause)</code>&nbsp;</td>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>protected void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../dev/nick/imageloader/accessory/ContentImageFetcher.html#callOnProgress-dev.nick.imageloader.accessory.ProgressListener-int-">callOnProgress</a></span>(<a href="../../../../dev/nick/imageloader/accessory/ProgressListener.html" title="dev.nick.accessories.accessory�еĽӿ�">ProgressListener</a>&lt;<a href="../../../../dev/nick/imageloader/accessory/result/BitmapResult.html" title="dev.nick.accessories.media.worker.result�е���">BitmapResult</a>&gt;&nbsp;listener,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../dev/nick/imageloader/accessory/ContentImageFetcher.html#callOnProgress-dev.nick.imageloader.accessory.ProgressListener-int-">callOnProgress</a></span>(<a href="../../../../dev/nick/imageloader/accessory/ProgressListener.html" title="dev.nick.accessories.accessory�еĽӿ�">ProgressListener</a>&lt;<a href="../../../../dev/nick/imageloader/accessory/result/BitmapResult.html" title="dev.nick.accessories.media.loader.worker.result�е���">BitmapResult</a>&gt;&nbsp;listener,
               int&nbsp;progress)</code>&nbsp;</td>
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>protected void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../dev/nick/imageloader/accessory/ContentImageFetcher.html#callOnStart-dev.nick.imageloader.accessory.ProgressListener-">callOnStart</a></span>(<a href="../../../../dev/nick/imageloader/accessory/ProgressListener.html" title="dev.nick.accessories.accessory�еĽӿ�">ProgressListener</a>&lt;<a href="../../../../dev/nick/imageloader/accessory/result/BitmapResult.html" title="dev.nick.accessories.media.worker.result�е���">BitmapResult</a>&gt;&nbsp;listener)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../dev/nick/imageloader/accessory/ContentImageFetcher.html#callOnStart-dev.nick.imageloader.accessory.ProgressListener-">callOnStart</a></span>(<a href="../../../../dev/nick/imageloader/accessory/ProgressListener.html" title="dev.nick.accessories.accessory�еĽӿ�">ProgressListener</a>&lt;<a href="../../../../dev/nick/imageloader/accessory/result/BitmapResult.html" title="dev.nick.accessories.media.loader.worker.result�е���">BitmapResult</a>&gt;&nbsp;listener)</code>&nbsp;</td>
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code>protected int</code></td>
@@ -210,11 +210,11 @@ extends java.lang.Object</pre>
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../dev/nick/imageloader/accessory/ContentImageFetcher.html#fetchFromUrl-java.lang.String-dev.nick.imageloader.accessory.DecodeSpec-dev.nick.imageloader.accessory.ProgressListener-dev.nick.imageloader.accessory.result.ErrorListener-">fetchFromUrl</a></span>(java.lang.String&nbsp;url,
             <a href="../../../../dev/nick/imageloader/accessory/DecodeSpec.html" title="dev.nick.accessories.accessory�е���">DecodeSpec</a>&nbsp;decodeSpec,
-            <a href="../../../../dev/nick/imageloader/accessory/ProgressListener.html" title="dev.nick.accessories.accessory�еĽӿ�">ProgressListener</a>&lt;<a href="../../../../dev/nick/imageloader/accessory/result/BitmapResult.html" title="dev.nick.accessories.media.worker.result�е���">BitmapResult</a>&gt;&nbsp;progressListener,
-            <a href="../../../../dev/nick/imageloader/accessory/result/ErrorListener.html" title="dev.nick.accessories.media.worker.result�еĽӿ�">ErrorListener</a>&nbsp;errorListener)</code>&nbsp;</td>
+            <a href="../../../../dev/nick/imageloader/accessory/ProgressListener.html" title="dev.nick.accessories.accessory�еĽӿ�">ProgressListener</a>&lt;<a href="../../../../dev/nick/imageloader/accessory/result/BitmapResult.html" title="dev.nick.accessories.media.loader.worker.result�е���">BitmapResult</a>&gt;&nbsp;progressListener,
+            <a href="../../../../dev/nick/imageloader/accessory/result/ErrorListener.html" title="dev.nick.accessories.media.loader.worker.result�еĽӿ�">ErrorListener</a>&nbsp;errorListener)</code>&nbsp;</td>
 </tr>
 <tr id="i6" class="altColor">
-<td class="colFirst"><code>protected <a href="../../../../dev/nick/imageloader/accessory/result/BitmapResult.html" title="dev.nick.accessories.media.worker.result�е���">BitmapResult</a></code></td>
+<td class="colFirst"><code>protected <a href="../../../../dev/nick/imageloader/accessory/result/BitmapResult.html" title="dev.nick.accessories.media.loader.worker.result�е���">BitmapResult</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../dev/nick/imageloader/accessory/ContentImageFetcher.html#newResult-Bitmap-">newResult</a></span>(Bitmap&nbsp;bitmap)</code>&nbsp;</td>
 </tr>
 <tr id="i7" class="rowColor">
@@ -250,7 +250,7 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>mSplitter</h4>
-<pre>protected&nbsp;dev.nick.accessories.media.worker.PathSplitter&lt;java.lang.String&gt; mSplitter</pre>
+<pre>protected&nbsp;dev.nick.accessories.media.loader.worker.PathSplitter&lt;java.lang.String&gt; mSplitter</pre>
 </li>
 </ul>
 <a name="mContext">
@@ -288,7 +288,7 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>��������ϸ����</h3>
-<a name="ContentImageFetcher-dev.nick.accessories.media.worker.PathSplitter-dev.nick.accessories.media.worker.MediaFetcher-">
+<a name="ContentImageFetcher-dev.nick.accessories.media.loader.worker.PathSplitter-dev.nick.accessories.media.loader.worker.MediaFetcher-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -307,7 +307,7 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>������ϸ����</h3>
-<a name="prepare-Context-dev.nick.accessories.media.LoaderConfig-">
+<a name="prepare-Context-dev.nick.accessories.media.loader.LoaderConfig-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -321,7 +321,7 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="fetchFromUrl-java.lang.String-dev.nick.accessories.media.worker.DecodeSpec-dev.nick.accessories.media.worker.ProgressListener-dev.nick.accessories.media.worker.result.ErrorListener-">
+<a name="fetchFromUrl-java.lang.String-dev.nick.accessories.media.loader.worker.DecodeSpec-dev.nick.accessories.media.loader.worker.ProgressListener-dev.nick.accessories.media.loader.worker.result.ErrorListener-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -332,9 +332,9 @@ extends java.lang.Object</pre>
                          @NonNull
                          <a href="../../../../dev/nick/imageloader/accessory/DecodeSpec.html" title="dev.nick.accessories.accessory�е���">DecodeSpec</a>&nbsp;decodeSpec,
                          @Nullable
-                         <a href="../../../../dev/nick/imageloader/accessory/ProgressListener.html" title="dev.nick.accessories.accessory�еĽӿ�">ProgressListener</a>&lt;<a href="../../../../dev/nick/imageloader/accessory/result/BitmapResult.html" title="dev.nick.accessories.media.worker.result�е���">BitmapResult</a>&gt;&nbsp;progressListener,
+                         <a href="../../../../dev/nick/imageloader/accessory/ProgressListener.html" title="dev.nick.accessories.accessory�еĽӿ�">ProgressListener</a>&lt;<a href="../../../../dev/nick/imageloader/accessory/result/BitmapResult.html" title="dev.nick.accessories.media.loader.worker.result�е���">BitmapResult</a>&gt;&nbsp;progressListener,
                          @Nullable
-                         <a href="../../../../dev/nick/imageloader/accessory/result/ErrorListener.html" title="dev.nick.accessories.media.worker.result�еĽӿ�">ErrorListener</a>&nbsp;errorListener)
+                         <a href="../../../../dev/nick/imageloader/accessory/result/ErrorListener.html" title="dev.nick.accessories.media.loader.worker.result�еĽӿ�">ErrorListener</a>&nbsp;errorListener)
                   throws java.lang.Exception</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">ָ����:</span></dt>
@@ -350,46 +350,46 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>newResult</h4>
-<pre>protected&nbsp;<a href="../../../../dev/nick/imageloader/accessory/result/BitmapResult.html" title="dev.nick.accessories.media.worker.result�е���">BitmapResult</a>&nbsp;newResult(Bitmap&nbsp;bitmap)</pre>
+<pre>protected&nbsp;<a href="../../../../dev/nick/imageloader/accessory/result/BitmapResult.html" title="dev.nick.accessories.media.loader.worker.result�е���">BitmapResult</a>&nbsp;newResult(Bitmap&nbsp;bitmap)</pre>
 </li>
 </ul>
-<a name="callOnStart-dev.nick.accessories.media.worker.ProgressListener-">
+<a name="callOnStart-dev.nick.accessories.media.loader.worker.ProgressListener-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>callOnStart</h4>
-<pre>protected&nbsp;void&nbsp;callOnStart(<a href="../../../../dev/nick/imageloader/accessory/ProgressListener.html" title="dev.nick.accessories.accessory�еĽӿ�">ProgressListener</a>&lt;<a href="../../../../dev/nick/imageloader/accessory/result/BitmapResult.html" title="dev.nick.accessories.media.worker.result�е���">BitmapResult</a>&gt;&nbsp;listener)</pre>
+<pre>protected&nbsp;void&nbsp;callOnStart(<a href="../../../../dev/nick/imageloader/accessory/ProgressListener.html" title="dev.nick.accessories.accessory�еĽӿ�">ProgressListener</a>&lt;<a href="../../../../dev/nick/imageloader/accessory/result/BitmapResult.html" title="dev.nick.accessories.media.loader.worker.result�е���">BitmapResult</a>&gt;&nbsp;listener)</pre>
 </li>
 </ul>
-<a name="callOnComplete-dev.nick.accessories.media.worker.ProgressListener-dev.nick.accessories.media.worker.result.BitmapResult-">
+<a name="callOnComplete-dev.nick.accessories.media.loader.worker.ProgressListener-dev.nick.accessories.media.loader.worker.result.BitmapResult-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>callOnComplete</h4>
-<pre>protected&nbsp;void&nbsp;callOnComplete(<a href="../../../../dev/nick/imageloader/accessory/ProgressListener.html" title="dev.nick.accessories.accessory�еĽӿ�">ProgressListener</a>&lt;<a href="../../../../dev/nick/imageloader/accessory/result/BitmapResult.html" title="dev.nick.accessories.media.worker.result�е���">BitmapResult</a>&gt;&nbsp;listener,
-                              <a href="../../../../dev/nick/imageloader/accessory/result/BitmapResult.html" title="dev.nick.accessories.media.worker.result�е���">BitmapResult</a>&nbsp;result)</pre>
+<pre>protected&nbsp;void&nbsp;callOnComplete(<a href="../../../../dev/nick/imageloader/accessory/ProgressListener.html" title="dev.nick.accessories.accessory�еĽӿ�">ProgressListener</a>&lt;<a href="../../../../dev/nick/imageloader/accessory/result/BitmapResult.html" title="dev.nick.accessories.media.loader.worker.result�е���">BitmapResult</a>&gt;&nbsp;listener,
+                              <a href="../../../../dev/nick/imageloader/accessory/result/BitmapResult.html" title="dev.nick.accessories.media.loader.worker.result�е���">BitmapResult</a>&nbsp;result)</pre>
 </li>
 </ul>
-<a name="callOnError-dev.nick.accessories.media.worker.result.ErrorListener-dev.nick.accessories.media.worker.result.Cause-">
+<a name="callOnError-dev.nick.accessories.media.loader.worker.result.ErrorListener-dev.nick.accessories.media.loader.worker.result.Cause-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>callOnError</h4>
-<pre>protected&nbsp;void&nbsp;callOnError(<a href="../../../../dev/nick/imageloader/accessory/result/ErrorListener.html" title="dev.nick.accessories.media.worker.result�еĽӿ�">ErrorListener</a>&nbsp;listener,
+<pre>protected&nbsp;void&nbsp;callOnError(<a href="../../../../dev/nick/imageloader/accessory/result/ErrorListener.html" title="dev.nick.accessories.media.loader.worker.result�еĽӿ�">ErrorListener</a>&nbsp;listener,
                            @NonNull
-                           <a href="../../../../dev/nick/imageloader/accessory/result/Cause.html" title="dev.nick.accessories.media.worker.result�е���">Cause</a>&nbsp;cause)</pre>
+                           <a href="../../../../dev/nick/imageloader/accessory/result/Cause.html" title="dev.nick.accessories.media.loader.worker.result�е���">Cause</a>&nbsp;cause)</pre>
 </li>
 </ul>
-<a name="callOnProgress-dev.nick.accessories.media.worker.ProgressListener-int-">
+<a name="callOnProgress-dev.nick.accessories.media.loader.worker.ProgressListener-int-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>callOnProgress</h4>
-<pre>protected&nbsp;void&nbsp;callOnProgress(<a href="../../../../dev/nick/imageloader/accessory/ProgressListener.html" title="dev.nick.accessories.accessory�еĽӿ�">ProgressListener</a>&lt;<a href="../../../../dev/nick/imageloader/accessory/result/BitmapResult.html" title="dev.nick.accessories.media.worker.result�е���">BitmapResult</a>&gt;&nbsp;listener,
+<pre>protected&nbsp;void&nbsp;callOnProgress(<a href="../../../../dev/nick/imageloader/accessory/ProgressListener.html" title="dev.nick.accessories.accessory�еĽӿ�">ProgressListener</a>&lt;<a href="../../../../dev/nick/imageloader/accessory/result/BitmapResult.html" title="dev.nick.accessories.media.loader.worker.result�е���">BitmapResult</a>&gt;&nbsp;listener,
                               int&nbsp;progress)</pre>
 </li>
 </ul>

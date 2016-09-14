@@ -24,13 +24,13 @@ import android.widget.ImageView;
 
 import dev.nick.accessories.injection.Injector;
 import dev.nick.accessories.injection.annotation.binding.BindView;
-import dev.nick.accessories.media.MediaLoader;
-import dev.nick.accessories.media.ProgressListenerStub;
-import dev.nick.accessories.media.queue.Priority;
-import dev.nick.accessories.media.ui.DisplayOption;
-import dev.nick.accessories.media.ui.MediaQuality;
-import dev.nick.accessories.media.ui.animator.FadeInViewAnimator;
-import dev.nick.accessories.media.ui.art.BlackWhiteMediaArt;
+import dev.nick.accessories.media.loader.MediaLoader;
+import dev.nick.accessories.media.loader.ProgressListenerStub;
+import dev.nick.accessories.media.loader.queue.Priority;
+import dev.nick.accessories.media.loader.ui.DisplayOption;
+import dev.nick.accessories.media.loader.ui.MediaQuality;
+import dev.nick.accessories.media.loader.ui.animator.FadeInViewAnimator;
+import dev.nick.accessories.media.loader.ui.art.BlackWhiteMediaArt;
 import dev.nick.accessoriestest.R;
 
 public class AssetsImageTest extends BaseTest {

@@ -38,11 +38,11 @@ import dev.nick.accessories.injection.Injector;
 import dev.nick.accessories.injection.annotation.binding.BindView;
 import dev.nick.accessories.injection.annotation.permission.RequestPermissions;
 import dev.nick.accessories.logger.LoggerManager;
-import dev.nick.accessories.media.MediaLoader;
-import dev.nick.accessories.media.ProgressListenerStub;
-import dev.nick.accessories.media.queue.Priority;
-import dev.nick.accessories.media.worker.result.Cause;
-import dev.nick.accessories.media.worker.result.ErrorListener;
+import dev.nick.accessories.media.loader.MediaLoader;
+import dev.nick.accessories.media.loader.ProgressListenerStub;
+import dev.nick.accessories.media.loader.queue.Priority;
+import dev.nick.accessories.media.loader.worker.result.Cause;
+import dev.nick.accessories.media.loader.worker.result.ErrorListener;
 import dev.nick.accessoriestest.R;
 
 @RequestPermissions(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})

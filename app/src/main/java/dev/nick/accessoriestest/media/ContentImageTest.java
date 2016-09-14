@@ -44,13 +44,13 @@ import dev.nick.accessories.injection.annotation.binding.CallMethod;
 import dev.nick.accessories.injection.annotation.binding.ServiceConnectionStub;
 import dev.nick.accessories.injection.annotation.permission.RequestPermissions;
 import dev.nick.accessories.logger.LoggerManager;
-import dev.nick.accessories.media.LoaderConfig;
-import dev.nick.accessories.media.MediaLoader;
-import dev.nick.accessories.media.cache.CachePolicy;
-import dev.nick.accessories.media.ui.DisplayOption;
-import dev.nick.accessories.media.ui.MediaQuality;
-import dev.nick.accessories.media.ui.animator.FadeInViewAnimator;
-import dev.nick.accessories.media.worker.network.NetworkPolicy;
+import dev.nick.accessories.media.loader.LoaderConfig;
+import dev.nick.accessories.media.loader.MediaLoader;
+import dev.nick.accessories.media.loader.cache.CachePolicy;
+import dev.nick.accessories.media.loader.ui.DisplayOption;
+import dev.nick.accessories.media.loader.ui.MediaQuality;
+import dev.nick.accessories.media.loader.ui.animator.FadeInViewAnimator;
+import dev.nick.accessories.media.loader.worker.network.NetworkPolicy;
 import dev.nick.accessoriestest.R;
 import dev.nick.accessoriestest.model.IMediaTrack;
 import dev.nick.accessoriestest.player.repository.TrackLoader;
@@ -76,7 +76,7 @@ public class ContentImageTest extends BaseTest {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.file_image_layout);
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
-        setTitle(getClass().getSimpleName());
+        setTitle("Click item to play, <-- to quit");
         Injector.shared().inject(this);
 
         LoggerManager.getLogger("HAS? " + getClass()).info(hasLeanback());
@@ -172,6 +172,7 @@ public class ContentImageTest extends BaseTest {
                         .from(uri)
                         .option(DisplayOption.bitmapBuilder()
                                 .imageQuality(MediaQuality.RAW)
+                                .showOnLoading(null)
                                 .viewMaybeReused()
                                 .imageAnimator(new FadeInViewAnimator())
                                 .build())

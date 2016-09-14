@@ -62,7 +62,7 @@ public class TestsList extends AppCompatActivity {
         List<Test> tests = new ArrayList<>();
 //        tests.add(new Test(FileImageTest.class));
 //        tests.add(new Test(NetworkImageTest.class));
-        tests.add(new Test(ContentImageTest.class));
+        tests.add(new Test(ContentImageTest.class, "getCurrentPosition", "Push some music before test"));
 //        tests.add(new Test(AssetsImageTest.class));
 //        tests.add(new Test(DrawableImageTest.class));
 //        tests.add(new Test(VectorImageTest.class));

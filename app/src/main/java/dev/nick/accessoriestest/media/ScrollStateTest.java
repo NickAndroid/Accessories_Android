@@ -38,14 +38,14 @@ import java.util.List;
 import dev.nick.accessories.injection.Injector;
 import dev.nick.accessories.injection.annotation.binding.BindView;
 import dev.nick.accessories.injection.annotation.permission.RequestPermissions;
-import dev.nick.accessories.media.LoaderConfig;
-import dev.nick.accessories.media.MediaLoader;
-import dev.nick.accessories.media.ProgressListenerStub;
-import dev.nick.accessories.media.cache.CachePolicy;
-import dev.nick.accessories.media.ui.DisplayOption;
-import dev.nick.accessories.media.ui.MediaQuality;
-import dev.nick.accessories.media.ui.animator.FadeInViewAnimator;
-import dev.nick.accessories.media.worker.bitmap.BitmapSource;
+import dev.nick.accessories.media.loader.LoaderConfig;
+import dev.nick.accessories.media.loader.MediaLoader;
+import dev.nick.accessories.media.loader.ProgressListenerStub;
+import dev.nick.accessories.media.loader.cache.CachePolicy;
+import dev.nick.accessories.media.loader.ui.DisplayOption;
+import dev.nick.accessories.media.loader.ui.MediaQuality;
+import dev.nick.accessories.media.loader.ui.animator.FadeInViewAnimator;
+import dev.nick.accessories.media.loader.worker.bitmap.BitmapSource;
 import dev.nick.accessoriestest.R;
 
 @RequestPermissions(permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.INTERNET})

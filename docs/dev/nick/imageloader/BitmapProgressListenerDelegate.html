@@ -100,7 +100,7 @@ var activeTableTab = "activeTableTab";
 <li>java.lang.Object</li>
 <li>
 <ul class="inheritance">
-<li>dev.nick.accessories.media.BitmapProgressListenerDelegate</li>
+<li>dev.nick.accessories.media.loader.BitmapProgressListenerDelegate</li>
 </ul>
 </li>
 </ul>
@@ -109,7 +109,7 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <dl>
 <dt>All Implemented Interfaces:</dt>
-<dd><a href="../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.worker">ProgressListener</a>&lt;Bitmap&gt;</dd>
+<dd><a href="../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.loader.worker">ProgressListener</a>&lt;Bitmap&gt;</dd>
 </dl>
 <hr>
 <br>
@@ -134,7 +134,7 @@ extends java.lang.Object</pre>
 <th class="colLast" scope="col">Field and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code>protected <a href="../../../dev/nick/imageloader/cache/CacheManager.html" title="interface in dev.nick.accessories.media.cache">CacheManager</a>&lt;T&gt;</code></td>
+<td class="colFirst"><code>protected <a href="../../../dev/nick/imageloader/cache/CacheManager.html" title="interface in dev.nick.accessories.media.loader.cache">CacheManager</a>&lt;T&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../dev/nick/imageloader/BitmapProgressListenerDelegate.html#cacheManager">cacheManager</a></span></code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
@@ -146,19 +146,19 @@ extends java.lang.Object</pre>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../dev/nick/imageloader/BitmapProgressListenerDelegate.html#isTaskDirty">isTaskDirty</a></span></code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><code>protected <a href="../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.worker">ProgressListener</a>&lt;T&gt;</code></td>
+<td class="colFirst"><code>protected <a href="../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.loader.worker">ProgressListener</a>&lt;T&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../dev/nick/imageloader/BitmapProgressListenerDelegate.html#listener">listener</a></span></code>&nbsp;</td>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code>protected <a href="../../../dev/nick/imageloader/ui/DisplayOption.html" title="class in dev.nick.accessories.media.ui">DisplayOption</a>&lt;T&gt;</code></td>
+<td class="colFirst"><code>protected <a href="../../../dev/nick/imageloader/ui/DisplayOption.html" title="class in dev.nick.accessories.media.loader.ui">DisplayOption</a>&lt;T&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../dev/nick/imageloader/BitmapProgressListenerDelegate.html#option">option</a></span></code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><code>protected <a href="../../../dev/nick/imageloader/ui/ImageSeat.html" title="interface in dev.nick.accessories.media.ui">ImageSeat</a>&lt;Bitmap&gt;</code></td>
+<td class="colFirst"><code>protected <a href="../../../dev/nick/imageloader/ui/ImageSeat.html" title="interface in dev.nick.accessories.media.loader.ui">ImageSeat</a>&lt;Bitmap&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../dev/nick/imageloader/BitmapProgressListenerDelegate.html#settable">settable</a></span></code>&nbsp;</td>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code>protected <a href="../../../dev/nick/imageloader/worker/task/TaskManager.html" title="interface in dev.nick.accessories.media.worker.task">TaskManager</a></code></td>
+<td class="colFirst"><code>protected <a href="../../../dev/nick/imageloader/worker/task/TaskManager.html" title="interface in dev.nick.accessories.media.loader.worker.task">TaskManager</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../dev/nick/imageloader/BitmapProgressListenerDelegate.html#taskManager">taskManager</a></span></code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
@@ -166,7 +166,7 @@ extends java.lang.Object</pre>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../dev/nick/imageloader/BitmapProgressListenerDelegate.html#url">url</a></span></code>&nbsp;</td>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code>protected <a href="../../../dev/nick/imageloader/worker/ViewSpec.html" title="class in dev.nick.accessories.media.worker">ViewSpec</a></code></td>
+<td class="colFirst"><code>protected <a href="../../../dev/nick/imageloader/worker/ViewSpec.html" title="class in dev.nick.accessories.media.loader.worker">ViewSpec</a></code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../dev/nick/imageloader/BitmapProgressListenerDelegate.html#dimenSpec">dimenSpec</a></span></code>&nbsp;</td>
 </tr>
 </table>
@@ -184,13 +184,13 @@ extends java.lang.Object</pre>
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../dev/nick/imageloader/BitmapProgressListenerDelegate.html#BitmapProgressListenerDelegate-dev.nick.imageloader.cache.CacheManager-dev.nick.imageloader.worker.task.TaskManager-dev.nick.imageloader.worker.ProgressListener-dev.nick.imageloader.worker.DimenSpec-dev.nick.imageloader.ui.DisplayOption-dev.nick.imageloader.ui.MediaHolder-dev.nick.imageloader.worker.task.DisplayTaskRecord-java.lang.String-">BitmapProgressListenerDelegate</a></span>(<a href="../../../dev/nick/imageloader/cache/CacheManager.html" title="interface in dev.nick.accessories.media.cache">CacheManager</a>&lt;Bitmap&gt;&nbsp;cacheManager,
-                              <a href="../../../dev/nick/imageloader/worker/task/TaskManager.html" title="interface in dev.nick.accessories.media.worker.task">TaskManager</a>&nbsp;taskManager,
-                              <a href="../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.worker">ProgressListener</a>&lt;Bitmap&gt;&nbsp;listener,
-                              <a href="../../../dev/nick/imageloader/worker/ViewSpec.html" title="class in dev.nick.accessories.media.worker">ViewSpec</a>&nbsp;dimenSpec,
-                              <a href="../../../dev/nick/imageloader/ui/DisplayOption.html" title="class in dev.nick.accessories.media.ui">DisplayOption</a>&lt;Bitmap&gt;&nbsp;option,
-                              <a href="../../../dev/nick/imageloader/ui/ImageSeat.html" title="interface in dev.nick.accessories.media.ui">ImageSeat</a>&lt;Bitmap&gt;&nbsp;mediaHolder,
-                              <a href="../../../dev/nick/imageloader/worker/task/DisplayTaskRecord.html" title="class in dev.nick.accessories.media.worker.task">DisplayTaskRecord</a>&nbsp;taskRecord,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../dev/nick/imageloader/BitmapProgressListenerDelegate.html#BitmapProgressListenerDelegate-dev.nick.imageloader.cache.CacheManager-dev.nick.imageloader.worker.task.TaskManager-dev.nick.imageloader.worker.ProgressListener-dev.nick.imageloader.worker.DimenSpec-dev.nick.imageloader.ui.DisplayOption-dev.nick.imageloader.ui.MediaHolder-dev.nick.imageloader.worker.task.DisplayTaskRecord-java.lang.String-">BitmapProgressListenerDelegate</a></span>(<a href="../../../dev/nick/imageloader/cache/CacheManager.html" title="interface in dev.nick.accessories.media.loader.cache">CacheManager</a>&lt;Bitmap&gt;&nbsp;cacheManager,
+                              <a href="../../../dev/nick/imageloader/worker/task/TaskManager.html" title="interface in dev.nick.accessories.media.loader.worker.task">TaskManager</a>&nbsp;taskManager,
+                              <a href="../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.loader.worker">ProgressListener</a>&lt;Bitmap&gt;&nbsp;listener,
+                              <a href="../../../dev/nick/imageloader/worker/ViewSpec.html" title="class in dev.nick.accessories.media.loader.worker">ViewSpec</a>&nbsp;dimenSpec,
+                              <a href="../../../dev/nick/imageloader/ui/DisplayOption.html" title="class in dev.nick.accessories.media.loader.ui">DisplayOption</a>&lt;Bitmap&gt;&nbsp;option,
+                              <a href="../../../dev/nick/imageloader/ui/ImageSeat.html" title="interface in dev.nick.accessories.media.loader.ui">ImageSeat</a>&lt;Bitmap&gt;&nbsp;mediaHolder,
+                              <a href="../../../dev/nick/imageloader/worker/task/DisplayTaskRecord.html" title="class in dev.nick.accessories.media.loader.worker.task">DisplayTaskRecord</a>&nbsp;taskRecord,
                               java.lang.String&nbsp;url)</code>&nbsp;</td>
 </tr>
 </table>
@@ -256,7 +256,7 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>taskManager</h4>
-<pre>protected&nbsp;<a href="../../../dev/nick/imageloader/worker/task/TaskManager.html" title="interface in dev.nick.accessories.media.worker.task">TaskManager</a> taskManager</pre>
+<pre>protected&nbsp;<a href="../../../dev/nick/imageloader/worker/task/TaskManager.html" title="interface in dev.nick.accessories.media.loader.worker.task">TaskManager</a> taskManager</pre>
 </li>
 </ul>
 <a name="cacheManager">
@@ -265,7 +265,7 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>cacheManager</h4>
-<pre>protected&nbsp;<a href="../../../dev/nick/imageloader/cache/CacheManager.html" title="interface in dev.nick.accessories.media.cache">CacheManager</a>&lt;T&gt; cacheManager</pre>
+<pre>protected&nbsp;<a href="../../../dev/nick/imageloader/cache/CacheManager.html" title="interface in dev.nick.accessories.media.loader.cache">CacheManager</a>&lt;T&gt; cacheManager</pre>
 </li>
 </ul>
 <a name="listener">
@@ -274,7 +274,7 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>listener</h4>
-<pre>protected&nbsp;<a href="../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.worker">ProgressListener</a>&lt;T&gt; listener</pre>
+<pre>protected&nbsp;<a href="../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.loader.worker">ProgressListener</a>&lt;T&gt; listener</pre>
 </li>
 </ul>
 <a name="settable">
@@ -283,7 +283,7 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>settable</h4>
-<pre>protected&nbsp;<a href="../../../dev/nick/imageloader/ui/ImageSeat.html" title="interface in dev.nick.accessories.media.ui">ImageSeat</a>&lt;Bitmap&gt; settable</pre>
+<pre>protected&nbsp;<a href="../../../dev/nick/imageloader/ui/ImageSeat.html" title="interface in dev.nick.accessories.media.loader.ui">ImageSeat</a>&lt;Bitmap&gt; settable</pre>
 </li>
 </ul>
 <a name="url">
@@ -301,7 +301,7 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>option</h4>
-<pre>protected&nbsp;<a href="../../../dev/nick/imageloader/ui/DisplayOption.html" title="class in dev.nick.accessories.media.ui">DisplayOption</a>&lt;T&gt; option</pre>
+<pre>protected&nbsp;<a href="../../../dev/nick/imageloader/ui/DisplayOption.html" title="class in dev.nick.accessories.media.loader.ui">DisplayOption</a>&lt;T&gt; option</pre>
 </li>
 </ul>
 <a name="dimenSpec">
@@ -310,7 +310,7 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>dimenSpec</h4>
-<pre>protected&nbsp;<a href="../../../dev/nick/imageloader/worker/ViewSpec.html" title="class in dev.nick.accessories.media.worker">ViewSpec</a> dimenSpec</pre>
+<pre>protected&nbsp;<a href="../../../dev/nick/imageloader/worker/ViewSpec.html" title="class in dev.nick.accessories.media.loader.worker">ViewSpec</a> dimenSpec</pre>
 </li>
 </ul>
 <a name="canceled">
@@ -339,19 +339,19 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="BitmapProgressListenerDelegate-dev.nick.accessories.media.cache.CacheManager-dev.nick.accessories.media.worker.task.TaskManager-dev.nick.accessories.media.worker.ProgressListener-dev.nick.accessories.media.worker.DimenSpec-dev.nick.accessories.media.ui.DisplayOption-dev.nick.accessories.media.ui.MediaHolder-dev.nick.accessories.media.worker.task.DisplayTaskRecord-java.lang.String-">
+<a name="BitmapProgressListenerDelegate-dev.nick.accessories.media.loader.cache.CacheManager-dev.nick.accessories.media.loader.worker.task.TaskManager-dev.nick.accessories.media.loader.worker.ProgressListener-dev.nick.accessories.media.loader.worker.DimenSpec-dev.nick.accessories.media.loader.ui.DisplayOption-dev.nick.accessories.media.loader.ui.MediaHolder-dev.nick.accessories.media.loader.worker.task.DisplayTaskRecord-java.lang.String-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>BitmapProgressListenerDelegate</h4>
-<pre>public&nbsp;BitmapProgressListenerDelegate(<a href="../../../dev/nick/imageloader/cache/CacheManager.html" title="interface in dev.nick.accessories.media.cache">CacheManager</a>&lt;Bitmap&gt;&nbsp;cacheManager,
-                                      <a href="../../../dev/nick/imageloader/worker/task/TaskManager.html" title="interface in dev.nick.accessories.media.worker.task">TaskManager</a>&nbsp;taskManager,
-                                      <a href="../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.worker">ProgressListener</a>&lt;Bitmap&gt;&nbsp;listener,
-                                      <a href="../../../dev/nick/imageloader/worker/ViewSpec.html" title="class in dev.nick.accessories.media.worker">ViewSpec</a>&nbsp;dimenSpec,
-                                      <a href="../../../dev/nick/imageloader/ui/DisplayOption.html" title="class in dev.nick.accessories.media.ui">DisplayOption</a>&lt;Bitmap&gt;&nbsp;option,
-                                      <a href="../../../dev/nick/imageloader/ui/ImageSeat.html" title="interface in dev.nick.accessories.media.ui">ImageSeat</a>&lt;Bitmap&gt;&nbsp;mediaHolder,
-                                      <a href="../../../dev/nick/imageloader/worker/task/DisplayTaskRecord.html" title="class in dev.nick.accessories.media.worker.task">DisplayTaskRecord</a>&nbsp;taskRecord,
+<pre>public&nbsp;BitmapProgressListenerDelegate(<a href="../../../dev/nick/imageloader/cache/CacheManager.html" title="interface in dev.nick.accessories.media.loader.cache">CacheManager</a>&lt;Bitmap&gt;&nbsp;cacheManager,
+                                      <a href="../../../dev/nick/imageloader/worker/task/TaskManager.html" title="interface in dev.nick.accessories.media.loader.worker.task">TaskManager</a>&nbsp;taskManager,
+                                      <a href="../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.loader.worker">ProgressListener</a>&lt;Bitmap&gt;&nbsp;listener,
+                                      <a href="../../../dev/nick/imageloader/worker/ViewSpec.html" title="class in dev.nick.accessories.media.loader.worker">ViewSpec</a>&nbsp;dimenSpec,
+                                      <a href="../../../dev/nick/imageloader/ui/DisplayOption.html" title="class in dev.nick.accessories.media.loader.ui">DisplayOption</a>&lt;Bitmap&gt;&nbsp;option,
+                                      <a href="../../../dev/nick/imageloader/ui/ImageSeat.html" title="interface in dev.nick.accessories.media.loader.ui">ImageSeat</a>&lt;Bitmap&gt;&nbsp;mediaHolder,
+                                      <a href="../../../dev/nick/imageloader/worker/task/DisplayTaskRecord.html" title="class in dev.nick.accessories.media.loader.worker.task">DisplayTaskRecord</a>&nbsp;taskRecord,
                                       java.lang.String&nbsp;url)</pre>
 </li>
 </ul>
@@ -381,7 +381,7 @@ extends java.lang.Object</pre>
 <pre>public&nbsp;void&nbsp;onStartLoading()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../dev/nick/imageloader/worker/ProgressListener.html#onStartLoading--">onStartLoading</a></code>&nbsp;in interface&nbsp;<code><a href="../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.worker">ProgressListener</a>&lt;T&gt;</code></dd>
+<dd><code><a href="../../../dev/nick/imageloader/worker/ProgressListener.html#onStartLoading--">onStartLoading</a></code>&nbsp;in interface&nbsp;<code><a href="../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.loader.worker">ProgressListener</a>&lt;T&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -394,7 +394,7 @@ extends java.lang.Object</pre>
 <pre>public&nbsp;void&nbsp;onProgressUpdate(float&nbsp;progress)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../dev/nick/imageloader/worker/ProgressListener.html#onProgressUpdate-float-">onProgressUpdate</a></code>&nbsp;in interface&nbsp;<code><a href="../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.worker">ProgressListener</a>&lt;T&gt;</code></dd>
+<dd><code><a href="../../../dev/nick/imageloader/worker/ProgressListener.html#onProgressUpdate-float-">onProgressUpdate</a></code>&nbsp;in interface&nbsp;<code><a href="../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.loader.worker">ProgressListener</a>&lt;T&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -407,7 +407,7 @@ extends java.lang.Object</pre>
 <pre>public&nbsp;void&nbsp;onCancel()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../dev/nick/imageloader/worker/ProgressListener.html#onCancel--">onCancel</a></code>&nbsp;in interface&nbsp;<code><a href="../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.worker">ProgressListener</a>&lt;T&gt;</code></dd>
+<dd><code><a href="../../../dev/nick/imageloader/worker/ProgressListener.html#onCancel--">onCancel</a></code>&nbsp;in interface&nbsp;<code><a href="../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.loader.worker">ProgressListener</a>&lt;T&gt;</code></dd>
 </dl>
 </li>
 </ul>

@@ -100,7 +100,7 @@ var activeTableTab = "activeTableTab";
 <li>java.lang.Object</li>
 <li>
 <ul class="inheritance">
-<li>dev.nick.accessories.media.ProgressListenerStub.Stub</li>
+<li>dev.nick.accessories.media.loader.ProgressListenerStub.Stub</li>
 </ul>
 </li>
 </ul>
@@ -109,7 +109,7 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <dl>
 <dt>All Implemented Interfaces:</dt>
-<dd><a href="../../../dev/nick/imageloader/LoadingListener.html" title="interface in dev.nick.accessories">LoadingListener</a>, <a href="../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.worker">ProgressListener</a>&lt;Bitmap&gt;, <a href="../../../dev/nick/imageloader/worker/result/ErrorListener.html" title="interface in dev.nick.accessories.media.worker.result">ErrorListener</a></dd>
+<dd><a href="../../../dev/nick/imageloader/LoadingListener.html" title="interface in dev.nick.accessories">LoadingListener</a>, <a href="../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.loader.worker">ProgressListener</a>&lt;Bitmap&gt;, <a href="../../../dev/nick/imageloader/worker/result/ErrorListener.html" title="interface in dev.nick.accessories.media.loader.worker.result">ErrorListener</a></dd>
 </dl>
 <dl>
 <dt>Enclosing interface:</dt>
@@ -133,7 +133,7 @@ implements <a href="../../../dev/nick/imageloader/LoadingListener.html" title="i
 </a>
 <h3>Nested Class Summary</h3>
 <ul class="blockList">
-<li class="blockList"><a name="nested.classes.inherited.from.class.dev.nick.accessories.media.ProgressListenerStub">
+<li class="blockList"><a name="nested.classes.inherited.from.class.dev.nick.accessories.media.loader.ProgressListenerStub">
 <!--   -->
 </a>
 <h3>Nested classes/interfaces inherited from interface&nbsp;dev.nick.imageloader.<a href="../../../dev/nick/imageloader/LoadingListener.html" title="interface in dev.nick.accessories">LoadingListener</a></h3>
@@ -180,7 +180,7 @@ implements <a href="../../../dev/nick/imageloader/LoadingListener.html" title="i
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../dev/nick/imageloader/LoadingListener.Stub.html#onError-dev.nick.imageloader.worker.result.Cause-">onError</a></span>(<a href="../../../dev/nick/imageloader/worker/result/Cause.html" title="class in dev.nick.accessories.media.worker.result">Cause</a>&nbsp;cause)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../dev/nick/imageloader/LoadingListener.Stub.html#onError-dev.nick.imageloader.worker.result.Cause-">onError</a></span>(<a href="../../../dev/nick/imageloader/worker/result/Cause.html" title="class in dev.nick.accessories.media.loader.worker.result">Cause</a>&nbsp;cause)</code>&nbsp;</td>
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>void</code></td>
@@ -229,19 +229,19 @@ implements <a href="../../../dev/nick/imageloader/LoadingListener.html" title="i
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="onError-dev.nick.accessories.media.worker.result.Cause-">
+<a name="onError-dev.nick.accessories.media.loader.worker.result.Cause-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>onError</h4>
 <pre>public&nbsp;void&nbsp;onError(@NonNull
-                    <a href="../../../dev/nick/imageloader/worker/result/Cause.html" title="class in dev.nick.accessories.media.worker.result">Cause</a>&nbsp;cause)</pre>
+                    <a href="../../../dev/nick/imageloader/worker/result/Cause.html" title="class in dev.nick.accessories.media.loader.worker.result">Cause</a>&nbsp;cause)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../dev/nick/imageloader/LoadingListener.html#onError-dev.nick.imageloader.worker.result.Cause-">onError</a></code>&nbsp;in interface&nbsp;<code><a href="../../../dev/nick/imageloader/LoadingListener.html" title="interface in dev.nick.accessories">LoadingListener</a></code></dd>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../dev/nick/imageloader/worker/result/ErrorListener.html#onError-dev.nick.imageloader.worker.result.Cause-">onError</a></code>&nbsp;in interface&nbsp;<code><a href="../../../dev/nick/imageloader/worker/result/ErrorListener.html" title="interface in dev.nick.accessories.media.worker.result">ErrorListener</a></code></dd>
+<dd><code><a href="../../../dev/nick/imageloader/worker/result/ErrorListener.html#onError-dev.nick.imageloader.worker.result.Cause-">onError</a></code>&nbsp;in interface&nbsp;<code><a href="../../../dev/nick/imageloader/worker/result/ErrorListener.html" title="interface in dev.nick.accessories.media.loader.worker.result">ErrorListener</a></code></dd>
 </dl>
 </li>
 </ul>
@@ -257,7 +257,7 @@ implements <a href="../../../dev/nick/imageloader/LoadingListener.html" title="i
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../dev/nick/imageloader/LoadingListener.html#onComplete-Bitmap-">onComplete</a></code>&nbsp;in interface&nbsp;<code><a href="../../../dev/nick/imageloader/LoadingListener.html" title="interface in dev.nick.accessories">LoadingListener</a></code></dd>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../dev/nick/imageloader/worker/ProgressListener.html#onComplete-T-">onComplete</a></code>&nbsp;in interface&nbsp;<code><a href="../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.worker">ProgressListener</a>&lt;Bitmap&gt;</code></dd>
+<dd><code><a href="../../../dev/nick/imageloader/worker/ProgressListener.html#onComplete-T-">onComplete</a></code>&nbsp;in interface&nbsp;<code><a href="../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.loader.worker">ProgressListener</a>&lt;Bitmap&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -272,7 +272,7 @@ implements <a href="../../../dev/nick/imageloader/LoadingListener.html" title="i
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../dev/nick/imageloader/LoadingListener.html#onProgressUpdate-float-">onProgressUpdate</a></code>&nbsp;in interface&nbsp;<code><a href="../../../dev/nick/imageloader/LoadingListener.html" title="interface in dev.nick.accessories">LoadingListener</a></code></dd>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../dev/nick/imageloader/worker/ProgressListener.html#onProgressUpdate-float-">onProgressUpdate</a></code>&nbsp;in interface&nbsp;<code><a href="../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.worker">ProgressListener</a>&lt;Bitmap&gt;</code></dd>
+<dd><code><a href="../../../dev/nick/imageloader/worker/ProgressListener.html#onProgressUpdate-float-">onProgressUpdate</a></code>&nbsp;in interface&nbsp;<code><a href="../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.loader.worker">ProgressListener</a>&lt;Bitmap&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -285,7 +285,7 @@ implements <a href="../../../dev/nick/imageloader/LoadingListener.html" title="i
 <pre>public&nbsp;void&nbsp;onCancel()</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../dev/nick/imageloader/worker/ProgressListener.html#onCancel--">onCancel</a></code>&nbsp;in interface&nbsp;<code><a href="../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.worker">ProgressListener</a>&lt;Bitmap&gt;</code></dd>
+<dd><code><a href="../../../dev/nick/imageloader/worker/ProgressListener.html#onCancel--">onCancel</a></code>&nbsp;in interface&nbsp;<code><a href="../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.loader.worker">ProgressListener</a>&lt;Bitmap&gt;</code></dd>
 </dl>
 </li>
 </ul>
@@ -300,7 +300,7 @@ implements <a href="../../../dev/nick/imageloader/LoadingListener.html" title="i
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../dev/nick/imageloader/LoadingListener.html#onStartLoading--">onStartLoading</a></code>&nbsp;in interface&nbsp;<code><a href="../../../dev/nick/imageloader/LoadingListener.html" title="interface in dev.nick.accessories">LoadingListener</a></code></dd>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../dev/nick/imageloader/worker/ProgressListener.html#onStartLoading--">onStartLoading</a></code>&nbsp;in interface&nbsp;<code><a href="../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.worker">ProgressListener</a>&lt;Bitmap&gt;</code></dd>
+<dd><code><a href="../../../dev/nick/imageloader/worker/ProgressListener.html#onStartLoading--">onStartLoading</a></code>&nbsp;in interface&nbsp;<code><a href="../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.loader.worker">ProgressListener</a>&lt;Bitmap&gt;</code></dd>
 </dl>
 </li>
 </ul>

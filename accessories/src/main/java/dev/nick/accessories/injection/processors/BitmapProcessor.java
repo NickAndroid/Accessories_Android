@@ -26,7 +26,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
 import dev.nick.accessories.injection.annotation.binding.BindBitmap;
-import dev.nick.accessories.media.MediaLoader;
+import dev.nick.accessories.media.loader.MediaLoader;
 
 class BitmapProcessor extends FieldProcessor {
 

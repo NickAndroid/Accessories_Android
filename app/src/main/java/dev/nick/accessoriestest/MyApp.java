@@ -27,18 +27,18 @@ import android.util.Log;
 
 import dev.nick.accessories.injection.Injector;
 import dev.nick.accessories.logger.LoggerManager;
-import dev.nick.accessories.media.LoaderConfig;
-import dev.nick.accessories.media.MediaLoader;
-import dev.nick.accessories.media.cache.CachePolicy;
-import dev.nick.accessories.media.queue.QueuePolicy;
-import dev.nick.accessories.media.worker.BaseMediaFetcher;
-import dev.nick.accessories.media.worker.DecodeSpec;
-import dev.nick.accessories.media.worker.PathSplitter;
-import dev.nick.accessories.media.worker.ProgressListener;
-import dev.nick.accessories.media.worker.bitmap.BitmapSource;
-import dev.nick.accessories.media.worker.movie.MovieSource;
-import dev.nick.accessories.media.worker.network.NetworkPolicy;
-import dev.nick.accessories.media.worker.result.ErrorListener;
+import dev.nick.accessories.media.loader.LoaderConfig;
+import dev.nick.accessories.media.loader.MediaLoader;
+import dev.nick.accessories.media.loader.cache.CachePolicy;
+import dev.nick.accessories.media.loader.queue.QueuePolicy;
+import dev.nick.accessories.media.loader.worker.BaseMediaFetcher;
+import dev.nick.accessories.media.loader.worker.DecodeSpec;
+import dev.nick.accessories.media.loader.worker.PathSplitter;
+import dev.nick.accessories.media.loader.worker.ProgressListener;
+import dev.nick.accessories.media.loader.worker.bitmap.BitmapSource;
+import dev.nick.accessories.media.loader.worker.movie.MovieSource;
+import dev.nick.accessories.media.loader.worker.network.NetworkPolicy;
+import dev.nick.accessories.media.loader.worker.result.ErrorListener;
 
 public class MyApp extends Application {
     @Override

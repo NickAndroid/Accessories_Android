@@ -49,8 +49,8 @@ var activeTableTab = "activeTableTab";
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../../../../dev/nick/imageloader/worker/DecodeSpec.html" title="class in dev.nick.accessories.media.worker"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../../dev/nick/imageloader/worker/FileImageFetcher.html" title="class in dev.nick.accessories.media.worker"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../../dev/nick/imageloader/worker/DecodeSpec.html" title="class in dev.nick.accessories.media.loader.worker"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
+<li><a href="../../../../dev/nick/imageloader/worker/FileImageFetcher.html" title="class in dev.nick.accessories.media.loader.worker"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../index.html?dev/nick/imageloader/worker/DrawableImageFetcher.html" target="_top">Frames</a></li>
@@ -92,7 +92,7 @@ var activeTableTab = "activeTableTab";
 <!-- ========= END OF TOP NAVBAR ========= -->
 <!-- ======== START OF CLASS DATA ======== -->
 <div class="header">
-<div class="subTitle">dev.nick.accessories.media.worker</div>
+<div class="subTitle">dev.nick.accessories.media.loader.worker</div>
 <h2 title="Class DrawableImageFetcher" class="title">Class DrawableImageFetcher</h2>
 </div>
 <div class="contentContainer">
@@ -100,7 +100,7 @@ var activeTableTab = "activeTableTab";
 <li>java.lang.Object</li>
 <li>
 <ul class="inheritance">
-<li>dev.nick.accessories.media.worker.bitmap.DrawableMediaFetcher</li>
+<li>dev.nick.accessories.media.loader.worker.bitmap.DrawableMediaFetcher</li>
 </ul>
 </li>
 </ul>
@@ -109,7 +109,7 @@ var activeTableTab = "activeTableTab";
 <li class="blockList">
 <dl>
 <dt>All Implemented Interfaces:</dt>
-<dd><a href="../../../../dev/nick/imageloader/worker/ImageFetcher.html" title="interface in dev.nick.accessories.media.worker">ImageFetcher</a>&lt;Bitmap&gt;</dd>
+<dd><a href="../../../../dev/nick/imageloader/worker/ImageFetcher.html" title="interface in dev.nick.accessories.media.loader.worker">ImageFetcher</a>&lt;Bitmap&gt;</dd>
 </dl>
 <hr>
 <br>
@@ -146,7 +146,7 @@ extends java.lang.Object</pre>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../dev/nick/imageloader/worker/DrawableImageFetcher.html#mLogger">mLogger</a></span></code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><code>protected dev.nick.accessories.media.worker.PathSplitter&lt;java.lang.String&gt;</code></td>
+<td class="colFirst"><code>protected dev.nick.accessories.media.loader.worker.PathSplitter&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../dev/nick/imageloader/worker/DrawableImageFetcher.html#mSplitter">mSplitter</a></span></code>&nbsp;</td>
 </tr>
 </table>
@@ -183,22 +183,22 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>protected void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../dev/nick/imageloader/worker/DrawableImageFetcher.html#callOnComplete-dev.nick.imageloader.worker.ProgressListener-T-">callOnComplete</a></span>(<a href="../../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.worker">ProgressListener</a>&lt;T&gt;&nbsp;listener,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../dev/nick/imageloader/worker/DrawableImageFetcher.html#callOnComplete-dev.nick.imageloader.worker.ProgressListener-T-">callOnComplete</a></span>(<a href="../../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.loader.worker">ProgressListener</a>&lt;T&gt;&nbsp;listener,
               T&nbsp;result)</code>&nbsp;</td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>protected void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../dev/nick/imageloader/worker/DrawableImageFetcher.html#callOnError-dev.nick.imageloader.worker.result.ErrorListener-dev.nick.imageloader.worker.result.Cause-">callOnError</a></span>(<a href="../../../../dev/nick/imageloader/worker/result/ErrorListener.html" title="interface in dev.nick.accessories.media.worker.result">ErrorListener</a>&nbsp;listener,
-           <a href="../../../../dev/nick/imageloader/worker/result/Cause.html" title="class in dev.nick.accessories.media.worker.result">Cause</a>&nbsp;cause)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../dev/nick/imageloader/worker/DrawableImageFetcher.html#callOnError-dev.nick.imageloader.worker.result.ErrorListener-dev.nick.imageloader.worker.result.Cause-">callOnError</a></span>(<a href="../../../../dev/nick/imageloader/worker/result/ErrorListener.html" title="interface in dev.nick.accessories.media.loader.worker.result">ErrorListener</a>&nbsp;listener,
+           <a href="../../../../dev/nick/imageloader/worker/result/Cause.html" title="class in dev.nick.accessories.media.loader.worker.result">Cause</a>&nbsp;cause)</code>&nbsp;</td>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>protected void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../dev/nick/imageloader/worker/DrawableImageFetcher.html#callOnProgress-dev.nick.imageloader.worker.ProgressListener-int-">callOnProgress</a></span>(<a href="../../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.worker">ProgressListener</a>&lt;T&gt;&nbsp;listener,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../dev/nick/imageloader/worker/DrawableImageFetcher.html#callOnProgress-dev.nick.imageloader.worker.ProgressListener-int-">callOnProgress</a></span>(<a href="../../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.loader.worker">ProgressListener</a>&lt;T&gt;&nbsp;listener,
               int&nbsp;progress)</code>&nbsp;</td>
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>protected void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../dev/nick/imageloader/worker/DrawableImageFetcher.html#callOnStart-dev.nick.imageloader.worker.ProgressListener-">callOnStart</a></span>(<a href="../../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.worker">ProgressListener</a>&lt;T&gt;&nbsp;listener)</code>&nbsp;</td>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../dev/nick/imageloader/worker/DrawableImageFetcher.html#callOnStart-dev.nick.imageloader.worker.ProgressListener-">callOnStart</a></span>(<a href="../../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.loader.worker">ProgressListener</a>&lt;T&gt;&nbsp;listener)</code>&nbsp;</td>
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code>protected int</code></td>
@@ -209,12 +209,12 @@ extends java.lang.Object</pre>
 <tr id="i5" class="rowColor">
 <td class="colFirst"><code>Bitmap</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../dev/nick/imageloader/worker/DrawableImageFetcher.html#fetchFromUrl-java.lang.String-dev.nick.imageloader.worker.DecodeSpec-dev.nick.imageloader.worker.ProgressListener-dev.nick.imageloader.worker.result.ErrorListener-">fetchFromUrl</a></span>(java.lang.String&nbsp;url,
-            <a href="../../../../dev/nick/imageloader/worker/DecodeSpec.html" title="class in dev.nick.accessories.media.worker">DecodeSpec</a>&nbsp;decodeSpec,
-            <a href="../../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.worker">ProgressListener</a>&lt;Bitmap&gt;&nbsp;progressListener,
-            <a href="../../../../dev/nick/imageloader/worker/result/ErrorListener.html" title="interface in dev.nick.accessories.media.worker.result">ErrorListener</a>&nbsp;errorListener)</code>&nbsp;</td>
+            <a href="../../../../dev/nick/imageloader/worker/DecodeSpec.html" title="class in dev.nick.accessories.media.loader.worker">DecodeSpec</a>&nbsp;decodeSpec,
+            <a href="../../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.loader.worker">ProgressListener</a>&lt;Bitmap&gt;&nbsp;progressListener,
+            <a href="../../../../dev/nick/imageloader/worker/result/ErrorListener.html" title="interface in dev.nick.accessories.media.loader.worker.result">ErrorListener</a>&nbsp;errorListener)</code>&nbsp;</td>
 </tr>
 <tr id="i6" class="altColor">
-<td class="colFirst"><code><a href="../../../../dev/nick/imageloader/worker/ImageFetcher.html" title="interface in dev.nick.accessories.media.worker">ImageFetcher</a>&lt;T&gt;</code></td>
+<td class="colFirst"><code><a href="../../../../dev/nick/imageloader/worker/ImageFetcher.html" title="interface in dev.nick.accessories.media.loader.worker">ImageFetcher</a>&lt;T&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../dev/nick/imageloader/worker/DrawableImageFetcher.html#prepare-Context-dev.nick.imageloader.LoaderConfig-">prepare</a></span>(Context&nbsp;context,
        <a href="../../../../dev/nick/imageloader/LoaderConfig.html" title="class in dev.nick.accessories">LoaderConfig</a>&nbsp;config)</code>&nbsp;</td>
 </tr>
@@ -246,7 +246,7 @@ extends java.lang.Object</pre>
 <ul class="blockList">
 <li class="blockList">
 <h4>mSplitter</h4>
-<pre>protected&nbsp;dev.nick.accessories.media.worker.PathSplitter&lt;java.lang.String&gt; mSplitter</pre>
+<pre>protected&nbsp;dev.nick.accessories.media.loader.worker.PathSplitter&lt;java.lang.String&gt; mSplitter</pre>
 </li>
 </ul>
 <a name="mContext">
@@ -284,13 +284,13 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="DrawableImageFetcher-dev.nick.accessories.media.worker.PathSplitter-">
+<a name="DrawableImageFetcher-dev.nick.accessories.media.loader.worker.PathSplitter-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>DrawableImageFetcher</h4>
-<pre>public&nbsp;DrawableImageFetcher(dev.nick.accessories.media.worker.PathSplitter&lt;java.lang.String&gt;&nbsp;splitter)</pre>
+<pre>public&nbsp;DrawableImageFetcher(dev.nick.accessories.media.loader.worker.PathSplitter&lt;java.lang.String&gt;&nbsp;splitter)</pre>
 </li>
 </ul>
 </li>
@@ -301,7 +301,7 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="fetchFromUrl-java.lang.String-dev.nick.accessories.media.worker.DecodeSpec-dev.nick.accessories.media.worker.ProgressListener-dev.nick.accessories.media.worker.result.ErrorListener-">
+<a name="fetchFromUrl-java.lang.String-dev.nick.accessories.media.loader.worker.DecodeSpec-dev.nick.accessories.media.loader.worker.ProgressListener-dev.nick.accessories.media.loader.worker.result.ErrorListener-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -310,73 +310,73 @@ extends java.lang.Object</pre>
 <pre>public&nbsp;Bitmap&nbsp;fetchFromUrl(@NonNull
                            java.lang.String&nbsp;url,
                            @NonNull
-                           <a href="../../../../dev/nick/imageloader/worker/DecodeSpec.html" title="class in dev.nick.accessories.media.worker">DecodeSpec</a>&nbsp;decodeSpec,
+                           <a href="../../../../dev/nick/imageloader/worker/DecodeSpec.html" title="class in dev.nick.accessories.media.loader.worker">DecodeSpec</a>&nbsp;decodeSpec,
                            @Nullable
-                           <a href="../../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.worker">ProgressListener</a>&lt;Bitmap&gt;&nbsp;progressListener,
+                           <a href="../../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.loader.worker">ProgressListener</a>&lt;Bitmap&gt;&nbsp;progressListener,
                            @Nullable
-                           <a href="../../../../dev/nick/imageloader/worker/result/ErrorListener.html" title="interface in dev.nick.accessories.media.worker.result">ErrorListener</a>&nbsp;errorListener)
+                           <a href="../../../../dev/nick/imageloader/worker/result/ErrorListener.html" title="interface in dev.nick.accessories.media.loader.worker.result">ErrorListener</a>&nbsp;errorListener)
                     throws java.lang.Exception</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../dev/nick/imageloader/worker/ImageFetcher.html#fetchFromUrl-java.lang.String-dev.nick.imageloader.worker.DecodeSpec-dev.nick.imageloader.worker.ProgressListener-dev.nick.imageloader.worker.result.ErrorListener-">fetchFromUrl</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../dev/nick/imageloader/worker/ImageFetcher.html" title="interface in dev.nick.accessories.media.worker">ImageFetcher</a>&lt;Bitmap&gt;</code></dd>
+<dd><code><a href="../../../../dev/nick/imageloader/worker/ImageFetcher.html#fetchFromUrl-java.lang.String-dev.nick.imageloader.worker.DecodeSpec-dev.nick.imageloader.worker.ProgressListener-dev.nick.imageloader.worker.result.ErrorListener-">fetchFromUrl</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../dev/nick/imageloader/worker/ImageFetcher.html" title="interface in dev.nick.accessories.media.loader.worker">ImageFetcher</a>&lt;Bitmap&gt;</code></dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
 <dd><code>java.lang.Exception</code></dd>
 </dl>
 </li>
 </ul>
-<a name="prepare-Context-dev.nick.accessories.media.LoaderConfig-">
+<a name="prepare-Context-dev.nick.accessories.media.loader.LoaderConfig-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>prepare</h4>
-<pre>public&nbsp;<a href="../../../../dev/nick/imageloader/worker/ImageFetcher.html" title="interface in dev.nick.accessories.media.worker">ImageFetcher</a>&lt;T&gt;&nbsp;prepare(Context&nbsp;context,
+<pre>public&nbsp;<a href="../../../../dev/nick/imageloader/worker/ImageFetcher.html" title="interface in dev.nick.accessories.media.loader.worker">ImageFetcher</a>&lt;T&gt;&nbsp;prepare(Context&nbsp;context,
                                <a href="../../../../dev/nick/imageloader/LoaderConfig.html" title="class in dev.nick.accessories">LoaderConfig</a>&nbsp;config)</pre>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../dev/nick/imageloader/worker/ImageFetcher.html#prepare-Context-dev.nick.imageloader.LoaderConfig-">prepare</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../dev/nick/imageloader/worker/ImageFetcher.html" title="interface in dev.nick.accessories.media.worker">ImageFetcher</a>&lt;T&gt;</code></dd>
+<dd><code><a href="../../../../dev/nick/imageloader/worker/ImageFetcher.html#prepare-Context-dev.nick.imageloader.LoaderConfig-">prepare</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../dev/nick/imageloader/worker/ImageFetcher.html" title="interface in dev.nick.accessories.media.loader.worker">ImageFetcher</a>&lt;T&gt;</code></dd>
 </dl>
 </li>
 </ul>
-<a name="callOnStart-dev.nick.accessories.media.worker.ProgressListener-">
+<a name="callOnStart-dev.nick.accessories.media.loader.worker.ProgressListener-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>callOnStart</h4>
-<pre>protected&nbsp;void&nbsp;callOnStart(<a href="../../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.worker">ProgressListener</a>&lt;T&gt;&nbsp;listener)</pre>
+<pre>protected&nbsp;void&nbsp;callOnStart(<a href="../../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.loader.worker">ProgressListener</a>&lt;T&gt;&nbsp;listener)</pre>
 </li>
 </ul>
-<a name="callOnComplete-dev.nick.accessories.media.worker.ProgressListener-java.lang.Object-">
+<a name="callOnComplete-dev.nick.accessories.media.loader.worker.ProgressListener-java.lang.Object-">
 <!--   -->
-</a><a name="callOnComplete-dev.nick.accessories.media.worker.ProgressListener-T-">
+</a><a name="callOnComplete-dev.nick.accessories.media.loader.worker.ProgressListener-T-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>callOnComplete</h4>
-<pre>protected&nbsp;void&nbsp;callOnComplete(<a href="../../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.worker">ProgressListener</a>&lt;T&gt;&nbsp;listener,
+<pre>protected&nbsp;void&nbsp;callOnComplete(<a href="../../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.loader.worker">ProgressListener</a>&lt;T&gt;&nbsp;listener,
                               T&nbsp;result)</pre>
 </li>
 </ul>
-<a name="callOnError-dev.nick.accessories.media.worker.result.ErrorListener-dev.nick.accessories.media.worker.result.Cause-">
+<a name="callOnError-dev.nick.accessories.media.loader.worker.result.ErrorListener-dev.nick.accessories.media.loader.worker.result.Cause-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>callOnError</h4>
-<pre>protected&nbsp;void&nbsp;callOnError(<a href="../../../../dev/nick/imageloader/worker/result/ErrorListener.html" title="interface in dev.nick.accessories.media.worker.result">ErrorListener</a>&nbsp;listener,
+<pre>protected&nbsp;void&nbsp;callOnError(<a href="../../../../dev/nick/imageloader/worker/result/ErrorListener.html" title="interface in dev.nick.accessories.media.loader.worker.result">ErrorListener</a>&nbsp;listener,
                            @NonNull
-                           <a href="../../../../dev/nick/imageloader/worker/result/Cause.html" title="class in dev.nick.accessories.media.worker.result">Cause</a>&nbsp;cause)</pre>
+                           <a href="../../../../dev/nick/imageloader/worker/result/Cause.html" title="class in dev.nick.accessories.media.loader.worker.result">Cause</a>&nbsp;cause)</pre>
 </li>
 </ul>
-<a name="callOnProgress-dev.nick.accessories.media.worker.ProgressListener-int-">
+<a name="callOnProgress-dev.nick.accessories.media.loader.worker.ProgressListener-int-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>callOnProgress</h4>
-<pre>protected&nbsp;void&nbsp;callOnProgress(<a href="../../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.worker">ProgressListener</a>&lt;T&gt;&nbsp;listener,
+<pre>protected&nbsp;void&nbsp;callOnProgress(<a href="../../../../dev/nick/imageloader/worker/ProgressListener.html" title="interface in dev.nick.accessories.media.loader.worker">ProgressListener</a>&lt;T&gt;&nbsp;listener,
                               int&nbsp;progress)</pre>
 </li>
 </ul>
@@ -419,8 +419,8 @@ extends java.lang.Object</pre>
 </div>
 <div class="subNav">
 <ul class="navList">
-<li><a href="../../../../dev/nick/imageloader/worker/DecodeSpec.html" title="class in dev.nick.accessories.media.worker"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
-<li><a href="../../../../dev/nick/imageloader/worker/FileImageFetcher.html" title="class in dev.nick.accessories.media.worker"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
+<li><a href="../../../../dev/nick/imageloader/worker/DecodeSpec.html" title="class in dev.nick.accessories.media.loader.worker"><span class="typeNameLink">Prev&nbsp;Class</span></a></li>
+<li><a href="../../../../dev/nick/imageloader/worker/FileImageFetcher.html" title="class in dev.nick.accessories.media.loader.worker"><span class="typeNameLink">Next&nbsp;Class</span></a></li>
 </ul>
 <ul class="navList">
 <li><a href="../../../../index.html?dev/nick/imageloader/worker/DrawableImageFetcher.html" target="_top">Frames</a></li>

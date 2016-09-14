@@ -23,8 +23,8 @@ import android.widget.TextView;
 
 import dev.nick.accessories.injection.Injector;
 import dev.nick.accessories.injection.annotation.binding.BindView;
-import dev.nick.accessories.media.MediaLoader;
-import dev.nick.accessories.media.control.StorageStats;
+import dev.nick.accessories.media.loader.MediaLoader;
+import dev.nick.accessories.media.loader.control.StorageStats;
 import dev.nick.accessoriestest.R;
 
 public class Usage extends AppCompatActivity {

@@ -63,7 +63,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
             @Override
             public void run() {
                 int po = 0;
-                while (true) {
+                while (mState != State.Destroy) {
                     if (isPlaying()) {
                         int last = po;
                         po = mPlayer.getCurrentPosition();
@@ -97,7 +97,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
             SharedExecutor.get().execute(new Runnable() {
                 @Override
                 public void run() {
-                  while (true) {
+                  while (mState != State.Destroy) {
                       if (mPlayer.isPlaying()) {
                           setState(State.Playing);
                           notifyPlaying(track);
@@ -317,6 +317,12 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
         play(tracks.get(next));
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        setState(State.Destroy);
+    }
+
     private State getState() {
         return mState;
     }
@@ -337,7 +343,7 @@ public class MediaPlayerService extends Service implements MediaPlayer.OnComplet
     }
 
     private enum State {
-        Playing, Paused, Stopped, Idle
+        Playing, Paused, Stopped, Idle, Destroy
     }
 
     public interface PlayMode {

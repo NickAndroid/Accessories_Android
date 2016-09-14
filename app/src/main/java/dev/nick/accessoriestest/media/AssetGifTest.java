@@ -25,11 +25,11 @@ import android.view.animation.Animation;
 import dev.nick.accessories.injection.Injector;
 import dev.nick.accessories.injection.annotation.binding.BindView;
 import dev.nick.accessories.logger.LoggerManager;
-import dev.nick.accessories.media.MediaLoader;
-import dev.nick.accessories.media.ui.MediaHolder;
-import dev.nick.accessories.media.worker.ProgressListener;
-import dev.nick.accessories.media.worker.result.Cause;
-import dev.nick.accessories.media.worker.result.ErrorListener;
+import dev.nick.accessories.media.loader.MediaLoader;
+import dev.nick.accessories.media.loader.ui.MediaHolder;
+import dev.nick.accessories.media.loader.worker.ProgressListener;
+import dev.nick.accessories.media.loader.worker.result.Cause;
+import dev.nick.accessories.media.loader.worker.result.ErrorListener;
 import dev.nick.accessoriestest.R;
 
 public class AssetGifTest extends BaseTest {
