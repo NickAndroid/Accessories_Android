@@ -24,6 +24,7 @@ import android.support.annotation.Nullable;
 
 import java.io.InterruptedIOException;
 
+import dev.nick.accessories.logger.LoggerManager;
 import dev.nick.accessories.media.loader.LoaderConfig;
 import dev.nick.accessories.media.loader.ui.MediaQuality;
 import dev.nick.accessories.media.loader.worker.DecodeSpec;
@@ -34,7 +35,6 @@ import dev.nick.accessories.media.loader.worker.MediaSource;
 import dev.nick.accessories.media.loader.worker.ProgressListener;
 import dev.nick.accessories.media.loader.worker.result.Cause;
 import dev.nick.accessories.media.loader.worker.result.ErrorListener;
-import dev.nick.accessories.logger.LoggerManager;
 
 public class BitmapDisplayTask extends BaseDisplayTask<Bitmap> {
 
